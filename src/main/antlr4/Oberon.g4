@@ -1,14 +1,16 @@
 grammar Oberon;
 
-start : CompilationUnit ;
-
-CompilationUnit
-  : 'MODULE' Id ';' ('CONST' Constant*)? 'END' Id '.'
+compilationUnit
+  : 'MODULE' name = Id ';' ('CONST' constant*)? 'END' Id '.'
   ;  
 
-Constant
-  : Id '=' Number ';'
+constant
+  : varName = Id '=' exp = expression ';'
   ;   
+
+expression
+ : intValue = Number
+ ;
 
 Id : CharDef (CharDef | Digit | '_')* ; 
 
@@ -23,7 +25,7 @@ Number
 Digit
   : '0'..'9'
   ;
-  
+
 //
 // Whitespace and comments
 //
