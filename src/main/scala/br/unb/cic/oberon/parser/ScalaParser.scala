@@ -3,7 +3,8 @@ package br.unb.cic.oberon.parser
 import org.antlr.v4.runtime._
 
 import br.unb.cic.oberon.ast._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+
 /**
   * A parser for the Oberon language using 
   * the ANTLR infrastructure. The main idea of 
