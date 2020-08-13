@@ -1,12 +1,16 @@
 grammar Oberon;
 
 compilationUnit
-  : 'MODULE' name = Id ';' ('CONST' constant*)? 'END' Id '.'
+  : 'MODULE' name = Id ';' ('CONST' constant*)? ('VAR' varDeclaration*)? 'END' Id '.'
   ;  
 
 constant
   : varName = Id '=' exp = expression ';'
-  ;   
+  ;
+
+varDeclaration
+  : Id (',' Id)* ':' Type ';'
+  ; 
 
 expression
  : intValue = Number
@@ -26,6 +30,14 @@ Digit
   : '0'..'9'
   ;
 
+
+Type
+ : INTEGER
+ | BOOL
+ ;
+ 
+INTEGER : 'INTEGER'; 
+BOOL    : 'BOOLEAN'; 
 //
 // Whitespace and comments
 //
