@@ -9,11 +9,16 @@ constant
   ;
 
 varDeclaration
-  : Id (',' Id)* ':' Type ';'
+  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'
   ; 
 
 expression
  : intValue = Number
+ ;
+
+oberonType
+ : 'INTEGER'
+ | 'BOOLEAN'
  ;
 
 Id : CharDef (CharDef | Digit | '_')* ; 
@@ -30,14 +35,8 @@ Digit
   : '0'..'9'
   ;
 
-
-Type
- : INTEGER
- | BOOL
- ;
  
-INTEGER : 'INTEGER'; 
-BOOL    : 'BOOLEAN'; 
+
 //
 // Whitespace and comments
 //
