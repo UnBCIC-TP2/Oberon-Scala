@@ -13,10 +13,12 @@ varDeclaration
   ; 
 
 expression
- : boolValue                                               #BooleanValue 
- | intValue                                                #IntegerValue
+ : '(' expression ')'                                             #Brackets
+ | intValue                                                       #IntegerValue
+ | Id                                                             #Variable
  | left = expression opr = ('*' | '/' | '&&') right = expression  #MultExpression  // '*' must come before '+', due to precedence
  | left = expression opr = ('+' | '-' | '||') right = expression  #AddExpression
+ | boolValue                                                      #BooleanValue 
  ;
 
 // <assoc=right> expr '::' expr

@@ -116,7 +116,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
   }
 
-    test("Testing the oberon simple07 code. This module has two compounds constants and two variables") {
+  test("Testing the oberon simple07 code. This module has two compounds constants and two variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").getFile)
 
     assert(path != null)
@@ -137,5 +137,34 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.size == 2)
     assert(module.variables(0) == VariableDeclaration(List(Variable("abc")), IntegerType))
     assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+  }
+
+  test("Testing the oberon simple08 code. This module has three constants and two variables") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+    assert(module.constants.size == 3)
+    assert(module.constants(0) == Constant(Variable("x"), BoolValue(false)))
+    assert(module.constants(1) == Constant(Variable("y"), BoolValue(true)))
+    assert(module.constants(2) == Constant(Variable("z"), AndExpression(BoolValue(true), BoolValue(false))))
+  }
+
+  ignore("Testing the oberon simple09 code. This module has one constant involving an 'and' and an 'or'") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+    assert(module.constants.size == 1)
+    assert(module.constants(0) == Constant(Variable("x"), OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+
   }
 }
