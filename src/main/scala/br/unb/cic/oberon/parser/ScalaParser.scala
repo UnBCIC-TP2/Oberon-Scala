@@ -1,8 +1,9 @@
 package br.unb.cic.oberon.parser
 
 import org.antlr.v4.runtime._
-
 import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.parser.OberonParser.ExpressionContext
+
 import scala.jdk.CollectionConverters._
 
 /**
@@ -94,20 +95,37 @@ class ParserVisitor {
    class ExpressionVisitor() extends OberonBaseVisitor[Unit] {
      var exp : Expression = _
 
-     override def visitIntValue(ctx: OberonParser.IntValueContext) {
+     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
        exp = IntValue(ctx.getText.toInt)
-     }
 
-     override def visitBoolValue(ctx: OberonParser.BoolValueContext) {
+     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
        exp = BoolValue(ctx.getText == "True")
-     }
 
-     override def visitAddExpression(ctx: OberonParser.AddExpressionContext) {
-       ctx.left.accept(this)
-       val lhs = exp
-       ctx.right.accept(this)
-       val rhs = exp
-       exp = AddExpression(lhs, rhs)
+     override def visitAddExpression(ctx: OberonParser.AddExpressionContext): Unit =
+      visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+
+     override def visitMultExpression(ctx: OberonParser.MultExpressionContext): Unit =
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+
+     private def expression(opr : String) : (Expression, Expression) => Expression =
+       opr match {
+         case "+"  => AddExpression
+         case "-"  => SubExpression
+         case "*"  => MultExpression
+         case "/"  => DivExpression
+         case "&&" => AndExpression
+         case "||" => OrExpression
+       }
+
+     /*
+      * The "ugly" code for visiting binary expressions.
+      */
+     private def visitBinExpression(left: OberonParser.ExpressionContext, right: OberonParser.ExpressionContext, constructor: (Expression, Expression)=> Expression) {
+       left.accept(this)      // first visit the left hand side of an expression.
+       val lhs = exp                 // assign the result to the value lhs
+       right.accept(this)    // second, visit the right hand side of an expression
+       val rhs = exp                // assign the result to the value rhs
+       exp = constructor(lhs, rhs)  // assign the result to exp, using constructor to set the actual expression
      }
    }
 }
