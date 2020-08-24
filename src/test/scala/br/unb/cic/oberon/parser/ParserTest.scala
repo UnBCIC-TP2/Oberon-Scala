@@ -38,4 +38,46 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(0) == VariableDeclaration(List(Variable("abc")), IntegerType))
     assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
   }
+
+  test("Testing the oberon simple03 code. This module has three constants and two variables") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+    assert(module.constants.size == 3)
+    assert(module.constants(0) == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
+    assert(module.constants(2) == Constant(Variable("z"), BoolValue(true)))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables(0) == VariableDeclaration(List(Variable("abc")), IntegerType))
+    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+  }
+
+  test("Testing the oberon simple04 code. This module has three constants and two variables") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+    assert(module.constants.size == 3)
+    assert(module.constants(0) == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
+    assert(module.constants(2) == Constant(Variable("z"), AddExpression(IntValue(5), IntValue(10))))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables(0) == VariableDeclaration(List(Variable("abc")), IntegerType))
+    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+  }
+
+
 }

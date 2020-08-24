@@ -17,6 +17,8 @@ case class Variable(name: String)
 /* Expressions */
 trait Expression
 case class IntValue(value: Int) extends Expression
+case class BoolValue(value: Boolean) extends Expression
+case class AddExpression(left: Expression, right: Expression) extends Expression
 
 /* Types */
 trait Type

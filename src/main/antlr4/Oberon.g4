@@ -13,30 +13,35 @@ varDeclaration
   ; 
 
 expression
- : intValue = Number
+ : boolValue                                #BooleanValue 
+ | intValue                                 #IntegerValue
+ | left = expression '+' right = expression #AddExpression
  ;
+
+intValue : INT ;
+
+boolValue: TRUE | FALSE ;
 
 oberonType
  : 'INTEGER'
  | 'BOOLEAN'
  ;
 
-Id : CharDef (CharDef | Digit | '_')* ; 
+INT : Digit+;
+
+TRUE  : 'True' ;
+FALSE : 'False'  ;
+
+
+Id : CharDef (CharDef | Digit | '_')* ;
 
 CharDef
   : ('a'..'z') | ('A' .. 'Z')
-  ; 
-
-Number
-  : '1'..'9' (Digit)*
-  ;
-  
-Digit
-  : '0'..'9'
   ;
 
+
+fragment Digit : [0-9] ;
  
-
 //
 // Whitespace and comments
 //

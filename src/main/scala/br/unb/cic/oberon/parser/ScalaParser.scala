@@ -46,8 +46,9 @@ class ParserVisitor {
    */
   def visitConstant(ctx: OberonParser.ConstantContext): Constant = {
     val variable = Variable(ctx.varName.getText)
-    val value = visitExpression(ctx.exp)
-    Constant(variable, value)
+    val v = new ExpressionVisitor()
+    ctx.accept(v)
+    Constant(variable, v.exp)
   }
 
   /**
@@ -62,12 +63,16 @@ class ParserVisitor {
   }
 
   /**
-   * Visit an expression node
+   * Visit an int expression node
    * @param ctx the context expression
-   * @return the abstract representation of an expression.
+   * @return the abstract representation of an int expression.
    */
-  def visitExpression(ctx: OberonParser.ExpressionContext) : Expression = {
-    IntValue(ctx.Number().getText.toInt)
+  def visitExpression(ctx: OberonParser.IntValueContext): Expression = {
+    IntValue(ctx.getText.toInt)
+  }
+
+  def visitExpression(ctx: OberonParser.BoolValueContext): Expression = {
+    BoolValue(ctx.getText == "True")
   }
 
   /**
@@ -85,4 +90,24 @@ class ParserVisitor {
       case "BOOLEAN" => BooleanType
       case _         => UndefinedType
     }
+
+   class ExpressionVisitor() extends OberonBaseVisitor[Unit] {
+     var exp : Expression = _
+
+     override def visitIntValue(ctx: OberonParser.IntValueContext) {
+       exp = IntValue(ctx.getText.toInt)
+     }
+
+     override def visitBoolValue(ctx: OberonParser.BoolValueContext) {
+       exp = BoolValue(ctx.getText == "True")
+     }
+
+     override def visitAddExpression(ctx: OberonParser.AddExpressionContext) {
+       ctx.left.accept(this)
+       val lhs = exp
+       ctx.right.accept(this)
+       val rhs = exp
+       exp = AddExpression(lhs, rhs)
+     }
+   }
 }
