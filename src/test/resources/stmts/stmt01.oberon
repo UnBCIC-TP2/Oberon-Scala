@@ -1,0 +1,13 @@
+MODULE SimpleModule;
+  
+VAR
+  x : INTEGER;
+  y : INTEGER;
+
+BEGIN
+ read(x);
+ read(y);
+ write(x + y)
+END
+
+END SimpleModule.

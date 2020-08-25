@@ -167,4 +167,59 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants(0) == Constant(Variable("x"), OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
 
   }
+
+  test("Testing the oberon stmt01 code. This module has a block of three statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(!module.stmt.isEmpty)
+
+    // assert that the main block containts a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmt in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) == ReadStmt("x"))
+    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts(2) == WriteStmt(AddExpression(VarExpression("x"), VarExpression("y"))))
+  }
+
+  test("Testing the oberon stmt02 code. This module has a block of four statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(!module.stmt.isEmpty)
+
+    // assert that the main block containts a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case _ => fail("we are expecting three stmt in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) == ReadStmt("x"))
+    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(stmts(3) == WriteStmt(VarExpression("z")))
+  }
 }

@@ -1,9 +1,11 @@
 package br.unb.cic.oberon.ast
 
+/* Abstract representation of an Oberon Module */
 case class OberonModule(
                          name: String,
                          constants: List[Constant],
-                         variables: List[VariableDeclaration]
+                         variables: List[VariableDeclaration],
+                         stmt: Option[Statement]
                        )
 /* Constant definition */
 case class Constant(variable: Variable, exp: Expression)
@@ -27,6 +29,14 @@ case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
 
+/* Statements */
+trait Statement
+case class AssignmentStmt(varName: String, exp: Expression) extends Statement
+case class SequenceStmt(stmts: List[Statement]) extends Statement
+case class ReadStmt(varName: String) extends Statement
+case class WriteStmt(expression: Expression) extends Statement
+case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
+case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 
 /* Types */
 trait Type
