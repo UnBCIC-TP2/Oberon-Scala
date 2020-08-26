@@ -110,6 +110,9 @@ class ParserVisitor {
      override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
        exp = BoolValue(ctx.getText == "True")
 
+     override def visitRelExpression(ctx: OberonParser.RelExpressionContext): Unit =
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+
      override def visitAddExpression(ctx: OberonParser.AddExpressionContext): Unit =
       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
@@ -125,12 +128,18 @@ class ParserVisitor {
 
       private def expression(opr : String) : (Expression, Expression) => Expression =
        opr match {
-         case "+"  => AddExpression
-         case "-"  => SubExpression
-         case "*"  => MultExpression
-         case "/"  => DivExpression
-         case "&&" => AndExpression
-         case "||" => OrExpression
+         case "="   => EQExpression
+         case "#"   => NEQExpression
+         case ">"   => GTExpression
+         case "<"   => LTExpression
+         case ">="  => GTEExpression
+         case "<="  => LTEExpression
+         case "+"   => AddExpression
+         case "-"   => SubExpression
+         case "*"   => MultExpression
+         case "/"   => DivExpression
+         case "&&"  => AndExpression
+         case "||"  => OrExpression
        }
 
      /*

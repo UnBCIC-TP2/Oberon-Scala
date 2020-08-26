@@ -22,6 +22,13 @@ case class Brackets(exp: Expression) extends Expression
 case class IntValue(value: Int) extends Expression
 case class BoolValue(value: Boolean) extends Expression
 case class VarExpression(name: String) extends Expression
+case class EQExpression(left:  Expression, right: Expression) extends Expression
+case class NEQExpression(left:  Expression, right: Expression) extends Expression
+case class GTExpression(left:  Expression, right: Expression) extends Expression
+case class LTExpression(left:  Expression, right: Expression) extends Expression
+case class GTEExpression(left:  Expression, right: Expression) extends Expression
+case class LTEExpression(left:  Expression, right: Expression) extends Expression
+
 case class AddExpression(left: Expression, right: Expression) extends Expression
 case class SubExpression(left: Expression, right: Expression) extends Expression
 case class MultExpression(left: Expression, right: Expression) extends Expression

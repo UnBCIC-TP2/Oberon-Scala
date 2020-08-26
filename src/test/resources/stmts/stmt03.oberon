@@ -2,13 +2,14 @@ MODULE SimpleModule;
   
 VAR
   x : INTEGER;
-  y : INTEGER;
-
+  max : INTEGER; 
 BEGIN
  read(x);
- read(y);
- z := x + y;
- write(z)
+ read(max);
+ IF(x > max) THEN
+   max := x 
+ END; 
+ write(max)
 END
 
 END SimpleModule.

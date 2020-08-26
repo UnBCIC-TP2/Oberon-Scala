@@ -17,13 +17,13 @@ block
  ; 
     
 expression
- : '(' expression ')'                                             #Brackets
- | intValue                                                       #IntegerValue
- | Id                                                             #Variable
- | left = expression opr = ('==' | '#=') right = expression      #RelExpression 
- | left = expression opr = ('*' | '/' | '&&') right = expression  #MultExpression  // '*' must come before '+', due to precedence
- | left = expression opr = ('+' | '-' | '||') right = expression  #AddExpression
- | boolValue                                                      #BooleanValue 
+ : '(' expression ')'                                                                     #Brackets
+ | intValue                                                                               #IntegerValue
+ | Id                                                                                     #Variable
+ | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
+ | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  // '*' must come before '+', due to precedence
+ | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ | boolValue                                                                              #BooleanValue 
  ;
 
 statement
