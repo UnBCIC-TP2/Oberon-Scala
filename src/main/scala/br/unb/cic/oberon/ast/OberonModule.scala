@@ -4,7 +4,7 @@ package br.unb.cic.oberon.ast
 case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
-                        procedires: List[Procedure],
+                        procedures: List[Procedure],
                         stmt: Option[Statement]
                        )
 
@@ -35,13 +35,13 @@ case class Brackets(exp: Expression) extends Expression
 case class IntValue(value: Int) extends Expression
 case class BoolValue(value: Boolean) extends Expression
 case class VarExpression(name: String) extends Expression
+case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
 case class NEQExpression(left:  Expression, right: Expression) extends Expression
 case class GTExpression(left:  Expression, right: Expression) extends Expression
 case class LTExpression(left:  Expression, right: Expression) extends Expression
 case class GTEExpression(left:  Expression, right: Expression) extends Expression
 case class LTEExpression(left:  Expression, right: Expression) extends Expression
-
 case class AddExpression(left: Expression, right: Expression) extends Expression
 case class SubExpression(left: Expression, right: Expression) extends Expression
 case class MultExpression(left: Expression, right: Expression) extends Expression
@@ -55,8 +55,10 @@ case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
+case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
+case class ReturnStmt(exp: Expression) extends Statement
 
 /* Types */
 trait Type

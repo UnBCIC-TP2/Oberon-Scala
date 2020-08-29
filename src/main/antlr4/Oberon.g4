@@ -23,8 +23,14 @@ procedure :
    Id
   ; 
 
-formals : formalArg (',' formalArg)* ;
+formals
+ : formalArg (',' formalArg)*
+ ;
 
+arguments
+ : expression (',' expression)*
+ ;
+ 
 formalArg 
  : (args += Id (',' args += Id)*) ':' argType = oberonType ';' 
  ; // TODO: we should also support VarBased formal arguments.
@@ -36,11 +42,12 @@ block
 expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
- | Id                                                                                     #Variable
- | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
- | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  // '*' must come before '+', due to precedence
- | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
  | boolValue                                                                              #BooleanValue 
+ | name = Id                                                                              #Variable
+ | name = Id '(' arguments? ')'                                                           #FunctionCall       
+ | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
+ | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
+ | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
  ;
 
 statement
@@ -48,8 +55,10 @@ statement
  | stmt += statement (';' stmt += statement)+                                              #SequenceStmt
  | 'read'  '(' var = Id ')'                                                                #ReadStmt
  | 'write' '(' expression ')'                                                              #WriteStmt
+ | name = Id '(' arguments? ')'                                                            #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                   #WhileStmt
+ | 'RETURN' exp = expression                                                               #ReturnStmt
  ; 
  
 // TODO: NOT, MOD, Relational operators, 

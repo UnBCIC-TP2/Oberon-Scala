@@ -143,6 +143,17 @@ class ParserVisitor {
        ctx.expression().accept(this)
      }
 
+      override def visitFunctionCall(ctx: OberonParser.FunctionCallContext): Unit = {
+        val name = ctx.name.getText
+        val args = new ListBuffer[Expression]
+
+        ctx.arguments().expression().forEach(e => {
+          e.accept(this)
+          args += exp
+        })
+        exp = FunctionCallExpression(name, args.toList)
+      }
+
       private def expression(opr : String) : (Expression, Expression) => Expression =
        opr match {
          case "="   => EQExpression
@@ -160,7 +171,7 @@ class ParserVisitor {
        }
 
      /*
-      * The "ugly" code for visiting binary expressions.
+      * The "ugly", though necessary code for visiting binary expressions.
       */
      private def visitBinExpression(left: OberonParser.ExpressionContext, right: OberonParser.ExpressionContext, constructor: (Expression, Expression)=> Expression) {
        left.accept(this)      // first visit the left hand side of an expression.
@@ -202,6 +213,18 @@ class ParserVisitor {
       stmt = WriteStmt(visitor.exp)
     }
 
+    override def visitProcedureCall(ctx: OberonParser.ProcedureCallContext): Unit = {
+      val name = ctx.name.getText
+      val args = new ListBuffer[Expression]
+      val visitor = new ExpressionVisitor()
+
+      ctx.arguments().expression().asScala.map(e => {
+        e.accept(visitor)
+        args += visitor.exp
+      })
+      stmt = ProcedureCallStmt(name, args.toList)
+    }
+
     override def visitIfElseStmt(ctx: OberonParser.IfElseStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
@@ -229,6 +252,12 @@ class ParserVisitor {
       val whileStmt = stmt
 
       stmt = WhileStmt(condition, whileStmt)
+    }
+
+    override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
+      ctx.exp.accept(visitor)
+      stmt = ReturnStmt(visitor.exp)
     }
   }
 
