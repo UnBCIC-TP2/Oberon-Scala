@@ -1,17 +1,34 @@
 grammar Oberon;
 
 compilationUnit
-  : 'MODULE' name = Id ';' ('CONST' constant*)? ('VAR' varDeclaration*)? block? 'END' Id '.'
+  : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
   ;  
 
+declarations
+  : ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  ;
+  
 constant
-  : varName = Id '=' exp = expression ';'
+  : constName = Id '=' exp = expression ';'
   ;
 
 varDeclaration
   : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
   ; 
 
+procedure :
+  'PROCEDURE' name = Id '(' formals?  ')' (: procedureType = oberonType)? ';'
+    declarations    // NOTE: This might support nested procedures
+    block
+   Id
+  ; 
+
+formals : formalArg (',' formalArg)* ;
+
+formalArg 
+ : (args += Id (',' args += Id)*) ':' argType = oberonType ';' 
+ ; // TODO: we should also support VarBased formal arguments.
+ 
 block
  : 'BEGIN' statement 'END'
  ; 
@@ -61,7 +78,7 @@ CharDef
 
 
 fragment Digit : [0-9] ;
- 
+
 //
 // Whitespace and comments
 //

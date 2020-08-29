@@ -35,11 +35,12 @@ class ParserVisitor {
 
   def visitCompilationUnit(ctx: OberonParser.CompilationUnitContext): Unit = {
     val name = ctx.name
-    val constants = ctx.constant().asScala.toList.map(c => visitConstant(c))
-    val variables = ctx.varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v))
+    val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
+    val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
+    val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, constants, variables, block)
+    module = OberonModule(name.getText, constants, variables, procedures, block)
   }
 
   /**
@@ -66,7 +67,7 @@ class ParserVisitor {
    * @return a constant declaration representation
    */
   def visitConstant(ctx: OberonParser.ConstantContext): Constant = {
-    val variable = Variable(ctx.varName.getText)
+    val variable = Variable(ctx.constName.getText)
     val v = new ExpressionVisitor()
     ctx.accept(v)
     Constant(variable, v.exp)
@@ -77,10 +78,26 @@ class ParserVisitor {
    * @param ctx variable declaration context
    * @return a variable declaration representation
    */
-  def visitVariableDeclaration(ctx: OberonParser.VarDeclarationContext): VariableDeclaration = {
-    val variables = ctx.vars.asScala.toList.map(v => Variable(v.getText))
+  def visitVariableDeclaration(ctx: OberonParser.VarDeclarationContext): List[VariableDeclaration] = {
     val variableType = visitOberonType(ctx.varType)
-    VariableDeclaration(variables, variableType)
+    ctx.vars.asScala.toList.map(v => VariableDeclaration(v.getText, variableType))
+  }
+
+  def visitProcedureDeclaration(ctx: OberonParser.ProcedureContext): Procedure = {
+    val name = ctx.name.getText
+    val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
+    val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
+    val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
+    val block = visitModuleBlock(ctx.block())
+
+    val returnType = if(ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
+
+    Procedure(name, args, returnType, constants, variables, block.get)
+  }
+
+  def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
+    val argType = visitOberonType(ctx.argType)
+    ctx.args.asScala.toList.map(arg => FormalArg(arg.getText, argType))
   }
 
 
@@ -148,7 +165,7 @@ class ParserVisitor {
      private def visitBinExpression(left: OberonParser.ExpressionContext, right: OberonParser.ExpressionContext, constructor: (Expression, Expression)=> Expression) {
        left.accept(this)      // first visit the left hand side of an expression.
        val lhs = exp                 // assign the result to the value lhs
-       right.accept(this)    // second, visit the right hand side of an expression
+       right.accept(this)     // second, visit the right hand side of an expression
        val rhs = exp                 // assign the result to the value rhs
        exp = constructor(lhs, rhs)   // assign the result to exp, using the 'constructor' to set the actual expression
      }

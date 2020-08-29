@@ -33,8 +33,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
   test("Testing the oberon simple03 code. This module has three constants and two variables") {
@@ -52,8 +52,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants(2) == Constant(Variable("z"), BoolValue(true)))
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
   test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
@@ -72,8 +72,8 @@ class ParserTestSuite extends AnyFunSuite {
 
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
   test("Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables") {
@@ -90,8 +90,8 @@ class ParserTestSuite extends AnyFunSuite {
 
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
 
@@ -109,8 +109,8 @@ class ParserTestSuite extends AnyFunSuite {
 
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
   test("Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables") {
@@ -131,8 +131,8 @@ class ParserTestSuite extends AnyFunSuite {
            IntValue(5)))))
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration(List(Variable("abc")), IntegerType))
-    assert(module.variables(1) == VariableDeclaration(List(Variable("def")), BooleanType))
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
   test("Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables") {

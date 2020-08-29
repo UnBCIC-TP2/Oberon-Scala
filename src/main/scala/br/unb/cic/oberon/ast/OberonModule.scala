@@ -1,17 +1,30 @@
 package br.unb.cic.oberon.ast
 
 /* Abstract representation of an Oberon Module */
-case class OberonModule(
-                         name: String,
-                         constants: List[Constant],
-                         variables: List[VariableDeclaration],
-                         stmt: Option[Statement]
+case class OberonModule(name: String,
+                        constants: List[Constant],
+                        variables: List[VariableDeclaration],
+                        procedires: List[Procedure],
+                        stmt: Option[Statement]
                        )
+
+/* procedure declaration definition */
+case class Procedure(name: String,
+                     args: List[FormalArg],
+                     returnType: Option[Type],
+                     constants: List[Constant],
+                     variables: List[VariableDeclaration],
+                     stmt: Statement
+                    )
+
+/* formal argument definition */
+case class FormalArg(name: String, argumentType: Type)
+
 /* Constant definition */
-case class Constant(variable: Variable, exp: Expression)
+case class Constant(name: Variable, exp: Expression)
 
 /* Variable declaration definition */
-case class VariableDeclaration(variables: List[Variable], variableType: Type)
+case class VariableDeclaration(nane: String, variableType: Type)
 
 /* Variable definition */
 case class Variable(name: String)
