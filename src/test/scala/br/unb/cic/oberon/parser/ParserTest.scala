@@ -322,4 +322,35 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmt.stmts(1) == ReadStmt("y"))
     assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
   }
+
+  test("Testing the oberon procedure02 code. This module resembles the code of the LDTA challenge") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Multiples")
+
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+
+    val procedure = module.procedures.head
+
+    assert(procedure.name == "calcmult")
+    assert(procedure.args.size == 2)
+    assert(procedure.returnType == Some(IntegerType))
+
+    procedure.stmt match {
+      case ReturnStmt(MultExpression(VarExpression("i"), VarExpression("base"))) => succeed
+      case _ => fail("expecting a return i * base stmt")
+    }
+
+    assert(module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.head == ReadStmt("base"))
+  }
 }
