@@ -67,7 +67,7 @@ class ParserVisitor {
    * @return a constant declaration representation
    */
   def visitConstant(ctx: OberonParser.ConstantContext): Constant = {
-    val variable = Variable(ctx.constName.getText)
+    val variable = ctx.constName.getText
     val v = new ExpressionVisitor()
     ctx.accept(v)
     Constant(variable, v.exp)

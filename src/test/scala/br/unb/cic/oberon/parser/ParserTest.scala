@@ -17,7 +17,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
   }
 
 
@@ -31,7 +31,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
@@ -47,9 +47,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
-    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
-    assert(module.constants(2) == Constant(Variable("z"), BoolValue(true)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", BoolValue(true)))
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
@@ -66,9 +66,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
-    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
-    assert(module.constants(2) == Constant(Variable("z"), AddExpression(IntValue(5), IntValue(10))))
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", AddExpression(IntValue(5), IntValue(10))))
 
 
     assert(module.variables.size == 2)
@@ -86,7 +86,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("z"), MultExpression(IntValue(5), IntValue(10))))
+    assert(module.constants.head == Constant("z", MultExpression(IntValue(5), IntValue(10))))
 
 
     assert(module.variables.size == 2)
@@ -105,7 +105,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("z"), AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+    assert(module.constants.head == Constant("z", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
 
 
     assert(module.variables.size == 2)
@@ -123,8 +123,8 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 2)
-    assert(module.constants.head == Constant(Variable("x"), AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
-      assert(module.constants(1) == Constant(Variable("y"),
+    assert(module.constants.head == Constant("x", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+      assert(module.constants(1) == Constant("y",
         AddExpression(IntValue(5),
          DivExpression(
            MultExpression(IntValue(10), IntValue(3)),
@@ -145,9 +145,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), BoolValue(false)))
-    assert(module.constants(1) == Constant(Variable("y"), BoolValue(true)))
-    assert(module.constants(2) == Constant(Variable("z"), AndExpression(BoolValue(true), BoolValue(false))))
+    assert(module.constants.head == Constant("x", BoolValue(false)))
+    assert(module.constants(1) == Constant("y", BoolValue(true)))
+    assert(module.constants(2) == Constant("z", AndExpression(BoolValue(true), BoolValue(false))))
   }
 
   ignore("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
@@ -160,7 +160,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+    assert(module.constants.head == Constant("x", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {
