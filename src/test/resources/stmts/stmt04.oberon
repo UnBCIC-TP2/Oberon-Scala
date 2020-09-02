@@ -5,8 +5,8 @@ VAR
   y : INTEGER;
   
 BEGIN
- read(x);
- read(y);
+ readInt(x);
+ readInt(y);
  WHILE(x < y) DO
    x := x * x
  END;

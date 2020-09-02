@@ -202,9 +202,9 @@ class ParserVisitor {
       stmt = SequenceStmt(stmts.toList)
     }
 
-    override def visitReadStmt(ctx: OberonParser.ReadStmtContext): Unit = {
+    override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
-      stmt = ReadStmt(varName)
+      stmt = ReadIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {

@@ -53,7 +53,7 @@ expression
 statement
  : var = Id ':=' exp = expression                                                          #AssignmentStmt
  | stmt += statement (';' stmt += statement)+                                              #SequenceStmt
- | 'read'  '(' var = Id ')'                                                                #ReadStmt
+ | 'readInt'  '(' var = Id ')'                                                             #ReadIntStmt
  | 'write' '(' expression ')'                                                              #WriteStmt
  | name = Id '(' arguments? ')'                                                            #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt

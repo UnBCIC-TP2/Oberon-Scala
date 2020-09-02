@@ -67,7 +67,7 @@ trait Statement {
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
-case class ReadStmt(varName: String) extends Statement
+case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement

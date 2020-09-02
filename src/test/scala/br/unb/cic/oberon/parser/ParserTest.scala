@@ -185,8 +185,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
     assert(stmts(2) == WriteStmt(AddExpression(VarExpression("x"), VarExpression("y"))))
   }
 
@@ -212,8 +212,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
     assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
     assert(stmts(3) == WriteStmt(VarExpression("z")))
   }
@@ -240,8 +240,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("max"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("max"))
 
     // the third stmt must be an IfElseStmt
     stmts(2) match {
@@ -277,8 +277,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
 
     // the third stmt must be an WhileStmt
     stmts(2) match {
@@ -318,8 +318,8 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadStmt("x"))
-    assert(stmt.stmts(1) == ReadStmt("y"))
+    assert(stmt.stmts.head == ReadIntStmt("x"))
+    assert(stmt.stmts(1) == ReadIntStmt("y"))
     assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
   }
 
@@ -351,6 +351,6 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadStmt("base"))
+    assert(stmt.stmts.head == ReadIntStmt("base"))
   }
 }

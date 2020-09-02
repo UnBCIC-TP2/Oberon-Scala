@@ -10,7 +10,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class EvalExpressionVisitorTest extends AnyFunSuite {
 
   test("Test eval on simple values") {
-    val visitor = new EvalExpressionVisitor(new Environment[Expression]())
+    val visitor = new EvalExpressionVisitor(new Interpreter())
     val val10 = IntValue(10)
     val bTrue = BoolValue(true)
     val bFalse = BoolValue(false)
@@ -26,7 +26,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
   }
 
   test("Test eval on arithmetic expressions (add and mult)") {
-    val visitor = new EvalExpressionVisitor(new Environment[Expression]())
+    val visitor = new EvalExpressionVisitor(new Interpreter())
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val val30 = IntValue(30)
@@ -38,7 +38,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
   }
 
   test("Test eval on arithmetic expressions (sub and div)") {
-    val visitor = new EvalExpressionVisitor(new Environment[Expression]())
+    val visitor = new EvalExpressionVisitor(new Interpreter())
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val val30 = IntValue(30)
@@ -50,7 +50,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
   }
 
   test("Test eval on boolean expressions ('and' and 'or')") {
-    val visitor = new EvalExpressionVisitor(new Environment[Expression]())
+    val visitor = new EvalExpressionVisitor(new Interpreter())
 
     val valTrue = BoolValue(true)
     val valFalse = BoolValue(false)
@@ -63,10 +63,10 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
   }
 
   test("Test eval on global variables") {
-    val env = new Environment[Expression]()
-    env.declareGlobal("x", IntValue(30))
+    val interpreter = new Interpreter()
+    interpreter.setGlobalVariable("x", IntValue(30))
 
-    val visitor = new EvalExpressionVisitor(env)
+    val visitor = new EvalExpressionVisitor(interpreter)
 
     val exp = AddExpression(IntValue(10), VarExpression("x"))
 
@@ -76,11 +76,11 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
   }
 
   test("Test eval on local (stack) and global variables") {
-    val env = new Environment[Expression]()
-    env.declareGlobal("x", IntValue(30))
-    env.declareLocal("y", IntValue(10))
+    val interpreter = new Interpreter()
+    interpreter.setGlobalVariable("x", IntValue(30))
+    interpreter.setLocalVariable("y", IntValue(10))
 
-    val visitor = new EvalExpressionVisitor(env)
+    val visitor = new EvalExpressionVisitor(interpreter)
 
     val exp = AddExpression(VarExpression("x"), VarExpression("y"))
 
@@ -88,6 +88,6 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
     assert(visitor.result == IntValue(40))
   }
-  
+
   // TODO: Write test cases  dealing with different scopes and name collision.
 }
