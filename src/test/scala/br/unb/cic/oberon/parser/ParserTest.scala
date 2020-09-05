@@ -353,4 +353,43 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.stmts.head == ReadIntStmt("base"))
   }
+
+  test("Testing the oberon procedure03 code. This module implements a fatorial function") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Fatorial")
+
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+
+    val procedure = module.procedures.head
+
+    assert(procedure.name == "fatorial")
+    assert(procedure.args.size == 1)
+    assert(procedure.returnType == Some(IntegerType))
+
+    procedure.stmt match {
+      case SequenceStmt(_) => succeed
+      case _ => fail("expecting a sequence of stmts")
+    }
+
+    val SequenceStmt(stmts) = procedure.stmt // pattern matching...
+    assert(stmts.size == 2)
+
+    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
+    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("fatorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+
+    module.stmt.get match {
+      case SequenceStmt(ss) => {
+        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("fatorial", List(IntValue(5)))))
+        assert(ss(1) == WriteStmt(VarExpression("res")))
+      }
+      case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
+    }
+  }
 }

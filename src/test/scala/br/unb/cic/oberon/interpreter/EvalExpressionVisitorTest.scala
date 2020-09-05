@@ -1,10 +1,7 @@
 package br.unb.cic.oberon.interpreter
 
-import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, BoolValue, Constant, DivExpression, Expression, IntValue, MultExpression, OrExpression, SubExpression, VarExpression}
-import br.unb.cic.oberon.environment.Environment
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.ast._
 import org.scalatest.funsuite.AnyFunSuite
 
 class EvalExpressionVisitorTest extends AnyFunSuite {

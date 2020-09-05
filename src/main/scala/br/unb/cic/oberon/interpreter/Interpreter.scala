@@ -49,18 +49,27 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
-  override def visit(stmt: Statement): Unit = stmt match {
-    case AssignmentStmt(name, exp) => env.setVariable(name, exp)
-    case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
-    case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
-    case WriteStmt(exp) => println(exp)
-    case IfElseStmt(condition, thenStmt, elseStmt) => if(evalCondition(condition)) thenStmt.accept(this) else if(elseStmt.isDefined) elseStmt.get.accept(this)
-    case WhileStmt(condition, whileStmt) => while(evalCondition(condition)) whileStmt.accept(this)
-    case ReturnStmt(exp: Expression) => setReturnExpression(exp)
-    case ProcedureCallStmt(name, args) => {
-      env.push()
-      visitProcedureCall(name, args)
-      env.pop()
+  override def visit(stmt: Statement): Unit = {
+    // we first check if we achieved a return stmt.
+    // if so, we should not execute any other statement
+    // in a sequence.
+    if (env.lookup(Values.ReturnKeyWord).isDefined) {
+      return
+    }
+    // otherwise, we pattern-match on the stmt.
+    stmt match {
+      case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
+      case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
+      case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
+      case WriteStmt(exp) => println(evalExpression(exp))
+      case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
+      case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
+      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
+      case ProcedureCallStmt(name, args) => {
+        env.push()
+        visitProcedureCall(name, args.map(a => evalExpression(a)))
+        env.pop()
+      }
     }
   }
 
@@ -90,6 +99,12 @@ class Interpreter extends OberonVisitorAdapter {
     expression.accept(evalVisitor)
 
     evalVisitor.result.asInstanceOf[BoolValue].value
+  }
+
+  def evalExpression(expression: Expression) : Expression = {
+    val evalVisitor = new EvalExpressionVisitor(this)
+    expression.accept(evalVisitor)
+    evalVisitor.result
   }
 
   /*
@@ -131,8 +146,12 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case AndExpression(left, right) => binBoolExpression(left, right, (v1: Boolean, v2: Boolean) => BoolValue(v1 && v2))
     case OrExpression(left, right) => binBoolExpression(left, right, (v1: Boolean, v2: Boolean) => BoolValue(v1 || v2))
     case FunctionCallExpression(name, args) => {
+      val actualArguments = args.map(a => {
+        a.accept(this)
+        this.result
+      })
       interpreter.env.push()
-      visitFunctionCall(name, args)
+      visitFunctionCall(name, actualArguments)
       interpreter.env.pop()
     }
   }

@@ -81,7 +81,7 @@ FALSE : 'False'  ;
 
 Id : CharDef (CharDef | Digit | '_')* ;
 
-CharDef
+fragment CharDef
   : ('a'..'z') | ('A' .. 'Z')
   ;
 

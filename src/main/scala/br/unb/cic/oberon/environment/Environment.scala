@@ -53,9 +53,7 @@ class Environment[T] {
 
   def findProcedure(name: String) : Procedure = procedures(name)
 
-  @deprecated
   def push(): Unit = stack.push(Map.empty[String, T])
 
-  @deprecated
   def pop(): Unit = stack.pop()
 }

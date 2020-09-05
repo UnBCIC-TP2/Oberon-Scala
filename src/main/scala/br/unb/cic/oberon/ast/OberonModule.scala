@@ -8,7 +8,9 @@ case class OberonModule(name: String,
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
                         stmt: Option[Statement]
-                       )
+                       ) {
+  def accept(v: OberonVisitor): Unit = v.visit(this)
+}
 
 /* procedure declaration definition */
 case class Procedure(name: String,
