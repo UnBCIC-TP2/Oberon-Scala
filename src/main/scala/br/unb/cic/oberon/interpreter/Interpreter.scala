@@ -56,7 +56,7 @@ class Interpreter extends OberonVisitorAdapter {
     if (env.lookup(Values.ReturnKeyWord).isDefined) {
       return
     }
-    // otherwise, we pattern-match on the stmt.
+    // otherwise, we pattern-match on the current stmt.
     stmt match {
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
       case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
@@ -65,11 +65,10 @@ class Interpreter extends OberonVisitorAdapter {
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
       case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
-      case ProcedureCallStmt(name, args) => {
+      case ProcedureCallStmt(name, args) =>
         env.push()
         visitProcedureCall(name, args.map(a => evalExpression(a)))
         env.pop()
-      }
     }
   }
 
@@ -133,18 +132,18 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case BoolValue(v) => result = BoolValue(v)
     case Undef() => result = Undef()
     case VarExpression(name) => result = interpreter.env.lookup(name).get
-    case EQExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 == v2))
-    case NEQExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 != v2))
-    case GTExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 > v2))
-    case LTExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 < v2))
-    case GTEExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 >= v2))
-    case LTEExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => BoolValue(v1 <= v2))
-    case AddExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => IntValue(v1 + v2))
-    case SubExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => IntValue(v1 - v2))
-    case MultExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => IntValue(v1 * v2))
-    case DivExpression(left, right) => binIntExpression(left, right, (v1: Integer, v2: Integer) => IntValue(v1 / v2))
-    case AndExpression(left, right) => binBoolExpression(left, right, (v1: Boolean, v2: Boolean) => BoolValue(v1 && v2))
-    case OrExpression(left, right) => binBoolExpression(left, right, (v1: Boolean, v2: Boolean) => BoolValue(v1 || v2))
+    case EQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value == v2.value))
+    case NEQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value != v2.value))
+    case GTExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value > v2.value))
+    case LTExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value < v2.value))
+    case GTEExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value >= v2.value))
+    case LTEExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value <= v2.value))
+    case AddExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value + v2.value))
+    case SubExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value - v2.value))
+    case MultExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value * v2.value))
+    case DivExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value / v2.value))
+    case AndExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value && v2.value))
+    case OrExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value || v2.value))
     case FunctionCallExpression(name, args) => {
       val actualArguments = args.map(a => {
         a.accept(this)
@@ -166,30 +165,25 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     result = interpreter.env.lookup(Values.ReturnKeyWord).get
   }
 
-
-  def binIntExpression(left: Expression, right: Expression, fn: (Integer, Integer) => Expression): Unit = {
-    // reduce the left expression to a normal form
+  /**
+   * Eval a binary expression.
+   *
+   * @param left the left expression
+   * @param right the right expression
+   * @param fn a function that constructs an expression. Here we
+   *           are using again a high-order function. We assign to
+   *           the "result" visitor attribute the value we compute
+   *           after applying this function.
+   *
+   * @tparam T a type parameter to set the function fn correctly.
+   */
+  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression) : Unit = {
     left.accept(this)
-    val v1 = result.asInstanceOf[IntValue].value
+    val v1 = result.asInstanceOf[Value[T]]
 
-    // reduce the right expression to a normal form
     right.accept(this)
-    val v2 = result.asInstanceOf[IntValue].value
+    val v2 = result.asInstanceOf[Value[T]]
 
-    // applies the high order function fn.
-    result = fn(v1, v2)
-  }
-
-  def binBoolExpression(left: Expression, right: Expression, fn: (Boolean, Boolean) => Expression): Unit = {
-    // reduce the left expression to a normal form
-    left.accept(this)
-    val v1 = result.asInstanceOf[BoolValue].value
-
-    // reduce the right expression to a normal form
-    right.accept(this)
-    val v2 = result.asInstanceOf[BoolValue].value
-
-    // applies the high order function fn.
     result = fn(v1, v2)
   }
 }
