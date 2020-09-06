@@ -25,22 +25,22 @@ case class Procedure(name: String,
 
 /* formal argument definition */
 case class FormalArg(name: String, argumentType: Type) {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 /* Constant definition */
 case class Constant(name: String, exp: Expression) {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 /* Variable declaration definition */
 case class VariableDeclaration(name: String, variableType: Type) {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 /* Expressions */
 trait Expression {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 abstract class Value[T](val value: T) extends Expression
@@ -66,7 +66,7 @@ case class AndExpression(left: Expression, right: Expression) extends Expression
 
 /* Statements */
 trait Statement {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
@@ -80,7 +80,7 @@ case class ReturnStmt(exp: Expression) extends Statement
 
 /* Types */
 trait Type {
-  def accept(v: OberonVisitor) : Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 case object IntegerType extends Type

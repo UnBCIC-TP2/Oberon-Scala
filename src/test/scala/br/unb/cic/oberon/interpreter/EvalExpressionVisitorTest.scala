@@ -12,14 +12,11 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val bTrue = BoolValue(true)
     val bFalse = BoolValue(false)
 
-    val10.accept(visitor)
-    assert(visitor.result == val10)
+    assert(val10.accept(visitor) == val10)
 
-    bTrue.accept(visitor)
-    assert(visitor.result == bTrue)
+    assert(bTrue.accept(visitor) == bTrue)
 
-    bFalse.accept(visitor)
-    assert(visitor.result == bFalse)
+    assert(bFalse.accept(visitor) == bFalse)
   }
 
   test("Test eval on arithmetic expressions (add and mult)") {
@@ -29,9 +26,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val val30 = IntValue(30)
 
     val exp = AddExpression(val10, MultExpression(val20, val30))
-    exp.accept(visitor)
-
-    assert(visitor.result == IntValue(610))
+    assert(exp.accept(visitor) == IntValue(610))
   }
 
   test("Test eval on arithmetic expressions (sub and div)") {
@@ -41,9 +36,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val val30 = IntValue(30)
 
     val exp = SubExpression(val20, DivExpression(val30, val10))
-    exp.accept(visitor)
-
-    assert(visitor.result == IntValue(17))
+    assert(exp.accept(visitor) == IntValue(17))
   }
 
   test("Test eval on boolean expressions ('and' and 'or')") {
@@ -54,9 +47,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
 
     val exp = AndExpression(valTrue, AndExpression(valTrue, OrExpression(valTrue, valFalse)))
-    exp.accept(visitor)
-
-    assert(visitor.result == valTrue)
+    assert(exp.accept(visitor) == valTrue)
   }
 
   test("Test eval on global variables") {
@@ -67,9 +58,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
     val exp = AddExpression(IntValue(10), VarExpression("x"))
 
-    exp.accept(visitor)
-
-    assert(visitor.result == IntValue(40))
+    assert(exp.accept(visitor) == IntValue(40))
   }
 
   test("Test eval on local (stack) and global variables") {
@@ -81,9 +70,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
     val exp = AddExpression(VarExpression("x"), VarExpression("y"))
 
-    exp.accept(visitor)
-
-    assert(visitor.result == IntValue(40))
+    assert(exp.accept(visitor) == IntValue(40))
   }
 
   // TODO: Write test cases  dealing with different scopes and name collision.

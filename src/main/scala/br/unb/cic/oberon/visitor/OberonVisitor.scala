@@ -14,24 +14,24 @@ import br.unb.cic.oberon.ast.{Constant, Expression, FormalArg, OberonModule, Pro
  */
 trait OberonVisitor {
   type T
-  var result : T = _
-  def visit(module: OberonModule) : Unit
-  def visit(constant: Constant) : Unit
-  def visit(variable: VariableDeclaration) : Unit
-  def visit(procedure: Procedure) : Unit
-  def visit(arg: FormalArg) : Unit
-  def visit(exp: Expression) : Unit
-  def visit(stmt: Statement) : Unit
-  def visit(aType: Type): Unit
+
+  def visit(module: OberonModule) : T
+  def visit(constant: Constant) : T
+  def visit(variable: VariableDeclaration) : T
+  def visit(procedure: Procedure) : T
+  def visit(arg: FormalArg) : T
+  def visit(exp: Expression) : T
+  def visit(stmt: Statement) : T
+  def visit(aType: Type): T
 }
 
 abstract class OberonVisitorAdapter extends OberonVisitor {
-  override def visit(module: OberonModule): Unit = {}
-  override def visit(constant: Constant): Unit = {}
-  override def visit(variable: VariableDeclaration): Unit = {}
-  override def visit(procedure: Procedure): Unit = {}
-  override def visit(arg: FormalArg): Unit = {}
-  override def visit(exp: Expression): Unit = {}
-  override def visit(stmt: Statement): Unit = {}
-  override def visit(aType: Type): Unit = {}
+  override def visit(module: OberonModule): T = ???   // ??? means: undef
+  override def visit(constant: Constant): T = ???
+  override def visit(variable: VariableDeclaration): T = ???
+  override def visit(procedure: Procedure): T = ???
+  override def visit(arg: FormalArg): T = ???
+  override def visit(exp: Expression): T = ???
+  override def visit(stmt: Statement): T = ???
+  override def visit(aType: Type): T = ???
 }

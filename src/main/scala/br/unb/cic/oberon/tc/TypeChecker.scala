@@ -1,25 +1,25 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{Constant, Expression, FormalArg, OberonModule, Procedure, Statement, Type, VariableDeclaration}
-import br.unb.cic.oberon.visitor.OberonVisitor
+import br.unb.cic.oberon.ast.{BoolValue, BooleanType, Constant, Expression, FormalArg, IntValue, IntegerType, OberonModule, Procedure, Statement, Type, Undef, VariableDeclaration}
+import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
-class TypeChecker extends OberonVisitor {
-  type T = Unit
-
-  override def visit(module: OberonModule): Unit = ???
-
-  override def visit(constant: Constant): Unit =
-    constant.exp.accept(this)
-
-  override def visit(variable: VariableDeclaration): Unit = ???
-
-  override def visit(procedure: Procedure): Unit = ???
-
-  override def visit(arg: FormalArg): Unit = ???
-
-  override def visit(exp: Expression): Unit = ???
-
-  override def visit(stmt: Statement): Unit = ???
-
-  override def visit(aType: Type): Unit = ???
-}
+//class ComputeExpressionType extends OberonVisitorAdapter {
+//  type T = Option[Type]
+//
+//  override def visit(exp: Expression): Unit = exp match {
+//    case IntValue(v) => result = Some(IntegerType)
+//    case BoolValue(v) => result = Some(BooleanType)
+//    case Undef() => result = None
+//    case
+//  }
+//}
+//
+//class TypeChecker extends OberonVisitorAdapter {
+//  type T = List[String]
+//
+//  override def visit(exp: Expression): Unit = exp match {
+//    case Undef() =>
+//    case IntValue(v) =>
+//    cas
+//  }
+//}

@@ -52,7 +52,9 @@ class Interpreter extends OberonVisitorAdapter {
   override def visit(stmt: Statement): Unit = {
     // we first check if we achieved a return stmt.
     // if so, we should not execute any other statement
-    // in a sequence.
+    // of a sequence of stmts. Whenever we achieve a
+    // return stmt, we associate in the local variables
+    // the name "return" to the return value.
     if (env.lookup(Values.ReturnKeyWord).isDefined) {
       return
     }
@@ -66,9 +68,12 @@ class Interpreter extends OberonVisitorAdapter {
       case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
       case ProcedureCallStmt(name, args) =>
-        env.push()
-        visitProcedureCall(name, args.map(a => evalExpression(a)))
-        env.pop()
+        // we evaluate the "args" in the current
+        // environment.
+        val actualArguments = args.map(a => evalExpression(a))
+        env.push()  // after that, we can "push", to indicate a procedure call.
+        visitProcedureCall(name, actualArguments) // then we execute the procedure.
+        env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
   }
 
@@ -78,32 +83,32 @@ class Interpreter extends OberonVisitorAdapter {
    * in the local variables, assigning
    * "return" -> exp.
    */
-  private def setReturnExpression(exp: Expression): Unit = env.setLocalVariable(Values.ReturnKeyWord, exp)
+  private def setReturnExpression(exp: Expression): Unit =
+    env.setLocalVariable(Values.ReturnKeyWord, exp)
 
-  def visitProcedureCall(name: String, args: List[Expression]) = {
+  def visitProcedureCall(name: String, args: List[Expression]): Unit = {
     val procedure = env.findProcedure(name)
     updateEnvironmentWithProcedureCall(procedure, args)
     procedure.stmt.accept(this)
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
-    procedure.args.map(formal => formal.name).zip(args).foreach(pair => env.setLocalVariable(pair._1, pair._2))
+    procedure.args.map(formal => formal.name)
+                  .zip(args)
+                  .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
   }
 
   def evalCondition(expression: Expression) : Boolean = {
     val evalVisitor = new EvalExpressionVisitor(this)
-
-    expression.accept(evalVisitor)
-
-    evalVisitor.result.asInstanceOf[BoolValue].value
+    expression.accept(evalVisitor).asInstanceOf[BoolValue].value
   }
 
   def evalExpression(expression: Expression) : Expression = {
     val evalVisitor = new EvalExpressionVisitor(this)
     expression.accept(evalVisitor)
-    evalVisitor.result
   }
 
   /*
@@ -126,12 +131,12 @@ class Interpreter extends OberonVisitorAdapter {
 class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorAdapter {
   type T = Expression
 
-  override def visit(exp: Expression): Unit = exp match {
+  override def visit(exp: Expression): Expression = exp match {
     case Brackets(expression) => expression.accept(this)
-    case IntValue(v) => result = IntValue(v)
-    case BoolValue(v) => result = BoolValue(v)
-    case Undef() => result = Undef()
-    case VarExpression(name) => result = interpreter.env.lookup(name).get
+    case IntValue(v) => IntValue(v)
+    case BoolValue(v) => BoolValue(v)
+    case Undef() => Undef()
+    case VarExpression(name) => interpreter.env.lookup(name).get
     case EQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value == v2.value))
     case NEQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value != v2.value))
     case GTExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value > v2.value))
@@ -145,24 +150,19 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case AndExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value && v2.value))
     case OrExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value || v2.value))
     case FunctionCallExpression(name, args) => {
-      val actualArguments = args.map(a => {
-        a.accept(this)
-        this.result
-      })
+      val actualArguments = args.map(a => a.accept(this))
       interpreter.env.push()
-      visitFunctionCall(name, actualArguments)
+      val exp = visitFunctionCall(name, actualArguments)
       interpreter.env.pop()
+      exp
     }
   }
 
-  def visitFunctionCall(name: String, args: List[Expression]): Unit = {
+  def visitFunctionCall(name: String, args: List[Expression]): Expression = {
     interpreter.visitProcedureCall(name, args)
-
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
-
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
-
-    result = interpreter.env.lookup(Values.ReturnKeyWord).get
+    returnValue.get
   }
 
   /**
@@ -177,13 +177,9 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
    *
    * @tparam T a type parameter to set the function fn correctly.
    */
-  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression) : Unit = {
-    left.accept(this)
-    val v1 = result.asInstanceOf[Value[T]]
-
-    right.accept(this)
-    val v2 = result.asInstanceOf[Value[T]]
-
-    result = fn(v1, v2)
+  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression) : Expression = {
+    val v1 = left.accept(this).asInstanceOf[Value[T]]
+    val v2 = right.accept(this).asInstanceOf[Value[T]]
+    fn(v1, v2)
   }
 }
