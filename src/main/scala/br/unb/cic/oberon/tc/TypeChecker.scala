@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ReadIntStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ReadIntStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -35,7 +35,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
   def computeBinExpressionType(left: Expression, right: Expression, expected: Type, result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
-    if(t1 == t2 && t1 == Some(expected)) Some(result) else None
+    if(t1 == t2 && t1.contains(expected)) Some(result) else None
   }
 }
 
@@ -47,17 +47,11 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
-    case SequenceStmt(stmts) => stmts.map(s => s.accept(this)).flatten
+    case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
+    case WhileStmt(_, _) => visitWhileStmt(stmt)
+    case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
     case ReadIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
-    case IfElseStmt(condition, thenStmt, elseStmt) => {
-      if(condition.accept(expVisitor) == Some(BooleanType)) {
-        val list1 = thenStmt.accept(this)
-        val list2 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
-        list1 ++ list2
-      }
-      else List((stmt, s"Expression $condition do not have a boolean type"))
-    }
   }
 
   private def visitAssignment(stmt: Statement) = stmt match {
@@ -68,5 +62,23 @@ class TypeChecker extends OberonVisitorAdapter {
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
+  }
+
+  private def visitIfElseStmt(stmt: Statement) = stmt match {
+    case IfElseStmt(condition, thenStmt, elseStmt) =>
+      if(condition.accept(expVisitor).contains(BooleanType)) {
+        val list1 = thenStmt.accept(this)
+        val list2 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
+        list1 ++ list2
+      }
+      else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  private def visitWhileStmt(stmt: Statement) = stmt match {
+    case WhileStmt(condition, stmt) =>
+      if(condition.accept(expVisitor).contains(BooleanType)) {
+        stmt.accept(this)
+      }
+      else List((stmt, s"Expression $condition do not have a boolean type"))
   }
 }

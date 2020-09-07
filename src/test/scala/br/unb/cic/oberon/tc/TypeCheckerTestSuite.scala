@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -104,5 +104,36 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 0)
+  }
+
+  test("Test while statement type checker (with invalid condition)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val stmt02 = WhileStmt(IntValue(10), stmt01)
+    assert(stmt01.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size == 1)
+  }
+
+  test("Test while statement type checker (with invalid stmt)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+
+    val stmt02 = WhileStmt(BoolValue(true), stmt01)
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+  }
+
+  test("Test while statement type checker") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val stmt02 = WhileStmt(BoolValue(true), stmt01)
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
   }
 }
