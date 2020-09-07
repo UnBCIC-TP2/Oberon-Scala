@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WriteStmt}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -53,11 +53,56 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt03.accept(visitor).size == 1)
 
-    // TODO: Fix this test case
     val seq1 = SequenceStmt(List(stmt01, stmt04))
     val seq2 = SequenceStmt(List(stmt01, stmt05))
 
     assert(seq1.accept(visitor).size == 0)
     assert(seq2.accept(visitor).size == 1)
+  }
+
+  test("Test if-else statement type checker (with invalid condition)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val stmt02 = IfElseStmt(IntValue(10), stmt01, None)
+    assert(stmt01.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size == 1)
+  }
+
+  test("Test if-else statement type checker (with invalid then-stmt)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+
+    val stmt02 = IfElseStmt(BoolValue(true), stmt01, None)
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+  }
+
+  test("Test if-else statement type checker (with invalid then-stmt and else-stmt)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(10))
+    val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 2)
+  }
+
+  test("Test if-else statement type checker") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("y", IntegerType)
+
+    val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
+
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt03.accept(visitor).size == 0)
   }
 }
