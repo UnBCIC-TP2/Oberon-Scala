@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IntValue, IntegerType, ReadIntStmt, Undef, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WriteStmt}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -37,5 +37,27 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test a sequence of statements type checker") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(10)) // invalid stmt
+    val stmt03 = AssignmentStmt("x", AddExpression(IntValue(5), BoolValue(false))) // invalid stmt
+    val stmt04 = WriteStmt(VarExpression("x"))
+    val stmt05 = WriteStmt(VarExpression("y"))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    assert(stmt01.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+
+    // TODO: Fix this test case
+    val seq1 = SequenceStmt(List(stmt01, stmt04))
+    val seq2 = SequenceStmt(List(stmt01, stmt05))
+
+    assert(seq1.accept(visitor).size == 0)
+    assert(seq2.accept(visitor).size == 1)
   }
 }
