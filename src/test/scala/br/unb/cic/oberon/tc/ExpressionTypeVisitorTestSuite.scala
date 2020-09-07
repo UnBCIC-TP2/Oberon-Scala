@@ -4,7 +4,7 @@ import br.unb.cic.oberon.ast.{AddExpression, BoolValue, BooleanType, DivExpressi
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import org.scalatest.funsuite.AnyFunSuite
 
-class ExpressionTypeVisitorTest extends AnyFunSuite {
+class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
 
     test("Test expression type on simple values") {
       val visitor = new ExpressionTypeVisitor()
