@@ -51,7 +51,7 @@ class Environment[T] {
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 
-  def findProcedure(name: String) : Procedure = procedures(name)
+  def findProcedure(name: String): Procedure = procedures(name)
 
   def push(): Unit = stack.push(Map.empty[String, T])
 

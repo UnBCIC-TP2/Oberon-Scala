@@ -362,14 +362,14 @@ class ParserTestSuite extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "Fatorial")
+    assert(module.name == "Factorial")
 
     assert(module.procedures.size == 1)
     assert(module.stmt.isDefined)
 
     val procedure = module.procedures.head
 
-    assert(procedure.name == "fatorial")
+    assert(procedure.name == "factorial")
     assert(procedure.args.size == 1)
     assert(procedure.returnType == Some(IntegerType))
 
@@ -382,11 +382,11 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts.size == 2)
 
     assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
-    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("fatorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
 
     module.stmt.get match {
       case SequenceStmt(ss) => {
-        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("fatorial", List(IntValue(5)))))
+        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("factorial", List(IntValue(5)))))
         assert(ss(1) == WriteStmt(VarExpression("res")))
       }
       case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")

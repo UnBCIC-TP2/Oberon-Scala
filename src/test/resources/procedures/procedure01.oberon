@@ -8,7 +8,7 @@ PROCEDURE sum(v1, v2 : INTEGER) : INTEGER;
  BEGIN
    RETURN v1 + v2
  END sum
- 
+
 BEGIN
  readInt(x);
  readInt(y);

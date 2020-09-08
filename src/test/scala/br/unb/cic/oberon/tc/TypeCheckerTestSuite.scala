@@ -1,7 +1,10 @@
 package br.unb.cic.oberon.tc
 
+import java.nio.file.{Files, Paths}
+
 import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
+import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class TypeCheckerTestSuite  extends AnyFunSuite {
@@ -135,5 +138,25 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
+  }
+
+  /*
+   * the following test cases read an oberon module with the
+   * factorial procedure.
+   */
+  test("Test invalid procedure declaration") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.procedures.size == 2)
+    assert(module.stmt.isDefined)
+
+
   }
 }

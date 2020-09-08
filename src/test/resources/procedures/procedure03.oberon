@@ -1,20 +1,20 @@
-MODULE Fatorial;
+MODULE Factorial;
 
 VAR
   res : INTEGER;
 
-PROCEDURE fatorial(i: INTEGER) : INTEGER;
+PROCEDURE factorial(i: INTEGER) : INTEGER;
  BEGIN
    IF(i = 1)
    THEN
      RETURN 1
    END;
-   RETURN i * fatorial(i - 1)
- END fatorial;
+   RETURN i * factorial(i - 1)
+ END factorial;
  
 BEGIN
- res := fatorial(5);
+ res := factorial(5);
  write(res)
 END
 
-END Fatorial.
+END Factorial.

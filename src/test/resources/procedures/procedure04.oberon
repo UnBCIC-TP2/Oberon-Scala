@@ -8,11 +8,16 @@ PROCEDURE sum(v1, v2 : INTEGER) : INTEGER;
  BEGIN
    RETURN v1 + v2
  END sum
- 
+
+PROCEDURE print(v1: INTEGER);
+BEGIN
+ write(v1)
+END print
+
 BEGIN
  readInt(x);
  readInt(y);
- write()
+ print(sum(x,y))
 END
 
 END SimpleModule.

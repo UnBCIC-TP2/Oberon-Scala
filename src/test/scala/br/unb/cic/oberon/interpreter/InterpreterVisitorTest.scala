@@ -25,7 +25,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
 
   }
 
-  test("Test eval on simple values") {
+  test("Test eval on factorial module") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").getFile)
 
     assert(path != null)
@@ -33,11 +33,13 @@ class InterpreterVisitorTest extends AnyFunSuite{
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
     val interpreter = new Interpreter()
-    assert(module.name == "Fatorial")
+    assert(module.name == "Factorial")
 
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("res").isDefined)
     assert(interpreter.env.lookup("res") == Some(IntValue(120)))
+
+
   }
 }

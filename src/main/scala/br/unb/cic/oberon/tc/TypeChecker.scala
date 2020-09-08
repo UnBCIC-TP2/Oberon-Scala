@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ReadIntStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -45,11 +45,24 @@ class TypeChecker extends OberonVisitorAdapter {
   val env =  new Environment[Type]()
   val expVisitor = new ExpressionTypeVisitor(this)
 
+  override def visit(module: OberonModule): List[(Statement, String)] = {
+    module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
+    module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
+    module.procedures.map(p => env.declareProcedure(p))
+
+    // TODO: check if the procedures are well typed.
+
+    if(module.stmt.isDefined) module.stmt.get.accept(this)
+    else List()
+  }
+
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
+    case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
+    case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
     case ReadIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
   }
@@ -80,5 +93,41 @@ class TypeChecker extends OberonVisitorAdapter {
         stmt.accept(this)
       }
       else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  /*
+   * Type checker for a procedure call. This is the "toughest" implementation
+   * here. We have to check:
+   *
+   * (a) the procedure exists
+   * (b) the type of the actual arguments match the type of the formal arguments
+   * (c) the procedure body (stmt) is well typed.
+   *
+   * @param stmt (a procedure call)
+   *
+   * @return Our error representation (statement + string with the error message)
+   */
+  private def procedureCallStmt(stmt: Statement): List[(Statement, String)] = stmt match {
+    case ProcedureCallStmt(name, args) =>
+      val procedure = env.findProcedure(name)
+      if(procedure == null) return List((stmt, s"Procedure $name has not been declared."))
+      else {
+        // check if the type of the formal arguments and the actual arguments
+        // match.
+        val formalArgumentTypes = procedure.args.map(a => a.argumentType)
+        val actualArgumentTypes = args.map(a => a.accept(expVisitor).get)
+        // the two lists must have the same size.
+        if(formalArgumentTypes.size != actualArgumentTypes.size) {
+          return List((stmt, s"Wrong number of arguments to the $name procedure"))
+        }
+        val allTypesMatch = formalArgumentTypes.zip(actualArgumentTypes)
+          .map(pair => pair._1 == pair._2)
+          .forall(v => v)
+        if(!allTypesMatch) {
+          return List((stmt, s"The arguments do not match the $name formal arguments"))
+        }
+        // if everything above is ok, lets check the procedure body.
+        procedure.stmt.accept(this)
+      }
   }
 }
