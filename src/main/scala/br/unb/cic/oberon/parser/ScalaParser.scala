@@ -122,13 +122,13 @@ class ParserVisitor {
      var exp : Expression = _
 
      override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
-      exp = IntValue(ctx.getText.toInt)
+       exp = IntValue(ctx.getText.toInt)
 
      override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
-      exp = BoolValue(ctx.getText == "True")
+       exp = BoolValue(ctx.getText == "True")
 
      override def visitRelExpression(ctx: OberonParser.RelExpressionContext): Unit =
-      visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitAddExpression(ctx: OberonParser.AddExpressionContext): Unit =
       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
@@ -137,10 +137,10 @@ class ParserVisitor {
       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitVariable(ctx: OberonParser.VariableContext): Unit =
-      exp = VarExpression(ctx.getText)
+       exp = VarExpression(ctx.getText)
 
      override def visitBrackets(ctx: OberonParser.BracketsContext): Unit = {
-      ctx.expression().accept(this)
+       ctx.expression().accept(this)
      }
 
       override def visitFunctionCall(ctx: OberonParser.FunctionCallContext): Unit = {
@@ -199,7 +199,14 @@ class ParserVisitor {
         s.accept(this)
         stmts += stmt
       })
-      stmt = SequenceStmt(stmts.toList)
+       stmt = SequenceStmt(flatSequenceOfStatements(stmts.toList))
+    }
+
+    def flatSequenceOfStatements(stmts: List[Statement]) : List[Statement] =
+      stmts match {
+        case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
+        case s :: rest => s :: flatSequenceOfStatements(rest)
+        case Nil => List()
     }
 
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
@@ -242,7 +249,7 @@ class ParserVisitor {
       stmt = IfElseStmt(condition, thenStmt, elseStmt)
     }
 
-    //eh isso aqui
+
     override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
