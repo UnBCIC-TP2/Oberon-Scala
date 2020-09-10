@@ -17,7 +17,7 @@ varDeclaration
   ; 
 
 procedure :
-  'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
+  'PROCEDURE' name = Id '(' formals?  ')' (: procedureType = oberonType)? ';'
     declarations    // NOTE: This might support nested procedures
     block
    Id
@@ -32,7 +32,7 @@ arguments
  ;
  
 formalArg 
- : (args += Id (',' args += Id)*) ':' argType = oberonType 
+ : (args += Id (',' args += Id)*) ':' argType = oberonType ';' 
  ; // TODO: we should also support VarBased formal arguments.
  
 block
@@ -51,14 +51,15 @@ expression
  ;
 
 statement
- : var = Id ':=' exp = expression                                                          #AssignmentStmt
- | stmt += statement (';' stmt += statement)+                                              #SequenceStmt
- | 'readInt'  '(' var = Id ')'                                                             #ReadIntStmt
- | 'write' '(' expression ')'                                                              #WriteStmt
- | name = Id '(' arguments? ')'                                                            #ProcedureCall
- | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt
- | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                   #WhileStmt
- | 'RETURN' exp = expression                                                               #ReturnStmt
+ : var = Id ':=' exp = expression                                                                                                   #AssignmentStmt
+ | stmt += statement (';' stmt += statement)+                                                                                       #SequenceStmt
+ | 'readInt'  '(' var = Id ')'                                                                                                      #ReadIntStmt
+ | 'write' '(' expression ')'                                                                                                       #WriteStmt
+ | name = Id '(' arguments? ')'                                                                                                     #ProcedureCall
+ | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                          #IfElseStmt
+ | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                            #WhileStmt
+ | 'RETURN' exp = expression                                                                                                        #ReturnStmt
+ | 'CASE' exp = expression 'OF' caseCond += expression ':' caseStmt += statement ('|' caseCond += expression':'caseStmt += statement)* ('ELSE' elseStmt= statement)? 'END' #CaseStmt
  ; 
  
 // TODO: NOT, MOD, Relational operators, 
@@ -92,13 +93,29 @@ fragment Digit : [0-9] ;
 // Whitespace and comments
 //
 
-WS  :  [ \t\r\n\u000C]+ -> skip
-    ;
+NL
+   : '\n'
+   | '\r' '\n'?
+   ;
+   
+
+fragment WhiteSpace
+   : '\u0020' | '\u0009' | '\u000D' | '\u000A'
+   ;
+   
+NEWLINE
+   : NL+ -> skip
+   ;
+
+WS
+   :  WhiteSpace+ -> skip
+   ;
 
 COMMENT
-    :   '/*' .*? '*/' -> skip
-    ;
+   :   '/*' .*? '*/' -> skip
+   ;
+
 
 LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
-    ;
+   :   '//' (~[\r\n])* -> skip
+   ;
