@@ -78,7 +78,6 @@ case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Opti
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 case class ForStmt(init: Statement, condition: Expression, stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
-case class ForStmt(stm: Statement, condition: Expression, stmt: Statement) extends Statement
 
 /* Types */
 trait Type {

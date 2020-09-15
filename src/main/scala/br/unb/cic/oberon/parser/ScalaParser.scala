@@ -265,16 +265,16 @@ class ParserVisitor {
     override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
-      ctx.stm.accept(this)
-      val forStm = stmt
+      ctx.init.accept(this)
+      val init = stmt
 
       ctx.expression().accept(visitor)
       val condition = visitor.exp
 
       ctx.stmt.accept(this)
-      val forStmt = stmt
+      val block = stmt
 
-      stmt = ForStmt(forStm, condition, forStmt)
+      stmt = ForStmt(init, condition, block)
     }
    
     override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
