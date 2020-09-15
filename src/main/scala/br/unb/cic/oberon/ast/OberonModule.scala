@@ -77,6 +77,7 @@ case class ProcedureCallStmt(name: String, args: List[Expression]) extends State
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
+case class ForStmt(stm: Statement, condition: Expression, stmt: Statement) extends Statement
 
 /* Types */
 trait Type {
