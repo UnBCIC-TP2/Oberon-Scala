@@ -58,6 +58,7 @@ statement
  | name = Id '(' arguments? ')'                                                            #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                   #WhileStmt
+ | 'FOR' stm = statement 'TO' cond = expression 'DO' stmt = statement 'END'                #ForStmt
  | 'RETURN' exp = expression                                                               #ReturnStmt
  ; 
  
