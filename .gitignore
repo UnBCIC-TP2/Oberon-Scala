@@ -31,3 +31,10 @@ build
 
 #general
 *.class
+
+#metals
+.metals/
+.vscode/
+null/
+project/
+.bloop/
