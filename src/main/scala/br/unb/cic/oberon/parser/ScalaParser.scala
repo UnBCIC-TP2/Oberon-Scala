@@ -249,7 +249,6 @@ class ParserVisitor {
       stmt = IfElseStmt(condition, thenStmt, elseStmt)
     }
 
-
     override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
@@ -263,7 +262,7 @@ class ParserVisitor {
       })
       val caseStmts = new ListBuffer[Statement]
       ctx.caseStmt.asScala.toList.foreach(s => {
-        s.accept(visitor)
+        s.accept(this)
         caseStmts += stmt
       })
 
