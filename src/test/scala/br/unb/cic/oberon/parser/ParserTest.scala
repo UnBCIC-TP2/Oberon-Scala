@@ -290,6 +290,58 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
+  test("Testing the oberon stmt06 code. This module has a simple case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt06.oberon").getFile);
+
+    assert(path != null);
+
+    val content = String.join("\n", Files.readAllLines(path));
+    val module = ScalaParser.parse(content);
+
+    assert(module.name == "SimpleModule");
+
+    assert(!module.stmt.isEmpty);
+    
+
+    module.stmt.getOrElse(false) match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3);
+      case _ => fail("Expected a sequence of 3 statements!!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
+
+    assert(sequenceStmts(0) == ReadIntStmt("xs"));
+
+    val myCaseStmt = sequenceStmts(1).asInstanceOf[CaseStmt];
+
+    assert(myCaseStmt.exp == VarExpression("xs"));
+
+    assert(myCaseStmt.caseCond.length == 4);
+
+    var caseLabel = 1;
+    myCaseStmt.caseCond.foreach(_expression => {
+      assert(_expression == IntValue(caseLabel));
+      caseLabel += 1;
+    })
+
+    assert(myCaseStmt.caseStmt.length == 4);
+    var caseValAssigment = 5;
+    myCaseStmt.caseStmt.foreach(_stmt => {
+      assert(_stmt == AssignmentStmt("xs", IntValue(caseValAssigment)));
+      caseValAssigment *= 2
+    })
+
+    myCaseStmt.elseStmt.getOrElse(false) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "xs");
+        assert(exp == IntValue(0));
+      }
+      case _ => fail("Expected an else on the case statement!");
+    }
+    assert(sequenceStmts(2) == WriteStmt(VarExpression("xs")));
+
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
