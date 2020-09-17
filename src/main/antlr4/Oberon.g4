@@ -17,7 +17,7 @@ varDeclaration
   ; 
 
 procedure :
-  'PROCEDURE' name = Id '(' formals?  ')' (: procedureType = oberonType)? ';'
+  'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
     declarations    // NOTE: This might support nested procedures
     block
    Id
@@ -32,7 +32,7 @@ arguments
  ;
  
 formalArg 
- : (args += Id (',' args += Id)*) ':' argType = oberonType ';' 
+ : (args += Id (',' args += Id)*) ':' argType = oberonType 
  ; // TODO: we should also support VarBased formal arguments.
  
 block
@@ -53,11 +53,12 @@ expression
 statement
  : var = Id ':=' exp = expression                                                          #AssignmentStmt
  | stmt += statement (';' stmt += statement)+                                              #SequenceStmt
- | 'read'  '(' var = Id ')'                                                                #ReadStmt
+ | 'readInt'  '(' var = Id ')'                                                             #ReadIntStmt
  | 'write' '(' expression ')'                                                              #WriteStmt
  | name = Id '(' arguments? ')'                                                            #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                   #WhileStmt
+ | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'          #ForStmt
  | 'RETURN' exp = expression                                                               #ReturnStmt
  ; 
  
@@ -81,7 +82,7 @@ FALSE : 'False'  ;
 
 Id : CharDef (CharDef | Digit | '_')* ;
 
-CharDef
+fragment CharDef
   : ('a'..'z') | ('A' .. 'Z')
   ;
 
@@ -92,29 +93,13 @@ fragment Digit : [0-9] ;
 // Whitespace and comments
 //
 
-NL
-   : '\n'
-   | '\r' '\n'?
-   ;
-   
-
-fragment WhiteSpace
-   : '\u0020' | '\u0009' | '\u000D' | '\u000A'
-   ;
-   
-NEWLINE
-   : NL+ -> skip
-   ;
-
-WS
-   :  WhiteSpace+ -> skip
-   ;
+WS  :  [ \t\r\n\u000C]+ -> skip
+    ;
 
 COMMENT
-   :   '/*' .*? '*/' -> skip
-   ;
-
+    :   '/*' .*? '*/' -> skip
+    ;
 
 LINE_COMMENT
-   :   '//' (~[\r\n])* -> skip
-   ;
+    :   '//' ~[\r\n]* -> skip
+    ;

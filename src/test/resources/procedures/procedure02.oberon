@@ -13,7 +13,7 @@ PROCEDURE calcmult(i: INTEGER, base: INTEGER) : INTEGER;
  END calcmult;
  
 BEGIN
- read(base);
+ readInt(base);
  count := 1;
  WHILE count < limit DO
    mult := calcmult(count, base);

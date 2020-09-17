@@ -8,10 +8,10 @@ PROCEDURE sum(v1, v2 : INTEGER) : INTEGER;
  BEGIN
    RETURN v1 + v2
  END sum
- 
+
 BEGIN
- read(x);
- read(y);
+ readInt(x);
+ readInt(y);
  write(sum(x,y))
 END
 

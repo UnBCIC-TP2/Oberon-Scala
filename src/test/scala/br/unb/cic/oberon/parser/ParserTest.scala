@@ -17,7 +17,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
   }
 
 
@@ -31,7 +31,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
@@ -47,9 +47,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
-    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
-    assert(module.constants(2) == Constant(Variable("z"), BoolValue(true)))
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", BoolValue(true)))
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
@@ -66,9 +66,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), IntValue(5)))
-    assert(module.constants(1) == Constant(Variable("y"), IntValue(10)))
-    assert(module.constants(2) == Constant(Variable("z"), AddExpression(IntValue(5), IntValue(10))))
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", AddExpression(IntValue(5), IntValue(10))))
 
 
     assert(module.variables.size == 2)
@@ -86,7 +86,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("z"), MultExpression(IntValue(5), IntValue(10))))
+    assert(module.constants.head == Constant("z", MultExpression(IntValue(5), IntValue(10))))
 
 
     assert(module.variables.size == 2)
@@ -105,7 +105,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("z"), AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+    assert(module.constants.head == Constant("z", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
 
 
     assert(module.variables.size == 2)
@@ -123,8 +123,8 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 2)
-    assert(module.constants.head == Constant(Variable("x"), AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
-      assert(module.constants(1) == Constant(Variable("y"),
+    assert(module.constants.head == Constant("x", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+      assert(module.constants(1) == Constant("y",
         AddExpression(IntValue(5),
          DivExpression(
            MultExpression(IntValue(10), IntValue(3)),
@@ -145,9 +145,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
-    assert(module.constants.head == Constant(Variable("x"), BoolValue(false)))
-    assert(module.constants(1) == Constant(Variable("y"), BoolValue(true)))
-    assert(module.constants(2) == Constant(Variable("z"), AndExpression(BoolValue(true), BoolValue(false))))
+    assert(module.constants.head == Constant("x", BoolValue(false)))
+    assert(module.constants(1) == Constant("y", BoolValue(true)))
+    assert(module.constants(2) == Constant("z", AndExpression(BoolValue(true), BoolValue(false))))
   }
 
   ignore("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
@@ -160,7 +160,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant(Variable("x"), OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+    assert(module.constants.head == Constant("x", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {
@@ -185,8 +185,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
     assert(stmts(2) == WriteStmt(AddExpression(VarExpression("x"), VarExpression("y"))))
   }
 
@@ -212,8 +212,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
     assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
     assert(stmts(3) == WriteStmt(VarExpression("z")))
   }
@@ -240,8 +240,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("max"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("max"))
 
     // the third stmt must be an IfElseStmt
     stmts(2) match {
@@ -277,8 +277,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadStmt("x"))
-    assert(stmts(1) == ReadStmt("y"))
+    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
 
     // the third stmt must be an WhileStmt
     stmts(2) match {
@@ -318,8 +318,8 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadStmt("x"))
-    assert(stmt.stmts(1) == ReadStmt("y"))
+    assert(stmt.stmts.head == ReadIntStmt("x"))
+    assert(stmt.stmts(1) == ReadIntStmt("y"))
     assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
   }
 
@@ -351,6 +351,45 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadStmt("base"))
+    assert(stmt.stmts.head == ReadIntStmt("base"))
+  }
+
+  test("Testing the oberon procedure03 code. This module implements a fatorial function") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Factorial")
+
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+
+    val procedure = module.procedures.head
+
+    assert(procedure.name == "factorial")
+    assert(procedure.args.size == 1)
+    assert(procedure.returnType == Some(IntegerType))
+
+    procedure.stmt match {
+      case SequenceStmt(_) => succeed
+      case _ => fail("expecting a sequence of stmts")
+    }
+
+    val SequenceStmt(stmts) = procedure.stmt // pattern matching...
+    assert(stmts.size == 2)
+
+    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
+    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+
+    module.stmt.get match {
+      case SequenceStmt(ss) => {
+        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("factorial", List(IntValue(5)))))
+        assert(ss(1) == WriteStmt(VarExpression("res")))
+      }
+      case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
+    }
   }
 }

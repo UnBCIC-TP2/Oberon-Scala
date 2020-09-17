@@ -67,7 +67,7 @@ class ParserVisitor {
    * @return a constant declaration representation
    */
   def visitConstant(ctx: OberonParser.ConstantContext): Constant = {
-    val variable = Variable(ctx.constName.getText)
+    val variable = ctx.constName.getText
     val v = new ExpressionVisitor()
     ctx.accept(v)
     Constant(variable, v.exp)
@@ -195,16 +195,24 @@ class ParserVisitor {
 
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
       val stmts = new ListBuffer[Statement]
+
       ctx.statement().asScala.toList.foreach(s => {
         s.accept(this)
         stmts += stmt
       })
-      stmt = SequenceStmt(stmts.toList)
+      stmt = SequenceStmt(flatSequenceOfStatements(stmts.toList))
     }
 
-    override def visitReadStmt(ctx: OberonParser.ReadStmtContext): Unit = {
+    def flatSequenceOfStatements(stmts: List[Statement]) : List[Statement] =
+      stmts match {
+        case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
+        case s :: rest => s :: flatSequenceOfStatements(rest)
+        case Nil => List()
+      }
+
+    override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
-      stmt = ReadStmt(varName)
+      stmt = ReadIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {
@@ -253,7 +261,22 @@ class ParserVisitor {
 
       stmt = WhileStmt(condition, whileStmt)
     }
+   
+    override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
 
+      ctx.init.accept(this)
+      val init = stmt
+
+      ctx.expression().accept(visitor)
+      val condition = visitor.exp
+
+      ctx.stmt.accept(this)
+      val block = stmt
+
+      stmt = ForStmt(init, condition, block)
+    }
+   
     override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)

@@ -4,8 +4,8 @@ VAR
   x : INTEGER;
   max : INTEGER; 
 BEGIN
- read(x);
- read(max);
+ readInt(x);
+ readInt(max);
  IF(x > max) THEN
    max := x 
  END; 

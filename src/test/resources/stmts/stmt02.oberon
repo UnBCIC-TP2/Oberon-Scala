@@ -5,8 +5,8 @@ VAR
   y : INTEGER;
 
 BEGIN
- read(x);
- read(y);
+ readInt(x);
+ readInt(y);
  z := x + y;
  write(z)
 END
