@@ -59,8 +59,13 @@ statement
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                          #IfElseStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                            #WhileStmt
  | 'RETURN' exp = expression                                                                                                        #ReturnStmt
- | 'CASE' exp = expression 'OF' caseCond += expression ':' caseStmt += statement ('|' caseCond += expression':'caseStmt += statement)* ('ELSE' elseStmt= statement)? 'END' #CaseStmt
- ; 
+ | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END' #CaseStmt
+ ;
+
+caseAlternative
+ : cond = expression ':' stmt = statement                       #SimpleCase
+ | min = expression '..' max = expression ':' stmt = statement  #RangeCase
+ ;
  
 // TODO: NOT, MOD, Relational operators, 
 // <assoc=right> expr '::' expr

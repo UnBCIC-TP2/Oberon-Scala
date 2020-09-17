@@ -250,20 +250,17 @@ class ParserVisitor {
     }
 
     override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
-      val visitor = new ExpressionVisitor()
+      val expressionVisitor = new ExpressionVisitor()
 
-      ctx.exp.accept(visitor)
-      val caseExp = visitor.exp
+      ctx.expression().accept(expressionVisitor)
+      val caseExp = expressionVisitor.exp
 
-      val caseConds = new ListBuffer[Expression]
-      ctx.caseCond.asScala.toList.foreach(e => {
-        e.accept(visitor)
-        caseConds += visitor.exp
-      })
-      val caseStmts = new ListBuffer[Statement]
-      ctx.caseStmt.asScala.toList.foreach(s => {
-        s.accept(this)
-        caseStmts += stmt
+      val caseVisitor = new CaseAlternativeVisitor()
+      
+      val cases = new ListBuffer[CaseAlternative]
+      ctx.cases.asScala.toList.foreach(e => {
+        e.accept(caseVisitor)
+        cases += caseVisitor.caseAlt
       })
 
       val elseStmt = if(ctx.elseStmt != null) {
@@ -271,7 +268,7 @@ class ParserVisitor {
         Some(stmt)
       } else None 
 
-      stmt = CaseStmt(caseExp, caseConds.toList, caseStmts.toList, elseStmt)
+      stmt = CaseStmt(caseExp, cases.toList, elseStmt)
     }
 
     override def visitWhileStmt(ctx: OberonParser.WhileStmtContext): Unit = {
@@ -290,6 +287,39 @@ class ParserVisitor {
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
       stmt = ReturnStmt(visitor.exp)
+    }
+  }
+
+  class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {
+    var caseAlt : CaseAlternative = _
+
+    override def visitSimpleCase(ctx:OberonParser.SimpleCaseContext): Unit = {
+      val expVisitor = new ExpressionVisitor()
+      
+      ctx.expression().accept(expVisitor)
+      val condition = expVisitor.exp
+      
+      val stmtVisitor = new StatementVisitor()
+
+      ctx.stmt.accept(stmtVisitor)
+      val stmt = stmtVisitor.stmt
+
+      caseAlt = SimpleCase(condition, stmt)
+    }
+
+    override def visitRangeCase(ctx:OberonParser.RangeCaseContext): Unit = {
+      var expressionVisitor = new ExpressionVisitor()
+      ctx.min.accept(expressionVisitor)
+      var min = expressionVisitor.exp
+     
+      ctx.max.accept(expressionVisitor)
+      var max = expressionVisitor.exp
+
+      var statementVisitor = new StatementVisitor()
+      ctx.stmt.accept(statementVisitor)
+      var stmt = statementVisitor.stmt
+
+      caseAlt = RangeCase(min, max, stmt)
     }
   }
 
