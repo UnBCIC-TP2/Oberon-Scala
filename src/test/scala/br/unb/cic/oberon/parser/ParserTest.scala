@@ -316,18 +316,17 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(myCaseStmt.exp == VarExpression("xs"));
 
-    assert(myCaseStmt.caseCond.length == 4);
+    assert(myCaseStmt.cases.length == 4);
 
     var caseLabel = 1;
-    myCaseStmt.caseCond.foreach(_expression => {
-      assert(_expression == IntValue(caseLabel));
-      caseLabel += 1;
-    })
-
-    assert(myCaseStmt.caseStmt.length == 4);
     var caseValAssigment = 5;
-    myCaseStmt.caseStmt.foreach(_stmt => {
-      assert(_stmt == AssignmentStmt("xs", IntValue(caseValAssigment)));
+    myCaseStmt.cases.foreach(miniCase => {
+
+      val _miniCase = miniCase.asInstanceOf[SimpleCase]
+
+      assert(_miniCase.condition == IntValue(caseLabel))
+      assert(_miniCase.stmt == AssignmentStmt("xs", IntValue(caseValAssigment)))
+      caseLabel += 1
       caseValAssigment *= 2
     })
 
