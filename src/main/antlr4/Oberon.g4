@@ -59,7 +59,7 @@ statement
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                          #IfElseStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                            #WhileStmt
  | 'RETURN' exp = expression                                                                                                        #ReturnStmt
- | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END' #CaseStmt
+ | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'        #CaseStmt
  ;
 
 caseAlternative
