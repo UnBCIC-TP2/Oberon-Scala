@@ -131,10 +131,10 @@ class ParserVisitor {
        visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitAddExpression(ctx: OberonParser.AddExpressionContext): Unit =
-      visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitMultExpression(ctx: OberonParser.MultExpressionContext): Unit =
-      visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitVariable(ctx: OberonParser.VariableContext): Unit =
        exp = VarExpression(ctx.getText)
@@ -195,11 +195,12 @@ class ParserVisitor {
 
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
       val stmts = new ListBuffer[Statement]
+
       ctx.statement().asScala.toList.foreach(s => {
         s.accept(this)
         stmts += stmt
       })
-       stmt = SequenceStmt(flatSequenceOfStatements(stmts.toList))
+      stmt = SequenceStmt(flatSequenceOfStatements(stmts.toList))
     }
 
     def flatSequenceOfStatements(stmts: List[Statement]) : List[Statement] =
@@ -207,7 +208,7 @@ class ParserVisitor {
         case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
         case s :: rest => s :: flatSequenceOfStatements(rest)
         case Nil => List()
-    }
+      }
 
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
