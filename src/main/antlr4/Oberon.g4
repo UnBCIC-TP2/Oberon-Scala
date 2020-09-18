@@ -51,15 +51,21 @@ expression
  ;
 
 statement
- : var = Id ':=' exp = expression                                                          #AssignmentStmt
- | stmt += statement (';' stmt += statement)+                                              #SequenceStmt
- | 'readInt'  '(' var = Id ')'                                                             #ReadIntStmt
- | 'write' '(' expression ')'                                                              #WriteStmt
- | name = Id '(' arguments? ')'                                                            #ProcedureCall
- | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END' #IfElseStmt
- | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                   #WhileStmt
- | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'          #ForStmt
- | 'RETURN' exp = expression                                                               #ReturnStmt
+ : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
+ | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
+ | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
+ | 'write' '(' expression ')'                                                                                                 #WriteStmt
+ | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
+ | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
+ | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                      #WhileStmt
+ | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
+ | 'RETURN' exp = expression                                                                                                  #ReturnStmt
+ | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt
+ ;
+
+caseAlternative
+ : cond = expression ':' stmt = statement                       #SimpleCase
+ | min = expression '..' max = expression ':' stmt = statement  #RangeCase
  ; 
  
 // TODO: NOT, MOD, Relational operators, 
