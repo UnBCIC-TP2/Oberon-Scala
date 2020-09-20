@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x, y, z : INTEGER;
+
+BEGIN
+    readInt(x); 
+    
+    FOR y := 0 TO x DO
+      z := z + y
+    END;
+
+    write(z)
+END
+
+END SimpleModule.
