@@ -290,6 +290,211 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
+  test("Testing the oberon stmt06 code. This module has a simple case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt06.oberon").getFile);
+
+    assert(path != null);
+
+    val content = String.join("\n", Files.readAllLines(path));
+    val module = ScalaParser.parse(content);
+
+    assert(module.name == "SimpleModule");
+
+    assert(!module.stmt.isEmpty);
+    
+
+    module.stmt.getOrElse(false) match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3);
+      case _ => fail("Expected a sequence of 3 statements!!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
+
+    assert(sequenceStmts(0) == ReadIntStmt("xs"));
+
+    val myCaseStmt = sequenceStmts(1).asInstanceOf[CaseStmt];
+
+    assert(myCaseStmt.exp == VarExpression("xs"));
+
+    assert(myCaseStmt.cases.length == 4);
+
+    var caseLabel = 1;
+    var caseValAssigment = 5;
+    myCaseStmt.cases.foreach(miniCase => {
+
+      val _miniCase = miniCase.asInstanceOf[SimpleCase]
+
+      assert(_miniCase.condition == IntValue(caseLabel))
+      assert(_miniCase.stmt == AssignmentStmt("xs", IntValue(caseValAssigment)))
+      caseLabel += 1
+      caseValAssigment *= 2
+    })
+
+    myCaseStmt.elseStmt.getOrElse(false) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "xs");
+        assert(exp == IntValue(0));
+      }
+      case _ => fail("Expected an else on the case statement!");
+    }
+    assert(sequenceStmts(2) == WriteStmt(VarExpression("xs")));
+
+  }
+  
+  test("Testing the oberon stmt07 code. This module has a For statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    // the third stmt must be an ForStmt
+    stmts(1) match {
+      case ForStmt(init, cond, stmt) =>
+        assert(init == AssignmentStmt("y", IntValue(0)))
+        assert(cond == VarExpression("x"))
+        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+      case _ => fail("expecting an assigment stmt and if-then stmt")
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("z")))
+
+  }
+
+  test("Testing the oberon stmt08 code. This module has a For statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt08.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    val stmts = sequence.stmts
+    
+    val code = AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x")))
+
+    assert(stmts.head == ReadIntStmt("y"))
+
+    stmts(1) match {
+      case ForStmt(init, cond, stmt) =>
+        assert(init == AssignmentStmt("x", IntValue(0)))
+        assert(cond == VarExpression("y"))
+        assert(stmt == ForStmt(AssignmentStmt("z", IntValue(0)), VarExpression("y"), code))
+      case _ => fail("expecting an assigment stmt and if-then stmt")
+    }
+ 
+    
+    assert(stmts(2) == WriteStmt(VarExpression("k")))
+
+  }
+
+  test("Testing the oberon stmt09 code. This module has a For statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt09.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    val stmts = sequence.stmts
+
+    // the third stmt must be an ForStmt
+    stmts.head match {
+      case ForStmt(init, cond, stmt) =>
+        assert(init == AssignmentStmt("y", IntValue(0)))
+        assert(cond == IntValue(10))
+        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+      case _ => fail("expecting an assigment stmt and if-then stmt")
+    }
+
+    assert(stmts(1) == WriteStmt(VarExpression("z")))
+
+  }
+  
+  test("Testing the oberon stmt10 code. This module has a For statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt10.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    val code = AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(2)));
+    val code2 = AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y")));
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    // the third stmt must be an ForStmt
+    stmts(1) match {
+      case ForStmt(init, cond, stmt) =>
+        assert(init == AssignmentStmt("y", IntValue(0)))
+        assert(cond == VarExpression("x"))
+        assert(stmt == SequenceStmt(List(code, code2)))
+      case _ => fail("expecting an assigment stmt and if-then stmt") 
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("z")))
+
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 

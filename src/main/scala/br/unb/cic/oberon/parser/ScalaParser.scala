@@ -131,7 +131,7 @@ class ParserVisitor {
        visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitAddExpression(ctx: OberonParser.AddExpressionContext): Unit =
-      visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
+       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
      override def visitMultExpression(ctx: OberonParser.MultExpressionContext): Unit =
        visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
@@ -250,6 +250,28 @@ class ParserVisitor {
       stmt = IfElseStmt(condition, thenStmt, elseStmt)
     }
 
+    override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
+      val expressionVisitor = new ExpressionVisitor()
+
+      ctx.expression().accept(expressionVisitor)
+      val caseExp = expressionVisitor.exp
+
+      val caseVisitor = new CaseAlternativeVisitor()
+      
+      val cases = new ListBuffer[CaseAlternative]
+      ctx.cases.asScala.toList.foreach(e => {
+        e.accept(caseVisitor)
+        cases += caseVisitor.caseAlt
+      })
+
+      val elseStmt = if(ctx.elseStmt != null) {
+        ctx.elseStmt.accept(this)
+        Some(stmt)
+      } else None 
+
+      stmt = CaseStmt(caseExp, cases.toList, elseStmt)
+    }
+
     override def visitWhileStmt(ctx: OberonParser.WhileStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
@@ -261,11 +283,59 @@ class ParserVisitor {
 
       stmt = WhileStmt(condition, whileStmt)
     }
+   
+    override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
 
+      ctx.init.accept(this)
+      val init = stmt
+
+      ctx.expression().accept(visitor)
+      val condition = visitor.exp
+
+      ctx.stmt.accept(this)
+      val block = stmt
+
+      stmt = ForStmt(init, condition, block)
+    }
+   
     override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
       stmt = ReturnStmt(visitor.exp)
+    }
+  }
+
+  class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {
+    var caseAlt : CaseAlternative = _
+
+    override def visitSimpleCase(ctx:OberonParser.SimpleCaseContext): Unit = {
+      val expVisitor = new ExpressionVisitor()
+      
+      ctx.expression().accept(expVisitor)
+      val condition = expVisitor.exp
+      
+      val stmtVisitor = new StatementVisitor()
+
+      ctx.stmt.accept(stmtVisitor)
+      val stmt = stmtVisitor.stmt
+
+      caseAlt = SimpleCase(condition, stmt)
+    }
+
+    override def visitRangeCase(ctx:OberonParser.RangeCaseContext): Unit = {
+      var expressionVisitor = new ExpressionVisitor()
+      ctx.min.accept(expressionVisitor)
+      var min = expressionVisitor.exp
+     
+      ctx.max.accept(expressionVisitor)
+      var max = expressionVisitor.exp
+
+      var statementVisitor = new StatementVisitor()
+      ctx.stmt.accept(statementVisitor)
+      var stmt = statementVisitor.stmt
+
+      caseAlt = RangeCase(min, max, stmt)
     }
   }
 
