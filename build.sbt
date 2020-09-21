@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest-featurespec" % "3.2.0" % "test"
-libraryDependencies += "com.lihaoyi" %% "pprint" % "0.5.6"
+libraryDependencies += "org.typelevel" %% "paiges-core" % "0.3.0"
 
 
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
