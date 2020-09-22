@@ -495,6 +495,188 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
+  test("Testing the oberon stmt11 code. This module has a case statement with range cases, two variabels, read and write statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt11.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "RangeCaseModule")
+
+    // Verifying variables declarations
+    assert(module.variables.length == 2)
+    assert(module.variables(0) == VariableDeclaration("x", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("y", IntegerType))
+
+    assert(module.stmt.nonEmpty);
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case _ => fail("This module should have 4 statements!")
+    }
+
+    // Verifying the statements
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
+
+    assert(sequenceStmts(0) == AssignmentStmt("y", IntValue(0)));
+    assert(sequenceStmts(1) == ReadIntStmt("x"));
+
+    val caseStmt = sequenceStmts(2).asInstanceOf[CaseStmt]
+
+    // Verifying the caseStmt properties
+    assert(caseStmt.exp == VarExpression("x"))
+    assert(caseStmt.cases.length == 2)
+    assert(caseStmt.elseStmt.isEmpty)
+
+    // Verifying the caseAlternatives in the case
+    val caseAlts = caseStmt.cases
+
+    assert(caseAlts.length == 2)
+    assert(caseAlts(0) == RangeCase(IntValue(0), IntValue(9),
+      AssignmentStmt("y", MultExpression(IntValue(2), VarExpression("x")))))
+    assert(caseAlts(1) == RangeCase(IntValue(10), IntValue(20),
+      AssignmentStmt("y", MultExpression(IntValue(4), VarExpression("x")))))
+
+    // Verifying the last statement
+    assert(sequenceStmts(3) == WriteStmt(VarExpression("y")))
+
+  } 
+
+  test("Testing the oberon stmt12 code. this module has a simple case statement with range case, reading min and max") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt12.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleRangeCaseModule")
+
+    // Verifying variables declarations
+    assert(module.variables.length == 3)
+    assert(module.variables(0) == VariableDeclaration("xs", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("min", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("max", IntegerType))
+    
+    assert(module.stmt.nonEmpty);
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case _ => fail("This module should have 5 statements!")
+    }
+
+    // Verifying the statements
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
+
+    assert(sequenceStmts(0) == ReadIntStmt("xs"));
+    assert(sequenceStmts(1) == ReadIntStmt("min"));
+    assert(sequenceStmts(2) == ReadIntStmt("max"));
+
+    val caseStmt = sequenceStmts(3).asInstanceOf[CaseStmt]
+
+    // Verifying the caseStmt properties
+    assert(caseStmt.exp == VarExpression("xs"))
+    
+    assert(caseStmt.cases.length == 3)
+
+    // Verifying the caseAlternatives in the case
+    val caseAlts = caseStmt.cases
+
+    assert(caseAlts.length == 3)
+    assert(caseAlts(0) == SimpleCase(IntValue(1), AssignmentStmt("xs",IntValue(5))))
+    assert(caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt("xs", IntValue(10))))
+    assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
+      
+    caseStmt.elseStmt.getOrElse(false) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "xs");
+        assert(exp == IntValue(0));
+      }
+      case _ => fail("Expected an else on the case statement!");
+    }
+    assert(sequenceStmts(4) == WriteStmt(VarExpression("xs")));
+  
+  }
+
+  test("Testing the oberon stmt13 code. This module has three variabels, two case statements, an read and a write statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt13.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "CaseModule")
+
+    // Verifying variables declarations
+    assert(module.variables.length == 3);
+    assert(module.variables(0) == VariableDeclaration("x", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("y", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("z", IntegerType))
+
+    // Verifying statements 
+    assert(module.stmt.nonEmpty);
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case _ => fail("This module should have 5 statements!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(sequenceStmts(0) == ReadIntStmt("x"))
+    assert(sequenceStmts(1) == AssignmentStmt("y", IntValue(1)))
+
+    // Verifying the first case statement
+    val caseStmt1 = sequenceStmts(2).asInstanceOf[CaseStmt]
+    assert(caseStmt1.exp == VarExpression("x"))
+
+    var caseSum = 5; var caseLabel = 5
+    caseStmt1.cases.foreach(_miniCase => {
+      val miniCase = _miniCase.asInstanceOf[SimpleCase]
+
+      assert(miniCase == SimpleCase(IntValue(caseLabel),
+        AssignmentStmt("y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
+        
+      caseSum += 5; caseLabel *= 2;
+    })
+
+    caseStmt1.elseStmt.getOrElse(None) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "y")
+        assert(exp == IntValue(41))
+      }
+      case None => fail("Expected an else on the first case statement!") 
+    }
+
+    // Verifying the second case statement
+    val caseStmt2 = sequenceStmts(3).asInstanceOf[CaseStmt]
+    assert(caseStmt2.exp == VarExpression("y"))
+
+    var minCaseValue = 1; var maxCaseValue = 5; var assignmentValue = 5
+    caseStmt2.cases.foreach(_miniCase => {
+      val miniCase = _miniCase.asInstanceOf[RangeCase]
+
+      assert(miniCase == RangeCase(IntValue(minCaseValue), IntValue(maxCaseValue),
+        AssignmentStmt("z", IntValue(assignmentValue))))
+
+      maxCaseValue *= 2; minCaseValue = maxCaseValue / 2 + 1; assignmentValue *= 2
+    })
+
+    caseStmt2.elseStmt.getOrElse(None) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "z")
+        assert(exp == IntValue(1))
+      }
+      case None => fail("Expected an else on the second case statement!") 
+    }
+
+    assert(sequenceStmts(4) == WriteStmt(VarExpression("z")))
+
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
