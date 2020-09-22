@@ -59,12 +59,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     expression match {
       case IntValue(v) => Doc.text(v.toString())
       case BoolValue(v) => Doc.text(if (v) "true" else "false")
-      case Undef() => Doc.text("undefined") // TODO: Perguntar para o professor
+      case Undef() => Doc.text("undefined")
       case VarExpression(name) => Doc.text(name)
       case Brackets(exp) => Doc.char('(') + Doc.space + generateExpression(exp) + Doc.space + Doc.char(')')
-      case EQExpression(left, right) => {
-        generateExpression(left) + Doc.space + Doc.text("==") + Doc.space + generateExpression(right)
-      }
+      case EQExpression(left, right) => generateBinExpression(left, right, "==")
       case FunctionCallExpression(name, args) => {
         val expressions = args.map { case (arg) =>
           generateExpression(arg)
@@ -76,6 +74,8 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     }
     
   }
+  def generateBinExpression(left: Expression, right: Expression, sign: String): Doc = 
+    generateExpression(left) + Doc.space + Doc.text(sign) + Doc.space + generateExpression(right)
 }
 
 class PPrintBasedGenerator extends CCodeGenerator {
