@@ -6,7 +6,7 @@ VAR
 BEGIN
     readInt(x); 
     
-    FOR y := 0 TO x DO
+    FOR y := 0 TO y < x DO
       z := z + y
     END;
 
