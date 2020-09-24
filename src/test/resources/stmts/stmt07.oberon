@@ -1,7 +1,7 @@
-MODULE SimpleModule;
+MODULE SimpleModule;	
 
-VAR
-  x, y, z : INTEGER;
+VAR	
+  x, y, z : INTEGER;	
 
 BEGIN
     readInt(x); 
@@ -10,7 +10,7 @@ BEGIN
       z := z + y
     END;
 
-    write(z)
-END
+    write(z)	
+END	
 
 END SimpleModule.

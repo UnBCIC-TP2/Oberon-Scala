@@ -150,7 +150,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants(2) == Constant("z", AndExpression(BoolValue(true), BoolValue(false))))
   }
 
-  ignore("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
+  test("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").getFile)
 
     assert(path != null)
@@ -160,7 +160,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("x", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+    assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {
