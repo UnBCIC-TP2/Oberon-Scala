@@ -341,7 +341,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
   
-  test("Testing the oberon stmt07 code. This module has a For statement") {
+  ignore("Testing the oberon stmt07 code. This module has a For statement") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt07.oberon").getFile)
 
     assert(path != null)
@@ -379,7 +379,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  test("Testing the oberon stmt08 code. This module has a For statement") {
+  ignore("Testing the oberon stmt08 code. This module has a For statement") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt08.oberon").getFile)
 
     assert(path != null)
@@ -419,7 +419,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  test("Testing the oberon stmt09 code. This module has a For statement") {
+  ignore("Testing the oberon stmt09 code. This module has a For statement") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt09.oberon").getFile)
 
     assert(path != null)
@@ -455,7 +455,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
   
-  test("Testing the oberon stmt10 code. This module has a For statement") {
+  ignore("Testing the oberon stmt10 code. This module has a For statement") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt10.oberon").getFile)
 
     assert(path != null)
