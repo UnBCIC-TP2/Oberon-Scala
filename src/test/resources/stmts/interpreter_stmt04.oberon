@@ -4,13 +4,15 @@ VAR
   x, z : INTEGER;
 
 BEGIN
-    x := 5;
+    x := 85;
     z := 0;
 
     CASE x OF
         4..10: x := 80;
        |11..20: x := 90;
-        ELSE z := 50
+       |50..70: x := 1;
+       |80..90: x := 2;
+       
     END
 END
 

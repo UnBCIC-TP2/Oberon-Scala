@@ -4,13 +4,14 @@ VAR
   x, z : INTEGER;
 
 BEGIN
-    x := 5;
+    x := 8;
     z := 0;
      
     CASE x OF
-        5: x := 1;
-       |6: x := 2;
-        ELSE z := 3
+        5: x := 1
+      | 6: x := x + 80
+      | 8: x := x + 2
+      
     END
 END
 

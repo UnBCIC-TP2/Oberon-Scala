@@ -105,7 +105,7 @@ test("Testing interpreter on interpreter_stmt02 program") {
 
     module.accept(interpreter)
 	
-	assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+	assert(interpreter.env.lookup("x") == Some(IntValue(10)))
   assert(interpreter.env.lookup("z") == Some(IntValue(0))) 
 
   }
@@ -124,6 +124,23 @@ test("Testing interpreter on interpreter_stmt03 program") {
 	
 	assert(interpreter.env.lookup("x") == Some(IntValue(90)))
   assert(interpreter.env.lookup("z") == Some(IntValue(50))) 
+
+  }
+
+test("Testing interpreter on interpreter_stmt04 program") {
+  val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").getFile)
+
+  assert(path != null)
+
+  val content = String.join("\n", Files.readAllLines(path))
+  val module = ScalaParser.parse(content)
+  val interpreter = new Interpreter()
+  assert(module.name == "SimpleModule")
+
+  module.accept(interpreter)
+
+assert(interpreter.env.lookup("x") == Some(IntValue(2)))
+assert(interpreter.env.lookup("z") == Some(IntValue(0))) 
 
   }
 
