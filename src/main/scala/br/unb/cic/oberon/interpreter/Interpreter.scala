@@ -69,7 +69,7 @@ class Interpreter extends OberonVisitorAdapter {
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
       
       case CaseStmt(exp, cases, elseStmt) =>
-        val v = evalExpression(exp) // visitor que avalia expressoes
+        var v = evalExpression(exp) // visitor que avalia expressoes
         var matched = false    
 
         var i = 0
@@ -95,12 +95,11 @@ class Interpreter extends OberonVisitorAdapter {
               }
           }
 
-
-
-          if (!matched && elseStmt.isDefined) {
-            elseStmt.get.accept(this) // executar stmt dentro do default
-          }
           i += 1
+        }
+
+        if (!matched && elseStmt.isDefined) {
+            elseStmt.get.accept(this) // executar stmt dentro do default
         }
       
           case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
