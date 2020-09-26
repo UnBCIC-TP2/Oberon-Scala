@@ -20,8 +20,8 @@ test("Testing interpreter on interpreter_stmt01 program") {
 
     module.accept(interpreter)
 	
-	assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
-	assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
+    assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
+    assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
     assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
 
   }
@@ -38,8 +38,8 @@ test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
 
     module.accept(interpreter)
 	
-	assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(120)))
+	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+   assert(interpreter.env.lookup("y") == Some(IntValue(120)))
 
   }
   
@@ -55,8 +55,8 @@ test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
 
     module.accept(interpreter)
 	
-	assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(1)))
+	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+   assert(interpreter.env.lookup("y") == Some(IntValue(1)))
 
   }
 
