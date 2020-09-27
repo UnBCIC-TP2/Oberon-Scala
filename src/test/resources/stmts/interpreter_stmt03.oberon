@@ -8,9 +8,9 @@ BEGIN
     z := 0;
      
     CASE x OF
-        4: x := 80;
-       |5: x := 90;
-        ELSE z := 50
+        4: x := 80
+       |5: x := 90
+       ELSE z := 50
     END
 END
 
