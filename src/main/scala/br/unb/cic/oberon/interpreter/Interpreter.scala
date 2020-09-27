@@ -79,7 +79,7 @@ class Interpreter extends OberonVisitorAdapter {
 
             case RangeCase(min, max, stmt) =>
 
-              if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) < evalCaseAlt(max))) {
+              if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
 
                 stmt.accept(this)
 

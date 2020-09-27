@@ -139,7 +139,7 @@ test("Testing interpreter on interpreter_stmt04 program") {
 
   module.accept(interpreter)
 
-  assert(interpreter.env.lookup("x") == Some(IntValue(3)))
+  assert(interpreter.env.lookup("x") == Some(IntValue(25)))
   assert(interpreter.env.lookup("z") == Some(IntValue(0))) 
 
   }
