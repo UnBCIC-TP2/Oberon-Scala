@@ -8,5 +8,5 @@ void main() {
   for(y = x; y < 100; y++){
     y = y * y;
   }
-  printf("%d", y);
+  printf("%d\n", y);
 }

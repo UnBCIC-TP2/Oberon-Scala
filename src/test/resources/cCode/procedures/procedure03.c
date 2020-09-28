@@ -12,5 +12,5 @@ void main() {
   int res;
 
   res = factorial(5);
-  printf("%d", res);
+  printf("%d\n", res);
 }

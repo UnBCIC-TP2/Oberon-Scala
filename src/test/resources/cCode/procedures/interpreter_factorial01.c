@@ -9,5 +9,5 @@ void main() {
     y = y * x;
     x = x - 1;
   }
-  printf("%d", y);
+  printf("%d\n", y);
 }

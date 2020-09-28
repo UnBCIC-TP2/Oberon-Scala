@@ -16,6 +16,6 @@ void main() {
     u = u + w;
   }
   u = u / x;
-  printf("%d", v);
-  printf("%d", u);
+  printf("%d\n", v);
+  printf("%d\n", u);
 }

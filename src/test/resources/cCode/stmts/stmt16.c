@@ -8,5 +8,5 @@ void main() {
     z = z / (z / y);
     y = y - 2;
   }
-  printf("%d", z);
+  printf("%d\n", z);
 }

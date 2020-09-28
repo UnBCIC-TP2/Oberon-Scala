@@ -14,5 +14,5 @@ void main() {
     prox = soma;
     i = i + 1;
   }
-  printf("%d", ant);
+  printf("%d\n", ant);
 }
