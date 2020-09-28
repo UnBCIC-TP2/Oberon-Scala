@@ -4,9 +4,10 @@
 void main() {
   int x, y;
 
-  scanf("%d", &x);
-  for(y = x; y < 100; y++){
-    y = y * y;
+  y = 1;
+  for (x = 1; x > 1; x++) {
+    y = y * x;
+    x = x - 1;
   }
   printf("%d\n", y);
 }

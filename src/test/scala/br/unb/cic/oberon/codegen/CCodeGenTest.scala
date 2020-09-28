@@ -7,6 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class CCodeGenTest extends AnyFunSuite {
 
+  // Tests for C code generator for stmt01.oberon - stmt16.oberon
   for(i <- 1 to 5) {
     val stmtNumber = "%02d".format(i)
     test(s"Testing C generator for stmt$stmtNumber") {

@@ -12,7 +12,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     for (procedure <- module.procedures) {
       println(generateProcedure(procedure).render(60))
     }
-    val mainDeclarations = generateDeclarations(module.variables, module.constants)
+    val mainDeclarations = generateDeclarations(module.variables)
     val mainBody = module.stmt match {
       case Some(stmt) => Doc.text("void main() ") + Doc.char('{') + Doc.line + mainDeclarations + Doc.line + generateStatement(stmt) + Doc.char('}')
       case None => Doc.text("void main() {}")
@@ -32,7 +32,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         argumentType + Doc.space + Doc.text(arg.name)
     }
 
-    val procedureDeclarations = generateDeclarations(procedure.variables, procedure.constants)
+    val procedureDeclarations = generateDeclarations(procedure.variables)
     val procedureArgs = Doc.intercalate(Doc.char(',') + Doc.space, args)
     val procedureName =
       returnType + Doc.space + Doc.text(procedure.name) + Doc.char('(')
@@ -44,7 +44,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       .char('}')
   }
 
-  def generateDeclarations(variables: List[VariableDeclaration], constants: List[Constant]): Doc = {
+  def generateDeclarations(variables: List[VariableDeclaration]): Doc = {
     val intVariables = variables.filter(_.variableType == IntegerType).map {
       case (intVar) => Doc.text(intVar.name)
     }
