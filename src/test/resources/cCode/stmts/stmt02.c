@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 void main() {
- int x, y;
+ int x, y, z;
 
  scanf("%d", &x);
  scanf("%d", &y);
- printf("%d", x + y);
+ z = x + y;
+ printf("%d", z);
 }

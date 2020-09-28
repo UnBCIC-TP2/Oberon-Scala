@@ -8,12 +8,13 @@ abstract class CCodeGenerator extends CodeGenerator {}
 
 case class PaigesBasedGenerator() extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
-    val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.line
+    val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.text("#include <stdbool.h>") + Doc.line + Doc.line
     for (procedure <- module.procedures) {
       println(generateProcedure(procedure).render(60))
     }
+    val mainDeclarations = generateDeclarations(module.variables, module.constants)
     val mainBody = module.stmt match {
-      case Some(stmt) => Doc.text("void main() ") + Doc.char('{') + Doc.line + generateStatement(stmt) + Doc.char('}')
+      case Some(stmt) => Doc.text("void main() ") + Doc.char('{') + Doc.line + mainDeclarations + Doc.line + generateStatement(stmt) + Doc.char('}')
       case None => Doc.text("void main() {}")
     }
     val main = mainHeader + mainBody
@@ -21,31 +22,40 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   }
 
   def generateProcedure(procedure: Procedure): Doc = {
-    var returnType = Doc.empty;
-    procedure.returnType match {
-      case Some(IntegerType) => returnType = Doc.text("int")
-      case Some(BooleanType) => returnType = Doc.text("bool")
-      case None => returnType = Doc.text("void")
-      case _ => returnType = Doc.text("undefined")
+    val returnType = procedure.returnType match {
+      case Some(varType) => generateType(varType)
+      case None => Doc.text("void")
     }
     val args = procedure.args.map {
       case (arg) =>
-        var argumentType = Doc.empty;
-        arg.argumentType match {
-          case IntegerType => argumentType = Doc.text("int")
-          case BooleanType => argumentType = Doc.text("bool")
-          case _ => argumentType = Doc.text("undefined")
-        }
+        val argumentType = generateType(arg.argumentType)
         argumentType + Doc.space + Doc.text(arg.name)
     }
+
+    val procedureDeclarations = generateDeclarations(procedure.variables, procedure.constants)
     val procedureArgs = Doc.intercalate(Doc.char(',') + Doc.space, args)
     val procedureName =
       returnType + Doc.space + Doc.text(procedure.name) + Doc.char('(')
     val procedureHeader =
       procedureArgs.tightBracketBy(procedureName, Doc.char(')'))
     val procedureBody = generateStatement(procedure.stmt)
-    procedureHeader + Doc.space + Doc.char('{') + Doc.line + procedureBody + Doc
+
+    procedureHeader + Doc.space + Doc.char('{') + Doc.line + procedureDeclarations + Doc.line + procedureBody + Doc
       .char('}')
+  }
+
+  def generateDeclarations(variables: List[VariableDeclaration], constants: List[Constant]): Doc = {
+    val intVariables = variables.filter(_.variableType == IntegerType).map {
+      case (intVar) => Doc.text(intVar.name)
+    }
+    val intDeclaration = if (intVariables.nonEmpty) Doc.space + Doc.text("int ") + Doc.intercalate(Doc.comma + Doc.space, intVariables) + Doc.char(';') + Doc.line else Doc.empty
+
+    val boolVariables = variables.filter(_.variableType == BooleanType).map {
+      case (boolVar) => Doc.text(boolVar.name)
+    }
+    val boolDeclaration = if (boolVariables.nonEmpty) Doc.space + Doc.text("bool ") + Doc.intercalate(Doc.comma + Doc.space, boolVariables) + Doc.char(';') + Doc.line else Doc.empty
+
+    intDeclaration + boolDeclaration
   }
 
   def generateStatement(statement: Statement): Doc = {
@@ -144,6 +154,14 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     generateExpression(left) + Doc.space + Doc.text(
       sign
     ) + Doc.space + generateExpression(right)
+
+  def generateType(varType: Type): Doc = {
+    varType match {
+      case IntegerType => Doc.text("int")
+      case BooleanType => Doc.text("bool")
+      case _ => Doc.text("undefined")
+    }
+  }
 }
 
 class PPrintBasedGenerator extends CCodeGenerator {
