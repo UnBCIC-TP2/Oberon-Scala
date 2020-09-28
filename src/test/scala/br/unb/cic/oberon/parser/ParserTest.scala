@@ -636,7 +636,7 @@ class ParserTestSuite extends AnyFunSuite {
     var caseSum = 5; var caseLabel = 5
     caseStmt1.cases.foreach(_miniCase => {
       val miniCase = _miniCase.asInstanceOf[SimpleCase]
-
+      
       assert(miniCase == SimpleCase(IntValue(caseLabel),
         AssignmentStmt("y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
         
@@ -677,6 +677,164 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
+  test("Testing the oberon stmt14 code. This module implements the factorial function with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt14.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "ProcedureCaseModule")
+
+    // Verifying the factorial procedure
+    assert(module.procedures.length == 1)
+    val factorial = module.procedures(0)
+
+    assert(factorial.name == "factorial")
+    assert(factorial.args.length == 1)
+    assert(factorial.returnType.getOrElse(None) == IntegerType)
+
+    val factorialStmt = factorial.stmt.asInstanceOf[SequenceStmt].stmts
+
+    assert(factorialStmt.length == 2)
+
+    val factorialCaseStmt = factorialStmt(0).asInstanceOf[CaseStmt]
+
+    // Verifying the case stmt in the factorial procedure
+    assert(factorialCaseStmt.exp == VarExpression("n"))
+    assert(factorialCaseStmt.cases.length == 2)
+    
+    assert(factorialCaseStmt.cases(0) == SimpleCase(IntValue(0), ReturnStmt(IntValue(1))))
+    assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(IntValue(1))))
+    
+    factorialCaseStmt.elseStmt.getOrElse(None) match {
+      case ReturnStmt(MultExpression(left, right)) => {
+        assert(left == VarExpression("n"))
+
+        assert(right == FunctionCallExpression("factorial", List(
+          SubExpression(VarExpression("n"), IntValue(1))
+        )))
+      }
+
+      case _ => fail("Missing an elseStmt in the factorial procedure case")
+    }
+
+    assert(factorialStmt(1) == ReturnStmt(MultExpression(VarExpression("n"),
+      FunctionCallExpression("factorial", List(
+        SubExpression(VarExpression("n"), IntValue(1)))))))
+    // End of the factorial procedure verification
+
+    // Verifying the body module statements
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmts) => succeed 
+      case _ => fail("Expecting a sequence of statements!")
+    }
+  }
+
+  test("Testing the oberon stmt15 code. This module tests if a number is even with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt15.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleRangeCaseModule")
+
+    // Verifying variables declarations
+    assert(module.variables.length == 2);
+    assert(module.variables(0) == VariableDeclaration("x", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("aux", IntegerType))
+
+    
+    assert(module.stmt.nonEmpty);
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case _ => fail("This module should have 5 statements!")
+    }
+
+    // Verifying statements 
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts  
+
+    assert(sequenceStmts(0) == ReadIntStmt("x"))
+    assert(sequenceStmts(1) == AssignmentStmt("aux", DivExpression(VarExpression("x"), IntValue(2))))
+    assert(sequenceStmts(2) == AssignmentStmt("aux", MultExpression(VarExpression("aux"), IntValue(2))))
+
+    // Verifying the case statement
+
+    val caseStmt = sequenceStmts(3).asInstanceOf[CaseStmt]
+    val caseAlts = caseStmt.cases
+
+    assert(caseAlts.length == 1)
+    assert(caseAlts(0) == SimpleCase(VarExpression("x"), AssignmentStmt("aux",IntValue(0))))
+
+    caseStmt.elseStmt.getOrElse(None) match {
+      case AssignmentStmt(varName, exp) => {
+        assert(varName == "aux")
+        assert(exp == IntValue(1))
+      }
+      case None => fail("Expected an else on the case statement!") 
+    }
+
+    // Verifying the write statement
+    assert(sequenceStmts(4) == WriteStmt(VarExpression("aux")))
+
+  }
+
+  test("Testing the oberon stmt16 code. This module implements a case statement inside a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt16.oberon").getFile)
+    
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "CaseCaseModule")
+    
+    // Verifying variables declarations
+    assert(module.variables.length == 1)
+    assert(module.variables(0) == VariableDeclaration("x", IntegerType))
+
+    assert(module.stmt.nonEmpty);
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case _ => fail("This module should have 3 statements!")
+    }
+
+    // Verifying the statements
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
+    assert(sequenceStmts(0) == ReadIntStmt("x"));
+
+    val caseStmt1 = sequenceStmts(1).asInstanceOf[CaseStmt]
+    
+
+    // Verifying the caseStmt properties
+    assert(caseStmt1.exp == VarExpression("x"))
+    
+    assert(caseStmt1.cases.length == 2)
+
+    // Verifying the caseAlternatives in the case
+    val caseAlts = caseStmt1.cases
+
+    assert(caseAlts.length == 2)
+    assert(caseStmt1.elseStmt.isEmpty)
+
+    val innerCase = CaseStmt(VarExpression("x"), List(RangeCase(IntValue(1), IntValue(5),
+      AssignmentStmt("x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))), 
+      None)
+
+    assert(caseAlts(0) == RangeCase(IntValue(1), IntValue(10), innerCase))
+    
+    assert(caseAlts(1) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("x",MultExpression(VarExpression("x"), IntValue(2)))))
+    
+    // Verifying the write statement
+    assert(sequenceStmts(2) == WriteStmt(VarExpression("x")))
+
+  }
+  
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
