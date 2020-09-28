@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 int u, v, y, z, x, w;
 
