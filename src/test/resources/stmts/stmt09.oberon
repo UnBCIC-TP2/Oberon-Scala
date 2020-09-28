@@ -1,16 +1,15 @@
-MODULE SimpleModule;
+MODULE SimpleModule;	
 
-VAR
-  y, z : INTEGER;
+VAR	
+  y, z : INTEGER;	
 
-BEGIN
-    
-    FOR y := 0 TO 10 DO
-      z := z + y
-    END;
 
-    write(z)
-    
-END
+BEGIN	
+    FOR y := 0 TO y < 10 DO	
+      z := z + y	
+    END;	
 
-END SimpleModule.
+    write(z)	
+END	
+
+END SimpleModule. 
