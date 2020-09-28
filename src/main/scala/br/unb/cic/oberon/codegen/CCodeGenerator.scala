@@ -48,12 +48,12 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     val intVariables = variables.filter(_.variableType == IntegerType).map {
       case (intVar) => Doc.text(intVar.name)
     }
-    val intDeclaration = if (intVariables.nonEmpty) Doc.space + Doc.text("int ") + Doc.intercalate(Doc.comma + Doc.space, intVariables) + Doc.char(';') + Doc.line else Doc.empty
+    val intDeclaration = if (intVariables.nonEmpty) formatLine(2) + Doc.text("int ") + Doc.intercalate(Doc.comma + Doc.space, intVariables) + Doc.char(';') + Doc.line else Doc.empty
 
     val boolVariables = variables.filter(_.variableType == BooleanType).map {
       case (boolVar) => Doc.text(boolVar.name)
     }
-    val boolDeclaration = if (boolVariables.nonEmpty) Doc.space + Doc.text("bool ") + Doc.intercalate(Doc.comma + Doc.space, boolVariables) + Doc.char(';') + Doc.line else Doc.empty
+    val boolDeclaration = if (boolVariables.nonEmpty) formatLine(2) + Doc.text("bool ") + Doc.intercalate(Doc.comma + Doc.space, boolVariables) + Doc.char(';') + Doc.line else Doc.empty
 
     intDeclaration + boolDeclaration
   }
@@ -61,7 +61,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def generateStatement(statement: Statement): Doc = {
     statement match {
       case AssignmentStmt(varName, expression) =>
-        Doc.space + Doc.text(varName) + Doc.space + Doc.char(
+        formatLine(2) + Doc.text(varName) + Doc.space + Doc.char(
           '='
         ) + Doc.space + generateExpression(expression) + Doc.char(
           ';'
@@ -74,11 +74,11 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         multipleStmts
       }
       case ReadIntStmt(varName) =>
-        Doc.space + Doc.text("scanf(\"%d\", &") + Doc.text(varName) + Doc.text(
+        formatLine(2) + Doc.text("scanf(\"%d\", &") + Doc.text(varName) + Doc.text(
           ");"
         ) + Doc.line
       case WriteStmt(expression) => {
-        Doc.space + Doc.text("printf(\"%d\", ") + generateExpression(
+        formatLine(2) + Doc.text("printf(\"%d\\n\", ") + generateExpression(
           expression
         ) + Doc.text(");") + Doc.line
       }
@@ -88,30 +88,30 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             generateExpression(arg)
         }
         val functionArgs =
-          Doc.intercalate(Doc.char(',') + Doc.space, expressions)
+          formatLine(2) + Doc.intercalate(Doc.char(',') + Doc.space, expressions)
         functionArgs.tightBracketBy(
           Doc.text(name) + Doc.char('('),
           Doc.char(')')
         )
       }
       case IfElseStmt(condition, thenStmt, elseStmt) => {
-        val ifCond = Doc.space + Doc.text("if (") + generateExpression(
+        val ifCond = formatLine(2) + Doc.text("if (") + generateExpression(
           condition
         ) + Doc.text(
           ")"
-        ) + Doc.text(" {") + Doc.line + generateStatement(thenStmt) + Doc.text(" }")
+        ) + Doc.text(" {") + Doc.line + formatLine(2) + generateStatement(thenStmt) + Doc.text(" }")
         val elseCond = elseStmt match {
           case Some(stmt) => {
-            Doc.space + Doc.text("else") +
-              Doc.text(" {") + Doc.line + generateStatement(stmt) + Doc.text(" }")
+            formatLine(2) + Doc.text("else") +
+              Doc.text(" {") + Doc.line + formatLine(2) + generateStatement(stmt) + Doc.text(" }")
           }
           case None => Doc.empty
         }
         ifCond + elseCond
       }
       case WhileStmt(condition, stmt) =>
-        Doc.space + Doc.text("while (") + generateExpression(condition) + Doc.text(")") + Doc.line +
-          Doc.text(" {") + Doc.line + generateStatement(stmt) + Doc.text(" }")
+        formatLine(2) + Doc.text("while (") + generateExpression(condition) + Doc.text(")") + Doc.line +
+          Doc.text(" {") + formatLine(2) + Doc.line + generateStatement(stmt) + Doc.text(" }")
 
       case _ => Doc.empty
     }
@@ -162,6 +162,9 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case _ => Doc.text("undefined")
     }
   }
+
+  def formatLine(spaces: Int): Doc = Doc.intercalate(Doc.empty,List.fill(spaces)(Doc.space)) // adiciona a identação na quantidade de espaços definidos
+
 }
 
 class PPrintBasedGenerator extends CCodeGenerator {
