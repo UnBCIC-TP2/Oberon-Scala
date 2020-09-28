@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define limit 10
 
@@ -12,7 +12,7 @@ void main() {
 
   scanf("%d", &base);
   count = 1;
-  while (count < limit) {
+  while (expression not found) {
     mult = calcmult(count, base);
     printf("%d\n", mult);
   }

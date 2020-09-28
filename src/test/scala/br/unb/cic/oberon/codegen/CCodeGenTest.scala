@@ -27,4 +27,21 @@ class CCodeGenTest extends AnyFunSuite {
       assert(generatedCCode == cCode)
     }
   }
+
+  test("Testing C generator for procedure02") {
+    val oberonPath = Paths.get(getClass.getClassLoader.getResource("procedures/procedure02.oberon").getFile.replace("/C:/","C:/"))
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(getClass.getClassLoader.getResource("cCode/procedures/procedure02.c").getFile.replace("/C:/","C:/"))
+    assert(cPath != null)
+
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    println(generatedCCode)
+    assert(generatedCCode == cCode)
+  }
 }
