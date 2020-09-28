@@ -2,15 +2,15 @@
 
 int u, v, y, z, x, w;
 
-void main() {
+void main () {
   scanf("%d", &x);
-  v=0;
-  for(y=0; y<x; y++){
+  v = 0;
+  for (y = 0; y < x; y++){
     scanf("%d", &w);
-    v = v + (w * (y+1));
+    v = v + (w * (y + 1));
   }
   v = v / x;
-  for(z=0; z<x; z++){
+  for (z = 0; z < x; z++){
     scanf("%d", &w);
     u = u + w;
   }

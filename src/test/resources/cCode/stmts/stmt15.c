@@ -2,11 +2,11 @@
 
 int x, y, z;
 
-void main(){
+void main () {
   scanf("%d", &x);
-  for(y=0; y<x; y++){
+  for(y = 0; y < x; y++){
     scanf("%d", &z);
-    z = z/(y*x);
+    z = z / (y * x);
   }
   printf("%d", z);
 }
