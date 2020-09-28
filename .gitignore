@@ -38,3 +38,4 @@ build
 null/
 project/
 .bloop/
+.scalafmt.conf
