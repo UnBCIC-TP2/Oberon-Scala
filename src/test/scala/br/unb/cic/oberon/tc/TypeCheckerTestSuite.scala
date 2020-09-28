@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt,SimpleCase, CaseAlternative, RangeCase}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -138,6 +138,87 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
+  }
+
+
+  test("Test switch-case statement type checker (invalid bool condition)") {
+    val visitor = new TypeChecker()
+    
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val caseElse = AssignmentStmt("x", IntValue(20))
+    
+
+    val case01 = SimpleCase(BoolValue(true), stmt01)
+    val case02 = SimpleCase(BoolValue(false), stmt01)
+    val cases = List(case01, case02)
+    
+    val stmt02 = CaseStmt(BoolValue(true), cases, Some(caseElse))
+
+    assert(stmt01.accept(visitor) == List())
+    assert(caseElse.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size ==  1)
+  }
+
+  test("Test switch-case statement type checker (invalid case01 condition)") {
+    val visitor = new TypeChecker()
+    
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val caseElse = AssignmentStmt("x", IntValue(20))
+    
+
+    val case01 = SimpleCase(IntValue(10), stmt01)
+    val case02 = SimpleCase(BoolValue(false), stmt01)
+    val cases = List(case01, case02)
+    
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    assert(stmt01.accept(visitor) == List())
+    assert(caseElse.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size ==  1)
+  }
+
+  test("Test switch-case statement type checker (invalid case01 and case02 condition)") {
+    val visitor = new TypeChecker()
+    
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val caseElse = AssignmentStmt("x", IntValue(20))
+    
+
+    val case01 = SimpleCase(IntValue(10), stmt01)
+    val case02 = SimpleCase(Undef(), stmt01)
+    val cases = List(case01, case02)
+    
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    assert(stmt01.accept(visitor) == List())
+    assert(caseElse.accept(visitor) == List())
+    assert(stmt02.accept(visitor).size ==  1)
+  }
+
+   test("Test switch-case statement type checker") {
+    val visitor = new TypeChecker()
+    
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val caseElse = AssignmentStmt("x", IntValue(20))
+    
+
+    val case01 = SimpleCase(IntValue(10), stmt01)
+    val case02 = SimpleCase(IntValue(20), stmt01)
+    val cases = List(case01, case02)
+    
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    assert(stmt01.accept(visitor) == List())
+    assert(caseElse.accept(visitor) == List())
+    assert(stmt02.accept(visitor) == List())
   }
 
   /*
