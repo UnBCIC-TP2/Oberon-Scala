@@ -6,16 +6,19 @@ import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class CCodeGenTest extends AnyFunSuite {
-  test("Testing the oberon simple01 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").getFile.replace("/C:/","C:/"))
+  test("Testing C generator for add, readInt and writeExpression") {
+    val oberonPath = Paths.get(getClass.getClassLoader.getResource("stmts/stmt01.oberon").getFile.replace("/C:/","C:/"))
+    assert(oberonPath != null)
 
-    assert(path != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
 
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val cPath = Paths.get(getClass.getClassLoader.getResource("cCode/stmts/stmt01.c").getFile.replace("/C:/","C:/"))
+    assert(cPath != null)
 
-    assert(module.name == "SimpleModule")
-    assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("x", IntValue(5)))
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
   }
 }

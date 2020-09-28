@@ -1,4 +1,5 @@
 package br.unb.cic.oberon.codegen
+
 import br.unb.cic.oberon.ast._
 import scala.annotation.tailrec
 import org.typelevel.paiges._
@@ -7,15 +8,16 @@ abstract class CCodeGenerator extends CodeGenerator {}
 
 case class PaigesBasedGenerator() extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
+    val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.line
     for (procedure <- module.procedures) {
       println(generateProcedure(procedure).render(60))
     }
-    val main = module.stmt match {
-      case Some(stmt) => Doc.text("void main() ") + Doc.line + generateStatement(stmt).tightBracketBy(Doc.char('{'), Doc.char('}'))
+    val mainBody = module.stmt match {
+      case Some(stmt) => Doc.text("void main() ") + Doc.char('{') + Doc.line + generateStatement(stmt) + Doc.char('}')
       case None => Doc.text("void main() {}")
     }
-    println(main.render(60))
-    ""
+    val main = mainHeader + mainBody
+    main.render(60)
   }
 
   def generateProcedure(procedure: Procedure): Doc = {
@@ -23,8 +25,8 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     procedure.returnType match {
       case Some(IntegerType) => returnType = Doc.text("int")
       case Some(BooleanType) => returnType = Doc.text("bool")
-      case None              => returnType = Doc.text("void")
-      case _                 => returnType = Doc.text("undefined")
+      case None => returnType = Doc.text("void")
+      case _ => returnType = Doc.text("undefined")
     }
     val args = procedure.args.map {
       case (arg) =>
@@ -32,7 +34,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         arg.argumentType match {
           case IntegerType => argumentType = Doc.text("int")
           case BooleanType => argumentType = Doc.text("bool")
-          case _           => argumentType = Doc.text("undefined")
+          case _ => argumentType = Doc.text("undefined")
         }
         argumentType + Doc.space + Doc.text(arg.name)
     }
@@ -87,32 +89,20 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
           condition
         ) + Doc.text(
           ")"
-        ) + Doc.line + generateStatement(thenStmt).tightBracketBy(
-          Doc.text(" {"),
-          Doc.text(" }")
-        )
+        ) + Doc.text(" {") + Doc.line + generateStatement(thenStmt) + Doc.text(" }")
         val elseCond = elseStmt match {
           case Some(stmt) => {
-            Doc.space + Doc.text("else ") + generateStatement(
-              thenStmt
-            ).tightBracketBy(
-              Doc.text(" {"),
-              Doc.text(" }")
-            )
+            Doc.space + Doc.text("else") +
+              Doc.text(" {") + Doc.line + generateStatement(stmt) + Doc.text(" }")
           }
           case None => Doc.empty
         }
         ifCond + elseCond
       }
       case WhileStmt(condition, stmt) =>
-        Doc.space + Doc.text("while (") + generateExpression(
-          condition
-        ) + Doc.text(
-          ")"
-        ) + Doc.line + generateStatement(stmt).tightBracketBy(
-          Doc.text(" {"),
-          Doc.text(" }")
-        )
+        Doc.space + Doc.text("while (") + generateExpression(condition) + Doc.text(")") + Doc.line +
+          Doc.text(" {") + Doc.line + generateStatement(stmt) + Doc.text(" }")
+
       case _ => Doc.empty
     }
 
@@ -120,9 +110,9 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
   def generateExpression(expression: Expression): Doc = {
     expression match {
-      case IntValue(v)         => Doc.text(v.toString())
-      case BoolValue(v)        => Doc.text(if (v) "true" else "false")
-      case Undef()             => Doc.text("undefined")
+      case IntValue(v) => Doc.text(v.toString())
+      case BoolValue(v) => Doc.text(if (v) "true" else "false")
+      case Undef() => Doc.text("undefined")
       case VarExpression(name) => Doc.text(name)
       case Brackets(exp) =>
         Doc.char('(') + Doc.space + generateExpression(exp) + Doc.space + Doc
@@ -145,11 +135,12 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     }
 
   }
+
   def generateBinExpression(
-      left: Expression,
-      right: Expression,
-      sign: String
-  ): Doc =
+                             left: Expression,
+                             right: Expression,
+                             sign: String
+                           ): Doc =
     generateExpression(left) + Doc.space + Doc.text(
       sign
     ) + Doc.space + generateExpression(right)
