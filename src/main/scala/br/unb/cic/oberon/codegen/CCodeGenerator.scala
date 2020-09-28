@@ -10,6 +10,11 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     for (procedure <- module.procedures) {
       println(generateProcedure(procedure).render(60))
     }
+    val main = module.stmt match {
+      case Some(stmt) => Doc.text("void main() ") + Doc.line + generateStatement(stmt).tightBracketBy(Doc.char('{'), Doc.char('}'))
+      case None => Doc.text("void main() {}")
+    }
+    println(main.render(60))
     ""
   }
 
@@ -60,10 +65,11 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         Doc.space + Doc.text("scanf(\"%d\", &") + Doc.text(varName) + Doc.text(
           ");"
         ) + Doc.line
-      case WriteStmt(expression) =>
+      case WriteStmt(expression) => {
         Doc.space + Doc.text("printf(\"%d\", ") + generateExpression(
           expression
         ) + Doc.text(");") + Doc.line
+      }
       case ProcedureCallStmt(name, args) => {
         val expressions = args.map {
           case (arg) =>
@@ -122,6 +128,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         Doc.char('(') + Doc.space + generateExpression(exp) + Doc.space + Doc
           .char(')')
       case EQExpression(left, right) => generateBinExpression(left, right, "==")
+      case AddExpression(left, right) => generateBinExpression(left, right, "+")
       case FunctionCallExpression(name, args) => {
         val expressions = args.map {
           case (arg) =>
@@ -134,7 +141,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
           Doc.char(')')
         )
       }
-      case _ => Doc.empty
+      case _ => Doc.text("expression not found")
     }
 
   }
