@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int x, y, z;
-
-void main () {
+void main() {
+  int x, y, z;
   scanf("%d", &x);
   for(y = x; y > 0; y++){
     z = z / (z / y);

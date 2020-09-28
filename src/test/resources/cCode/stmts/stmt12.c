@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int u, v, y, z, x, w;
+void main() {
+  int u, v, y, z, x, w;
 
-void main () {
   scanf("%d", &x);
   v = 0;
   for (y = 0; y < x; y++){
