@@ -120,7 +120,7 @@ class TypeChecker extends OberonVisitorAdapter {
               }
               else {
                 val list1 = List((stmt, s"Min $min or max $max does not have an integer type"))
-                list2 ++ list1
+                list2 = list1 ++ list2
               } 
           }
 
