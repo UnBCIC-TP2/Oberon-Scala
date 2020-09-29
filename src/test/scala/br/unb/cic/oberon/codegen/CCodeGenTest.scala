@@ -62,8 +62,6 @@ class CCodeGenTest extends AnyFunSuite {
       assert(cPath != null)
 
       val cCode = String.join("\n", Files.readAllLines(cPath))
-      println(module.stmt)
-      println(generatedCCode)
       assert(generatedCCode == cCode)
     }
   }
@@ -98,8 +96,6 @@ class CCodeGenTest extends AnyFunSuite {
       assert(cPath != null)
 
       val cCode = String.join("\n", Files.readAllLines(cPath))
-      println(module.stmt)
-      println(generatedCCode)
       assert(generatedCCode == cCode)
     }
   }
@@ -130,8 +126,6 @@ class CCodeGenTest extends AnyFunSuite {
     assert(cPath != null)
 
     val cCode = String.join("\n", Files.readAllLines(cPath))
-    println(module.stmt)
-    println(generatedCCode)
     assert(generatedCCode == cCode)
   }
 }
