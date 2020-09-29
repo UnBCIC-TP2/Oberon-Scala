@@ -1086,7 +1086,109 @@ class ParserTestSuite extends AnyFunSuite {
     assert(sequenceStmts(2) == WriteStmt(VarExpression("x")))
 
   }
-  
+
+  test("Testing the oberon stmt23 code. This module has a while with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt23.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "WhileCaseModule")
+
+    assert(module.variables.length == 2)
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case _ => fail("This module should have a sequence of 3 statements!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(sequenceStmts(0) == AssignmentStmt("x", IntValue(0)))
+
+    val myWhileStmt = sequenceStmts(1).asInstanceOf[WhileStmt];
+
+    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20)))
+
+    myWhileStmt.stmt match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("Expected a sequence of statements in the while statement!")
+    }
+
+    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(0).asInstanceOf[CaseStmt]
+
+    assert(innerCase.exp == VarExpression("x"))
+
+    assert(innerCase.cases(0) == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+
+    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum", 
+      AddExpression(VarExpression("sum"), VarExpression("x")))))
+
+    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")), 
+      AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
+
+    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
+      VarExpression("sum"), MultExpression(IntValue(2), VarExpression("x"))))))
+
+    assert(innerCase.elseStmt == None)
+
+    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
+      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+
+    assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
+
+  }
+
+  test("Testing the oberon stmt24 code. This module has a while with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt24.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "WhileCaseModule")
+
+    assert(module.variables.length == 3)
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 4)
+      case _ => fail("This module should have a sequence of 4 statements!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(sequenceStmts(0) == AssignmentStmt("x", IntValue(0)))
+
+    assert(sequenceStmts(1) == ReadIntStmt("lim"))
+
+    val myWhileStmt = sequenceStmts(2).asInstanceOf[WhileStmt];
+
+    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), VarExpression("lim")))
+
+    myWhileStmt.stmt match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("Expected a sequence of statements in the while statement!")
+    }
+
+    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(0).asInstanceOf[CaseStmt]
+
+    assert(innerCase.exp == VarExpression("x"))
+
+    assert(innerCase.cases(0) == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+
+    assert(innerCase.elseStmt.getOrElse(None) == AssignmentStmt("sum", AddExpression(
+      VarExpression("sum"), VarExpression("x"))))
+
+    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
+      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+
+    assert(sequenceStmts(3) == WriteStmt(VarExpression("sum")))
+
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
