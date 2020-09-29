@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, ForStmt, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -60,6 +60,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
+    case ForStmt(_, _, _) => visitForStmt(stmt)
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
     case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
@@ -91,6 +92,16 @@ class TypeChecker extends OberonVisitorAdapter {
     case WhileStmt(condition, stmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)) {
         stmt.accept(this)
+      }
+      else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  private def visitForStmt(stmt: Statement) = stmt match {
+    case ForStmt(init, condition, stmt) =>
+      if(condition.accept(expVisitor).contains(BooleanType)) {
+        val list1 = init.accept(this)
+        val list2 = stmt.accept(this)
+        list1 ++ list2
       }
       else List((stmt, s"Expression $condition do not have a boolean type"))
   }
