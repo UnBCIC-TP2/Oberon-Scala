@@ -113,6 +113,20 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         formatLine(2) + Doc.text("while (") + generateExpression(condition) + Doc.text(")") + Doc.line +
           Doc.text(" {") + formatLine(2) + Doc.line + generateStatement(stmt) + Doc.text(" }")
 
+      case ForStmt(init: Statement, condition, stmt) => {
+        init match {
+          case AssignmentStmt(varName, expression) => {
+            formatLine(2) + Doc.text("for(") +  Doc.text(varName) + Doc.space + Doc.char('=') + Doc.space +
+             generateExpression(expression) + Doc.text("; ") + generateExpression(condition) + Doc.text("; ") +
+              Doc.text(varName) + Doc.text("++") + Doc.text("){") + Doc.line + formatLine(2) +
+               generateStatement(stmt) + formatLine(2) + Doc.text(" }") + Doc.line
+          }
+        case _ => Doc.empty
+        }
+      }
+
+      case ReturnStmt(exp) => formatLine(2) + Doc.text("return ") + generateExpression(exp)
+
       case _ => Doc.empty
     }
 
@@ -120,15 +134,13 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
   def generateExpression(expression: Expression): Doc = {
     expression match {
+      case Brackets(exp) =>
+        Doc.char('(') + Doc.space + generateExpression(exp) + Doc.space + Doc
+          .char(')')
       case IntValue(v) => Doc.text(v.toString())
       case BoolValue(v) => Doc.text(if (v) "true" else "false")
       case Undef() => Doc.text("undefined")
       case VarExpression(name) => Doc.text(name)
-      case Brackets(exp) =>
-        Doc.char('(') + Doc.space + generateExpression(exp) + Doc.space + Doc
-          .char(')')
-      case EQExpression(left, right) => generateBinExpression(left, right, "==")
-      case AddExpression(left, right) => generateBinExpression(left, right, "+")
       case FunctionCallExpression(name, args) => {
         val expressions = args.map {
           case (arg) =>
@@ -141,6 +153,19 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
           Doc.char(')')
         )
       }
+      case EQExpression(left, right) => generateBinExpression(left, right, "==")
+      case NEQExpression(left, right) => generateBinExpression(left, right, "!=")
+      case GTExpression(left, right) => generateBinExpression(left, right, ">")
+      case LTExpression(left, right) => generateBinExpression(left, right, "<")
+      case GTEExpression(left, right) => generateBinExpression(left, right, ">=")
+      case LTEExpression(left, right) => generateBinExpression(left, right, "<=")
+      case AddExpression(left, right) => generateBinExpression(left, right, "+")
+      case SubExpression(left, right) => generateBinExpression(left, right, "-")
+      case MultExpression(left, right) => generateBinExpression(left, right, "*")
+      case DivExpression(left, right) => generateBinExpression(left, right, "/")
+      case OrExpression(left, right) => generateBinExpression(left, right, "OR")
+      case AndExpression(left, right) => generateBinExpression(left, right, "&")
+      
       case _ => Doc.text("expression not found")
     }
 

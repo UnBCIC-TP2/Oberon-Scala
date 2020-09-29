@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class CCodeGenTest extends AnyFunSuite {
 
-  for(i <- 1 to 2) {
+  for(i <- 14 to 14) {
     val stmtNumber = "%02d".format(i)
     test(s"Testing C generator for stmt$stmtNumber") {
       val oberonPath = Paths.get(getClass.getClassLoader.getResource(s"stmts/stmt$stmtNumber.oberon").getFile.replace("/C:/","C:/"))
