@@ -6,7 +6,7 @@ void main() {
   scanf("%d", &x);
   for(y = 0; y < x; y++){
     scanf("%d", &z);
-    z = z / (y * x);
+    z = z / (y * x); //TODO: A expressão do tipo bracket não parece ter sido implementada no parser
   }
   printf("%d\n", z);
 }

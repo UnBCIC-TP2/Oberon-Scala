@@ -8,7 +8,7 @@ void main() {
   prox = 1;
   soma = 0;
   n = 7;
-  for(i = 1; i <= n; i++){
+  for (i = 1; i <= n; i++) {
     soma = prox + ant;
     ant = prox;
     prox = soma;

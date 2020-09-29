@@ -10,5 +10,5 @@ void main() {
 
   scanf("%d", &x);
   scanf("%d", &y);
-  printf("%d", sum(x, y));
+  printf("%d\n", sum(x, y));
 }

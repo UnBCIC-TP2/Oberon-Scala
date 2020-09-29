@@ -6,7 +6,7 @@ int sum(int v1, int v2) {
 }
 
 void print(int v1) {
-  printf("%d", v1);
+  printf("%d\n", v1);
 }
 
 void main() {
