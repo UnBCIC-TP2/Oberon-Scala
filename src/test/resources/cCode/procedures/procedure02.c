@@ -12,7 +12,7 @@ void main() {
 
   scanf("%d", &base);
   count = 1;
-  while (expression not found) {
+  while (count < limit) {
     mult = calcmult(count, base);
     printf("%d\n", mult);
   }
