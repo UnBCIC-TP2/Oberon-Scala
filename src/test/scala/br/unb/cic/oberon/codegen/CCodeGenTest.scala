@@ -8,8 +8,8 @@ import org.scalatest.funsuite.AnyFunSuite
 class CCodeGenTest extends AnyFunSuite {
 
   // Tests for C code generator for stmt01.oberon - stmt16.oberon
-  val successfulTests = List(1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 14)
-  val unsuccessfulTests = List(6, 11, 12, 15, 16)
+  val successfulTests = (1 to 10).toList ++ List(13, 14)
+  val unsuccessfulTests = List(11, 12, 15, 16)
   for (i <- successfulTests) {
     val stmtNumber = "%02d".format(i)
     test(s"Testing C generator for stmt$stmtNumber") {
@@ -33,7 +33,6 @@ class CCodeGenTest extends AnyFunSuite {
           .replace("/C:/", "C:/")
       )
       assert(cPath != null)
-
       val cCode = String.join("\n", Files.readAllLines(cPath))
       assert(generatedCCode == cCode)
     }

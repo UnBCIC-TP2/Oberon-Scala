@@ -193,6 +193,34 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         formatLine(spaces) + Doc.text("return ") + generateExpression(exp) + Doc
           .char(';') + Doc.line
 
+      case CaseStmt(exp, cases, elseStmt) => {
+        val caseStmts = cases.map {
+          case SimpleCase(condition, stmt) =>
+            formatLine(spaces) + Doc.text("case ") + generateExpression(
+              condition
+            ) + Doc.char(':') + Doc.line + generateStatement(
+              stmt,
+              spaces + 2
+            ) + formatLine(spaces + 2) + Doc.text("break;")
+          case RangeCase(min, max, stmt) =>
+            formatLine(spaces) + Doc.text("case ") + generateExpression(
+              min
+            ) + Doc.text(" ... ") + generateExpression(max) + Doc.char(
+              ':'
+            ) + Doc.line + generateStatement(
+              stmt,
+              spaces + 2
+            ) + formatLine(spaces + 2) + Doc.text("break;")
+        }
+        val stmtDefault = elseStmt match {
+          case Some(stmt) => formatLine(spaces) + Doc.text("default:") + Doc.line + generateStatement(stmt, spaces + 2) + formatLine(spaces + 2) + Doc.text("break;") + Doc.line
+          case None => Doc.empty
+        }
+        val stmts = Doc.intercalate(Doc.line, caseStmts :+ stmtDefault)
+
+        formatLine(spaces) + Doc.text("switch ") + Doc.char('(') + generateExpression(exp) + Doc.text(") {") + Doc.line + stmts + formatLine(spaces) + Doc.char('}') + Doc.line
+      }
+
       case _ => Doc.empty
     }
   }
