@@ -495,8 +495,8 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  test("Testing the oberon stmt11 code. This module has a case statement with range cases, two variabels, read and write statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt11.oberon").getFile)
+  test("Testing the oberon stmt17 code. This module has a case statement with range cases, two variabels, read and write statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt17.oberon").getFile)
 
     assert(path != null)
 
@@ -544,8 +544,8 @@ class ParserTestSuite extends AnyFunSuite {
 
   } 
 
-  test("Testing the oberon stmt12 code. this module has a simple case statement with range case, reading min and max") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt12.oberon").getFile)
+  test("Testing the oberon stmt18 code. this module has a simple case statement with range case, reading min and max") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt18.oberon").getFile)
 
     assert(path != null)
 
@@ -600,8 +600,8 @@ class ParserTestSuite extends AnyFunSuite {
   
   }
 
-  test("Testing the oberon stmt13 code. This module has three variabels, two case statements, an read and a write statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt13.oberon").getFile)
+  test("Testing the oberon stmt19 code. This module has three variabels, two case statements, an read and a write statements") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt19.oberon").getFile)
 
     assert(path != null)
 
@@ -677,8 +677,8 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  test("Testing the oberon stmt14 code. This module implements the factorial function with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt14.oberon").getFile)
+  test("Testing the oberon stmt20 code. This module implements the factorial function with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt20.oberon").getFile)
 
     assert(path != null)
 
@@ -732,8 +732,8 @@ class ParserTestSuite extends AnyFunSuite {
     }
   }
 
-  test("Testing the oberon stmt15 code. This module tests if a number is even with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt15.oberon").getFile)
+  test("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt21.oberon").getFile)
 
     assert(path != null)
 
@@ -783,8 +783,8 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  test("Testing the oberon stmt16 code. This module implements a case statement inside a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt16.oberon").getFile)
+  test("Testing the oberon stmt22 code. This module implements a case statement inside a case statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt22.oberon").getFile)
     
     assert(path != null)
 
