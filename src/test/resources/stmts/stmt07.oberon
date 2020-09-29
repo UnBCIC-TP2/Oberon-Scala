@@ -1,16 +1,16 @@
-MODULE SimpleModule;
+MODULE SimpleModule;	
 
-VAR
-  x, y, z : INTEGER;
+VAR	
+  x, y, z : INTEGER;	
 
 BEGIN
     readInt(x); 
     
-    FOR y := 0 TO x DO
+    FOR y := 0 TO y < x DO
       z := z + y
     END;
 
-    write(z)
-END
+    write(z)	
+END	
 
 END SimpleModule.
