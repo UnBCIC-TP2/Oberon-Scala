@@ -140,7 +140,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size == 0)
   }
 
-  test("Test switch-case statement type checker Range-case (invalid case01) ") {
+  test("Test switch-case statement type checker RangeCase (invalid case01 min expression) ") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -164,7 +164,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
   }
 
-  test("Test switch-case statement type checker Range-case (invalid case02) ") {
+  test("Test switch-case statement type checker RangeCase (invalid case02 min expression) ") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -188,7 +188,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
   }
 
-  test("Test switch-case statement type checker Range-case (invalid case01 and case02) ") {
+  test("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -212,7 +212,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 2)
   }
 
-  test("Test switch-case statement type checker Range-case (invalid case01 and case02 second parameter) ") {
+  test("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -236,7 +236,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 2)
   }
 
-  test("Test switch-case statement type checker Range-case (invalid CaseStmt exp) ") {
+  test("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -260,7 +260,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
   }
 
-  test("Test switch-case statement type checker (invalid bool condition)") {
+  test("Test switch-case statement type checker SimpleCase (invalid CaseStmt condition)") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -280,7 +280,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size ==  1)
   }
 
-  test("Test switch-case statement type checker (invalid case02 condition)") {
+  test("Test switch-case statement type checker SimpleCase (invalid case02 condition)") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -300,7 +300,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size ==  1)
   }
 
-  test("Test switch-case statement type checker (invalid case01 and case02 condition)") {
+  test("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -320,7 +320,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size ==  2)
   }
 
-  test("Test switch-case statement type checker Range-case correct") {
+  test("Test switch-case statement type checker RangeCase") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -344,7 +344,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor) == List())
   }
 
-   test("Test switch-case statement type checker") {
+  test("Test switch-case statement type checker SimpleCase") {
     val visitor = new TypeChecker()
     
     val stmt01 = AssignmentStmt("x", IntValue(10))
