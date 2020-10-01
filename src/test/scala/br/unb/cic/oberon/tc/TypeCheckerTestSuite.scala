@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -138,6 +138,60 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
+  }
+
+  test("Test for statement type checker (with invalid init)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(10))
+
+    visitor.env.setGlobalVariable("y", IntegerType)
+
+    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test for statement type checker (with invalid condition)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("y", IntegerType)
+
+    val stmt03 = ForStmt(stmt01,IntValue(10), stmt02)
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test for statement type checker (with invalid stmt)") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = AssignmentStmt("y", IntValue(100))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test for statement type checker") {
+    val visitor = new TypeChecker()
+    val stmt01 = AssignmentStmt("x", IntValue(0))
+    val stmt02 = AssignmentStmt("y", IntValue(10))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("y", IntegerType)
+
+    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt03.accept(visitor).size == 0)
   }
 
   /*

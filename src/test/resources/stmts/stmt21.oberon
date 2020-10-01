@@ -1,0 +1,22 @@
+MODULE SimpleRangeCaseModule;
+
+VAR
+  x : INTEGER;
+  aux : INTEGER;
+
+BEGIN
+  readInt(x);
+  aux := x / 2;
+  aux := aux * 2;
+
+  CASE x OF
+      x:      aux:=0          //retorna 0 no caso de x se par
+    ELSE          aux:=1      //retorna 1 no caso de x se impar
+  
+  END;
+
+  write(aux)
+
+END
+
+END SimpleRangeCaseModule.

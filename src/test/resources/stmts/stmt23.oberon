@@ -1,0 +1,29 @@
+MODULE WhileCaseModule
+
+VAR
+  x, sum : INTEGER;
+
+BEGIN
+  x := 0;
+
+  WHILE x < 20 DO
+
+    CASE x OF
+        0:        sum := 0
+      | 1 .. 9:   sum := sum + x
+      | 10:
+        write(sum);
+        sum := 2 * 10
+
+      | 11 .. 20: sum := sum + 2 * x
+
+    END;
+
+    x := x + 1
+  END;
+
+  write(sum)
+
+END
+
+END WhileCaseModule.
