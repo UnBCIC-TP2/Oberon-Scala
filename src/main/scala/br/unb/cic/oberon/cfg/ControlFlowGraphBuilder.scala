@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.cfg
 
-import br.unb.cic.oberon.ast.{IfElseStmt, Procedure, SequenceStmt, Statement, WhileStmt}
+import br.unb.cic.oberon.ast.{CaseAlternative, CaseStmt, IfElseStmt, Procedure, RangeCase, SequenceStmt, SimpleCase, Statement, WhileStmt}
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
@@ -48,6 +48,10 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
               processStmtNode(s1, Some(s2), g)
               createControlFlowGraph(s2 :: rest, g)  
             }
+            case CaseStmt(_, _, Some(_)) => {
+              processStmtNode(s1, Some(s2), g)
+              createControlFlowGraph(s2 :: rest, g)
+            }
             case _ => {
               g += SimpleNode(s1) ~> SimpleNode(s2)
               processStmtNode(s1, Some(s2), g)
@@ -70,41 +74,43 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    * @param g the cumulative graph
    * @return a new version of the graph
    */
-  def processStmtNode(from: Statement, target: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
+  def processStmtNode(from: Statement, target: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Any = {
     from match {
       case IfElseStmt(_, thenStmt, optionalElseStmt) => {
         processStmtNode(from, thenStmt, target, g)
-        if(optionalElseStmt.isDefined) {
+        if (optionalElseStmt.isDefined) {
           processStmtNode(from, optionalElseStmt.get, target, g)
         }
-        g   // returns g
+        g // returns g
       }
       case WhileStmt(_, whileStmt) => {
         processStmtNode(from, whileStmt, target, g)
       }
 
-      case CaseStmt(exp, cases, optionalElseStmt) => {
-          cases.forEach((caseAlternative) => {
-            caseAlternative match {
-              case SimpleCase(_, stmt) => {
-                processStmtNode(from, stmt, target, g)
-              }
-              case RangeCase(_, _, stmt) => {
-                processStmtNode(from, stmt, target, g)
-              }
+      case CaseStmt(_, cases, optionalElseStmt) => {
+        cases.foreach((caseA) => {
+          caseA match {
+            case SimpleCase(_, stmt) => {
+              processStmtNode(from, stmt, target, g)
             }
-          })
-          if(optionalElseStmt.isDefined) {
-            processStmtNode(from, optionalElseStmt.get, target, g)
+            case RangeCase(_, _, stmt) => {
+              processStmtNode(from, stmt, target, g)
+            }
           }
-        } 
+        })
+        if (optionalElseStmt.isDefined) {
+          processStmtNode(from, optionalElseStmt.get, target, g)
+        } else {
+          g += SimpleNode(from) ~> SimpleNode(target.get)
+        }
+        g
       }
+
       // TODO: write here the remaining "compound" stmts: e.g.,: ForStmt, ...
       //       This is particularly important fro groups 04 and 09.
-      case _ => g    // if not a compound stmt (e.g., procedure call, assignment, ...), just return the graph g
-     }
+      case _ => g // if not a compound stmt (e.g., procedure call, assignment, ...), just return the graph g
+    }
   }
-
   /**
    * Deals with the cases where the "target" statement is a sequence stmt
    * @param from the from statement
