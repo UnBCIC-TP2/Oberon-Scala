@@ -2,7 +2,7 @@ MODULE Multiples;
 
 CONST
   limit = 10;
-  
+
 VAR
   base, count : INTEGER;
   mult : INTEGER;
@@ -10,7 +10,7 @@ VAR
 PROCEDURE calcmult(i: INTEGER, base: INTEGER) : INTEGER;
  BEGIN
    RETURN i * base
- END calcmult;
+ END calcmult
  
 BEGIN
  readInt(base);
