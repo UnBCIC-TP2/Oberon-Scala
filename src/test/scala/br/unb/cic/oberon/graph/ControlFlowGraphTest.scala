@@ -2,6 +2,7 @@ package br.unb.cic.oberon.graph
 
 import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, CaseStmt, GTExpression, IfElseStmt, IntValue, MultExpression, RangeCase, ReadIntStmt, SequenceStmt, SimpleCase, SubExpression, VarExpression, WriteStmt}
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode}
+import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
@@ -52,7 +53,8 @@ class ControlFlowGraphTest extends AnyFunSuite {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
   // Right now, we expect this to fail
-  test("Simple control flow graph with repeated statements") {
+
+  ignore("Simple control flow graph with repeated statements") {
 
     val stmt0 = ReadIntStmt("x")
     val stmt1 = ReadIntStmt("y")

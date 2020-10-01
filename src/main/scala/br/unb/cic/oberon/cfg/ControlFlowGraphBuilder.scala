@@ -74,7 +74,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    * @param g the cumulative graph
    * @return a new version of the graph
    */
-  def processStmtNode(from: Statement, target: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Any = {
+  def processStmtNode(from: Statement, target: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
     from match {
       case IfElseStmt(_, thenStmt, optionalElseStmt) => {
         processStmtNode(from, thenStmt, target, g)
