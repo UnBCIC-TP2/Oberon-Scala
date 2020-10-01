@@ -31,3 +31,11 @@ build
 
 #general
 *.class
+
+#metals
+.metals/
+.vscode/
+null/
+project/
+.bloop/
+.scalafmt.conf

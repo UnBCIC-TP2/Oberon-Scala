@@ -19,6 +19,7 @@ test("Testing interpreter on interpreter_stmt01 program") {
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
+    
 	
 	assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
 	assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
