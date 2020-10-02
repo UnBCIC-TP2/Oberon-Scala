@@ -178,5 +178,37 @@ test("Testing interpreter on interpreter_stmt06 program") {
 
   }
 
+test("Testing interpreter on interpreter_stmt07 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(52)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+
+  }
+
+test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("ant") == Some(IntValue(55)))
+  }
+
 
 }
