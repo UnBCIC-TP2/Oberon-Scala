@@ -210,5 +210,56 @@ test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10
     assert(interpreter.env.lookup("ant") == Some(IntValue(55)))
   }
 
+test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+	
+	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+   assert(interpreter.env.lookup("y") == Some(IntValue(24)))
+
+  }
+
+test("Testing interpreter on interpreter_stmt08 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt08.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+	
+	 assert(interpreter.env.lookup("x") == Some(IntValue(-50)))
+   assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+
+  }
+
+test("Testing interpreter on interpreter_stmt09 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt09.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+	
+	 assert(interpreter.env.lookup("x") == Some(IntValue(25)))
+   assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+
+  }
+
 
 }
