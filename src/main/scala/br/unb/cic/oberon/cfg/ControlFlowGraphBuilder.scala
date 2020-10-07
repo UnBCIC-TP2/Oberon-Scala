@@ -82,8 +82,9 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
       case WhileStmt(_, whileStmt) => {
         processStmtNode(from, whileStmt, target, g)
       }
-      // TODO: write here the remaining "compound" stmts: e.g.,: ForStmt, CaseStmt, ...
-      //       This is particularly important fro groups 04 and 09.
+      case ForStmt(init,_ ,forStmt) => {
+        processStmtNode(init, forStmt, target, g)
+      }
       case _ => g    // if not a compound stmt (e.g., procedure call, assignment, ...), just return the graph g
      }
   }
