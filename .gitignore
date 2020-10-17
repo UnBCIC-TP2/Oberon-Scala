@@ -5,6 +5,7 @@ project/project
 project/target
 target/
 build/
+null/
 
 # eclipse
 build
@@ -35,7 +36,5 @@ build
 #metals
 .metals/
 .vscode/
-null/
-project/
 .bloop/
 .scalafmt.conf
