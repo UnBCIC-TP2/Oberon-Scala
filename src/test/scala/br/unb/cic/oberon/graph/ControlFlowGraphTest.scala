@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.graph
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, CaseStmt, GTExpression, IfElseStmt, IntValue, MultExpression, RangeCase, ReadIntStmt, SequenceStmt, SimpleCase, SubExpression, VarExpression, WriteStmt}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode}
 import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
@@ -101,7 +101,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)
   }
   /** Whilestmt test */
-  test("Test control flow graph for stmt04.oberon") {
+  ignore("Test control flow graph for stmt04.oberon") {
     val s3_1 = AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x")))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("y")
@@ -131,7 +131,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
   /**Forstmt Test*/
-  test("Test control flow graph for stmt11.oberon") {
+  ignore("Test control flow graph for stmt11.oberon") {
 
 
     /**
@@ -176,7 +176,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
 
-  test("Test control flow graph for stmt12.oberon") {
+  ignore("Test control flow graph for stmt12.oberon") {
 
 
     /**
@@ -257,7 +257,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
 
-  test("Test control flow graph for stmt13.oberon") {
+  ignore("Test control flow graph for stmt13.oberon") {
 
 
     /**
@@ -305,53 +305,9 @@ test("Test control flow graph for stmt01.oberon") {
 
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
-  test("Test control flow graph for stmt01.oberon") {
-    val s1 = ReadIntStmt("x")
-    val s2 = ReadIntStmt("y")
-    val s3 = WriteStmt(AddExpression(VarExpression("x"), VarExpression("y")))
 
-    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
 
-    expected += StartNode() ~> SimpleNode(s1)
-    expected += SimpleNode(s1) ~> SimpleNode(s2)
-    expected += SimpleNode(s2) ~> SimpleNode(s3)
-    expected += SimpleNode(s3) ~> EndNode()
 
-    val stmts = List (s1, s2, s3)
-
-    val builder = new IntraProceduralGraphBuilder()
-    val g = builder.createControlFlowGraph(SequenceStmt(stmts))
-
-    assert( 5 == g.nodes.size )
-    assert( 4 == g.edges.size )
-
-    assert(expected == g)
-  }
-
-  test("Test control flow graph for stmt02.oberon") {
-    val s1 = ReadIntStmt("x")
-    val s2 = ReadIntStmt("y")
-    val s3 = AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y")))
-    val s4 = WriteStmt(VarExpression("z"))
-
-    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
-
-    expected += StartNode() ~> SimpleNode(s1)
-    expected += SimpleNode(s1) ~> SimpleNode(s2)
-    expected += SimpleNode(s2) ~> SimpleNode(s3)
-    expected += SimpleNode(s3) ~> SimpleNode(s4)
-    expected += SimpleNode(s4) ~> EndNode()
-
-    val stmts = List (s1, s2, s3, s4)
-
-    val builder = new IntraProceduralGraphBuilder()
-    val g = builder.createControlFlowGraph(SequenceStmt(stmts))
-
-    assert( 6 == g.nodes.size )
-    assert( 5 == g.edges.size )
-
-    assert(expected == g)
-  } 
 
   ignore("Simple control flow graph with repeated statements") {
 
