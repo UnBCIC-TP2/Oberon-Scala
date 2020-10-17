@@ -86,7 +86,11 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
       case WhileStmt(_, whileStmt) => {
         processStmtNode(from, whileStmt, target, g)
       }
-
+      case ForStmt(init,_ ,forStmt) => {
+        processStmtNode(init, forStmt, target, g)
+      }
+      case _ => g    // if not a compound stmt (e.g., procedure call, assignment, ...), just return the graph g
+     }
       case CaseStmt(_, cases, optionalElseStmt) => {
         cases.foreach((caseA) => {
           caseA match {
