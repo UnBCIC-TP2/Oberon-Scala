@@ -249,6 +249,26 @@ class ParserVisitor {
 
       stmt = IfElseStmt(condition, thenStmt, elseStmt)
     }
+   
+   override def visitIfElseIfStmt(ctx: OberonParser.IfElseIfStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
+
+      ctx.expression().accept(visitor)
+      val condition = visitor.exp
+
+      ctx.thenStmt.accept(this)
+      val thenStmt = stmt
+    
+      ctx.elseifStmt.accept(this)
+      val elseifStmt = stmt
+        
+      val elseStmt = if(ctx.elseStmt != null) {
+        ctx.elseStmt.accept(this)
+        Some(stmt)
+      } else None
+
+      stmt = IfElseIfStmt(condition, thenStmt, elseifStmt, elseStmt)
+    }
 
     override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
       val expressionVisitor = new ExpressionVisitor()
