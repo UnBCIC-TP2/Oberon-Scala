@@ -78,6 +78,14 @@ case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Opti
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 case class ForStmt(init: Statement, condition: Expression, stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
+case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) extends Statement
+
+trait CaseAlternative {
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+
+case class SimpleCase(condition: Expression, stmt: Statement) extends CaseAlternative
+case class RangeCase(min: Expression, max: Expression, stmt: Statement) extends CaseAlternative
 
 /* Types */
 trait Type {
