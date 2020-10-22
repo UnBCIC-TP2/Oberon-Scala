@@ -1,0 +1,19 @@
+MODULE ForRangeModule;
+
+VAR
+  x : INTEGER;
+
+PROCEDURE squareOf(n : INTEGER) : INTEGER;
+ BEGIN
+   RETURN n * n
+ END squareOf
+
+BEGIN
+
+  FOR x IN 0 .. 10 DO
+    write(squareOf(x))
+  END
+    
+END
+
+END ForRangeModule. 
