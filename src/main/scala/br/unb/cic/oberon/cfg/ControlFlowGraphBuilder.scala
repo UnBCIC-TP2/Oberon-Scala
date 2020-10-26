@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.cfg
 
-import br.unb.cic.oberon.ast.{CaseAlternative, CaseStmt, IfElseStmt, Procedure, RangeCase, SequenceStmt, SimpleCase, Statement, WhileStmt}
+import br.unb.cic.oberon.ast._
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
@@ -42,29 +42,24 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    */
   def createControlFlowGraph(stmts: List[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] =
     stmts match {
-      case s1 :: s2 :: rest => {                     // case the list has at least two elements. this is the recursive case
-          s1 match {
-            case IfElseStmt(_, _, Some(_)) => {      // in this case, we do not create an edge from s1 -> s2
-              processStmtNode(s1, Some(s2), g)
-              createControlFlowGraph(s2 :: rest, g)  
-            }
-            case CaseStmt(_, _, Some(_)) => {
-              processStmtNode(s1, Some(s2), g)
-              createControlFlowGraph(s2 :: rest, g)
-            }
-            case _ => {
-              g += SimpleNode(s1) ~> SimpleNode(s2)
-              processStmtNode(s1, Some(s2), g)
-              createControlFlowGraph(s2 :: rest, g)
-            }
-          }
+      case s1 :: s2 :: rest => // case the list has at least two elements. this is the recursive case
+        s1 match {
+          case IfElseStmt(_, _, Some(_)) => // in this case, we do not create an edge from s1 -> s2
+            processStmtNode(s1, Some(s2), g)
+            createControlFlowGraph(s2 :: rest, g)
+          case CaseStmt(_, _, Some(_)) =>
+            processStmtNode(s1, Some(s2), g)
+            createControlFlowGraph(s2 :: rest, g)
+          case _ =>
+            g += SimpleNode(s1) ~> SimpleNode(s2)
+            processStmtNode(s1, Some(s2), g)
+            createControlFlowGraph(s2 :: rest, g)
         }
-        case s1 :: List() => {                       // case the list has just one element. this is the base case
-          g += SimpleNode(s1) ~> EndNode()
-          processStmtNode(s1, None, g)                     // process the singleton node of the stmts list of statements
-          return g
-        }
-      }
+      case s1 :: List() => // case the list has just one element. this is the base case
+        g += SimpleNode(s1) ~> EndNode()
+        processStmtNode(s1, None, g) // process the singleton node of the stmts list of statements
+        g
+    }
 
 
   /**
@@ -76,38 +71,29 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    */
   def processStmtNode(from: Statement, target: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
     from match {
-      case IfElseStmt(_, thenStmt, optionalElseStmt) => {
+      case IfElseStmt(_, thenStmt, optionalElseStmt) =>
         processStmtNode(from, thenStmt, target, g)
         if (optionalElseStmt.isDefined) {
           processStmtNode(from, optionalElseStmt.get, target, g)
         }
         g // returns g
-      }
-      case WhileStmt(_, whileStmt) => {
-        processStmtNode(from, whileStmt, target, g)
-      }
-
-      case CaseStmt(_, cases, optionalElseStmt) => {
-        cases.foreach((caseA) => {
-          caseA match {
-            case SimpleCase(_, stmt) => {
+      case WhileStmt(_, whileStmt) =>
+        processStmtNode(from, whileStmt, target, g) // returns the recursiv call
+      case ForStmt(init,_ ,forStmt) =>
+        processStmtNode(init, forStmt, target, g)
+      case CaseStmt(_, cases, optionalElseStmt) =>
+        cases.foreach((caseBlock) => {
+          caseBlock match {
+            case SimpleCase(_, stmt) =>
               processStmtNode(from, stmt, target, g)
-            }
-            case RangeCase(_, _, stmt) => {
+            case RangeCase(_, _, stmt) =>
               processStmtNode(from, stmt, target, g)
-            }
           }
         })
-        if (optionalElseStmt.isDefined) {
+        if (optionalElseStmt.isDefined)
           processStmtNode(from, optionalElseStmt.get, target, g)
-        } else {
-          g += SimpleNode(from) ~> SimpleNode(target.get)
-        }
+        else g += SimpleNode(from) ~> SimpleNode(target.get)
         g
-      }
-
-      // TODO: write here the remaining "compound" stmts: e.g.,: ForStmt, ...
-      //       This is particularly important fro groups 04 and 09.
       case _ => g // if not a compound stmt (e.g., procedure call, assignment, ...), just return the graph g
     }
   }
@@ -121,21 +107,19 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    */
   def processStmtNode(from: Statement, target: Statement, end: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
     target match {
-      case SequenceStmt(stmts) => {             // if the target is a SequenceStmt, we have to create "sub-graph"
-        g += SimpleNode(from) ~> SimpleNode(stmts.head)                 // create an edge from "from" to the first elements of the list stmts
+      case SequenceStmt(stmts) => // if the target is a SequenceStmt, we have to create "sub-graph"
+        g += SimpleNode(from) ~> SimpleNode(stmts.head) // create an edge from "from" to the first elements of the list stmts
         if(end.isDefined) {
           g += SimpleNode(stmts.last) ~> SimpleNode(end.get)
         }
         createControlFlowGraph(stmts, g)
-      }
-      case _ => {
+      case _ =>
         g += SimpleNode(from) ~> SimpleNode(target)
         if(end.isDefined) {
           g += SimpleNode(target) ~> SimpleNode(end.get)
         }
-        g  // remember, the last statement corresponds to the "return statement"
-      }
-   }
+        g // remember, the last statement corresponds to the "return statement"
+    }
   }
 }
 
