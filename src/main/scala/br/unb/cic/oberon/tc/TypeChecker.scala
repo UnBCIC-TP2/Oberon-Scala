@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, ForStmt, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt, RangeCase, SimpleCase, CaseStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -60,7 +60,9 @@ class TypeChecker extends OberonVisitorAdapter {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
+    case ForStmt(_, _, _) => visitForStmt(stmt)
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
+    case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
     case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
     case ReadIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
@@ -93,6 +95,52 @@ class TypeChecker extends OberonVisitorAdapter {
         stmt.accept(this)
       }
       else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  private def visitForStmt(stmt: Statement) = stmt match {
+    case ForStmt(init, condition, stmt) =>
+      if(condition.accept(expVisitor).contains(BooleanType)) {
+        val list1 = init.accept(this)
+        val list2 = stmt.accept(this)
+        list1 ++ list2
+      }
+      else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  private def visitSwitchStmt(stmt: Statement) = stmt match {
+    case CaseStmt(exp, cases, elseStmt) =>
+      if(exp.accept(expVisitor).contains(IntegerType)){
+      var list2 = List[(br.unb.cic.oberon.ast.Statement, String)]()
+        cases.foreach (c =>
+          c match {
+            case SimpleCase(condition, stmt1) =>
+              if(condition.accept(expVisitor).contains(IntegerType)) {
+                val list1 = stmt1.accept(this)
+                list1
+              }
+              else {
+                val list1 = List((stmt, s"Case value $condition does not have an integer type"))
+                list2 = list1 ++ list2
+
+              }
+
+            case RangeCase(min, max, stmt2) =>
+              if(min.accept(expVisitor).contains(IntegerType) && max.accept(expVisitor).contains(IntegerType)){
+                val list1 = stmt2.accept(this)
+                list1
+              }
+              else {
+                val list1 = List((stmt, s"Min $min or max $max does not have an integer type"))
+                list2 = list1 ++ list2
+              }
+          }
+
+        )
+
+        val list3 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
+        list2 ++ list3
+      }
+      else List((stmt, s"Expression $exp does not have an integer type"))
   }
 
   /*
