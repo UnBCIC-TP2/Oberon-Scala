@@ -259,14 +259,16 @@ class ParserVisitor {
       val condition = visitor.exp
       ctx.condAndThen.stmt.accept(this)
       val thenStmt = stmt
+
       val ifStmt = IfStmt(condition, thenStmt)
       val elsifStmt = new ListBuffer[IfStmt]
-      ctx.elsifStmt.asScala.toList.foreach(e => {
+      ctx.elsifs.asScala.toList.foreach(e => {
         val newVisitor = new ExpressionVisitor()
-        e.accept(newVisitor)
-        val elifCondition = newVisitor.exp
-
-
+        e.expression().accept(newVisitor)
+        val elsifCondition = newVisitor.exp
+        e.stmt.accept(this)
+        val elsifThenStmt = stmt
+        elsifStmt+=IfStmt(elsifCondition, elsifThenStmt)
       })
 
       val elseStmt = if (ctx.elseStmt != null) {
