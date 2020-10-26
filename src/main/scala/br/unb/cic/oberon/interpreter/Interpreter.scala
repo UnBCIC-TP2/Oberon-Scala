@@ -30,7 +30,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
 
-    // execute the statment, if it is defined. remember,
+    // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
       module.stmt.get.accept(this)
