@@ -75,6 +75,8 @@ case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
+case class IfElseIfStmt(ifStmt: IfStmt, elseifStmt: List[IfStmt], elseStmt: Option[Statement] ) extends Statement
+case class IfStmt(condition: Expression,thenStmt: Statement) extends Statement
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 case class ForStmt(init: Statement, condition: Expression, stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
