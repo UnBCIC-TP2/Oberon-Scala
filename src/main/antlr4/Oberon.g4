@@ -57,6 +57,7 @@ statement
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
+ | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSIF' elsifStmt += statement)+ ('ELSE' elseStmt = statement)? 'END'  #IfElseIfStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                      #WhileStmt
  | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
  | 'RETURN' exp = expression                                                                                                  #ReturnStmt
