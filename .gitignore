@@ -35,6 +35,7 @@ build
 
 #metals
 .metals/
+project/metals.sbt
 .vscode/
 .bloop/
 .scalafmt.conf
