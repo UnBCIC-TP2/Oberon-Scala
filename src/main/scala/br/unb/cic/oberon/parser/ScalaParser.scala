@@ -255,20 +255,21 @@ class ParserVisitor {
 
     override def visitIfElseIfStmt(ctx: OberonParser.IfElseIfStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
+
       ctx.condAndThen.expression().accept(visitor)
       val condition = visitor.exp
       ctx.condAndThen.stmt.accept(this)
       val thenStmt = stmt
-
+      
       val ifStmt = IfStmt(condition, thenStmt)
+  
       val elsifStmt = new ListBuffer[IfStmt]
       ctx.elsifs.asScala.toList.foreach(e => {
-        val newVisitor = new ExpressionVisitor()
-        e.expression().accept(newVisitor)
-        val elsifCondition = newVisitor.exp
+        e.expression().accept(visitor)
+        val elsifCondition = visitor.exp
         e.stmt.accept(this)
         val elsifThenStmt = stmt
-        elsifStmt+=IfStmt(elsifCondition, elsifThenStmt)
+        elsifStmt += IfStmt(elsifCondition, elsifThenStmt)
       })
 
       val elseStmt = if (ctx.elseStmt != null) {
