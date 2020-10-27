@@ -1349,7 +1349,44 @@ class ParserTestSuite extends AnyFunSuite {
     assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
   }
 
+  test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
 
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    stmts(1) match {
+      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
+        assert(thenStmt == AssignmentStmt("y", IntValue(1)))
+        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
+        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
+        assert(elseStmt == AssignmentStmt("y", IntValue(4)))
+      case _ => fail("expecting an if-then stmt")
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("y")))
+  }
 
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
