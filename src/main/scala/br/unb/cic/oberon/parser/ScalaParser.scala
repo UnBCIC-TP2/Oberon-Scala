@@ -318,7 +318,39 @@ class ParserVisitor {
 
       stmt = ForStmt(init, condition, block)
     }
-   
+
+    override def visitForRangeStmt(ctx: OberonParser.ForRangeStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
+
+      val varName = ctx.`var`.getText
+      val variable = VarExpression(varName)
+
+      ctx.min.accept(visitor)
+      val rangeMin = visitor.exp
+      
+      ctx.max.accept(visitor)
+      val rangeMax = visitor.exp
+
+      ctx.stmt.accept(this)
+      val block = stmt
+
+      // Instantiating the values for the basic ForStmt
+      
+      // var := rangeMin
+      val init = AssignmentStmt(variable.name, rangeMin)
+
+      // var <= rangeMax
+      val condition = LTEExpression(variable, rangeMax)
+      
+      // var := var + 1
+      val accumulator = AssignmentStmt(variable.name, AddExpression(variable, IntValue(1)))
+
+      // stmt; var := var + 1
+      val realBlock = SequenceStmt(List(block, accumulator))
+
+      stmt = ForStmt(init, condition, realBlock)
+    }
+
     override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)

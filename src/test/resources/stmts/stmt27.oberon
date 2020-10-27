@@ -1,0 +1,16 @@
+MODULE ForRangeModule;
+
+VAR
+  x, y : INTEGER;
+
+BEGIN
+
+  FOR x IN 0 .. 20 DO
+    FOR y IN x .. 20 DO
+      write(y)
+    END
+  END
+    
+END
+
+END ForRangeModule.
