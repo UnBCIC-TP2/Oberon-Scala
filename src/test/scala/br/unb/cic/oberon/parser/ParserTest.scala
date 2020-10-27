@@ -1381,7 +1381,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
         assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
         assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
-        assert(elseStmt == AssignmentStmt("y", IntValue(4)))
+        assert(elseStmt == Some(AssignmentStmt("y", IntValue(4))))
       case _ => fail("expecting an if-then stmt")
     }
 
