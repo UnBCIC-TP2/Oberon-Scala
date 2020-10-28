@@ -78,7 +78,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
         }
         g // returns g
       case WhileStmt(_, whileStmt) =>
-        processStmtNode(from, whileStmt, target, g) // returns the recursiv call
+        processStmtNode(from, whileStmt, target, g) // returns the recursive call
       case ForStmt(init,_ ,forStmt) =>
         processStmtNode(init, forStmt, target, g)
       case CaseStmt(_, cases, optionalElseStmt) =>
