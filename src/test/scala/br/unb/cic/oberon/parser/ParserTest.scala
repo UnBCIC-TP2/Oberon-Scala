@@ -1490,4 +1490,23 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
     }
   }
+
+  test("Testing the oberon stmt30 module. This module has a RepeatUntil") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined && module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.size == 4)
+
+    assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
+  }
 }
