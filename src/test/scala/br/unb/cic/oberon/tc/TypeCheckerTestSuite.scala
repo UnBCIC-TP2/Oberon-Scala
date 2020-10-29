@@ -457,7 +457,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     
     val condition  = EQExpression(VarExpression("x"), IntValue(0))
     val stmt01     = ReadIntStmt("x")
-    val repeatStmt = RepeatUntilStmt(cown, stmt01)
+    val repeatStmt = RepeatUntilStmt(condition, stmt01)
     
     visitor.env.setGlobalVariable("x", IntegerType)
     
@@ -515,10 +515,10 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BooleanType(true),  stmt01)
-    val repeatStmt02 = RepeatUntilStmt(BooleanType(true), repeatStmt01)
-    val repeatStmt03 = RepeatUntilStmt(BooleanType(true),  repeatStmt02)
-    val repeatStmt04 = RepeatUntilStmt(BooleanType(true), repeatStmt03)
+    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
+    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
+    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
     
     visitor.env.setGlobalVariable("x", IntegerType)
     val allStmts = List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
@@ -532,10 +532,10 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     val stmt01       = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BooleanType(true), stmt01)
-    val repeatStmt02 = RepeatUntilStmt(BooleanType(true), repeatStmt01)
-    val repeatStmt03 = RepeatUntilStmt(BooleanType(true), repeatStmt02)
-    val repeatStmt04 = RepeatUntilStmt(BooleanType(true), repeatStmt03)
+    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
+    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
+    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
     
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
@@ -544,7 +544,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     })
   }
 
-  test("Test a valid Repeat statement, a boolean variable") {
+  test("Test a valid Repeat statement, with a boolean variable") {
     val visitor = new TypeChecker()
 
     val boolVar    = VarExpression("flag")
@@ -557,7 +557,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   }
 
-  test("Test a invalid Repeat statement, with some exceptions") {
+  test("Test a valid Repeat statement, with a sequence of statements") {
     val visitor = new TypeChecker()
 
     val stmt01     = AssignmentStmt("x", BoolValue(false))
@@ -566,10 +566,17 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt02.accept(visitor).size == 4)
+    assert(stmt02.accept(visitor).size == 0)
   }
 
-  
+  test("Test a invalid Repeat statement, with a sequence of statements") {
+    val visitor = new TypeChecker()
 
+    val stmt01     = AssignmentStmt("x", BoolValue(false))
+    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01)
+    val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
+
+    assert(stmt02.accept(visitor).size == 4)
+  }
 
 }
