@@ -22,6 +22,11 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest-featurespec" % "3.2.0" % "test"
+libraryDependencies += "org.typelevel" %% "paiges-core" % "0.3.0"
+
+
+libraryDependencies += "org.scala-graph" %% "graph-core" % "1.13.2"
+libraryDependencies += "org.scala-graph" %% "graph-dot" % "1.13.0"
 
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
 
