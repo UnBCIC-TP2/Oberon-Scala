@@ -6,8 +6,8 @@ VAR
 BEGIN	
     readInt(y);	
 
-    FOR x := 0 TO y DO	
-        FOR z := 0 TO y DO	
+    FOR x := 0 TO x < y DO	
+        FOR z := 0 TO z < y DO	
             k := z + x	
         END	
     END;	
