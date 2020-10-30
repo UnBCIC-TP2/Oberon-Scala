@@ -1491,7 +1491,7 @@ class ParserTestSuite extends AnyFunSuite {
     }
   }
 
-  test("Testing the oberon stmt30 module. This module has a RepeatUntil") {
+  /*test("Testing the oberon stmt30 module. This module has a RepeatUntil") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
 
     assert(path != null)
@@ -1508,5 +1508,5 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmt.stmts.size == 4)
 
     assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
-  }
+  }*/
 }
