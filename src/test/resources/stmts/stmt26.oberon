@@ -1,0 +1,17 @@
+MODULE ForRangeModule;
+
+VAR
+  x, min, max : INTEGER;
+
+BEGIN
+
+  readInt(min);
+  readInt(max);
+
+  FOR x IN min .. max DO
+    write(x)
+  END
+    
+END
+
+END ForRangeModule. 

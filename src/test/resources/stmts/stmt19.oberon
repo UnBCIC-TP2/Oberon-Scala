@@ -1,0 +1,29 @@
+MODULE CaseModule;
+
+VAR
+  x, y, z: INTEGER;
+
+BEGIN
+  readInt(x);
+  y := 1;
+
+  CASE x OF
+      5:    y := x + 5
+    | 10:   y := x + 10
+    | 20:   y := x + 15
+    ELSE    y := 41
+  END;
+
+  CASE y OF
+      1 .. 5:   z := 5
+    | 6 .. 10:  z := 10
+    | 11 .. 20: z := 20
+    | 21 .. 40: z := 40
+    ELSE        z := 1
+  END;
+
+  write(z)
+
+END
+
+END CaseModule.
