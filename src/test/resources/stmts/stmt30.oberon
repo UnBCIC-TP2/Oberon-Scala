@@ -1,0 +1,19 @@
+MODULE SimpleModule;
+  
+VAR
+  x, y : INTEGER;
+BEGIN
+  readInt(x);
+  IF(x < 5) THEN
+    y := 1
+  ELSIF(x < 7) THEN
+    y := 2
+  ELSIF(x < 9) THEN
+    y := 3
+  ELSE
+    y := 4
+  END;
+  write(y)
+END
+
+END SimpleModule.

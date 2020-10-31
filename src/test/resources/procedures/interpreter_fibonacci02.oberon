@@ -13,7 +13,7 @@ BEGIN
    WHILE i <= n DO
 
         CASE i OF
-            i..n: soma := prox + ant; 
+            i..n: soma := prox + ant
         END;
 
         ant := prox;

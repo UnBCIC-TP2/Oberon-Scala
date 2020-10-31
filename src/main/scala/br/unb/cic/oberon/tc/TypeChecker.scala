@@ -86,7 +86,7 @@ class TypeChecker extends OberonVisitorAdapter {
         val list2 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
         list1 ++ list2
       }
-      else List((stmt, s"Expression $condition do not have a boolean type"))
+      else List((stmt, s"Expression $condition does not have a boolean type"))
   }
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
