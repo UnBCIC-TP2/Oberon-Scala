@@ -258,6 +258,40 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         ) + Doc.line
       }
 
+      case IfElseIfStmt(condition, thenStmt, elseifStmt, elseStmt) => {
+        val ifCond =
+          formatLine(startSpaces) + Doc.text("if (") + generateExpression(
+            condition
+          ) + Doc.text(
+            ")"
+          ) + Doc.text(" {") + Doc.line + generateStatement(
+            thenStmt,
+            startSpaces + padSpaces,
+            padSpaces
+          ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+        val elsifCond =
+          formatLine(startSpaces) + Doc.text("else if (") + generateExpression(
+            condition
+          ) + Doc.text(
+            ")"
+          ) + Doc.text(" {") + Doc.line + generateStatement(
+            thenStmt,
+            startSpaces + padSpaces,
+            padSpaces
+          ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+        val elseCond = elseStmt match {
+          case Some(stmt) => {
+            formatLine(startSpaces) + Doc.text("else") +
+              Doc.text(" {") + Doc.line + generateStatement(
+              stmt,
+              startSpaces + padSpaces,
+              padSpaces
+            ) + Doc.char('}') + Doc.line
+          }
+          case None => Doc.empty
+        }
+        ifCond + elsifCond + elseCond
+      }
       case _ => Doc.empty
     }
   }
