@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+  
+VAR
+  first, second, temp : INTEGER;
+BEGIN
+    readInt(first)
+    readInt(second);
+
+  IF(first > second) THEN
+    temp = first;
+    first = second;
+    second = temp;
+  END;
+  write(first)
+  write(second);
+
+END
+END SimpleModule.
