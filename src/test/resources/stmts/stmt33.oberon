@@ -5,15 +5,14 @@ VAR
 BEGIN
   readInt(x);
   readInt(y);
-  
-  IF(x>y) THEN
-    gt = 1;
-  ELSIF(x<y) THEN
-    gt = -1;
+  IF(x > y) THEN
+    gt := 2
+  ELSIF(x < y) THEN
+    gt := 1
   ELSE
-    gt = 0;
+    gt := 0
   END;
-  write(gt);
+  write(gt)
 END
 
 END SimpleModule.

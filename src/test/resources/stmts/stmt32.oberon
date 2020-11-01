@@ -8,11 +8,11 @@ BEGIN
   readInt(n3);
 
   IF((n1>n2)&&(n1>n3)) THEN
-    write(n1);
+    write(n1)
   ELSIF((n2>n3)&&(n2>n1)) THEN
-    write(n2);
+    write(n2)
   ELSE
-    write(n3);
+    write(n3)
   END;
 END
 
