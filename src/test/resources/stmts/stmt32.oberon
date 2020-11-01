@@ -1,0 +1,19 @@
+MODULE SimpleModule;
+  
+VAR
+  n1, n2, n3 : INTEGER;
+BEGIN
+  readInt(n1);
+  readInt(n2);
+  readInt(n3);
+
+  IF((n1>n2)&&(n1>n3)) THEN
+    write(n1);
+  ELSIF((n2>n3)&&(n2>n1)) THEN
+    write(n2);
+  ELSE
+    write(n3);
+  END;
+END
+
+END SimpleModule.
