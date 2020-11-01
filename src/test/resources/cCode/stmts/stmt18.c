@@ -10,4 +10,6 @@ int main() {
         first = second;
         second = temp;
     }
+    printf("%d\n", first);
+    printf("%d\n", second);
 }

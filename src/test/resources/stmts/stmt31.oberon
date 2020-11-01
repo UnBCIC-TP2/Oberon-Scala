@@ -11,6 +11,8 @@ BEGIN
     first = second;
     second = temp;
   END;
+  write(first)
+  write(second);
 
 END
 END SimpleModule.
