@@ -303,7 +303,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       case MultExpression(left, right) =>
         generateBinExpression(left, right, "*")
       case DivExpression(left, right) => generateBinExpression(left, right, "/")
-      case OrExpression(left, right)  => generateBinExpression(left, right, "OR")
+      case OrExpression(left, right)  => generateBinExpression(left, right, "|")
       case AndExpression(left, right) => generateBinExpression(left, right, "&")
 
       case _ => Doc.text("expression not found")

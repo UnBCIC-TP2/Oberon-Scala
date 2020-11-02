@@ -211,4 +211,108 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
+  test("RepeatUntil Test with just one loop") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil01.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil01.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil Nested") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil02.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil02.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil Compound Exit Condition") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil03.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil03.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil In Procedure") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil04.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil04.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
 }

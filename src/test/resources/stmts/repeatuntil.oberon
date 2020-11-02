@@ -9,4 +9,4 @@ BEGIN
 	write(x)
 END	
 
-END SimpleModule.
+END RepeatUntilModule.
