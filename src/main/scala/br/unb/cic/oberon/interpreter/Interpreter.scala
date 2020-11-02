@@ -90,7 +90,9 @@ class Interpreter extends OberonVisitorAdapter {
 
       while(i < listOfElseIf.size  && !matched) {
           listOfElseIf(i) match {
-              case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) stmt.accept(this)
+              case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
+                stmt.accept(this) 
+                matched = true}
           }
           i += 1
       }
