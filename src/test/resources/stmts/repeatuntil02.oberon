@@ -1,0 +1,19 @@
+MODULE RepeatUntilModule;	
+
+VAR	
+  x, y : INTEGER;	
+
+BEGIN	
+    x := 0;
+	y := 0;
+	REPEAT
+		x := x + 1;
+		REPEAT
+			y := y + 1
+		UNTIL y >= 10
+	UNTIL x >= 10;
+	write(x);
+	write(y)
+END	
+
+END RepeatUntilModule.
