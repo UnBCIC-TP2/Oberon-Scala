@@ -50,6 +50,9 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
           case CaseStmt(_, _, Some(_)) =>
             processStmtNode(s1, Some(s2), g)
             createControlFlowGraph(s2 :: rest, g)
+		  case IfElseIfStmt(_, _, _, Some(_)) =>
+            processStmtNode(s1, Some(s2), g)
+            createControlFlowGraph(s2 :: rest, g)
           case _ =>
             g += SimpleNode(s1) ~> SimpleNode(s2)
             processStmtNode(s1, Some(s2), g)
@@ -81,6 +84,19 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
         processStmtNode(from, whileStmt, target, g) // returns the recursive call
       case ForStmt(init,_ ,forStmt) =>
         processStmtNode(init, forStmt, target, g)
+	  case IfElseIfStmt(_, thenStmt, elseIfStmt, optionalElseStmt) =>
+		processStmtNode(from, thenStmt, target, g)
+        elseIfStmt.foreach((ifElseIfBlock) => {
+          ifElseIfBlock match {
+            case ElseIfStmt(_, thenStmt) =>
+              processStmtNode(from, thenStmt, target, g)
+          }
+        })
+        if (optionalElseStmt.isDefined){
+          processStmtNode(from, optionalElseStmt.get, target, g)
+		}
+		else g += SimpleNode(from) ~> SimpleNode(target.get)
+        g
       case CaseStmt(_, cases, optionalElseStmt) =>
         cases.foreach((caseBlock) => {
           caseBlock match {
