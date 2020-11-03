@@ -490,4 +490,27 @@ test("Test control flow graph for stmt01.oberon") {
     assert( 11 == g.edges.size)
     assert( expected == g)
   }
+  test("Test control flow graph of RepeatUntil with 1 expression and 1 condition ") {
+    val stmt0 = AssignmentStmt("x", IntValue(1))
+    val stmt1 = AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+    val stmt2 = RepeatUntilStmt(LTExpression(VarExpression("x"), IntValue(9)), stmt1)
+    val stmt3 = WriteStmt(VarExpression ("x"))
+
+    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+    expected += StartNode() ~> SimpleNode(stmt0)
+    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
+    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
+    expected += SimpleNode(stmt1) ~> SimpleNode(stmt3)
+    expected += SimpleNode(stmt2) ~> SimpleNode(stmt1)
+    expected += SimpleNode(stmt2) ~> SimpleNode(stmt3)
+    expected += SimpleNode(stmt3) ~> EndNode()
+
+    val statements = List(stmt0, stmt1, stmt2, stmt3)
+    val builder = new IntraProceduralGraphBuilder()
+    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+
+    assert( 6 == g.nodes.size)
+    assert( 7 == g.edges.size)
+    assert( expected == g)
+  }
 }
