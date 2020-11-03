@@ -1388,6 +1388,98 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
+  test("Testing the oberon stmt31 code. This module has IF-ELSIF statement without ELSE stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    stmts(1) match {
+      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == GTExpression(VarExpression("x"), IntValue(1)))
+        assert(thenStmt == AssignmentStmt("y", IntValue(0)))
+        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(3)))
+        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
+        assert(elseStmt == None)
+      case _ => fail("expecting an if-then stmt")
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("y")))
+  }
+
+  test("Testing the oberon stmt32 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    stmts(1) match {
+      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
+        assert(thenStmt == AssignmentStmt("y", IntValue(1)))
+        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
+        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
+        assert(elseIfs(2).condition == LTExpression(VarExpression("x"), IntValue(11)))
+        assert(elseIfs(2).thenStmt == AssignmentStmt("y", IntValue(4)))
+        assert(elseIfs(3).condition == LTExpression(VarExpression("x"), IntValue(13)))
+        assert(elseIfs(3).thenStmt == AssignmentStmt("y", IntValue(5)))
+        assert(elseIfs(4).condition == LTExpression(VarExpression("x"), IntValue(15)))
+        assert(elseIfs(4).thenStmt == AssignmentStmt("y", IntValue(6)))
+        assert(elseIfs(5).condition == LTExpression(VarExpression("x"), IntValue(17)))
+        assert(elseIfs(5).thenStmt == AssignmentStmt("y", IntValue(7)))
+        assert(elseIfs(6).condition == LTExpression(VarExpression("x"), IntValue(19)))
+        assert(elseIfs(6).thenStmt == AssignmentStmt("y", IntValue(8)))
+        assert(elseIfs(7).condition == LTExpression(VarExpression("x"), IntValue(21)))
+        assert(elseIfs(7).thenStmt == AssignmentStmt("y", IntValue(9)))
+        assert(elseIfs(8).condition == LTExpression(VarExpression("x"), IntValue(23)))
+        assert(elseIfs(8).thenStmt == AssignmentStmt("y", IntValue(10)))
+        assert(elseIfs(9).condition == EQExpression(VarExpression("x"), IntValue(25)))
+        assert(elseIfs(9).thenStmt == AssignmentStmt("y", IntValue(11)))
+        assert(elseStmt == Some(AssignmentStmt("y", IntValue(12))))
+      case _ => fail("expecting an if-then stmt")
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("y")))
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
