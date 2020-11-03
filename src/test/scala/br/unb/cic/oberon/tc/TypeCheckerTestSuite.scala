@@ -474,8 +474,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
-  }
-  
+  }  
 
   test("Test a invalid Repeat statement in the type checker") {
     val visitor = new TypeChecker()
@@ -580,3 +579,4 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
 }
+
