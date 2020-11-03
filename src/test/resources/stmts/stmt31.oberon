@@ -1,15 +1,16 @@
 MODULE SimpleModule;
-  
+
 VAR
-  x, y : INTEGER;
+  x : INTEGER;
+  y : INTEGER;
+
 BEGIN
-  readInt(x);
-  IF(x > 1) THEN
-    y := 0
-  ELSIF(x < 3) THEN
-    y := 2
-  END;
-  write(y)
+ readInt(x);
+ readInt(y);
+ REPEAT
+   x := x * x
+ UNTIL x < y;
+ write(x)
 END
 
 END SimpleModule.

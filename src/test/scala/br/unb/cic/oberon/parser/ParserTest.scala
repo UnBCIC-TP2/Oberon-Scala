@@ -1388,8 +1388,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  test("Testing the oberon stmt31 code. This module has IF-ELSIF statement without ELSE stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").getFile)
+  test("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt09.oberon").getFile)
 
     assert(path != null)
 
@@ -1425,8 +1425,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  test("Testing the oberon stmt32 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").getFile)
+  test("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt10.oberon").getFile)
 
     assert(path != null)
 
@@ -1583,8 +1583,8 @@ class ParserTestSuite extends AnyFunSuite {
     }
   }
 
-  test("Testing the oberon stmt30 module. This module has a RepeatUntil") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
+  test("Testing the oberon stmt31 module. This module has a RepeatUntil") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").getFile)
 
     assert(path != null)
 

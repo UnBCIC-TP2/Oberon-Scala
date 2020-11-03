@@ -2,7 +2,8 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase,SimpleCase}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt}
+import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -428,13 +429,154 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module  = ScalaParser.parse(content)
 
     assert(module.name == "SimpleModule")
 
     assert(module.procedures.size == 2)
     assert(module.stmt.isDefined)
 
+  }
+
+  test("Test the type checker of a valid Repeat statement") {
+    val visitor = new TypeChecker()
+    
+    val condition  = LTExpression(VarExpression("x"), IntValue(10))
+    val stmt01     = ReadIntStmt("x")
+    val repeatStmt = RepeatUntilStmt(condition, stmt01)
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    assert(stmt01.accept(visitor) == List())
+    assert(repeatStmt.accept(visitor) == List())    
+  }
+
+
+  test("Test the type checker of a valid Repeat statement 2"){
+    val visitor = new TypeChecker()
+    
+    val condition  = EQExpression(VarExpression("x"), IntValue(0))
+    val stmt01     = ReadIntStmt("x")
+    val repeatStmt = RepeatUntilStmt(condition, stmt01)
+    
+    visitor.env.setGlobalVariable("x", IntegerType)
+    
+    assert(stmt01.accept(visitor) == List())
+    assert(repeatStmt.accept(visitor) == List())  
+    
+  }
+  
+  test("Test the type checker of a valid Repeat statement 3"){
+    val visitor = new TypeChecker()
+    val stmt01  =  AssignmentStmt("x", IntValue(10))
+    
+    val stmt02  = RepeatUntilStmt(BoolValue(true), stmt01)
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+  }  
+
+  test("Test a invalid Repeat statement in the type checker") {
+    val visitor = new TypeChecker()
+  
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val stmt02 = ReadIntStmt("x")
+    val stmt03 = IfElseStmt(BoolValue(false), stmt01, Some(stmt02))
+    val stmt04 = AssignmentStmt("x", IntValue(20))
+    val stmt05 = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
+    val stmt06 = RepeatUntilStmt(BoolValue(true), stmt05)
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 2)
+    assert(stmt04.accept(visitor).size == 1)
+    assert(stmt05.accept(visitor).size == 5)
+    assert(stmt06.accept(visitor).size == 5)
+  }
+
+  
+  test("Test the type checker of a valid Repeat statement 4"){
+  val visitor = new TypeChecker()
+  
+  val condition  = AndExpression(GTEExpression(VarExpression("x"), IntValue(1)),
+    LTEExpression(VarExpression("x"), IntValue(10)))
+  val stmt01     = ReadIntStmt("x")
+  val repeatStmt = RepeatUntilStmt(condition, stmt01)
+  
+  visitor.env.setGlobalVariable("x", IntegerType)
+  
+  assert(stmt01.accept(visitor) == List())
+  assert(repeatStmt.accept(visitor) == List())  
+  
+  }
+
+  test("Test a valid Repeat statement, with nested Repeat statements") {
+    val visitor = new TypeChecker()
+
+    val stmt01 = AssignmentStmt("x", IntValue(10))
+    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
+    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
+    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
+    
+    visitor.env.setGlobalVariable("x", IntegerType)
+    val allStmts = List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
+
+    allStmts.foreach(stmt => {
+      assert(stmt.accept(visitor).size == 0)
+    })
+  }
+
+  test("Test a invalid Repeat statement, with nested Repeat statements") {
+    val visitor = new TypeChecker()
+
+    val stmt01       = AssignmentStmt("x", IntValue(10))
+    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
+    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
+    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
+    
+    val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
+
+    allStmts.foreach(stmt => {
+      assert(stmt.accept(visitor).size == 1)
+    })
+  }
+
+  test("Test a valid Repeat statement, with a boolean variable") {
+    val visitor = new TypeChecker()
+
+    val boolVar    = VarExpression("flag")
+    val stmt01     = AssignmentStmt(boolVar.name, BoolValue(true))
+    val repeatStmt = RepeatUntilStmt(boolVar, stmt01)
+
+    visitor.env.setGlobalVariable("flag", BooleanType)
+
+    assert(repeatStmt.accept(visitor).size == 0) 
 
   }
+
+  test("Test a valid Repeat statement, with a sequence of statements") {
+    val visitor = new TypeChecker()
+
+    val stmt01     = AssignmentStmt("x", BoolValue(false))
+    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01)
+    val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    assert(stmt02.accept(visitor).size == 0)
+  }
+
+  test("Test a invalid Repeat statement, with a sequence of statements") {
+    val visitor = new TypeChecker()
+
+    val stmt01     = AssignmentStmt("x", BoolValue(false))
+    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01)
+    val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
+
+    assert(stmt02.accept(visitor).size == 4)
+  }
+
 }
+
