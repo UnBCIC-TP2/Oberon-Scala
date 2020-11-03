@@ -86,7 +86,8 @@ class Interpreter extends OberonVisitorAdapter {
 
     if (evalCondition(condition)) thenStmt.accept(this) 
     
-    else 
+    
+    else {
 
       while(i < listOfElseIf.size  && !matched) {
           listOfElseIf(i) match {
@@ -97,7 +98,7 @@ class Interpreter extends OberonVisitorAdapter {
           i += 1
       }
 
-      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
+      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)}
   }
 
   private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement])  : Unit = {
