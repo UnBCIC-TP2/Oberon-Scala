@@ -1508,5 +1508,5 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmt.stmts.size == 4)
 
     assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
-  }*/
+  }
 }
