@@ -530,8 +530,8 @@ test("Test control flow graph RepeatUntilStmt 02 - 1 Expression and 1 Condition 
     expected += SimpleNode(stmt02) ~> SimpleNode(stmt03)
     expected += SimpleNode(stmt03) ~> SimpleNode(stmt04)
     expected += SimpleNode(stmt03) ~> SimpleNode(stmt05)
-    expected += SimpleNode(stmt04) ~> SimpleNode(stmt05)
     expected += SimpleNode(stmt04) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt05)
     expected += SimpleNode(stmt05) ~> EndNode()
 
     val statements = List(stmt00, stmt01, stmt02, stmt03, stmt04, stmt05)
