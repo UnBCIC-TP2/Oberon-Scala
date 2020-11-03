@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
 import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
@@ -108,6 +108,138 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 0)
+  }
+  
+  test ("Test if-else-if statment type checker (invalid condition 'if')"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(20))
+    val stmt02 = AssignmentStmt("z", IntValue(30))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("z", IntegerType)
+
+    val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
+    val list1 = List(stmt03)
+  
+    val stmt04 = IfElseIfStmt(IntValue(34), stmt01, list1, None);
+  
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt04.accept(visitor).size == 1)
+  }
+  
+  test ("Test else-if statment type checker (invalid condition 'else-if')"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(40))
+    val stmt02 = AssignmentStmt("z", IntValue(100))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("z", IntegerType)
+  
+    val stmt03 = ElseIfStmt(IntValue(70), stmt02)
+    val list1 = List(stmt03)
+  
+    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+    
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt04.accept(visitor).size == 1)
+  }
+
+  test ("Test else-if statment type checker (invalid condition list 'else-if')"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(40))
+    val stmt02 = AssignmentStmt("z", IntValue(100))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("z", IntegerType)
+
+    val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
+    val stmt04 = ElseIfStmt(IntValue(73), stmt02)
+    val stmt05 = ElseIfStmt(IntValue(58), stmt01)
+    val stmt06 = ElseIfStmt(BoolValue(false), stmt01)
+    val list1 = List(stmt03, stmt04, stmt05, stmt06)
+    
+    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+    
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt07.accept(visitor).size == 2)
+  }
+
+  test ("Test else-if statment type checker (invalid then-stmt 'else-if')"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(40))
+    val stmt02 = AssignmentStmt("z", IntValue(100))
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+
+    val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
+    val list1 = List(stmt03)
+  
+    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None)
+    
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt04.accept(visitor).size == 1)
+  }
+  
+  test("Test if-else-if statment type checker (invalid else-stmt)"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(40))
+    val stmt02 = AssignmentStmt("z", IntValue(100))
+    val stmt03 = AssignmentStmt("w", IntValue(20))
+    
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("z", IntegerType)
+
+    val stmt04 = ElseIfStmt(BoolValue(true), stmt02)
+    val list1 = List(stmt04)
+
+    val stmt05 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
+
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt03.accept(visitor).size == 1)
+    assert(stmt05.accept(visitor).size == 1)
+  }
+
+  test("Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(40))
+    val stmt02 = AssignmentStmt("z", IntValue(100))
+    val stmt03 = AssignmentStmt("w", IntValue(20))
+
+    val stmt04 = ElseIfStmt(IntValue(56), stmt02)
+    val stmt05 = ElseIfStmt(IntValue(79), stmt01)
+    val stmt06 = ElseIfStmt(BoolValue(true), stmt02)
+    val list1 = List(stmt04, stmt05, stmt06)
+
+    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+    assert(stmt07.accept(visitor).size == 5)
+  }
+  
+  test("Test if-else-if statment type checker"){
+    val visitor = new TypeChecker
+    val stmt01 = AssignmentStmt("x", IntValue(15))
+    val stmt02 = AssignmentStmt("y", IntValue(5))
+    
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("y", IntegerType)
+
+    val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
+    val list1 = List(stmt03)
+  
+    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+  
+    assert(stmt01.accept(visitor).size == 0)
+    assert(stmt02.accept(visitor).size == 0)
+    assert(stmt04.accept(visitor).size == 0)
+    
   }
 
   test("Test while statement type checker (with invalid condition)") {
