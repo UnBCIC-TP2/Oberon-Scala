@@ -292,7 +292,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
               padSpaces
             ) + formatLine(startSpaces) +  Doc.char('}') + Doc.line
           }
-          case None => Doc.empty
+          case None => Doc.line + Doc.empty
         }
         val stmts = Doc.intercalate(Doc.line, elsifCond)
         ifCond + stmts + elseCond

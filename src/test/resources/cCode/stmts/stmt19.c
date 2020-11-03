@@ -1,20 +1,22 @@
-#include<stdio.h>
+#include <stdio.h>
 #include <stdbool.h>
 
-void main(){
-    int n1,n2,n3;
-    
-    scanf("%d",&n1);
-    scanf("%d",&n2);    
-    scanf("%d",&n3);
-    
-    if ((n1>n2)&&(n1>n3)) {
-        printf("%d", n1);
-    }
-    else if ((n2>n3)&&(n2>n1)) {
-        printf("%d", n2);
-    }
-    else {
-        printf("%d", n3);
-    }
+void main() {
+  int a, b, c;
+
+  scanf("%d", &a);
+  scanf("%d", &b);
+  scanf("%d", &c);
+  if (a > b) {
+    printf("%d\n", a);
+  }
+  else if (b > a) {
+    printf("%d\n", b);
+  }
+  else if (a > c) {
+    printf("%d\n", c);
+  }
+  else {
+    printf("%d\n", c);
+  }
 }
