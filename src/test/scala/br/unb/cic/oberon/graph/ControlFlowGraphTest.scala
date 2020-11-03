@@ -490,7 +490,8 @@ test("Test control flow graph for stmt01.oberon") {
     assert( 11 == g.edges.size)
     assert( expected == g)
   }
-  test("Test control flow graph of RepeatUntil with 1 expression and 1 condition ") {
+
+  test("Test control flow graph RepeatUntilStmt 01 - 1 Expression and 1 Condition ") {
     val stmt0 = AssignmentStmt("x", IntValue(1))
     val stmt1 = AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
     val stmt2 = RepeatUntilStmt(LTExpression(VarExpression("x"), IntValue(9)), stmt1)
@@ -511,6 +512,34 @@ test("Test control flow graph for stmt01.oberon") {
 
     assert( 6 == g.nodes.size)
     assert( 7 == g.edges.size)
+    assert( expected == g)
+  }
+
+test("Test control flow graph RepeatUntilStmt 02 - 1 Expression and 1 Condition ") {
+    val stmt00 = AssignmentStmt("x", IntValue(30))
+    val stmt01 = AssignmentStmt("y", IntValue(2))
+    val stmt02 = AssignmentStmt("z", DivExpression (VarExpression ("x") , VarExpression("y")))
+    val stmt03 = AssignmentStmt("z", AddExpression (VarExpression ("z"), IntValue(2)))
+    val stmt04 = RepeatUntilStmt(LTExpression (VarExpression("z"), (IntValue(20))), stmt03)
+    val stmt05 = WriteStmt(VarExpression ("z"))
+
+    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+    expected += StartNode() ~> SimpleNode(stmt00)
+    expected += SimpleNode(stmt00) ~> SimpleNode(stmt01)
+    expected += SimpleNode(stmt01) ~> SimpleNode(stmt02)
+    expected += SimpleNode(stmt02) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt04)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt05) ~> EndNode()
+
+    val statements = List(stmt00, stmt01, stmt02, stmt03, stmt04, stmt05)
+    val builder = new IntraProceduralGraphBuilder()
+    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+
+    assert( 8 == g.nodes.size)
+    assert( 9 == g.edges.size)
     assert( expected == g)
   }
 }
