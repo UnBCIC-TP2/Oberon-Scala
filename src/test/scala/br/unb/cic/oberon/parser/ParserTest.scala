@@ -1492,7 +1492,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt30 module. This module has a RepeatUntil") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").getFile)
 
     assert(path != null)
 
