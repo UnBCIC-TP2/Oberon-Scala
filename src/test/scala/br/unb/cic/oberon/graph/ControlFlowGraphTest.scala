@@ -569,33 +569,33 @@ test("Test control flow graph RepeatUntilStmt 02 - 1 Expression and 1 Condition 
     assert( 9 == g.edges.size)
     assert( expected == g)
   }
-  test("Test control flow graph of RepeatUntil 04 with 2 expression and 1 condition ") {
-    val stmt3_1 = AssignmentStmt("max", VarExpression("x"))
-    val stmt0 = ReadIntStmt("x")
-    val stmt1 = ReadIntStmt("max")
-    val stmt2 = AssignmentStmt("x", SubExpression(VarExpression("x"), IntValue(1)))
-    val stmt3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), stmt3_1 , None)
-    val stmt4 = RepeatUntilStmt(LTExpression(VarExpression("x"), IntValue(10)), stmt0)
-    val stmt5 = WriteStmt(VarExpression ("x"))
-
-    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
-    expected += StartNode() ~> SimpleNode(stmt0)
-    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
-    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
-    expected += SimpleNode(stmt2) ~> SimpleNode(stmt3)
-    expected += SimpleNode(stmt3) ~> SimpleNode(stmt3_1)
-    expected += SimpleNode(stmt3_1) ~> SimpleNode(stmt4)
-    expected += SimpleNode(stmt2) ~> SimpleNode(stmt5)
-    expected += SimpleNode(stmt4) ~> SimpleNode(stmt2)
-    expected += SimpleNode(stmt4) ~> SimpleNode(stmt5)
-    expected += SimpleNode(stmt5) ~> EndNode()
-
-    val statements = List(stmt0, stmt1, stmt2, stmt3, stmt3_1, stmt4, stmt5)
-    val builder = new IntraProceduralGraphBuilder()
-    val g = builder.createControlFlowGraph(SequenceStmt(statements))
-
-    assert( 9 == g.nodes.size)
-    assert( 10 == g.edges.size)
-    assert( expected == g)
-  }
+//  test("Test control flow graph of RepeatUntil 04 with 2 expression and 1 condition ") {
+//    val stmt3_1 = AssignmentStmt("max", VarExpression("x"))
+//    val stmt0 = ReadIntStmt("x")
+//    val stmt1 = ReadIntStmt("max")
+//    val stmt2 = AssignmentStmt("x", SubExpression(VarExpression("x"), IntValue(1)))
+//    val stmt3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), stmt3_1 , None)
+//    val stmt4 = RepeatUntilStmt(LTExpression(VarExpression("x"), IntValue(10)), stmt0)
+//    val stmt5 = WriteStmt(VarExpression ("x"))
+//
+//    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+//    expected += StartNode() ~> SimpleNode(stmt0)
+//    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
+//    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
+//    expected += SimpleNode(stmt2) ~> SimpleNode(stmt3)
+//    expected += SimpleNode(stmt3) ~> SimpleNode(stmt3_1)
+//    expected += SimpleNode(stmt3_1) ~> SimpleNode(stmt4)
+//    expected += SimpleNode(stmt2) ~> SimpleNode(stmt5)
+//    expected += SimpleNode(stmt4) ~> SimpleNode(stmt2)
+//    expected += SimpleNode(stmt4) ~> SimpleNode(stmt5)
+//    expected += SimpleNode(stmt5) ~> EndNode()
+//
+//    val statements = List(stmt0, stmt1, stmt2, stmt3, stmt3_1, stmt4, stmt5)
+//    val builder = new IntraProceduralGraphBuilder()
+//    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+//
+//    assert( 9 == g.nodes.size)
+//    assert( 10 == g.edges.size)
+//    assert( expected == g)
+//  }
 }
