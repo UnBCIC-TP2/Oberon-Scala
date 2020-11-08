@@ -1189,6 +1189,205 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
+  test("Testing the oberon stmt25 code. This module tests if a ForRange stmt is correctly converted to a For stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt25.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert("ForRangeModule" == module.name)
+    assert(1 == module.variables.length)
+
+    assert(None != module.stmt.getOrElse(None))
+    val forStmt = module.stmt.get.asInstanceOf[ForStmt]
+
+    assert(AssignmentStmt("x", IntValue(0)) == forStmt.init)
+    assert(LTEExpression(VarExpression("x"), IntValue(10)) == forStmt.condition)
+    assert(SequenceStmt(List(WriteStmt(VarExpression("x")),
+      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))) == forStmt.stmt)
+
+  }
+
+  test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt26.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert("ForRangeModule" == module.name)
+    assert(3 == module.variables.length)
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmts) => assert(3 == stmts.length)
+      case _ => fail("Error! Expected a sequence stmt with 3 statements!!!")
+    }
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(ReadIntStmt("min") == sequenceStmts(0))
+    assert(ReadIntStmt("max") == sequenceStmts(1))
+
+    val forRangeStmt = sequenceStmts(2).asInstanceOf[ForStmt]
+
+    val innerInit = AssignmentStmt("x", VarExpression("min"))
+    val innerCondition = LTEExpression(VarExpression("x"), VarExpression("max"))
+    val innerStmts = List(WriteStmt(VarExpression("x")), AssignmentStmt("x", AddExpression(
+      VarExpression("x"), IntValue(1))))
+
+    val forStmts = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
+    
+    assert(innerInit == forRangeStmt.init)
+    assert(innerCondition == forRangeStmt.condition)
+    assert(innerStmts(0) == forStmts(0))
+    assert(innerStmts(1) == forStmts(1))
+
+  }
+
+  test("Testing the oberon stmt27 code. This module has a ForRange stmt nested with another ForRange stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt27.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert("ForRangeModule" == module.name)
+    assert(2 == module.variables.length)
+
+    assert(None != module.stmt.getOrElse(None))
+
+    val forRangeStmt = module.stmt.get.asInstanceOf[ForStmt]
+
+    val initStmt1 = AssignmentStmt("x", IntValue(0))
+    val condExpr1 = LTEExpression(VarExpression("x"), IntValue(20))
+
+    assert(initStmt1 == forRangeStmt.init)
+    assert(condExpr1 == forRangeStmt.condition)
+
+    val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
+    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    val nestedFor = stmts1(0).asInstanceOf[ForStmt]
+
+    val initStmt2 = AssignmentStmt("y", VarExpression("x"))
+    val condExpr2 = LTEExpression(VarExpression("y"), IntValue(20))
+    val stmt2 = nestedFor.stmt.asInstanceOf[SequenceStmt].stmts
+
+    assert(initStmt2 == nestedFor.init)
+    assert(condExpr2 == nestedFor.condition)
+    assert(WriteStmt(VarExpression("y")) == stmt2(0))
+    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+
+  }
+
+    test("Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt28.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert("ForRangeModule" == module.name)
+    assert(4 == module.variables.length)
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmts) => assert(3 == stmts.length)
+      case _ => fail("Expected a sequence of 3 statements!!!")
+    }
+  
+    val sequenceStmts = module.stmt.getOrElse(None).asInstanceOf[SequenceStmt].stmts
+    assert(ReadIntStmt("min") == sequenceStmts(0))
+    assert(ReadIntStmt("max") == sequenceStmts(1))
+
+    val forRangeStmt = sequenceStmts(2).asInstanceOf[ForStmt]
+
+    val initStmt1 = AssignmentStmt("x", VarExpression("min"))
+    val condExpr1 = LTEExpression(VarExpression("x"), VarExpression("max"))
+
+    assert(initStmt1 == forRangeStmt.init)
+    assert(condExpr1 == forRangeStmt.condition)
+
+    val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
+    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    val nestedFor = stmts1(0).asInstanceOf[ForStmt]
+
+    val initStmt2 = AssignmentStmt("y", VarExpression("x"))
+    val condExpr2 = LTEExpression(VarExpression("y"), VarExpression("max"))
+    val stmt2 = nestedFor.stmt.asInstanceOf[SequenceStmt].stmts
+
+    assert(initStmt2 == nestedFor.init)
+    assert(condExpr2 == nestedFor.condition)
+    assert(WriteStmt(VarExpression("y")) == stmt2(0))
+    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+
+  }
+
+    test("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt29.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert("ForRangeModule" == module.name)
+    assert(1 == module.variables.length)
+
+    assert(None != module.stmt.getOrElse(None))
+    val forStmt = module.stmt.get.asInstanceOf[ForStmt]
+
+    val initStmt = AssignmentStmt("x", IntValue(0))
+    val condExpr = LTEExpression(VarExpression("x"), IntValue(10))
+    val stmts = forStmt.stmt.asInstanceOf[SequenceStmt].stmts
+
+    assert(initStmt == forStmt.init)
+    assert(condExpr == forStmt.condition)
+    assert(WriteStmt(FunctionCallExpression("squareOf", List(VarExpression("x")))) == stmts(0))
+    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
+  }
+
+  test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("x"))
+
+    stmts(1) match {
+      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
+        assert(thenStmt == AssignmentStmt("y", IntValue(1)))
+        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
+        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
+        assert(elseStmt == Some(AssignmentStmt("y", IntValue(4))))
+      case _ => fail("expecting an if-then stmt")
+    }
+
+    assert(stmts(2) == WriteStmt(VarExpression("y")))
+  }
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").getFile)
 
@@ -1290,5 +1489,24 @@ class ParserTestSuite extends AnyFunSuite {
       }
       case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
     }
+  }
+
+  test("Testing the oberon stmt31 module. This module has a RepeatUntil") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined && module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.size == 4)
+
+    assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
   }
 }

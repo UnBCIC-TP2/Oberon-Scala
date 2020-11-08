@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+
+VAR
+    x, y : INTEGER;
+BEGIN
+    x := 0;
+    IF (x < 0) THEN
+        y := 1
+    ELSIF (x > 0) THEN
+        y := 2
+    ELSE
+        y := 3
+    END;
+    write(y)
+END
+
+END SimpleModule.
+        
