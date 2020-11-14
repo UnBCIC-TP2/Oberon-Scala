@@ -11,7 +11,8 @@ BEGIN
       x := 20
     ELSE
       x := x + 1
-    END;
+    END   
+
   UNTIL x > 10;
 
   write(x)
