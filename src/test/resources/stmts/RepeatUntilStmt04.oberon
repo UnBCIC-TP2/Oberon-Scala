@@ -10,10 +10,11 @@ BEGIN
     IF (x > 5) THEN
       x := 20
     ELSE
-      x := x + 1
+      x := x + 1;
+      write(x)
     END   
 
-  UNTIL x > 10;
+  UNTIL x >= 10;
 
   write(x)
 

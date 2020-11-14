@@ -435,7 +435,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("sum") == Some(IntValue(64)));
+    assert(interpreter.env.lookup("sum") == Some(IntValue(11)));
 
   }
 
@@ -480,12 +480,42 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
     val module = ScalaParser.parse(content)
     val interpreter = new Interpreter()
     assert(module.name == "RepeatUntilModule")
-
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("x") == Some(IntValue(11)));
     assert(interpreter.env.lookup("y") == Some(IntValue(40)));
 
+  }
+  test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "RepeatUntilModule")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(20)));
+    assert(interpreter.env.lookup("y") == Some(IntValue(20)));
+  }
+
+  test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt08.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "RepeatUntilModule")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(10)));
+    assert(interpreter.env.lookup("y") == Some(IntValue(10)));
   }
 
 }
