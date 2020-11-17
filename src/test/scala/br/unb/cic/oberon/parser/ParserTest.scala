@@ -1509,4 +1509,23 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
   }
+  // Parser doesn't create Bracket Expression objects.
+  ignore("Testing simple10.oberon - Bracket Expression") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon")
+      .getFile
+      .replaceFirst("\\/(.:\\/)", "$1"))
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined && module.stmt.get.isInstanceOf[AssignmentStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[AssignmentStmt]
+
+    assert(stmt.exp.isInstanceOf[Brackets])
+  }
 }

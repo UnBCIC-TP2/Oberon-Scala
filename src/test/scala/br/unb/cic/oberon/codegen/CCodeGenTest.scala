@@ -17,7 +17,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"stmts/stmt$stmtNumber.oberon")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(oberonPath != null)
 
@@ -30,7 +30,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"cCode/stmts/stmt$stmtNumber.c")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(cPath != null)
       val cCode = String.join("\n", Files.readAllLines(cPath))
@@ -45,7 +45,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"stmts/stmt$stmtNumber.oberon")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(oberonPath != null)
 
@@ -58,7 +58,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"cCode/stmts/stmt$stmtNumber.c")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(cPath != null)
 
@@ -75,7 +75,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"procedures/procedure$procedureNumber.oberon")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(oberonPath != null)
 
@@ -88,7 +88,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource(s"cCode/procedures/procedure$procedureNumber.c")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(cPath != null)
 
@@ -107,7 +107,7 @@ class CCodeGenTest extends AnyFunSuite {
             s"procedures/interpreter_factorial$procedureNumber.oberon"
           )
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(oberonPath != null)
 
@@ -122,7 +122,7 @@ class CCodeGenTest extends AnyFunSuite {
             s"cCode/procedures/interpreter_factorial$procedureNumber.c"
           )
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(cPath != null)
 
@@ -137,7 +137,7 @@ class CCodeGenTest extends AnyFunSuite {
       getClass.getClassLoader
         .getResource(s"procedures/interpreter_fibonacci01.oberon")
         .getFile
-        .replace("/C:/", "C:/")
+        .replaceFirst("\\/(.:\\/)", "$1")
     )
     assert(oberonPath != null)
 
@@ -152,7 +152,7 @@ class CCodeGenTest extends AnyFunSuite {
           s"cCode/procedures/interpreter_fibonacci01.c"
         )
         .getFile
-        .replace("/C:/", "C:/")
+        .replaceFirst("\\/(.:\\/)", "$1")
     )
     assert(cPath != null)
 
@@ -165,7 +165,7 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource("stmts/stmt01.oberon")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(oberonPath != null)
 
@@ -178,10 +178,141 @@ class CCodeGenTest extends AnyFunSuite {
         getClass.getClassLoader
           .getResource("cCode/stmts/stmt01_4spaces.c")
           .getFile
-          .replace("/C:/", "C:/")
+          .replaceFirst("\\/(.:\\/)", "$1")
       )
       assert(cPath != null)
       val cCode = String.join("\n", Files.readAllLines(cPath))
       assert(generatedCCode == cCode)
     }
+
+  test("First RepeatUntil Test") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil Test with just one loop") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil01.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil01.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil Nested") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil02.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil02.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil Compound Exit Condition") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil03.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil03.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
+  test("RepeatUntil In Procedure") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/repeatuntil04.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/repeatuntil04.c")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+
+    assert(generatedCCode == cCode)
+  }
+
 }

@@ -10,7 +10,7 @@ BEGIN
       readInt(z);
       z := z/(y+1);
       write(z)
-    END;
+    END
     
 END
 
