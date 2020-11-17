@@ -495,7 +495,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
   
-  test("Testing the oberon stmt11 code. This module has a For statement") {
+  ignore("Testing the oberon stmt11 code. This module has a For statement") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt11.oberon").getFile)
 
     assert(path != null)
