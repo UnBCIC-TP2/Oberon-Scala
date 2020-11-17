@@ -48,13 +48,16 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    * @return a new version of the graph
    */
   def createControlFlowGraph(stmts: List[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] =
-  stmts match {
+ stmts match {
     case s1 :: s2 :: rest => // case the list has at least two elements. this is the recursive case
       s1 match {
         case IfElseStmt(_, _, Some(_)) => // in this case, we do not create an edge from s1 -> s2
           processStmtNode(s1, Some(s2), g)
           createControlFlowGraph(s2 :: rest, g)
         case CaseStmt(_, _, Some(_)) =>
+          processStmtNode(s1, Some(s2), g)
+          createControlFlowGraph(s2 :: rest, g)
+        case IfElseIfStmt(_, _, _, Some(_)) =>
           processStmtNode(s1, Some(s2), g)
           createControlFlowGraph(s2 :: rest, g)
         case _ =>
@@ -88,6 +91,19 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
         processStmtNode(from, whileStmt, target, g) // returns the recursive call
       case ForStmt(init,_ ,forStmt) =>
         processStmtNode(init, forStmt, target, g)
+      case IfElseIfStmt(_, thenStmt, elseIfStmt, optionalElseStmt) =>
+        processStmtNode(from, thenStmt, target, g)
+          elseIfStmt.foreach((ifElseIfBlock) => {
+            ifElseIfBlock match {
+              case ElseIfStmt(_, thenStmt) =>
+                processStmtNode(from, thenStmt, target, g)
+            }
+          })
+          if (optionalElseStmt.isDefined){
+            processStmtNode(from, optionalElseStmt.get, target, g)
+          }
+          else g += SimpleNode(from) ~> SimpleNode(target.get)
+          g
       case CaseStmt(_, cases, optionalElseStmt) =>
         cases.foreach((caseBlock) => {
           caseBlock match {
