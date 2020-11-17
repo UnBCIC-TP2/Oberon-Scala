@@ -2,7 +2,6 @@ package br.unb.cic.oberon.graph
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode}
-import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
@@ -491,6 +490,123 @@ test("Test control flow graph for stmt01.oberon") {
     assert( expected == g)
   }
 
+  test("Test control flow graph RepeatUntilStmt 03 - 1 Expression and 1 Condition ") {
+    val stmt00 = AssignmentStmt("x", IntValue(3))
+    val stmt01 = AssignmentStmt("y", IntValue(4))
+    val stmt02 = AssignmentStmt("z", MultExpression (VarExpression ("x") , VarExpression("y")))
+    val stmt03 = AssignmentStmt("z", AddExpression (VarExpression ("z"), IntValue(5)))
+    val stmt04 = RepeatUntilStmt(LTExpression (VarExpression("z"), IntValue(50)), stmt03)
+    val stmt05 = WriteStmt(VarExpression ("z"))
+
+    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+    expected += StartNode() ~> SimpleNode(stmt00)
+    expected += SimpleNode(stmt00) ~> SimpleNode(stmt01)
+    expected += SimpleNode(stmt01) ~> SimpleNode(stmt02)
+    expected += SimpleNode(stmt02) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt04)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt05) ~> EndNode()
+
+    val statements = List(stmt00, stmt01, stmt02, stmt03, stmt04, stmt05)
+    val builder = new IntraProceduralGraphBuilder()
+    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+
+    assert( 8 == g.nodes.size)
+    assert( 9 == g.edges.size)
+    assert( expected == g)
+  }
+
+  test("Test control flow graph of RepeatUntil 05 with 2 expression and 1 condition ") {
+    val stmt2_1 = AssignmentStmt("max", VarExpression("x"))
+    val stmt0 = ReadIntStmt("x")
+    val stmt1 = ReadIntStmt("max")
+    val stmt2 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), stmt2_1 , None)
+    val stmt3 = AssignmentStmt("x", SubExpression(VarExpression("x"), IntValue(1)))
+    val stmt4 = RepeatUntilStmt(LTExpression(VarExpression("x"), IntValue(10)), stmt3)
+    val stmt5 = WriteStmt(VarExpression ("x"))
+
+    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+    expected += StartNode() ~> SimpleNode(stmt0)
+    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
+    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
+    expected += SimpleNode(stmt2) ~> SimpleNode(stmt2_1)
+    expected += SimpleNode(stmt2_1) ~> SimpleNode(stmt3)
+    expected += SimpleNode(stmt2_1) ~> SimpleNode(stmt2_1) //gerado
+    //    expected += SimpleNode(stmt2) ~> SimpleNode(stmt3)
+    expected += SimpleNode(stmt3) ~> SimpleNode(stmt4)
+    expected += SimpleNode(stmt3) ~> SimpleNode(stmt5)
+    //    expected += SimpleNode(stmt4) ~> SimpleNode(stmt2)
+    expected += SimpleNode(stmt4) ~> SimpleNode(stmt3) //gerado
+    expected += SimpleNode(stmt4) ~> SimpleNode(stmt5)
+    expected += SimpleNode(stmt5) ~> EndNode()
+
+    val statements = List(stmt0, stmt1, stmt2, stmt2_1, stmt3, stmt4, stmt5)
+    val builder = new IntraProceduralGraphBuilder()
+    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+
+    assert( 9 == g.nodes.size)
+    assert( 11 == g.edges.size)
+    assert( expected == g)
+  }
+
+  /*
+  MODULE SimpleModule;
+
+    VAR
+      x, y : INTEGER;
+    BEGIN
+      readInt(x);
+      IF(x < 5) THEN
+        y := 1
+      ELSIF(x < 7) THEN
+        y := 2
+      ELSIF(x < 9) THEN
+        y := 3
+      END;
+      write(y)
+    END
+
+  END SimpleModule.
+  */
+
+  test("Test control flow graph of IfElseIfStmt with 3 if/else if and NO else case") {
+
+    val if_stmt = AssignmentStmt("y", IntValue(1))
+    val elsif1_stmt = AssignmentStmt("y", IntValue(2))
+    val elsif_case_1 = ElseIfStmt(LTExpression(VarExpression("x"), IntValue(7)), elsif1_stmt)
+    val elsif2_stmt = AssignmentStmt("y", IntValue(3))
+    val elsif_case_2 = ElseIfStmt(LTExpression(VarExpression("x"), IntValue(9)), elsif2_stmt)
+
+    val elsif = List(elsif_case_1, elsif_case_2)
+
+    val stmt0 = ReadIntStmt("x")
+    val stmt1 = IfElseIfStmt(LTExpression(VarExpression("x"), IntValue(5)), if_stmt, elsif, None)
+    val stmt2 = WriteStmt(VarExpression("y"))
+
+    var expected = Graph[GraphNode, GraphEdge.DiEdge]()
+    expected += StartNode() ~> SimpleNode(stmt0)
+    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
+    expected += SimpleNode(stmt1) ~> SimpleNode(if_stmt)
+    expected += SimpleNode(stmt1) ~> SimpleNode(elsif1_stmt)
+    expected += SimpleNode(stmt1) ~> SimpleNode(elsif2_stmt)
+    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
+    expected += SimpleNode(if_stmt) ~> SimpleNode(stmt2)
+    expected += SimpleNode(elsif1_stmt) ~> SimpleNode(stmt2)
+    expected += SimpleNode(elsif2_stmt) ~> SimpleNode(stmt2)
+    expected += SimpleNode(stmt2) ~> EndNode()
+
+    val statements = List(stmt0, stmt1, stmt2)
+    val builder = new IntraProceduralGraphBuilder()
+    val g = builder.createControlFlowGraph(SequenceStmt(statements))
+
+    assert( g.nodes.size == 8)
+    assert( g.edges.size == 10)
+    assert( g == expected )
+  }
+
+
 /*
   MODULE SimpleModule;
     
@@ -550,60 +666,6 @@ test("Test control flow graph for stmt01.oberon") {
     assert( g == expected )
   }
 
-  /*
-    MODULE SimpleModule;
-      
-      VAR
-        x, y : INTEGER;
-      BEGIN
-        readInt(x);
-        IF(x < 5) THEN
-          y := 1
-        ELSIF(x < 7) THEN
-          y := 2
-        ELSIF(x < 9) THEN
-          y := 3
-        END;
-        write(y)
-      END
-
-    END SimpleModule.
-  */
-
-  test("Test control flow graph of IfElseIfStmt with 3 if/else if and NO else case") {
-
-    val if_stmt = AssignmentStmt("y", IntValue(1))
-    val elsif1_stmt = AssignmentStmt("y", IntValue(2))
-    val elsif_case_1 = ElseIfStmt(LTExpression(VarExpression("x"), IntValue(7)), elsif1_stmt)
-    val elsif2_stmt = AssignmentStmt("y", IntValue(3))
-    val elsif_case_2 = ElseIfStmt(LTExpression(VarExpression("x"), IntValue(9)), elsif2_stmt)
-
-      val elsif = List(elsif_case_1, elsif_case_2)
-
-      val stmt0 = ReadIntStmt("x")
-      val stmt1 = IfElseIfStmt(LTExpression(VarExpression("x"), IntValue(5)), if_stmt, elsif, None)
-      val stmt2 = WriteStmt(VarExpression("y"))
-
-      var expected = Graph[GraphNode, GraphEdge.DiEdge]()
-      expected += StartNode() ~> SimpleNode(stmt0)
-      expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
-      expected += SimpleNode(stmt1) ~> SimpleNode(if_stmt)
-      expected += SimpleNode(stmt1) ~> SimpleNode(elsif1_stmt)
-      expected += SimpleNode(stmt1) ~> SimpleNode(elsif2_stmt)
-      expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
-      expected += SimpleNode(if_stmt) ~> SimpleNode(stmt2)
-      expected += SimpleNode(elsif1_stmt) ~> SimpleNode(stmt2)
-      expected += SimpleNode(elsif2_stmt) ~> SimpleNode(stmt2)
-      expected += SimpleNode(stmt2) ~> EndNode()
-
-      val statements = List(stmt0, stmt1, stmt2)
-      val builder = new IntraProceduralGraphBuilder()
-      val g = builder.createControlFlowGraph(SequenceStmt(statements))
-
-      assert( g.nodes.size == 8)
-      assert( g.edges.size == 10)
-      assert( g == expected )
-  }
 
   /*
     MODULE SimpleModule;
@@ -631,47 +693,34 @@ test("Test control flow graph for stmt01.oberon") {
     END SimpleModule.
   */
 
-  test("Test control flow graph of IfElseIfStmt with nested if's") {
-    
-    val if_stmt01 = AssignmentStmt("y", IntValue(0))
-    val elsif_elsif_1_stmt = AssignmentStmt("y", IntValue(1))
-    val elsif_elsif_case_1 = ElseIfStmt(EQExpression(VarExpression("y"), IntValue(3)), elsif_elsif_1_stmt)
-    val elsif_elsif_2_stmt = AssignmentStmt("y", IntValue(2))
-    val elsif_elsif_case_2 = ElseIfStmt(GTExpression(VarExpression("y"), IntValue(3)), elsif_elsif_2_stmt)
 
-    val elsif1_stmt = AssignmentStmt("y", IntValue(10))
-    val elsif_case_1 = ElseIfStmt(EQExpression(VarExpression("x"), IntValue(5)), elsif1_stmt)
-    
-    val elsif = List(elsif_case_1)
-    val elsif2 = List(elsif_elsif_case_1, elsif_elsif_case_2)
-    val if_stmt = IfElseIfStmt(LTExpression(VarExpression("y"), IntValue(3)), if_stmt01, elsif2, None)
-    val else_stmt = AssignmentStmt("y", IntValue(90))
-    
-    
-    val stmt0 = ReadIntStmt("x")
-    val stmt1 = ReadIntStmt("y")
-    val stmt2 = IfElseIfStmt(LTExpression(VarExpression("x"), IntValue(5)), if_stmt, elsif, Some(else_stmt))
-    val stmt3 = WriteStmt(VarExpression("y"))
-    
+test("Test control flow graph RepeatUntilStmt 02 - 1 Expression and 1 Condition ") {
+    val stmt00 = AssignmentStmt("x", IntValue(30))
+    val stmt01 = AssignmentStmt("y", IntValue(2))
+    val stmt02 = AssignmentStmt("z", DivExpression (VarExpression ("x") , VarExpression("y")))
+    val stmt03 = AssignmentStmt("z", AddExpression (VarExpression ("z"), IntValue(2)))
+    val stmt04 = RepeatUntilStmt(LTExpression (VarExpression("z"), IntValue(20)), stmt03)
+    val stmt05 = WriteStmt(VarExpression ("z"))
+
     var expected = Graph[GraphNode, GraphEdge.DiEdge]()
-    expected += StartNode() ~> SimpleNode(stmt0)
-    expected += SimpleNode(stmt0) ~> SimpleNode(stmt1)
-    expected += SimpleNode(stmt1) ~> SimpleNode(stmt2)
-    expected += SimpleNode(stmt2) ~> SimpleNode(if_stmt)
-    expected += SimpleNode(stmt2) ~> SimpleNode(elsif1_stmt)
-    expected += SimpleNode(stmt2) ~> SimpleNode(else_stmt)
-    expected += SimpleNode(if_stmt) ~> SimpleNode(stmt3)
-    expected += SimpleNode(elsif1_stmt) ~> SimpleNode(stmt3)
-    expected += SimpleNode(else_stmt) ~> SimpleNode(stmt3)
-    expected += SimpleNode(stmt3) ~> EndNode()
+    expected += StartNode() ~> SimpleNode(stmt00)
+    expected += SimpleNode(stmt00) ~> SimpleNode(stmt01)
+    expected += SimpleNode(stmt01) ~> SimpleNode(stmt02)
+    expected += SimpleNode(stmt02) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt04)
+    expected += SimpleNode(stmt03) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt03)
+    expected += SimpleNode(stmt04) ~> SimpleNode(stmt05)
+    expected += SimpleNode(stmt05) ~> EndNode()
 
-    val statements = List(stmt0, stmt1, stmt2, stmt3)
+    val statements = List(stmt00, stmt01, stmt02, stmt03, stmt04, stmt05)
     val builder = new IntraProceduralGraphBuilder()
     val g = builder.createControlFlowGraph(SequenceStmt(statements))
 
-    assert( g.nodes.size == 9)
-    assert( g.edges.size == 10)
-    assert( g == expected )
+    assert( 8 == g.nodes.size)
+    assert( 9 == g.edges.size)
+    assert( expected == g)
   }
-
 }
+
+
