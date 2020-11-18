@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, ForStmt, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt, RangeCase, SimpleCase, CaseStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, ForStmt, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt, RangeCase, SimpleCase, CaseStmt, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -59,7 +59,9 @@ class TypeChecker extends OberonVisitorAdapter {
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
+    case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
+    case RepeatUntilStmt(_, _) => visitRepeatUntilStmt(stmt)
     case ForStmt(_, _, _) => visitForStmt(stmt)
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
@@ -88,10 +90,38 @@ class TypeChecker extends OberonVisitorAdapter {
       }
       else List((stmt, s"Expression $condition does not have a boolean type"))
   }
+  
+  private def visitIfElseIfStmt(stmt: Statement) = stmt match {
+    case IfElseIfStmt(condition, thenStmt, elseIfStmt, elseStmt) =>
+      if(condition.accept(expVisitor).contains(BooleanType)){
+        val list1 = thenStmt.accept(this)
+        var list2 = List[(br.unb.cic.oberon.ast.Statement, String)]()
+          elseIfStmt.foreach (elsif =>
+            if(elsif.condition.accept(expVisitor).contains(BooleanType)){
+              val list4 = elsif.thenStmt.accept(this)
+              list2 = list2 ++ list4
+            }else{
+              val list4 = List((stmt, s"Expression $condition does not have a boolean type"))
+              list2 = list2 ++ list4
+            }
+          )
+        val list3 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
+        list2 ++ list1 ++ list3
+      }
+      else List((stmt, s"Expression $condition does not have a boolean type"))
+  }
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
     case WhileStmt(condition, stmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)) {
+        stmt.accept(this)
+      }
+      else List((stmt, s"Expression $condition do not have a boolean type"))
+  }
+
+  private def visitRepeatUntilStmt(stmt: Statement) = stmt match {
+    case RepeatUntilStmt(condition, stmt) =>
+      if(condition.accept(expVisitor).getOrElse(None) == BooleanType) {
         stmt.accept(this)
       }
       else List((stmt, s"Expression $condition do not have a boolean type"))

@@ -1,0 +1,23 @@
+MODULE RepeatUntilModule;
+
+VAR
+  x, sum, lim : INTEGER;
+
+BEGIN
+  x := 0;
+  lim := 10;
+
+  REPEAT
+    CASE x OF
+      0:   sum := 0
+      ELSE sum := sum + x
+    END;
+
+    x := x + 1
+  UNTIL x > lim;
+
+  write(sum)
+
+END
+
+END RepeatUntilModule.
