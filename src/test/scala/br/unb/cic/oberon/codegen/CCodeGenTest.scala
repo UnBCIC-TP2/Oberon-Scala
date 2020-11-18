@@ -214,7 +214,7 @@ class CCodeGenTest extends AnyFunSuite {
   test("Testing C generator for stmt31") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
-        .getResource("stmts/stmt31.oberon")
+        .getResource("stmts/ifelseif_stmt31.oberon")
         .getFile
         .replace("/C:/", "C:/")
     )
