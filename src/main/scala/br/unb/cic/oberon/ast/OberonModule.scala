@@ -7,7 +7,9 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
-                        stmt: Option[Statement]
+                        stmt: Option[Statement],
+                        // Temporary change, might be overwritten by another group - G09
+                        userTypes: List[UserType]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
@@ -63,6 +65,8 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
+// Temporary change, might be overwritten by another group - G09
+case class RecordVarExpression (name: String, attribute: List[String]) extends Expression
 
 /* Statements */
 trait Statement {
@@ -98,3 +102,6 @@ trait Type {
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
+
+// Temporary change, might be overwritten by another group - G09
+case class UserType (name: String, attributes: Map[String, Type]) extends Type

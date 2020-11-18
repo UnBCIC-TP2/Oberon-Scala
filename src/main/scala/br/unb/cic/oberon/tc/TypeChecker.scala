@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, Constant, DivExpression, EQExpression, Expression, FormalArg, ForStmt, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ReadIntStmt, ReturnStmt, SequenceStmt, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt, RangeCase, SimpleCase, CaseStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, Expression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordVarExpression, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, UserType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -30,6 +30,16 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case AndExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     case OrExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     // TODO: function call ...
+    // Temporary change, might be overwritten by another group - G09
+    case RecordVarExpression(name, attributeName) => {
+      if (typeChecker.env.lookup(name).isDefined) {
+        val recordType = typeChecker.env.lookup(name).get
+        recordType match {
+          case UserType(typeName, _) => typeChecker.env.lookupAttributeType(attributeName, typeName)
+          case _ => None
+        }
+      } else None
+    }
   }
 
   def computeBinExpressionType(left: Expression, right: Expression, expected: Type, result: Type) : Option[Type] = {
@@ -49,6 +59,8 @@ class TypeChecker extends OberonVisitorAdapter {
     module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.map(p => env.declareProcedure(p))
+    // Temporary change, might be overwritten by another group - G09
+    module.userTypes.map(u => env.addUserType(u.name, u))
 
     // TODO: check if the procedures are well typed.
 
