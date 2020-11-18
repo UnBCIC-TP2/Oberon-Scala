@@ -65,13 +65,48 @@ class Interpreter extends OberonVisitorAdapter {
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
       case WriteStmt(exp) => println(evalExpression(exp))
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
+      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
       case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
+      case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
-      case CaseStmt(exp, cases, elseStmt) =>
-        var v = evalExpression(exp)
-        var matched = false    
-        var i = 0
-        while(i < cases.size  && !matched) {
+      case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)  
+      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
+      case ProcedureCallStmt(name, args) =>
+      // we evaluate the "args" in the current
+      // environment.
+      val actualArguments = args.map(a => evalExpression(a))
+      env.push()  // after that, we can "push", to indicate a procedure call.
+      visitProcedureCall(name, actualArguments) // then we execute the procedure.
+      env.pop() // and we pop, to indicate that a procedure finished its execution.
+    }
+  }
+
+  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]) : Unit = {
+    var matched = false    
+    var i = 0
+
+    if (evalCondition(condition)) thenStmt.accept(this) 
+    
+    
+    else {
+
+      while(i < listOfElseIf.size  && !matched) {
+          listOfElseIf(i) match {
+              case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
+                stmt.accept(this) 
+                matched = true}
+          }
+          i += 1
+      }
+
+      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)}
+  }
+
+  private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement])  : Unit = {
+    var v = evalExpression(exp)
+    var matched = false    
+    var i = 0
+    while(i < cases.size  && !matched) {
           cases(i) match {
             case RangeCase(min, max, stmt) =>
               if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
@@ -89,15 +124,6 @@ class Interpreter extends OberonVisitorAdapter {
         if (!matched && elseStmt.isDefined) {
             elseStmt.get.accept(this)
         }
-      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
-      case ProcedureCallStmt(name, args) =>
-      // we evaluate the "args" in the current
-      // environment.
-      val actualArguments = args.map(a => evalExpression(a))
-      env.push()  // after that, we can "push", to indicate a procedure call.
-      visitProcedureCall(name, actualArguments) // then we execute the procedure.
-      env.pop() // and we pop, to indicate that a procedure finished its execution.
-    }
   }
 
   /*
