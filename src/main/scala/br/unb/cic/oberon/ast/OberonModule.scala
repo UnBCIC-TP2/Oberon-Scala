@@ -63,6 +63,7 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
+case class ExpressionName(exp: Expression, name: String) extends Expression
 
 /* Statements */
 trait Statement {
