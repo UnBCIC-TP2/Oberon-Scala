@@ -44,7 +44,8 @@ expression
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
- | name = Id '(' arguments? ')'                                                           #FunctionCall       
+ | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | arrayBase = expression '[' index = expression ']'                                      #ArrayIndex
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
