@@ -65,9 +65,8 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
-// Temporary change, might be overwritten by another group - G09
-case class RecordVarExpression (name: String, attribute: List[String]) extends Expression
-
+case class FieldAccessExpression (exp: Expression, name: String) extends Expression
+ 
 /* Statements */
 trait Statement {
   def accept(v: OberonVisitor) = v.visit(this)
@@ -102,6 +101,7 @@ trait Type {
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
+case class ReferenceType (name: String) extends Type
+//case class AnonymousUserDefinedType extends Type
 
-// Temporary change, might be overwritten by another group - G09
-case class UserType (name: String, attributes: Map[String, Type]) extends Type
+

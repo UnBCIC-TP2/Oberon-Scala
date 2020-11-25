@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, Expression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordVarExpression, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, UserType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, Expression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, FieldAccessExpression, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, ReferenceType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -30,15 +30,15 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case AndExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     case OrExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     // TODO: function call ...
-    // Temporary change, might be overwritten by another group - G09
-    case RecordVarExpression(name, attributeName) => {
-      if (typeChecker.env.lookup(name).isDefined) {
-        val recordType = typeChecker.env.lookup(name).get
-        recordType match {
-          case UserType(typeName, _) => typeChecker.env.lookupAttributeType(attributeName, typeName)
-          case _ => None
+    case FieldAccessExpression(exp, attributeName) => {
+      val expType = visit(exp)
+      if (expType.isEmpty) None
+      expType.get match {
+        case ReferenceType(recordName) => {
+          typeChecker.env.lookupAttributeType(recordName, attributeName)
         }
-      } else None
+        case _ => None
+      }
     }
   }
 
@@ -83,6 +83,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   private def visitAssignment(stmt: Statement) = stmt match {
     case AssignmentStmt(v, exp) =>
+      // Possible redundancy - see visit(exp) function, VarExpression case
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined)
           List()

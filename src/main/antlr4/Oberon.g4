@@ -44,6 +44,7 @@ expression
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
+ | exp = expression '.' name = Id                                                         #FieldAccess
  | name = Id '(' arguments? ')'                                                           #FunctionCall       
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
