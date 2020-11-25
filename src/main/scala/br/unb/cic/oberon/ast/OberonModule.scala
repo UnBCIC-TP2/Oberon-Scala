@@ -4,10 +4,10 @@ import br.unb.cic.oberon.visitor.OberonVisitor
 
 /* Abstract representation of an Oberon Module */
 case class OberonModule(name: String,
+                        userTypes: List[UserDefinedType],
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
-                        userTypes: List[UserDefinedType],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)

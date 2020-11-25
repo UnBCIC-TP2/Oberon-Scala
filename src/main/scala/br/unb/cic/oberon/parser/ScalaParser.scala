@@ -42,7 +42,7 @@ class ParserVisitor {
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, constants, variables, procedures, userTypes, block)
+    module = OberonModule(name.getText, userTypes, constants, variables, procedures, block)
   }
 
   /**
@@ -453,11 +453,11 @@ class ParserVisitor {
     override def visitArrayTypeDeclaration(ctx: OberonParser.ArrayTypeDeclarationContext): Unit = {
       val typeVisitor = new ParserVisitor()
       
-      val nome = ctx.nameType.getText
-      val tamanho = ctx.length.getText.toInt
-      val variableType = typeVisitor.visitOberonType(ctx.vartype)
+      val name = ctx.nameType.getText
+      val length = ctx.length.getText.toInt
+      val baseType = typeVisitor.visitOberonType(ctx.vartype)
 
-      uType = ArrayType(nome, tamanho, variableType)
+      uType = ArrayType(name, length, baseType)
     }
 
   }
