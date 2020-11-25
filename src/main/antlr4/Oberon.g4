@@ -5,9 +5,14 @@ compilationUnit
   ;  
 
 declarations
-  : ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
   ;
-  
+
+userTypeDeclaration
+  : nameType = Id '=' ('ARRAY' length = INT 'OF' vartype = oberonType)      #ArrayTypeDeclaration
+  | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
+  ;
+
 constant
   : constName = Id '=' exp = expression ';'
   ;
@@ -58,7 +63,7 @@ statement
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
- | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSIF' elsifs += elseIfStmt)+ ('ELSE' elseStmt = statement)? 'END'                                 #IfElseIfStmt
+ | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSIF' elsifs += elseIfStmt)+ ('ELSE' elseStmt = statement)? 'END'    #IfElseIfStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                      #WhileStmt
  | 'REPEAT' stmt = statement 'UNTIL' cond = expression                                                                        #RepeatUntilStmt
  | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
@@ -82,8 +87,9 @@ intValue : INT ;
 boolValue: TRUE | FALSE ;
 
 oberonType
- : 'INTEGER'
- | 'BOOLEAN'
+ : 'INTEGER'         #IntegerType
+ | 'BOOLEAN'         #BooleanType
+ | name = Id         #ReferenceType        // Reference for user defined types
  ;
 
 INT : Digit+;

@@ -1,0 +1,27 @@
+MODULE RepeatUntilModule;
+
+VAR
+  x, sum : INTEGER;
+
+BEGIN
+  x := 0;
+  REPEAT
+    CASE x OF
+        0:        sum := 0
+      | 1 .. 9:   sum := sum + x
+      | 10:
+        write(sum);
+        sum := 2 * 10
+
+      | 11 .. 20: sum := sum + 2 * x
+
+    END;
+
+    x := x + 1
+  UNTIL x > 20;
+
+  write(sum)
+
+END
+
+END RepeatUntilModule.
