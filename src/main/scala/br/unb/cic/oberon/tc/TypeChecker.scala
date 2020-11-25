@@ -30,6 +30,16 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case AndExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     case OrExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     // TODO: function call ...
+    case FieldAccessExpression(exp, attributeName) => {
+      val expType = visit(exp)
+      if (expType.isEmpty) None
+      expType.get match {
+        case ReferenceType(recordName) => {
+          typeChecker.env.lookupAttributeType(recordName, attributeName)
+        }
+        case _ => None
+      }
+    }
   }
 
   def computeBinExpressionType(left: Expression, right: Expression, expected: Type, result: Type) : Option[Type] = {
@@ -49,6 +59,8 @@ class TypeChecker extends OberonVisitorAdapter {
     module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.map(p => env.declareProcedure(p))
+    // Temporary change, might be overwritten by another group - G09
+    module.userTypes.map(u => env.addUserType(u.name, u))
 
     // TODO: check if the procedures are well typed.
 
@@ -73,6 +85,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   private def visitAssignment(stmt: Statement) = stmt match {
     case AssignmentStmt(v, exp) =>
+      // Possible redundancy - see visit(exp) function, VarExpression case
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined)
           List()
