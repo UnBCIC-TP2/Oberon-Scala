@@ -173,7 +173,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         }
         ifCond + elseCond
       }
-      case WhileStmt(condition, stmt) =>
+      case WhileStmt(condition, stmt) => {
         formatLine(startSpaces) + Doc.text("while (") + generateExpression(
           condition
         ) + Doc.text(")") +
@@ -182,7 +182,13 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           startSpaces + padSpaces,
           padSpaces
         ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
-
+      }
+      case RepeatUntilStmt(condition, stmt) => {
+        formatLine(startSpaces) + Doc.text("do {") + Doc.line +
+          generateStatement(stmt, startSpaces + padSpaces, padSpaces) +
+          formatLine(startSpaces) + Doc.text("} while (!(") +
+          generateExpression(condition) + Doc.text("));") + Doc.line
+      }
       case ForStmt(init: Statement, condition, stmt) => {
         init match {
           case AssignmentStmt(varName, expression) => {
@@ -297,7 +303,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       case MultExpression(left, right) =>
         generateBinExpression(left, right, "*")
       case DivExpression(left, right) => generateBinExpression(left, right, "/")
-      case OrExpression(left, right)  => generateBinExpression(left, right, "OR")
+      case OrExpression(left, right)  => generateBinExpression(left, right, "|")
       case AndExpression(left, right) => generateBinExpression(left, right, "&")
 
       case _ => Doc.text("expression not found")
