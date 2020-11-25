@@ -190,7 +190,7 @@ class ParserVisitor {
     var stmt: Statement = _
 
     override def visitAssignmentStmt(ctx: OberonParser.AssignmentStmtContext): Unit = {
-      val varName = ctx.`var`.getText
+      val varName = ctx.`designator`.getText
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
       stmt = AssignmentStmt(varName, visitor.exp)
