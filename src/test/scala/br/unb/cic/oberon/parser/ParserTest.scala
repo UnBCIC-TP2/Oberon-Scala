@@ -1509,4 +1509,114 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
   }
+
+  test("Testing the oberon stmt32 code. This module has some user types declarations") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 4)
+
+    val typeList = module.userTypes
+
+    val type1 = ArrayType("type1", 10, IntegerType)
+    
+    val type2 = RecordType("type2", List(VariableDeclaration("lista",  ReferenceToUserDefinedType("type1")),
+      VariableDeclaration("inteiro", IntegerType)))
+    
+    val type3 = RecordType("type3", List(
+      VariableDeclaration("mylist", ReferenceToUserDefinedType("type2")), 
+      VariableDeclaration("age", IntegerType),
+      VariableDeclaration("check", BooleanType),
+      VariableDeclaration("kleber", ReferenceToUserDefinedType("type1")),
+      VariableDeclaration("bolo", ReferenceToUserDefinedType("type1"))))
+      
+    val type4 = RecordType("type4", List(
+      VariableDeclaration("v1", IntegerType),
+      VariableDeclaration("v2", IntegerType)))
+
+    val typetoTest = List(type1, type2, type3, type4)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+
+  }
+
+  test("Testing the oberon stmt33 code. This module has a record and array type declarations"){
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt33.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 3)
+
+    val typeList = module.userTypes
+
+    val tysize = ArrayType("tysize", 5, IntegerType)
+    
+    val shoes = RecordType("shoes", List(VariableDeclaration("id", IntegerType), 
+      VariableDeclaration("sizes", ReferenceToUserDefinedType("tysize")),
+      VariableDeclaration("price", IntegerType),
+      VariableDeclaration("stock", IntegerType),
+      VariableDeclaration("limited", BooleanType)))
+
+    val shoes_array =  ArrayType("shoes_array", 50, ReferenceToUserDefinedType("shoes"))
+    
+    val typetoTest = List(tysize, shoes, shoes_array)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+  }
+
+  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 5)
+
+    val typeList = module.userTypes
+
+    val m_id = ArrayType("m_id", 15, IntegerType)
+    val team = RecordType("team", List( 
+      VariableDeclaration("t_id", IntegerType),
+      VariableDeclaration("members", ReferenceToUserDefinedType("m_id")),
+      VariableDeclaration("n_members", IntegerType),
+      VariableDeclaration("full", BooleanType)))
+
+    val team_array = ArrayType("team_array", 20, ReferenceToUserDefinedType("team"))
+    val test_array = ArrayType("test_array", 20, IntegerType)
+    val second_test = ArrayType("second_test", 20, ReferenceToUserDefinedType("test_array"))
+    val typetoTest = List(m_id, team, team_array, test_array, second_test)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+  }
+
 }

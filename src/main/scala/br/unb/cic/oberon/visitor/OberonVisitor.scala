@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.visitor
 
-import br.unb.cic.oberon.ast.{Constant, Expression, FormalArg, OberonModule, Procedure, Statement, Type, VariableDeclaration, CaseAlternative}
+import br.unb.cic.oberon.ast.{Constant, Expression, FormalArg, OberonModule, Procedure, Statement, Type, VariableDeclaration, CaseAlternative, UserDefinedType}
 
 /**
  * The abstract definition of an Oberon Visitor.
@@ -24,6 +24,7 @@ trait OberonVisitor {
   def visit(stmt: Statement) : T
   def visit(aType: Type): T
   def visit(caseAlt: CaseAlternative): T
+  def visit(userType: UserDefinedType): T
 }
 
 abstract class OberonVisitorAdapter extends OberonVisitor {
@@ -36,4 +37,5 @@ abstract class OberonVisitorAdapter extends OberonVisitor {
   override def visit(stmt: Statement): T = ???
   override def visit(aType: Type): T = ???
   override def visit(caseAlt: CaseAlternative): T = ???
+  override def visit(userType: UserDefinedType): T = ???
 }
