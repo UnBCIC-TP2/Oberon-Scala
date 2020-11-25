@@ -7,6 +7,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
+                        userTypes: List[UserDefinedType],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
@@ -98,3 +99,11 @@ trait Type {
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
+case class ReferenceToUserDefinedType(name: String) extends Type
+
+trait UserDefinedType{
+  def accept(v: OberonVisitor) = v.visit(this)
+} 
+
+case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
+case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
