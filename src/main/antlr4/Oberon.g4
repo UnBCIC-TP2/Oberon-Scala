@@ -46,6 +46,7 @@ block
     
 expression
  : '(' expression ')'                                                                     #Brackets
+ | exp = expression '.' name = Id                                                         #ExpressionName
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
@@ -53,7 +54,7 @@ expression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
- | exp = expression '.' name = Id                                                         #ExpressionName
+
  ;
 
 statement
