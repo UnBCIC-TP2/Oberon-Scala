@@ -51,9 +51,9 @@ expression
  ;
 
 statement
-
  : designator = Id ':=' exp = expression                                                                                      #AssignmentStmt
- | designator = Id '['INT']'                                                                                                  #ArrayIndex
+ | designator = Id ':=' Id '['INT']'                                                                                          #ArrayIndexStmt
+ | designator = Id ':=' designator = Id '.' designator = Id                                                                   #RecordStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt

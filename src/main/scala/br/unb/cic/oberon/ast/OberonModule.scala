@@ -70,6 +70,8 @@ trait Statement {
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
+case class ArrayIndexStmt(varName: String, arrayIndex: Array[Int]) extends Statement
+//case class RecordStmt(varName: String, stmt: Statement + "." + Statement) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
