@@ -9,7 +9,7 @@ TYPE
 VAR
   list1: list;
   list2: list;
-  list3: list
+  list3: list;
   result: INTEGER;
 
 BEGIN
