@@ -39,9 +39,10 @@ class ParserVisitor {
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
+    val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, constants, variables, procedures, block)
+    module = OberonModule(name.getText, userTypes, constants, variables, procedures, block)
   }
 
   /**
@@ -103,6 +104,12 @@ class ParserVisitor {
     ctx.args.asScala.toList.map(arg => FormalArg(arg.getText, argType))
   }
 
+  def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
+    val userTypeVisitor = new UserDefinedTypeVisitor()
+
+    ctx.accept(userTypeVisitor)
+    userTypeVisitor.uType
+  }
 
   /**
    * Visit an oberon type.
@@ -113,12 +120,26 @@ class ParserVisitor {
    * @param ctx the oberon type context
    * @return a oberon type representation.
    */
-  def visitOberonType(ctx: OberonParser.OberonTypeContext): Type =
-    ctx.getText match {
-      case "INTEGER" => IntegerType
-      case "BOOLEAN" => BooleanType
-      case _ => UndefinedType
+  def visitOberonType(ctx: OberonParser.OberonTypeContext): Type = {
+    val typeVisitor = new OberonTypeVisitor()
+    ctx.accept(typeVisitor)
+
+    if(typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
+  }
+
+  class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
+    var baseType: Type = _
+
+    override def visitIntegerType(ctx: OberonParser.IntegerTypeContext): Unit =
+      baseType = IntegerType
+      
+    override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = { baseType = BooleanType }
+ 
+    override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
+      val nameType = ctx.name.getText
+      baseType = ReferenceToUserDefinedType(nameType)
     }
+  }
 
   /* A visitor for parsing expressions */
   class ExpressionVisitor() extends OberonBaseVisitor[Unit] {
@@ -422,4 +443,33 @@ class ParserVisitor {
     }
   }
 
+  class UserDefinedTypeVisitor extends OberonBaseVisitor[Unit] {
+    var uType: UserDefinedType = _
+
+    override def visitRecordTypeDeclaration(ctx: OberonParser.RecordTypeDeclarationContext): Unit = {
+      val variablesList = new ListBuffer[VariableDeclaration]
+      val name = ctx.nameType.getText
+
+      ctx.vars.asScala.toList.foreach(variable => {
+        val varList = visitVariableDeclaration(variable)
+
+        varList.foreach(v => {
+          variablesList += v
+        })
+      })
+
+      uType = RecordType(name, variablesList.toList)
+    }
+
+    override def visitArrayTypeDeclaration(ctx: OberonParser.ArrayTypeDeclarationContext): Unit = {
+      val typeVisitor = new ParserVisitor()
+      
+      val name = ctx.nameType.getText
+      val length = ctx.length.getText.toInt
+      val baseType = typeVisitor.visitOberonType(ctx.vartype)
+
+      uType = ArrayType(name, length, baseType)
+    }
+
+  }
 }
