@@ -10,7 +10,7 @@ TYPE
   result: INTEGER;
 
   BEGIN
-    result := t4.v1 + 1;
+    result := 1 + t4.v1;
     write(result)
   END
 
