@@ -1,7 +1,17 @@
-MODULE SimpleModule;
+MODULE ExpressionNameModule;
 
-BEGIN
+TYPE
+  type4 = RECORD
+    v1, v2: INTEGER
+  END
 
-END
+  VAR
+  t4 : type4;
+  result: INTEGER;
 
-END SimpleModule. 
+  BEGIN
+    result := t4.v1 + 1;
+    write(result)
+  END
+
+END ExpressionNameModule.

@@ -1,7 +1,7 @@
-MODULE SimpleModule;
+MODULE ExpressionNameModule;
 
 BEGIN
     write(variable.name)
 END
 
-END SimpleModule. 
+END ExpressionNameModule.

@@ -1734,4 +1734,45 @@ class ParserTestSuite extends AnyFunSuite {
     })
   }
 
+  test("Testing the oberon ExpressionNameParser1 code. This module tests if the parser can see expression name access"){
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser1.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "ExpressionNameModule")
+    assert(module.stmt.isDefined)
+
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[ExpressionName])
+
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].exp.isInstanceOf[VarExpression])
+
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].name.isInstanceOf[String])
+
+
+  }
+
+  test("Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name"){
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser2.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "ExpressionNameModule")
+
+    assert(module.stmt.isDefined)
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[ExpressionName])
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[IntValue].value == 1)
+
+
+  }
+
 }
