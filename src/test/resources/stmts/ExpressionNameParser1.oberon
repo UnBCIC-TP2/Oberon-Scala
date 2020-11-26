@@ -1,0 +1,7 @@
+MODULE SimpleModule;
+
+BEGIN
+    write(variable.name)
+END
+
+END SimpleModule. 
