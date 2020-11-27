@@ -434,7 +434,6 @@ class ParserVisitor {
 
   class UserDefinedTypeVisitor extends OberonBaseVisitor[Unit] {
     var uType: UserDefinedType = _
-
     override def visitRecordTypeDeclaration(ctx: OberonParser.RecordTypeDeclarationContext): Unit = {
       val variablesList = new ListBuffer[VariableDeclaration]
       val name = ctx.nameType.getText

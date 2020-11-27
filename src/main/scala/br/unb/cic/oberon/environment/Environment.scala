@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.environment
 
 
-import br.unb.cic.oberon.ast.{Expression, Procedure, Type, UserType}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -24,12 +24,23 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
-  private val userTypes = Map.empty[String, Map[String, T]]
+  private val arrayTypes = Map.empty[String, UserDefinedType]
+  private val recordTypes = Map.empty[String, Map[String, Type]]
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
-  // Temporary change, might be overwritten by another group - G09
-  def addUserType (name: String, value: T) : Unit = userTypes += name -> value
+  def addUserType (userType: UserDefinedType) : Unit = {
+    userType match {
+      case RecordType(name, attributes) => {
+        val attributeMap = Map.empty[String, Type]
+        attributes.foreach(attribute => {
+          attributeMap += attribute.name -> attribute.variableType
+        })
+        recordTypes += name -> attributeMap
+      }
+      case ArrayType(name, _, _) => arrayTypes += name -> userType
+    }
+  }
 
   def setLocalVariable(name: String, value: T) : Unit = {
     if(stack.size == 0) {
@@ -54,36 +65,9 @@ class Environment[T] {
     else None
   }
 
-  // Temporary change, might be overwritten by another group - G09
-//  def lookupAttributeType(attributeName: List[String], recordTypeName: String) : Option[Type] = {
-//    if (userTypes.contains(recordTypeName)) {
-//      val recordType = userTypes(recordTypeName)
-//      if (recordType.attributes.contains(attributeName.head)) {
-//        attributeName match {
-//          case n1 :: n2 :: rest => {
-//            val recordType = userTypes(recordTypeName)
-//            recordType.attributes(n1) match {
-//              case UserType(name,_) => {
-//                lookupAttributeType(n2::rest, name)
-//              }
-//              // If this case is reached, there was a syntax error in the Oberon code.
-//              case _ => None
-//            }
-//          }
-//          case n1 :: List() => {
-//            Some(recordType.attributes(n1))
-//          }
-//        }
-//      } else None
-//    } else None
-//
-//  }
-
-  def lookupAttributeType(recordName: String, attributeName: String) : Option[T] = {
-    if (userTypes.contains(recordName)) {
-      if (userTypes(recordName).contains(attributeName)) {
-        Some(userTypes(recordName)(attributeName))
-      } else None
+  def lookupRecordType(name: String) : Option[Map[String, Type]] = {
+    if (recordTypes.contains(name)) {
+      Some(recordTypes(name))
     } else None
   }
 

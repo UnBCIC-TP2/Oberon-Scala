@@ -9,8 +9,6 @@ case class OberonModule(name: String,
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
                         stmt: Option[Statement],
-                        // Temporary change, might be overwritten by another group - G09
-                        userTypes: List[UserType]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
@@ -51,6 +49,8 @@ abstract class Value[T](val value: T) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class IntValue(v: Int) extends Value[Int](v)
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
+case class ArrayValue(v: List[Expression]) extends Value[List[Expression]](v)
+case class RecordValue(v: Map[String, Expression]) extends Value[Map[String, Expression]](v)
 case class Undef() extends Expression
 case class VarExpression(name: String) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
@@ -104,9 +104,9 @@ case object BooleanType extends Type
 case object UndefinedType extends Type
 case class ReferenceToUserDefinedType(name: String) extends Type
 
-trait UserDefinedType{
-  def accept(v: OberonVisitor) = v.visit(this)
-} 
+ trait UserDefinedType {
+def accept(v: OberonVisitor) = v.visit(this)
+}
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
