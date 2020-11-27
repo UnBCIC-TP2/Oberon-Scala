@@ -51,9 +51,7 @@ expression
  ;
 
 statement
- : designator = Id ':=' exp = expression                                                                                      #AssignmentStmt
- | designator = Id ':=' Id '['INT']'                                                                                          #ArrayIndexStmt
- | designator = Id ':=' designator = Id '.' designator = Id                                                                   #RecordStmt
+ : des = designator ':=' exp = expression                                                                                     #AssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
@@ -68,10 +66,17 @@ statement
  | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt
  ;
 
+designator
+ : var = Id                                               #Var
+ | expression '['INT']'                                   #ArrayIndex
+ | expression '.' name = Id                               #Record
+ ;
+
 caseAlternative
  : cond = expression ':' stmt = statement                       #SimpleCase
  | min = expression '..' max = expression ':' stmt = statement  #RangeCase
  ; 
+
 
 elseIfStmt : cond = expression 'THEN' stmt = statement ;
 
