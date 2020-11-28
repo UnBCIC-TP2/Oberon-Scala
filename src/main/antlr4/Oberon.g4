@@ -51,7 +51,8 @@ expression
  ;
 
 statement
- : des = designator ':=' exp = expression                                                                                     #AssignmentStmt
+ : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
+ | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
@@ -68,8 +69,8 @@ statement
 
 designator
  : var = Id                                               #Var
- | expression '['INT']'                                   #ArrayIndex
- | expression '.' name = Id                               #Record
+ | array = expression '['INT']'                           #ArrayIndex
+ | record = expression '.' name = Id                               #Record
  ;
 
 caseAlternative
