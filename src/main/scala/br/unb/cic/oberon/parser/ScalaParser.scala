@@ -190,22 +190,15 @@ class ParserVisitor {
     var stmt: Statement = _
 
     override def visitAssignmentStmt(ctx: OberonParser.AssignmentStmtContext): Unit = {
-      val varName = ctx.`var`.getText
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
-      stmt = AssignmentStmt(varName, visitor.exp)
-    }
-
-    override def visitEAssignmentStmt(ctx: OberonParser.EAssignmentStmtContext): Unit = {
-      val visitor = new ExpressionVisitor()
-      ctx.exp.accept(visitor)
-
-      val EAssignmentVisitor = new AssignmentAlternativeVisitor()
-
-      ctx.designator.accept(EAssignmentVisitor)
-      val designator = EAssignmentVisitor.assignmentAlt
-
-      stmt = EAssignmentStmt(designator, visitor.exp)
+	  
+	  val AssignmentVisitor = new AssignmentAlternativeVisitor()
+	  
+	  ctx.designator.accept(AssignmentVisitor)
+	  val designator = AssignmentVisitor.assignmentAlt
+	  
+      stmt = AssignmentStmt(designator, visitor.exp)
     }
 
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
@@ -272,7 +265,7 @@ class ParserVisitor {
       val condition = visitor.exp
       ctx.thenStmt.accept(this)
       val thenStmt = stmt
-
+  
       val elsifStmt = new ListBuffer[ElseIfStmt]
       ctx.elsifs.asScala.toList.foreach(e => {
         e.expression().accept(visitor)
@@ -335,7 +328,7 @@ class ParserVisitor {
 
       stmt = RepeatUntilStmt(condition, repeatUntilStmt)
     }
-
+   
     override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
@@ -359,7 +352,7 @@ class ParserVisitor {
 
       ctx.min.accept(visitor)
       val rangeMin = visitor.exp
-
+      
       ctx.max.accept(visitor)
       val rangeMax = visitor.exp
 
@@ -367,15 +360,15 @@ class ParserVisitor {
       val block = stmt
 
       // Instantiating the values for the basic ForStmt
-
+      
       // var := rangeMin
-      val init = EAssignmentStmt(VarAssignment(variable.name), rangeMin)
+      val init = AssignmentStmt(VarAssignment(variable.name), rangeMin)
 
       // var <= rangeMax
       val condition = LTEExpression(variable, rangeMax)
-
+      
       // var := var + 1
-      val accumulator = EAssignmentStmt(VarAssignment(variable.name), AddExpression(variable, IntValue(1)))
+      val accumulator = AssignmentStmt(VarAssignment(variable.name), AddExpression(variable, IntValue(1)))
 
       // stmt; var := var + 1
       val realBlock = SequenceStmt(List(block, accumulator))
@@ -422,25 +415,36 @@ class ParserVisitor {
       caseAlt = RangeCase(min, max, stmt)
     }
   }
-
+  
   class AssignmentAlternativeVisitor extends OberonBaseVisitor[Unit] {
     var assignmentAlt: AssignmentAlternative = _
 
     override def visitVarAssignment(ctx: OberonParser.VarAssignmentContext): Unit = {
-      val varName = ctx.`des`.getText
+      val varName = ctx.`var`.getText
       assignmentAlt = VarAssignment(varName)
     }
 
     override def visitArrayAssignment(ctx: OberonParser.ArrayAssignmentContext): Unit = {
-      var expressionVisitor = new ExpressionVisitor()
+      val expressionVisitor = new ExpressionVisitor()
       ctx.array.accept(expressionVisitor)
-      var array = expressionVisitor.exp
+      val array = expressionVisitor.exp
 
       ctx.elem.accept(expressionVisitor)
-      var elem = expressionVisitor.exp
+      val elem = expressionVisitor.exp
 
       assignmentAlt = ArrayAssignment(array, elem)
     }
-  }
 
+    override def visitRecordAssignment(ctx: OberonParser.RecordAssignmentContext): Unit = {
+      var expressionVisitor = new ExpressionVisitor()
+      ctx.record.accept(expressionVisitor)
+      val record = expressionVisitor.exp
+
+      ctx.atrib.accept(expressionVisitor)
+      val atrib = expressionVisitor.exp
+
+      assignmentAlt = RecordAssignment(record, atrib)
+    }
+  }
+  
 }

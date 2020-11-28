@@ -69,8 +69,7 @@ trait Statement {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
-case class AssignmentStmt(varName: String, exp: Expression) extends Statement
-case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
+case class AssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
@@ -95,6 +94,7 @@ trait AssignmentAlternative
 
 case class VarAssignment(varName: String) extends AssignmentAlternative
 case class ArrayAssignment(array: Expression, elem: Expression) extends AssignmentAlternative
+case class RecordAssigment(record: Expression, atrib: Expression) extends AssignmentAlternative
 
 /* Types */
 trait Type {
