@@ -1,9 +1,10 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{Expression, Procedure}
+import br.unb.cic.oberon.ast.{Expression, Procedure, UserDefinedType, ArrayType, RecordType, Undef}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
+import scala.collection.mutable.ListBuffer
 
 /**
  * The environment represents a memory region, which
@@ -23,9 +24,11 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
-  private val userTypes = Map.empty[String, List[T]]
+  private val userTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
+  def setGlobalVariable(name: String, value: T) : Unit = {
+    global += name -> value
+  }
 
   def setLocalVariable(name: String, value: T) : Unit = {
     if(stack.size == 0) {
@@ -36,8 +39,8 @@ class Environment[T] {
 
   def setUserType(userDefinedType: UserDefinedType) : Unit = {
     userDefinedType match {
-      case ArrayType(name, length, variableType) => userTypes += name -> ListBuffer.fill(length, Undef())
-      case RecordType => _
+      case ArrayType(name, length, variableType) => userTypes += name -> ListBuffer.fill(length)(Undef())
+      case _ => ???
     }
   }
 
@@ -54,6 +57,11 @@ class Environment[T] {
   def lookup(name: String) : Option[T] = {
     if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
+    else None
+  }
+
+  def lookupUserType(name: String) : Option[ListBuffer[Expression]] = {
+    if (userTypes.contains(name)) Some(userTypes(name))
     else None
   }
 

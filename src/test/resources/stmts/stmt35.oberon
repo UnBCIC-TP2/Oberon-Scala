@@ -1,0 +1,7 @@
+MODULE UserTypeModule;
+
+TYPE
+  a = ARRAY 10 OF INTEGER
+  b = ARRAY 15 OF INTEGER
+
+END UserTypeModule.

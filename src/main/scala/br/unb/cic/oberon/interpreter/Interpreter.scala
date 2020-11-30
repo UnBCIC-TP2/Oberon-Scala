@@ -29,6 +29,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
+    module.userTypes.foreach(userType => userType.accept(this))
 
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
@@ -45,8 +46,8 @@ class Interpreter extends OberonVisitorAdapter {
     env.setGlobalVariable(variable.name, Undef())
   }
 
-  override def visit(userDefinedType: UserDefinedType): Unit = {
-    env.setUserType(userDefinedType)
+  override def visit(userType: UserDefinedType): Unit = {
+    env.setUserType(userType)
   }
 
   override def visit(procedure: Procedure): Unit = {

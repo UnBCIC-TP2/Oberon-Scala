@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
+import scala.collection.mutable.ListBuffer
 
 class InterpreterTest extends AnyFunSuite{
 
@@ -516,6 +517,24 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     assert(interpreter.env.lookup("x") == Some(IntValue(10)));
     assert(interpreter.env.lookup("y") == Some(IntValue(10)));
+  }
+
+  test("stmt35") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt35.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "UserTypeModule")
+
+    module.accept(interpreter)
+
+    println(interpreter.env.lookupUserType("a"))
+
+    assert(interpreter.env.lookupUserType("a") == Some(ListBuffer.fill(10)(Undef())));
+    assert(interpreter.env.lookupUserType("b") == Some(ListBuffer.fill(15)(Undef())));
   }
 
 }
