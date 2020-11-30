@@ -45,6 +45,10 @@ class Interpreter extends OberonVisitorAdapter {
     env.setGlobalVariable(variable.name, Undef())
   }
 
+  override def visit(userDefinedType: UserDefinedType): Unit = {
+    env.setUserType(userDefinedType)
+  }
+
   override def visit(procedure: Procedure): Unit = {
     env.declareProcedure(procedure)
   }

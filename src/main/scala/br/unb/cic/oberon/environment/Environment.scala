@@ -23,6 +23,7 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
+  private val userTypes = Map.empty[String, List[T]]
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
@@ -31,6 +32,13 @@ class Environment[T] {
       stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
+  }
+
+  def setUserType(userDefinedType: UserDefinedType) : Unit = {
+    userDefinedType match {
+      case ArrayType(name, length, variableType) => userTypes += name -> ListBuffer.fill(length, Undef())
+      case RecordType => _
+    }
   }
 
   def setVariable(name: String, value: T) : Unit = {
