@@ -1470,13 +1470,11 @@ public class OberonParser extends Parser {
 	}
 	public static class RecordAssignmentContext extends DesignatorContext {
 		public ExpressionContext record;
-		public ExpressionContext atrib;
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
+		public Token atrib;
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
 		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
+		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
 		public RecordAssignmentContext(DesignatorContext ctx) { copyFrom(ctx); }
 	}
 	public static class VarAssignmentContext extends DesignatorContext {
@@ -1534,7 +1532,7 @@ public class OberonParser extends Parser {
 				setState(276);
 				match(T__3);
 				setState(277);
-				((RecordAssignmentContext)_localctx).atrib = expression(0);
+				((RecordAssignmentContext)_localctx).atrib = match(Id);
 				}
 				break;
 			}
@@ -1904,7 +1902,7 @@ public class OberonParser extends Parser {
 		"\2\2\u010c\u010d\3\2\2\2\u010d\27\3\2\2\2\u010e\u010c\3\2\2\2\u010f\u011a"+
 		"\7\65\2\2\u0110\u0111\5\24\13\2\u0111\u0112\7.\2\2\u0112\u0113\5\24\13"+
 		"\2\u0113\u0114\7/\2\2\u0114\u011a\3\2\2\2\u0115\u0116\5\24\13\2\u0116"+
-		"\u0117\7\6\2\2\u0117\u0118\5\24\13\2\u0118\u011a\3\2\2\2\u0119\u010f\3"+
+		"\u0117\7\6\2\2\u0117\u0118\7\65\2\2\u0118\u011a\3\2\2\2\u0119\u010f\3"+
 		"\2\2\2\u0119\u0110\3\2\2\2\u0119\u0115\3\2\2\2\u011a\31\3\2\2\2\u011b"+
 		"\u011c\5\24\13\2\u011c\u011d\7\13\2\2\u011d\u011e\5\26\f\2\u011e\u0126"+
 		"\3\2\2\2\u011f\u0120\5\24\13\2\u0120\u0121\7)\2\2\u0121\u0122\5\24\13"+
