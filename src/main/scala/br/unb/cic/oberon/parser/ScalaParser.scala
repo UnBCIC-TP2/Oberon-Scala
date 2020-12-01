@@ -198,7 +198,7 @@ class ParserVisitor {
 	  ctx.designator.accept(AssignmentVisitor)
 	  val designator = AssignmentVisitor.assignmentAlt
 	  
-      stmt = AssignmentStmt(designator, visitor.exp)
+      stmt = EAssignmentStmt(designator, visitor.exp)
     }
 
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
@@ -362,13 +362,13 @@ class ParserVisitor {
       // Instantiating the values for the basic ForStmt
       
       // var := rangeMin
-      val init = AssignmentStmt(VarAssignment(variable.name), rangeMin)
+      val init = EAssignmentStmt(VarAssignment(variable.name), rangeMin)
 
       // var <= rangeMax
       val condition = LTEExpression(variable, rangeMax)
       
       // var := var + 1
-      val accumulator = AssignmentStmt(VarAssignment(variable.name), AddExpression(variable, IntValue(1)))
+      val accumulator = EAssignmentStmt(VarAssignment(variable.name), AddExpression(variable, IntValue(1)))
 
       // stmt; var := var + 1
       val realBlock = SequenceStmt(List(block, accumulator))
@@ -439,9 +439,7 @@ class ParserVisitor {
       var expressionVisitor = new ExpressionVisitor()
       ctx.record.accept(expressionVisitor)
       val record = expressionVisitor.exp
-
-      ctx.atrib.accept(expressionVisitor)
-      val atrib = expressionVisitor.exp
+      val atrib = ctx.atrib.getText
 
       assignmentAlt = RecordAssignment(record, atrib)
     }

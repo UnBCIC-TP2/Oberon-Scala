@@ -69,7 +69,7 @@ statement
  designator
   : var = Id                                                          #VarAssignment
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
-  | record = expression '.' atrib = expression                        #RecordAssignment
+  | record = expression '.' atrib = Id                                #RecordAssignment
   ;
 
 caseAlternative
