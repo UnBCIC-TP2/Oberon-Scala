@@ -5,7 +5,12 @@ compilationUnit
   ;  
 
 declarations
-  : ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  : ('TYPE' userTypeDeclaration+) ?  ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  ;
+
+userTypeDeclaration
+  : nameType = Id '=' ('ARRAY' length = INT 'OF' vartype = oberonType)      #ArrayTypeDeclaration
+  | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
   ;
   
 constant
@@ -83,6 +88,7 @@ boolValue: TRUE | FALSE ;
 oberonType
  : 'INTEGER'
  | 'BOOLEAN'
+ | name = Id         #ReferenceType        // Reference for user defined types
  ;
 
 INT : Digit+;
