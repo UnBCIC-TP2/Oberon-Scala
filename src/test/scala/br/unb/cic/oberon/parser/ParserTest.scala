@@ -1624,4 +1624,5 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.exp.isInstanceOf[Brackets])
   }
+  
 }

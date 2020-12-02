@@ -51,7 +51,8 @@ expression
  ;
 
 statement
- : des = designator ':=' exp = expression                                                                                     #AssignmentStmt
+ : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
+ | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
