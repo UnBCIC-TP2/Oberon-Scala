@@ -1,0 +1,13 @@
+MODULE SimpleModule;
+
+VAR
+    v, sum : INTEGER;
+BEGIN
+    v[2] := 3;
+    
+    sum := 9 + 2;
+
+    v[2] := sum
+END
+
+END SimpleModule.
