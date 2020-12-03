@@ -1,0 +1,15 @@
+MODULE SimpleModule;
+
+VAR
+    record
+        last: INTEGER
+        actual: INTEGER
+        next: INTEGER
+    year : record;   
+BEGIN
+    year.last := 2019;
+    year.actual := 2020;
+    year.next := 2021;
+END
+
+END SimpleModule.

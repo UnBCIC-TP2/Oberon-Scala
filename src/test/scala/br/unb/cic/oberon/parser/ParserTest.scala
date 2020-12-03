@@ -1624,6 +1624,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.exp.isInstanceOf[Brackets])
   }
+
   test("Testing the oberon recordAssignmentStmt01 code") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt01.oberon").getFile)
 
@@ -1648,4 +1649,91 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), IntValue(5)))
   }
+
+  test("Testing the oberon recordAssignmentStmt02 code") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case _ => fail("we are expecting one stmt in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("year"), "last"), IntValue(2019)))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("year"), "actual"), IntValue(2020)))
+    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("year"), "next"), IntValue(2021)))
+  }
+
+  test("Testing the oberon recordAssignmentStmt03 code") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case _ => fail("we are expecting one stmt in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("vagas"), "salaA"), IntValue(20)))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("vagas"), "salaB"), IntValue(30)))
+    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("matricula"), "alunoA"), IntValue(180047205)))
+    assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("matricula"), "alunoB"), IntValue(180108531)))
+  }
+
+  test("Testing the oberon recordAssignmentStmt04 code") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case _ => fail("we are expecting one stmt in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == AssignmentStmt(("n"), IntValue(1)))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "A"), IntValue(1)))
+    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "B"), IntValue(3)))
+    assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
+    assert(stmts(4) == EAssignmentStmt(ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
+
+
+  }  
+
 }
