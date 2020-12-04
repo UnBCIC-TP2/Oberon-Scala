@@ -68,15 +68,15 @@ class Interpreter extends OberonVisitorAdapter {
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
-      case EAssignmentStmt (indexDesignator, exp) => { 
+      case EAssignmentStmt(indexDesignator, exp) => {
         indexDesignator match {
           case ArrayAssignment(arrayExpression, indexExpression) => {
-            env.reassignArray(arrayExpression.name, evalExpression(indexExpression).v, evalExpression(exp))
+            env.reassignArray(arrayExpression.asInstanceOf[VarExpression].name, evalExpression(indexExpression).asInstanceOf[IntValue].value, evalExpression(exp))
           }
           case RecordAssignment(record, atrib) => ???
           case _ => ???
         }
-       }
+      }
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
       case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
@@ -86,61 +86,63 @@ class Interpreter extends OberonVisitorAdapter {
       case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
       case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
-      case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)  
+      case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
       case ProcedureCallStmt(name, args) =>
-      // we evaluate the "args" in the current
-      // environment.
-      val actualArguments = args.map(a => evalExpression(a))
-      env.push()  // after that, we can "push", to indicate a procedure call.
-      visitProcedureCall(name, actualArguments) // then we execute the procedure.
-      env.pop() // and we pop, to indicate that a procedure finished its execution.
+        // we evaluate the "args" in the current
+        // environment.
+        val actualArguments = args.map(a => evalExpression(a))
+        env.push() // after that, we can "push", to indicate a procedure call.
+        visitProcedureCall(name, actualArguments) // then we execute the procedure.
+        env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
   }
 
-  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]) : Unit = {
-    var matched = false    
+  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {
+    var matched = false
     var i = 0
 
-    if (evalCondition(condition)) thenStmt.accept(this) 
-    
-    
+    if (evalCondition(condition)) thenStmt.accept(this)
+
+
     else {
 
-      while(i < listOfElseIf.size  && !matched) {
-          listOfElseIf(i) match {
-              case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
-                stmt.accept(this) 
-                matched = true}
+      while (i < listOfElseIf.size && !matched) {
+        listOfElseIf(i) match {
+          case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
+            stmt.accept(this)
+            matched = true
           }
-          i += 1
+        }
+        i += 1
       }
 
-      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)}
+      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
+    }
   }
 
-  private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement])  : Unit = {
+  private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Unit = {
     var v = evalExpression(exp)
-    var matched = false    
+    var matched = false
     var i = 0
-    while(i < cases.size  && !matched) {
-          cases(i) match {
-            case RangeCase(min, max, stmt) =>
-              if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
-                stmt.accept(this)
-                matched = true
-              }
-            case SimpleCase(condition, stmt) =>
-              if (v == evalExpression(condition)) {
-                stmt.accept(this)
-                matched = true
-              }
+    while (i < cases.size && !matched) {
+      cases(i) match {
+        case RangeCase(min, max, stmt) =>
+          if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
+            stmt.accept(this)
+            matched = true
           }
-          i += 1
-        }
-        if (!matched && elseStmt.isDefined) {
-            elseStmt.get.accept(this)
-        }
+        case SimpleCase(condition, stmt) =>
+          if (v == evalExpression(condition)) {
+            stmt.accept(this)
+            matched = true
+          }
+      }
+      i += 1
+    }
+    if (!matched && elseStmt.isDefined) {
+      elseStmt.get.accept(this)
+    }
   }
 
   /*
@@ -160,24 +162,24 @@ class Interpreter extends OberonVisitorAdapter {
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
     procedure.args.map(formal => formal.name)
-                  .zip(args)
-                  .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+      .zip(args)
+      .foreach(pair => env.setLocalVariable(pair._1, pair._2))
 
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
   }
 
-  def evalCondition(expression: Expression) : Boolean = {
+  def evalCondition(expression: Expression): Boolean = {
     val evalVisitor = new EvalExpressionVisitor(this)
     expression.accept(evalVisitor).asInstanceOf[BoolValue].value
   }
 
-  def evalExpression(expression: Expression) : Expression = {
+  def evalExpression(expression: Expression): Expression = {
     val evalVisitor = new EvalExpressionVisitor(this)
     expression.accept(evalVisitor)
   }
 
-  def evalCaseAlt(expression: Expression) : Integer = {
+  def evalCaseAlt(expression: Expression): Integer = {
     val evalVisitor = new EvalExpressionVisitor(interpreter = this)
     expression.accept(evalVisitor).asInstanceOf[IntValue].value
   }
@@ -194,7 +196,7 @@ class Interpreter extends OberonVisitorAdapter {
   /*
    * the same here.
    */
-  def setLocalVariable(name: String, exp: Expression) : Unit = {
+  def setLocalVariable(name: String, exp: Expression): Unit = {
     env.setLocalVariable(name, exp)
   }
 }
@@ -239,16 +241,15 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   /**
    * Eval a binary expression.
    *
-   * @param left the left expression
+   * @param left  the left expression
    * @param right the right expression
-   * @param fn a function that constructs an expression. Here we
-   *           are using again a high-order function. We assign to
-   *           the "result" visitor attribute the value we compute
-   *           after applying this function.
-   *
+   * @param fn    a function that constructs an expression. Here we
+   *              are using again a high-order function. We assign to
+   *              the "result" visitor attribute the value we compute
+   *              after applying this function.
    * @tparam T a type parameter to set the function fn correctly.
    */
-  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression) : Expression = {
+  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression): Expression = {
     val v1 = left.accept(this).asInstanceOf[Value[T]]
     val v2 = right.accept(this).asInstanceOf[Value[T]]
     fn(v1, v2)

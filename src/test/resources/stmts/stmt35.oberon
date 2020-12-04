@@ -5,7 +5,7 @@ TYPE
   b = ARRAY 15 OF INTEGER
 
 BEGIN
-   a[0] := 5
+   a[0] := 5;
    b[1] := 10 
 END
 

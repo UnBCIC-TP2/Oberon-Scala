@@ -520,7 +520,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
   }
 
   test("stmt35") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt35.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt35.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
 
     assert(path != null)
 
@@ -530,11 +530,8 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
     assert(module.name == "UserTypeModule")
 
     module.accept(interpreter)
-
-    println(interpreter.env.lookupUserType("a"))
-
-    assert(interpreter.env.lookupUserType("a") == Some(ListBuffer.fill(10)(Undef())));
-    assert(interpreter.env.lookupUserType("b") == Some(ListBuffer.fill(15)(Undef())));
+    assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
+    assert(interpreter.env.lookupArrayIndex("b",1).contains(IntValue(10)))
   }
 
 }

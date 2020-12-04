@@ -473,8 +473,7 @@ class ParserVisitor {
       assignmentAlt = RecordAssignment(record, atrib)
     }
   }
-  
-}
+
 
   class UserDefinedTypeVisitor extends OberonBaseVisitor[Unit] {
     var uType: UserDefinedType = _
