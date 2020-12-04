@@ -54,6 +54,9 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
+  // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
+
+
   override def visit(stmt: Statement): Unit = {
     // we first check if we achieved a return stmt.
     // if so, we should not execute any other statement
@@ -65,6 +68,15 @@ class Interpreter extends OberonVisitorAdapter {
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
+      case EAssignmentStmt (indexDesignator, exp) => { 
+        indexDesignator match {
+          case ArrayAssignment(arrayExpression, indexExpression) => {
+            env.reassignArray(arrayExpression.name, evalExpression(indexExpression).v, evalExpression(exp))
+          }
+          case RecordAssignment(record, atrib) => ???
+          case _ => ???
+        }
+       }
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
       case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))

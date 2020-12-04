@@ -60,9 +60,10 @@ class Environment[T] {
     else None
   }
 
-  def lookupUserType(name: String) : Option[ListBuffer[Expression]] = {
-    if (userTypes.contains(name)) Some(userTypes(name))
-    else None
+  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
+    if (userTypes.contains(name)) {
+      userTypes(name).update(index, value) 
+    }
   }
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
