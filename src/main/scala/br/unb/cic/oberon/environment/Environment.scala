@@ -66,6 +66,13 @@ class Environment[T] {
     }
   }
 
+  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
+    if (userTypes.contains(name) && userTypes(name).length > index) {
+      Some(userTypes(name)(index))
+    }
+    else None
+  }
+
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 
   def findProcedure(name: String): Procedure = procedures(name)
