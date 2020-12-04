@@ -217,6 +217,18 @@ class ParserVisitor {
       stmt = AssignmentStmt(varName, visitor.exp)
     }
 
+    override def visitEAssignmentStmt(ctx: OberonParser.EAssignmentStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
+      ctx.exp.accept(visitor)
+	  
+	  val EAssignmentVisitor = new AssignmentAlternativeVisitor()
+	  
+	  ctx.designator.accept(EAssignmentVisitor)
+	  val designator = EAssignmentVisitor.assignmentAlt
+	  
+      stmt = EAssignmentStmt(designator, visitor.exp)
+    }
+
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
       val stmts = new ListBuffer[Statement]
 
@@ -431,6 +443,38 @@ class ParserVisitor {
       caseAlt = RangeCase(min, max, stmt)
     }
   }
+  
+  class AssignmentAlternativeVisitor extends OberonBaseVisitor[Unit] {
+    var assignmentAlt: AssignmentAlternative = _
+
+    override def visitVarAssignment(ctx: OberonParser.VarAssignmentContext): Unit = {
+      val varName = ctx.`var`.getText
+      assignmentAlt = VarAssignment(varName)
+    }
+
+    override def visitArrayAssignment(ctx: OberonParser.ArrayAssignmentContext): Unit = {
+      val expressionVisitor = new ExpressionVisitor()
+      ctx.array.accept(expressionVisitor)
+      val array = expressionVisitor.exp
+
+      ctx.elem.accept(expressionVisitor)
+      val elem = expressionVisitor.exp
+
+
+      assignmentAlt = ArrayAssignment(array, elem)
+    }
+
+    override def visitRecordAssignment(ctx: OberonParser.RecordAssignmentContext): Unit = {
+      var expressionVisitor = new ExpressionVisitor()
+      ctx.record.accept(expressionVisitor)
+      val record = expressionVisitor.exp
+      val atrib = ctx.atrib.getText
+
+      assignmentAlt = RecordAssignment(record, atrib)
+    }
+  }
+  
+}
 
   class UserDefinedTypeVisitor extends OberonBaseVisitor[Unit] {
     var uType: UserDefinedType = _
@@ -462,3 +506,4 @@ class ParserVisitor {
 
   }
 }
+
