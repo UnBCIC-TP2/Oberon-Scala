@@ -1,0 +1,22 @@
+MODULE test;
+
+TYPE
+    
+    HALLS = RECORD
+        integrante : BOOLEAN;
+        matricula : INTEGER
+    END
+    
+    HALLS_array = ARRAY 9 OF HALLS
+
+VAR
+    x : INTEGER;
+
+
+BEGIN
+    readInt(x)
+END 
+
+
+END test.
+    

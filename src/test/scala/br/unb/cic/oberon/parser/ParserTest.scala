@@ -1734,4 +1734,194 @@ class ParserTestSuite extends AnyFunSuite {
     })
   }
 
+
+  test("Testing the oberon userTypeSimple01 code module. This module has a record type declaration, with invalid declarations") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 1)
+
+    val listDeclaration = List(VariableDeclaration("size", IntegerType), 
+      VariableDeclaration("variables", UndefinedType), VariableDeclaration("Varinho", 
+      ReferenceToUserDefinedType("myType")))
+
+    assert(module.userTypes(0) == RecordType("myType", listDeclaration))
+    
+  }
+
+  test("Testing the oberon userTypeSimple02 code module. This module has array and record type declarations") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple02.oberon").getFile)
+
+    assert(path != null)
+    
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    // val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(module.name == "test")
+    assert(module.stmt.get.asInstanceOf[ReadIntStmt] == ReadIntStmt("x"))
+    
+    assert(module.userTypes.length == 2)
+
+    val typeList = module.userTypes
+
+    val halls = RecordType("HALLS", List(VariableDeclaration("integrante", BooleanType),
+      VariableDeclaration("matricula",IntegerType)))
+
+    val halls_array = ArrayType("HALLS_array", 9, ReferenceToUserDefinedType("HALLS"))
+
+    val typetoTest = List(halls, halls_array)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+
+  }
+
+  test("Testing the oberon userTypeSimple03 code module. This module has a record type declaration, with invalid declarations"){
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "test")
+
+    assert(module.userTypes.length == 3)
+
+    val typeList = module.userTypes
+
+    val test_array = ArrayType("test_array", 5, BooleanType)
+    
+    val tipo1 = RecordType("tipo1", List(
+      VariableDeclaration("num", IntegerType), 
+      VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))))
+  
+    val tipo2 =  RecordType("tipo2",
+      List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
+
+    val typetoTest = List(test_array, tipo1, tipo2)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+      
+  }
+
+  test("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 3)
+
+    val listDeclaration = List(VariableDeclaration("size", IntegerType), 
+      VariableDeclaration("variables", ReferenceToUserDefinedType("cplusplus")), VariableDeclaration("Varinho", 
+      ReferenceToUserDefinedType("myType")))
+
+    
+    assert(module.userTypes(0) == ArrayType("cplusplus", 10, BooleanType))
+    assert(module.userTypes(1) == RecordType("java", listDeclaration))
+    assert(module.userTypes(2) == ArrayType("python", 5, ReferenceToUserDefinedType("java")))
+  }
+
+  test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"){
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple05.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 2)
+
+    assert(module.variables.length == 3)
+    
+    val varList = List(VariableDeclaration("x", ReferenceToUserDefinedType("simple")),
+      VariableDeclaration("y", ReferenceToUserDefinedType("simple")), 
+      VariableDeclaration("z", ReferenceToUserDefinedType("complicated")))
+       
+    var it : Int = 0
+    module.variables.foreach(v => {
+      assert(v == varList(it))
+      it += 1
+    })
+  }
+
+  test("Testing the oberon userTypeSimple06 code module. This module has a record and array type declaration"){
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple06.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "test_ando")
+
+    assert(module.userTypes.length == 3)
+
+    val typeList = module.userTypes
+
+    val cheesewithbread = ArrayType("cheesewithbread", 10, IntegerType)
+    
+    val cheesewithoutbread = RecordType("cheesewithoutbread", List(
+      VariableDeclaration("var1", IntegerType), 
+      VariableDeclaration("var2", ReferenceToUserDefinedType("cheesewithbread"))))
+  
+    val cheesewithhalfabread =  ArrayType("cheesewithhalfabread", 100000, ReferenceToUserDefinedType("cheesewithoutbread"))
+
+    val typetoTest = List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t == typetoTest(it))
+      it += 1
+    })
+      
+  }
+
+  test("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"){
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 1)
+
+    assert(module.procedures.length == 1)
+
+    val userProcedure = module.procedures.head
+
+    assert(userProcedure.name == "initialize_array")
+    assert(userProcedure.args.length == 1)
+    assert(userProcedure.returnType.get.asInstanceOf[ReferenceToUserDefinedType] == ReferenceToUserDefinedType("simple"))
+    assert(userProcedure.variables.length == 1)
+    // assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
+  }
+  
 }
