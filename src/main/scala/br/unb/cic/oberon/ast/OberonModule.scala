@@ -96,6 +96,7 @@ trait Type {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
+
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
@@ -107,3 +108,4 @@ trait UserDefinedType{
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
+
