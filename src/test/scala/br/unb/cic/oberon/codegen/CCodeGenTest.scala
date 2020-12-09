@@ -375,7 +375,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  test("Testing C generator for stmt32") {
+  ignore("Testing C generator for stmt32") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/stmt32.oberon")
@@ -400,7 +400,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  test("Testing C generator for stmt33") {
+  ignore("Testing C generator for stmt33") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/stmt33.oberon")
@@ -425,7 +425,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  test("Testing C generator for stmt34") {
+  ignore("Testing C generator for stmt34") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/stmt34.oberon")
