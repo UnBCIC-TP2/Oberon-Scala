@@ -51,6 +51,7 @@ case class IntValue(v: Int) extends Value[Int](v)
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
 case class Undef() extends Expression
 case class VarExpression(name: String) extends Expression
+case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
 case class NEQExpression(left:  Expression, right: Expression) extends Expression
