@@ -20,7 +20,6 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants.head == Constant("x", IntValue(5)))
   }
 
-
   test("Testing the oberon simple02 code. This module has one constants and two variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").getFile)
 
@@ -161,6 +160,64 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+  }
+
+    test("Testing the oberon arrayIndex01 module. This module has a ArrayIndex") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/arrayIndex01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.variables.size == 1)
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),AddExpression(IntValue(2), IntValue(6)))))
+    assert(stmts(1) == WriteStmt(VarExpression("x")))
+  }
+
+  test("Testing the oberon arrayIndex02 code. This module has a ArrayIndex") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/arrayIndex02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    assert(module.variables.size == 1)
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
+
+    assert(module.stmt.isDefined)
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),IntValue(8))))
+    assert(stmts(1) == WriteStmt(VarExpression("x")))
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {

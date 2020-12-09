@@ -162,6 +162,16 @@ class ParserVisitor {
       exp = FieldAccessExpression(parentExpression, expressionName)
     }
 
+    override def visitArraySubscript(ctx: OberonParser.ArraySubscriptContext): Unit = {
+      ctx.arrayBase.accept(this)
+      val arrayBase = exp
+
+      ctx.index.accept(this)
+      val index = exp
+
+      exp = ArraySubscript(arrayBase, index)
+    }
+
     override def visitRelExpression(ctx: OberonParser.RelExpressionContext): Unit =
       visitBinExpression(ctx.left, ctx.right, expression(ctx.opr.getText))
 
