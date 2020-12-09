@@ -65,6 +65,7 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
+case class ExpressionName(exp: Expression, name: String) extends Expression
 
 /* Statements */
 trait Statement {
@@ -105,7 +106,7 @@ case class ReferenceToUserDefinedType(name: String) extends Type
 
 trait UserDefinedType{
   def accept(v: OberonVisitor) = v.visit(this)
-} 
+}
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
