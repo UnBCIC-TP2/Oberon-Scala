@@ -49,11 +49,12 @@ block
     
 expression
  : '(' expression ')'                                                                     #Brackets
- | exp = expression '.' name = Id                                                         #FieldAccess
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
- | name = Id '(' arguments? ')'                                                           #FunctionCall       
+ | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | exp = expression '.' name = Id                                                         #FieldAccess
+ | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
