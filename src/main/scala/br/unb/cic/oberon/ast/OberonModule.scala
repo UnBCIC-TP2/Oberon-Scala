@@ -4,6 +4,7 @@ import br.unb.cic.oberon.visitor.OberonVisitor
 
 /* Abstract representation of an Oberon Module */
 case class OberonModule(name: String,
+                        userTypes: List[UserDefinedType],
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
@@ -95,6 +96,16 @@ trait Type {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
+
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
+case class ReferenceToUserDefinedType(name: String) extends Type
+
+trait UserDefinedType{
+  def accept(v: OberonVisitor) = v.visit(this)
+} 
+
+case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
+case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
+

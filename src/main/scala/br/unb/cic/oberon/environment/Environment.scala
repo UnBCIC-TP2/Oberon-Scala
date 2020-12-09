@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{Expression, Procedure}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -23,8 +23,25 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
+  private val arrayTypes = Map.empty[String, Int, UserDefinedType]
+  private val recordTypes = Map.empty[String, Map[String, Type]]
+
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
+
+  def addUserType (userType: UserDefinedType) : Unit = {
+    userType match {
+      case RecordType(name, attributes) => {
+        val attributeMap = Map.empty[String, Type]
+        attributes.foreach(attribute => {
+          attributeMap += attribute.name -> attribute.variableType
+        })
+        recordTypes += name -> attributeMap
+      }
+
+      case ArrayType(name, length, userType) => arrayTypes += name -> length -> userType
+    }
+  }
 
   def setLocalVariable(name: String, value: T) : Unit = {
     if(stack.size == 0) {
@@ -47,6 +64,18 @@ class Environment[T] {
     if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
     else None
+  }
+
+  def lookupRecordType(name: String) : Option[Map[String, Type]] = {
+    if (recordTypes.contains(name)) {
+      Some(recordTypes(name))
+    } else None
+  }
+
+  def lookupArrayType(name: String, length: Int, Type) = {
+    if (arrayTypes.contains(name)) {
+      Some(arrayTypes(name))
+    } else None
   }
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
