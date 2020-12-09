@@ -1,0 +1,26 @@
+MODULE SimpleModule;
+
+VAR
+    
+    fila : INTEGER
+
+    onibus
+        A : INTEGER
+        B : INTEGER
+        C : INTEGER
+
+    passageiros : onibus;
+
+       
+BEGIN
+
+    n := 1;
+    passageiros.A := 1;
+    passageiros.B := 3;
+    passageiros.C := 2;
+    fila[n] := A  
+    
+ 
+END
+
+END SimpleModule.

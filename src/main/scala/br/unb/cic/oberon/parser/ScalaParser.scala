@@ -124,7 +124,7 @@ class ParserVisitor {
     val typeVisitor = new OberonTypeVisitor()
     ctx.accept(typeVisitor)
 
-    if(typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
+    if (typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
   }
 
   class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
@@ -132,9 +132,11 @@ class ParserVisitor {
 
     override def visitIntegerType(ctx: OberonParser.IntegerTypeContext): Unit =
       baseType = IntegerType
-      
-    override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = { baseType = BooleanType }
- 
+
+    override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = {
+      baseType = BooleanType
+    }
+
     override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
       val nameType = ctx.name.getText
       baseType = ReferenceToUserDefinedType(nameType)
@@ -238,6 +240,18 @@ class ParserVisitor {
       stmt = AssignmentStmt(varName, visitor.exp)
     }
 
+    override def visitEAssignmentStmt(ctx: OberonParser.EAssignmentStmtContext): Unit = {
+      val visitor = new ExpressionVisitor()
+      ctx.exp.accept(visitor)
+
+      val EAssignmentVisitor = new AssignmentAlternativeVisitor()
+
+      ctx.designator.accept(EAssignmentVisitor)
+      val designator = EAssignmentVisitor.assignmentAlt
+
+      stmt = EAssignmentStmt(designator, visitor.exp)
+    }
+
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
       val stmts = new ListBuffer[Statement]
 
@@ -302,7 +316,7 @@ class ParserVisitor {
       val condition = visitor.exp
       ctx.thenStmt.accept(this)
       val thenStmt = stmt
-  
+
       val elsifStmt = new ListBuffer[ElseIfStmt]
       ctx.elsifs.asScala.toList.foreach(e => {
         e.expression().accept(visitor)
@@ -365,7 +379,7 @@ class ParserVisitor {
 
       stmt = RepeatUntilStmt(condition, repeatUntilStmt)
     }
-   
+
     override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
@@ -389,7 +403,7 @@ class ParserVisitor {
 
       ctx.min.accept(visitor)
       val rangeMin = visitor.exp
-      
+
       ctx.max.accept(visitor)
       val rangeMax = visitor.exp
 
@@ -397,13 +411,13 @@ class ParserVisitor {
       val block = stmt
 
       // Instantiating the values for the basic ForStmt
-      
+
       // var := rangeMin
       val init = AssignmentStmt(variable.name, rangeMin)
 
       // var <= rangeMax
       val condition = LTEExpression(variable, rangeMax)
-      
+
       // var := var + 1
       val accumulator = AssignmentStmt(variable.name, AddExpression(variable, IntValue(1)))
 
@@ -453,6 +467,36 @@ class ParserVisitor {
     }
   }
 
+  class AssignmentAlternativeVisitor extends OberonBaseVisitor[Unit] {
+    var assignmentAlt: AssignmentAlternative = _
+
+    override def visitVarAssignment(ctx: OberonParser.VarAssignmentContext): Unit = {
+      val varName = ctx.`var`.getText
+      assignmentAlt = VarAssignment(varName)
+    }
+
+    override def visitArrayAssignment(ctx: OberonParser.ArrayAssignmentContext): Unit = {
+      val expressionVisitor = new ExpressionVisitor()
+      ctx.array.accept(expressionVisitor)
+      val array = expressionVisitor.exp
+
+      ctx.elem.accept(expressionVisitor)
+      val elem = expressionVisitor.exp
+
+
+      assignmentAlt = ArrayAssignment(array, elem)
+    }
+
+    override def visitRecordAssignment(ctx: OberonParser.RecordAssignmentContext): Unit = {
+      var expressionVisitor = new ExpressionVisitor()
+      ctx.record.accept(expressionVisitor)
+      val record = expressionVisitor.exp
+      val atrib = ctx.name.getText
+
+      assignmentAlt = RecordAssignment(record, atrib)
+    }
+  }
+
   class UserDefinedTypeVisitor extends OberonBaseVisitor[Unit] {
     var uType: UserDefinedType = _
 
@@ -473,13 +517,12 @@ class ParserVisitor {
 
     override def visitArrayTypeDeclaration(ctx: OberonParser.ArrayTypeDeclarationContext): Unit = {
       val typeVisitor = new ParserVisitor()
-      
+
       val name = ctx.nameType.getText
       val length = ctx.length.getText.toInt
       val baseType = typeVisitor.visitOberonType(ctx.vartype)
 
       uType = ArrayType(name, length, baseType)
     }
-
   }
 }
