@@ -49,7 +49,7 @@ block
     
 expression
  : '(' expression ')'                                                                     #Brackets
- | exp = expression '.' name = Id                                                         #ExpressionName
+ | exp = expression '.' name = Id                                                         #FieldAccess
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable

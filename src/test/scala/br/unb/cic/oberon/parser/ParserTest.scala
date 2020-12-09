@@ -1745,11 +1745,11 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.name == "ExpressionNameModule")
     assert(module.stmt.isDefined)
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].exp.isInstanceOf[VarExpression])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[VarExpression])
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].name.isInstanceOf[String])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
 
 
   }
@@ -1768,7 +1768,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.asInstanceOf[IntValue].value == 1)
 
@@ -1787,11 +1787,11 @@ class ParserTestSuite extends AnyFunSuite {
   	
   	assert(module.stmt.isDefined)
   	
-  	assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[ExpressionName])
+  	assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].exp.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[FieldAccessExpression])
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[ExpressionName].name.isInstanceOf[String])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
   }
   
   test("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names"){
@@ -1808,9 +1808,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
     
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
 
   }
   
@@ -1828,11 +1828,11 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
     
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].left.isInstanceOf[ExpressionName])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].left.isInstanceOf[FieldAccessExpression])
 
-	assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[ExpressionName])
+	assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[FieldAccessExpression])
 
 
   }

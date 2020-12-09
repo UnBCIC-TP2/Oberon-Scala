@@ -151,7 +151,7 @@ class ParserVisitor {
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")
 
-    override def visitExpressionName(ctx: OberonParser.ExpressionNameContext): Unit = {
+    override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
 
       ctx.expression().accept(visitor)
@@ -159,7 +159,7 @@ class ParserVisitor {
 
       val expressionName = ctx.name.getText
 
-      exp = ExpressionName(parentExpression, expressionName)
+      exp = FieldAccessExpression(parentExpression, expressionName)
     }
 
     override def visitRelExpression(ctx: OberonParser.RelExpressionContext): Unit =
