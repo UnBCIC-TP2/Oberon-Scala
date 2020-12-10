@@ -47,7 +47,7 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   override def visit(userType: UserDefinedType): Unit = {
-    env.setUserType(userType)
+    env.addUserDefinedType(userType)
   }
 
   override def visit(procedure: Procedure): Unit = {
