@@ -11,7 +11,10 @@ declarations
 userTypeDeclaration
   : nameType = Id '=' ('ARRAY' length = INT 'OF' vartype = oberonType)      #ArrayTypeDeclaration
   | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
+
   ;
+
+
 
 constant
   : constName = Id '=' exp = expression ';'
@@ -49,10 +52,13 @@ expression
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
- | name = Id '(' arguments? ')'                                                           #FunctionCall       
+ | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | exp = expression '.' name = Id                                                         #FieldAccess
+ | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+
  ;
 
 statement
@@ -75,7 +81,7 @@ statement
  designator
   : var = Id                                                          #VarAssignment
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
-  | record = expression '.' atrib = Id                                #RecordAssignment
+  | record = expression '.' name = Id                                 #RecordAssignment
   ;
 
 caseAlternative

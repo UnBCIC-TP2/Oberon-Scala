@@ -1,0 +1,26 @@
+MODULE SimpleModule;
+  
+VAR
+  first, second, third, temp : INTEGER;
+BEGIN
+  readInt(first);
+  readInt(second);
+  readInt(third);
+  IF(first > second) THEN
+    temp := first;
+    first := second;
+    second := temp
+  ELSIF(first > third) THEN
+    temp := first;
+    first := third;
+    third := temp
+  ELSIF(second > third) THEN
+    temp := second;
+    second := third;
+    third := temp
+  END;
+  write(first);
+  write(second);
+  write(third)
+END
+END SimpleModule.
