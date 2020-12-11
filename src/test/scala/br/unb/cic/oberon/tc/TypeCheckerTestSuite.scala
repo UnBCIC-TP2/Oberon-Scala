@@ -2,8 +2,9 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
-import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, CaseStmt, ElseIfStmt, ForStmt, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, RangeCase, ReadIntStmt, RepeatUntilStmt, SequenceStmt, SimpleCase, Undef, VarExpression, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
+import br.unb.cic.oberon.codegen.PaigesBasedGenerator
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -708,6 +709,20 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     assert(stmt02.accept(visitor).size == 4)
+  }
+
+  ignore("First Record type checking from Oberon File") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record01.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
   }
 
 }

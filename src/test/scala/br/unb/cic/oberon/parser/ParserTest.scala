@@ -8,7 +8,12 @@ import br.unb.cic.oberon.ast._
 class ParserTestSuite extends AnyFunSuite {
 
   test("Testing the oberon simple01 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").getFile)
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("simple/simple01.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
 
     assert(path != null)
 
@@ -21,8 +26,12 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple02 code. This module has one constants and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").getFile)
-
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("simple/simple02.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
@@ -37,8 +46,12 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple03 code. This module has three constants and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").getFile)
-
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("simple/simple03.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
@@ -56,7 +69,12 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").getFile)
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("simple/simple04.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
 
     assert(path != null)
 
@@ -1748,8 +1766,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
   
-  ignore("Testing the oberon stmt32 code. This module has some user types declarations") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").getFile)
+
+  test("Testing the oberon stmt32 code. This module has some user types declarations") {
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/stmt32.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
 
     assert(path != null)
 
@@ -1845,8 +1869,13 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  ignore("Testing the oberon stmt33 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt33.oberon").getFile)
+  test("Testing the oberon stmt33 code. This module has a record and array type declarations"){
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/stmt33.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
 
     assert(path != null)
 
@@ -1932,8 +1961,13 @@ class ParserTestSuite extends AnyFunSuite {
     })
   }
 
-  ignore("Testing the oberon stmt34 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
+  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+    val path = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/stmt34.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
 
 
     assert(path != null)

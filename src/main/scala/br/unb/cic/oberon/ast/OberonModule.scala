@@ -8,7 +8,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
-                        stmt: Option[Statement]
+                        stmt: Option[Statement],
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
@@ -50,6 +50,7 @@ case class Brackets(exp: Expression) extends Expression
 case class IntValue(v: Int) extends Value[Int](v)
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
+case class RecordValue(v: Map[String, Expression]) extends Value[Map[String, Expression]](v)
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class VarExpression(name: String) extends Expression
@@ -66,7 +67,8 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
-
+case class FieldAccessExpression (exp: Expression, name: String) extends Expression
+ 
 /* Statements */
 trait Statement {
   def accept(v: OberonVisitor) = v.visit(this)
@@ -117,4 +119,3 @@ trait UserDefinedType{
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
-

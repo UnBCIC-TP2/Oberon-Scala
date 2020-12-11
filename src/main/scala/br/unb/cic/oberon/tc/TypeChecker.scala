@@ -30,18 +30,15 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case AndExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     case OrExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
     // TODO: function call ...
-
     case FieldAccessExpression(exp, attributeName) => {
       val expType = visit(exp)
       if (expType.isEmpty) None
       expType.get match {
         case ReferenceToUserDefinedType(userTypeName) => {
-          val baseType = typeChecker.env.lookupUserDefinedType(userTypeName)
-          if (baseType.isEmpty) None
-          if (baseType.get.isInstanceOf[RecordType]) {
-            val recordType = baseType.get.asInstanceOf[RecordType]
-            val attribute = recordType.variables.find(v => v.name.equals(attributeName))
-            if(attribute.isDefined) Some(attribute.get.variableType) else None
+          val recordTypeAttributeMap = typeChecker.env.lookupRecordType(userTypeName)
+          if (recordTypeAttributeMap.isEmpty) None
+          if (recordTypeAttributeMap.get.contains(attributeName)) {
+            Some(recordTypeAttributeMap.get(attributeName))
           } else None
         }
         case _ => None
@@ -66,7 +63,7 @@ class TypeChecker extends OberonVisitorAdapter {
     module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.map(p => env.declareProcedure(p))
-    module.userTypes.map(u => env.addUserDefinedType(u)) //added G04
+    module.userTypes.map(u => env.addUserType(u))
 
     // TODO: check if the procedures are well typed.
 
@@ -91,6 +88,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   private def visitAssignment(stmt: Statement) = stmt match {
     case AssignmentStmt(v, exp) =>
+      // Possible redundancy - see visit(exp) function, VarExpression case
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined)
           List()
