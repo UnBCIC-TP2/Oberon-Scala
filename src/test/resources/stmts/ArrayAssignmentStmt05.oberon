@@ -1,0 +1,13 @@
+MODULE SimpleModule;
+  
+VAR
+    array : INTEGER;
+    n : INTEGER;
+    value : INTEGER;
+BEGIN
+    n := 5;
+    value := 12;
+    array[n + 1] := value
+END
+
+END SimpleModule.
