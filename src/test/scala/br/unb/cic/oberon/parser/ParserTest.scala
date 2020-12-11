@@ -2055,7 +2055,8 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon recordAssignmentStmt05 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt05.oberon").getFile
+      .replaceFirst("\\/(.:\\/)", "$1"))
 
     assert(path != null)
 

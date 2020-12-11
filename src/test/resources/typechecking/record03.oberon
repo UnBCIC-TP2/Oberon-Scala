@@ -1,0 +1,22 @@
+MODULE RecordTypeChecking;
+
+TYPE
+  inside = RECORD
+	int: INTEGER;
+	bool: BOOLEAN;
+  END
+  
+  nested = RECORD
+	in: inside;
+  END
+  
+VAR
+  test: nested;
+
+BEGIN
+  test.in.int := 10;
+  test.in.bool := False
+
+END
+
+END RecordTypeChecking.

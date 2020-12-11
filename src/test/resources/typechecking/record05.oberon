@@ -1,0 +1,27 @@
+MODULE RecordTypeChecking;
+
+TYPE
+  level00 = RECORD
+	int: INTEGER;
+	bool: BOOLEAN;
+  END
+  
+  level01 = RECORD
+	in: level00;
+  END
+  
+  level02 = RECORD
+	in: level01;
+	testint: INTEGER;
+  END
+  
+VAR
+  test: level02;
+
+BEGIN
+  test.in.in.int := 34566;
+  test.testint := 23;
+
+END
+
+END RecordTypeChecking.

@@ -64,7 +64,9 @@ class Environment[T] {
     else None
   }
 
-  def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
+  def lookupRecordType(name: String) : Option[Map[String, Type]] = {
+    recordTypes.get(name)
+  }
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 

@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EAssignmentStmt, EQExpression, ElseIfStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordAssignment, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -73,6 +73,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
+    case EAssignmentStmt(_, _) => visitEAssignment(stmt.asInstanceOf[EAssignmentStmt])
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
@@ -95,6 +96,24 @@ class TypeChecker extends OberonVisitorAdapter {
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
+  }
+
+  private def visitEAssignment(stmt: EAssignmentStmt) = {
+    stmt.designator match {
+      case RecordAssignment(exp, attributeName) => {
+        val leftSideType = FieldAccessExpression(exp, attributeName).accept(expVisitor)
+        if (leftSideType.isDefined) {
+          val rightSideType = stmt.exp.accept(expVisitor)
+          if (rightSideType.isDefined) {
+            if (leftSideType == rightSideType) List()
+            else List((stmt, "Type mismatch between left side expression and right side expression"))
+          } else List((stmt, s"Expression $stmt.exp is ill typed"))
+        } else List((stmt, "Designator is incorrect"))
+
+      }
+      // TODO: ArrayAssignment case
+      case _ => List((stmt, s"Type checking for this class not implemented"))
+    }
   }
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {

@@ -10,7 +10,7 @@ case class OberonModule(name: String,
                         procedures: List[Procedure],
                         stmt: Option[Statement],
                        ) {
-  def accept(v: OberonVisitor): Unit = v.visit(this)
+  def accept(v: OberonVisitor) = v.visit(this)
 }
 
 /* procedure declaration definition */
@@ -67,7 +67,6 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
-case class FieldAccessExpression (exp: Expression, name: String) extends Expression
  
 /* Statements */
 trait Statement {
