@@ -185,12 +185,14 @@ class CCodeGenTest extends AnyFunSuite {
       assert(generatedCCode == cCode)
     }
 
+
   test("First RepeatUntil Test") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/repeatuntil.oberon")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
+
     )
     assert(oberonPath != null)
 
@@ -201,6 +203,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val cPath = Paths.get(
       getClass.getClassLoader
+
         .getResource("cCode/stmts/repeatuntil.c")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
@@ -217,6 +220,7 @@ class CCodeGenTest extends AnyFunSuite {
         .getResource("stmts/repeatuntil01.oberon")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
+
     )
     assert(oberonPath != null)
 
@@ -227,6 +231,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val cPath = Paths.get(
       getClass.getClassLoader
+
         .getResource("cCode/stmts/repeatuntil01.c")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
@@ -253,6 +258,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val cPath = Paths.get(
       getClass.getClassLoader
+
         .getResource("cCode/stmts/repeatuntil02.c")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
@@ -279,6 +285,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val cPath = Paths.get(
       getClass.getClassLoader
+
         .getResource("cCode/stmts/repeatuntil03.c")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
@@ -295,6 +302,7 @@ class CCodeGenTest extends AnyFunSuite {
         .getResource("stmts/repeatuntil04.oberon")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
+
     )
     assert(oberonPath != null)
 
@@ -305,6 +313,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val cPath = Paths.get(
       getClass.getClassLoader
+
         .getResource("cCode/stmts/repeatuntil04.c")
         .getFile
         .replaceFirst("\\/(.:\\/)", "$1")
@@ -315,4 +324,129 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
+//Tests for IfElseIf 
+  test("Testing C generator for stmt30") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/stmt30.oberon")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/stmt17.c")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
+  }
+
+  test("Testing C generator for ifelseif_stmt31") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/ifelseif_stmt31.oberon")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/stmt18.c")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
+  }
+
+  ignore("Testing C generator for stmt32") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/ifelseif_stmt32.oberon")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/stmt19.c")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
+  }
+
+  ignore("Testing C generator for stmt33") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/ifelseif_stmt33.oberon")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/stmt20.c")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
+  }
+
+  ignore("Testing C generator for stmt34") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("stmts/stmt34.oberon")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(oberonPath != null)
+
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val codeGen = PaigesBasedGenerator()
+    val generatedCCode = codeGen.generateCode(module)
+
+    val cPath = Paths.get(
+      getClass.getClassLoader
+        .getResource("cCode/stmts/stmt21.c")
+        .getFile
+        .replace("/C:/", "C:/")
+    )
+    assert(cPath != null)
+    val cCode = String.join("\n", Files.readAllLines(cPath))
+    assert(generatedCCode == cCode)
+  }
 }

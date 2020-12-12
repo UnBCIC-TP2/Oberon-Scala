@@ -1,0 +1,20 @@
+MODULE ExpressionNameModule;
+
+TYPE
+  list = RECORD
+    head: INTEGER;
+    tail: list
+  END
+
+VAR
+  list1: list;
+  list2: list;
+  list3: list;
+  result: INTEGER;
+
+BEGIN
+  result := list3.tail.head + list1.head * list2.head;
+  write(result)
+END
+
+END ExpressionNameModule.
