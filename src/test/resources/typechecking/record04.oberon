@@ -1,0 +1,17 @@
+MODULE RecordTypeChecking;
+
+TYPE
+  coord = RECORD
+	x: INTEGER;
+	y: BOOLEAN;
+  END
+  
+VAR
+  test: coord;
+
+BEGIN
+  test.x := True
+
+END
+
+END RecordTypeChecking.

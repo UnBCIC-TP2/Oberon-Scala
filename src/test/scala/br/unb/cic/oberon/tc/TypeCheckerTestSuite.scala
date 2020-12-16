@@ -2,8 +2,9 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
-import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
+import br.unb.cic.oberon.ast.{AddExpression, Statement, AssignmentStmt, BoolValue, BooleanType, CaseStmt, ElseIfStmt, ForStmt, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, RangeCase, ReadIntStmt, RepeatUntilStmt, SequenceStmt, SimpleCase, Undef, VarExpression, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
+import br.unb.cic.oberon.codegen.PaigesBasedGenerator
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -708,6 +709,102 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     assert(stmt02.accept(visitor).size == 4)
+  }
+
+  test("First Record type checking from Oberon File") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record01.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert (typeCheckErrors.size == 0)
+  }
+
+  test("Record with 2 attributes") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record02.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert(typeCheckErrors.size == 0)
+  }
+
+  test("Nested record") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record03.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert(typeCheckErrors.size == 0)
+  }
+
+  test("Record assignment with type error") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record04.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert(typeCheckErrors.size == 1)
+  }
+
+  test("Nested record, 2 levels") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record05.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert(typeCheckErrors.size == 0)
+  }
+
+  test("Nested record, 2 levels, assignment with another variable as source") {
+    val oberonPath = Paths.get(
+      getClass.getClassLoader
+        .getResource(s"typechecking/record06.oberon")
+        .getFile
+        .replaceFirst("\\/(.:\\/)", "$1")
+    )
+    assert(oberonPath != null)
+    val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
+    val module = ScalaParser.parse(oberonContent)
+    val typeChecker = new TypeChecker()
+    val typeCheckErrors = module.accept(typeChecker)
+
+    assert(typeCheckErrors.size == 0)
   }
 
 }

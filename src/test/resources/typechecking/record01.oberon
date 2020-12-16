@@ -1,0 +1,15 @@
+MODULE RecordTypeChecking;
+
+TYPE
+  coord = RECORD x: INTEGER; END
+  
+VAR
+  test: coord;
+
+BEGIN
+  test.x := 10;
+  write(test.x)
+
+END
+
+END RecordTypeChecking.

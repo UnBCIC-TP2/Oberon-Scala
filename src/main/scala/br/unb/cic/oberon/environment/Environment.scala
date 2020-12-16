@@ -23,13 +23,22 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
-  private val userDefinedTypes = Map.empty[String, UserDefinedType]
-
+  private val arrayTypes = Map.empty[String, UserDefinedType]
+  private val recordTypes = Map.empty[String, Map[String, Type]]
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
-  def addUserDefinedType(userType: UserDefinedType) : Unit = {
-    userDefinedTypes  += userDefinedTypeName(userType) -> userType
+  def addUserType (userType: UserDefinedType) : Unit = {
+    userType match {
+      case RecordType(name, attributes) => {
+        val attributeMap = Map.empty[String, Type]
+        attributes.foreach(attribute => {
+          attributeMap += attribute.name -> attribute.variableType
+        })
+        recordTypes += name -> attributeMap
+      }
+      case ArrayType(name, _, _) => arrayTypes += name -> userType
+    }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
@@ -55,7 +64,9 @@ class Environment[T] {
     else None
   }
 
-  def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
+  def lookupRecordType(name: String) : Option[Map[String, Type]] = {
+    recordTypes.get(name)
+  }
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 
