@@ -49,6 +49,7 @@ abstract class Value[T](val value: T) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class IntValue(v: Int) extends Value[Int](v)
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
+case class ArrayValue(v: List[Expression]) extends Value[List[Expression]](v)
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
@@ -105,7 +106,6 @@ trait Type {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
-
 case object IntegerType extends Type
 case object BooleanType extends Type
 case object UndefinedType extends Type
@@ -113,8 +113,7 @@ case class ReferenceToUserDefinedType(name: String) extends Type
 
 trait UserDefinedType{
   def accept(v: OberonVisitor) = v.visit(this)
-}
+} 
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
-

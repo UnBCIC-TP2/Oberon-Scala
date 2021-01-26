@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
+import scala.collection.mutable.ListBuffer
 
 class InterpreterTest extends AnyFunSuite{
 
@@ -516,6 +517,52 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     assert(interpreter.env.lookup("x") == Some(IntValue(10)));
     assert(interpreter.env.lookup("y") == Some(IntValue(10)));
+  }
+
+  test("stmt35") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt35.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "UserTypeModule")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
+    assert(interpreter.env.lookupArrayIndex("b",1).contains(IntValue(10)))
+  }
+  test("stmt36") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt36.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "UserTypeModule")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
+    assert(interpreter.env.lookupArrayIndex("a",1).contains(IntValue(10)))
+    assert(interpreter.env.lookupArrayIndex("b",0).contains(IntValue(10)))
+    assert(interpreter.env.lookupArrayIndex("a",2).contains(IntValue(25)))
+  }
+  test("stmt37") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt37.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    assert(module.name == "UserTypeModule")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
+    assert(interpreter.env.lookupArrayIndex("a",2).contains(IntValue(25)))
+
   }
 
 }

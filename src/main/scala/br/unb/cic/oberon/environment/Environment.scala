@@ -1,9 +1,10 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType,Undef}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
+import scala.collection.mutable.ListBuffer
 
 /**
  * The environment represents a memory region, which
@@ -25,11 +26,16 @@ class Environment[T] {
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
+  private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes  += userDefinedTypeName(userType) -> userType
+    userType match {
+      case ArrayType(name, length, variableType) => userArrayTypes += name -> ListBuffer.fill(length)(Undef())
+      case _ => ???
+    }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
@@ -52,6 +58,19 @@ class Environment[T] {
   def lookup(name: String) : Option[T] = {
     if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
+    else None
+  }
+
+  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
+    if (userArrayTypes.contains(name)) {
+      userArrayTypes(name).update(index, value)
+    }
+  }
+
+  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
+    if (userArrayTypes.contains(name) && userArrayTypes(name).length > index) {
+      Some(userArrayTypes(name)(index))
+    }
     else None
   }
 
