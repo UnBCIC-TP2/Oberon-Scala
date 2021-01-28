@@ -1343,7 +1343,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-    test("Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt") {
+  test("Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt28.oberon").getFile)
 
     assert(path != null)
@@ -1386,7 +1386,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-    test("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
+  test("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt29.oberon").getFile)
 
     assert(path != null)
@@ -1748,7 +1748,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
   
-  ignore("Testing the oberon stmt32 code. This module has some user types declarations") {
+  test("Testing the oberon stmt32 code. This module has some user types declarations") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").getFile)
 
     assert(path != null)
@@ -1758,23 +1758,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "UserTypeModule")
 
-    assert(module.stmt.isDefined)
+    assert(!module.stmt.isDefined)
 
-    // assert that the main block contains a sequence of statements
-    module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 5)
-      case _ => fail("we are expecting five stmts in the main block")
-    }
-
-    // now we can assume that the main block contains a sequence of stmts
-    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
-    val stmts = sequence.stmts
-
-    assert(stmts.head == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), IntValue(10)))
-    assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(1)), IntValue(20)))
-    assert(stmts(2) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(2)), IntValue(30)))
-    assert(stmts(3) == EAssignmentStmt(ArrayAssignment(VarExpression("outroarray"), IntValue(0)), IntValue(1)))
-    assert(stmts(4) == EAssignmentStmt(ArrayAssignment(VarExpression("outroarray"), IntValue(1)), IntValue(5)))
+    assert(module.userTypes.size == 4)
   }
 
   test("Testing the oberon ArrayAssignmentStmt04 code. This module has two array assignments") {
