@@ -11,10 +11,7 @@ declarations
 userTypeDeclaration
   : nameType = Id '=' ('ARRAY' length = INT 'OF' vartype = oberonType)      #ArrayTypeDeclaration
   | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
-
   ;
-
-
 
 constant
   : constName = Id '=' exp = expression ';'
