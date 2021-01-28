@@ -28,5 +28,8 @@ libraryDependencies += "org.typelevel" %% "paiges-core" % "0.3.0"
 libraryDependencies += "org.scala-graph" %% "graph-core" % "1.13.2"
 libraryDependencies += "org.scala-graph" %% "graph-dot" % "1.13.0"
 
+libraryDependencies += "org.scala-sbt.jline3" % "jline-terminal" % "3.16.0-sbt-211a082ed6326908dc84ca017ce4430728f18a8a"
+
+
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
 
