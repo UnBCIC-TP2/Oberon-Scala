@@ -7,142 +7,145 @@ import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.ListBuffer
 
-class InterpreterTest extends AnyFunSuite{
+class InterpreterTest extends AnyFunSuite {
 
-test("Testing interpreter on interpreter_stmt01 program") {
+  val interpreter = new Interpreter()
+
+  interpreter.setTestEnvironment()
+
+  test("Testing interpreter on interpreter_stmt01 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    
-	
+
     assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
     assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
     assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
 
   }
-  
-test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
+
+  test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-   assert(interpreter.env.lookup("y") == Some(IntValue(120)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(120)))
 
   }
-  
-test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
+
+  test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial02.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-   assert(interpreter.env.lookup("y") == Some(IntValue(1)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(1)))
 
   }
 
-test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
+  test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial03.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	assert(interpreter.env.lookup("x") == Some(IntValue(0)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(0)))
     assert(interpreter.env.lookup("y") == Some(IntValue(1)))
 
   }
-  
-test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {
+
+  test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci01.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	assert(interpreter.env.lookup("ant") == Some(IntValue(13)))
+
+    assert(interpreter.env.lookup("ant") == Some(IntValue(13)))
 
   }
 
-test("Testing interpreter on interpreter_stmt02 program") {
+  test("Testing interpreter on interpreter_stmt02 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt02.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	assert(interpreter.env.lookup("x") == Some(IntValue(15)))
-  assert(interpreter.env.lookup("z") == Some(IntValue(18))) 
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(15)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(18)))
 
   }
 
-test("Testing interpreter on interpreter_stmt03 program") {
+  test("Testing interpreter on interpreter_stmt03 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt03.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	assert(interpreter.env.lookup("x") == Some(IntValue(90)))
-  assert(interpreter.env.lookup("z") == Some(IntValue(0)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(90)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(0)))
 
   }
 
-test("Testing interpreter on interpreter_stmt04 program") {
-  val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").getFile)
+  test("Testing interpreter on interpreter_stmt04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").getFile)
 
-  assert(path != null)
+    assert(path != null)
 
-  val content = String.join("\n", Files.readAllLines(path))
-  val module = ScalaParser.parse(content)
-  val interpreter = new Interpreter()
-  assert(module.name == "SimpleModule")
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
 
-  module.accept(interpreter)
+    assert(module.name == "SimpleModule")
 
-  assert(interpreter.env.lookup("x") == Some(IntValue(101)))
-  assert(interpreter.env.lookup("z") == Some(IntValue(0))) 
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(101)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(0)))
 
   }
 
@@ -153,7 +156,7 @@ test("Testing interpreter on interpreter_stmt04 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -163,14 +166,14 @@ test("Testing interpreter on interpreter_stmt04 program") {
 
   }
 
-test("Testing interpreter on interpreter_stmt06 program") {
+  test("Testing interpreter on interpreter_stmt06 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt06.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -180,14 +183,14 @@ test("Testing interpreter on interpreter_stmt06 program") {
 
   }
 
-test("Testing interpreter on interpreter_stmt07 program") {
+  test("Testing interpreter on interpreter_stmt07 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt07.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -197,14 +200,14 @@ test("Testing interpreter on interpreter_stmt07 program") {
 
   }
 
-test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
+  test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci02.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -212,64 +215,65 @@ test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10
     assert(interpreter.env.lookup("ant") == Some(IntValue(55)))
   }
 
-test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
+  test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial04.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	 assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-   assert(interpreter.env.lookup("y") == Some(IntValue(24)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(24)))
 
   }
 
-test("Testing interpreter on interpreter_stmt08 program") {
+  test("Testing interpreter on interpreter_stmt08 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt08.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	 assert(interpreter.env.lookup("x") == Some(IntValue(-50)))
-   assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(-50)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
 
   }
 
-test("Testing interpreter on interpreter_stmt09 program") {
+  test("Testing interpreter on interpreter_stmt09 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt09.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-	
-	 assert(interpreter.env.lookup("x") == Some(IntValue(25)))
-   assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(25)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
 
   }
-test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
+
+  test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -278,14 +282,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt02.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -294,14 +298,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -310,14 +314,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt04.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -326,14 +330,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -342,14 +346,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt06.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -358,14 +362,14 @@ test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
 
   }
 
-test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
+  test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt07.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -381,7 +385,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
@@ -397,7 +401,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -414,7 +418,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -431,7 +435,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -447,7 +451,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -463,7 +467,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -479,7 +483,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
     module.accept(interpreter)
 
@@ -487,6 +491,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
     assert(interpreter.env.lookup("y") == Some(IntValue(40)));
 
   }
+  
   test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").getFile)
 
@@ -494,7 +499,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -510,7 +515,7 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
@@ -526,12 +531,12 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "UserTypeModule")
 
     module.accept(interpreter)
     assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
-    assert(interpreter.env.lookupArrayIndex("b",1).contains(IntValue(10)))
+    assert(interpreter.env.lookupArrayIndex("b", 1).contains(IntValue(10)))
   }
   test("stmt36") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt36.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
@@ -540,15 +545,16 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "UserTypeModule")
 
     module.accept(interpreter)
     assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
-    assert(interpreter.env.lookupArrayIndex("a",1).contains(IntValue(10)))
-    assert(interpreter.env.lookupArrayIndex("b",0).contains(IntValue(10)))
-    assert(interpreter.env.lookupArrayIndex("a",2).contains(IntValue(25)))
+    assert(interpreter.env.lookupArrayIndex("a", 1).contains(IntValue(10)))
+    assert(interpreter.env.lookupArrayIndex("b", 0).contains(IntValue(10)))
+    assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
+
   test("stmt37") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt37.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
 
@@ -556,13 +562,12 @@ test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-    val interpreter = new Interpreter()
+
     assert(module.name == "UserTypeModule")
 
     module.accept(interpreter)
     assert(interpreter.env.lookupArrayIndex("a", 0).contains(IntValue(5)))
-    assert(interpreter.env.lookupArrayIndex("a",2).contains(IntValue(25)))
-
+    assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
 }

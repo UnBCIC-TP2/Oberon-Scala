@@ -1,14 +1,14 @@
 MODULE UserTypeModule;
 
 TYPE
-  tysize = ARRAY 5 OF INTEGER
-  
+  sizes = ARRAY 5 OF INTEGER
+
   shoes = RECORD
     id: INTEGER;
-    sizes: tysize;
+    sizes: sizes;
     price: INTEGER;
     stock: INTEGER;
-    limited: BOOLEAN
+    limited: BOOLEAN;
   END
 
   shoes_array = ARRAY 50 OF shoes

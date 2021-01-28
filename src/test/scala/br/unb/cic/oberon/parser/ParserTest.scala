@@ -1843,7 +1843,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), IntValue(5)))
   }
 
-  ignore("Testing the oberon recordAssignmentStmt02 code") {
+  test("Testing the oberon recordAssignmentStmt02 code") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt02.oberon").getFile)
 
     assert(path != null)
@@ -1853,28 +1853,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    assert(module.userTypes.length == 3)
-
-    val typeList = module.userTypes
-
-    val tysize = ArrayType("tysize", 5, IntegerType)
-
-    val shoes = RecordType("shoes", List(VariableDeclaration("id", IntegerType),
-      VariableDeclaration("sizes", ReferenceToUserDefinedType("tysize")),
-      VariableDeclaration("price", IntegerType),
-      VariableDeclaration("stock", IntegerType),
-      VariableDeclaration("limited", BooleanType)))
-
-    val shoes_array =  ArrayType("shoes_array", 50, ReferenceToUserDefinedType("shoes"))
-
-    val typetoTest = List(tysize, shoes, shoes_array)
-
-    var it: Int = 0
-
-    typeList.foreach(t => {
-      assert(t == typetoTest(it))
-      it += 1
-    })
+    assert(module.userTypes.length == 1)
   }
 
   ignore("Testing the oberon stmt34 code. This module has a record and array type declarations"){
@@ -2002,34 +1981,6 @@ class ParserTestSuite extends AnyFunSuite {
 
 
   }
-
-//
-//
-//    assert(module.name == "UserTypeModule")
-//
-//    assert(module.userTypes.length == 5)
-//
-//    val typeList = module.userTypes
-//
-//    val m_id = ArrayType("m_id", 15, IntegerType)
-//    val team = RecordType("team", List(
-//      VariableDeclaration("t_id", IntegerType),
-//      VariableDeclaration("members", ReferenceToUserDefinedType("m_id")),
-//      VariableDeclaration("n_members", IntegerType),
-//      VariableDeclaration("full", BooleanType)))
-//
-//    val team_array = ArrayType("team_array", 20, ReferenceToUserDefinedType("team"))
-//    val test_array = ArrayType("test_array", 20, IntegerType)
-//    val second_test = ArrayType("second_test", 20, ReferenceToUserDefinedType("test_array"))
-//    val typetoTest = List(m_id, team, team_array, test_array, second_test)
-//
-//    var it: Int = 0
-//
-//    typeList.foreach(t => {
-//      assert(t == typetoTest(it))
-//      it += 1
-//    })
-//  }
 
   test("Testing the oberon ExpressionNameParser1 code. This module tests if the parser can see expression name access"){
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser1.oberon").getFile)
@@ -2321,7 +2272,5 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
-  //test("Testing the oberon ArrayAssignmentStmt03 code. This module has five array assignments") {
-  //val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt03.oberon").getFile)
-  
+
 }

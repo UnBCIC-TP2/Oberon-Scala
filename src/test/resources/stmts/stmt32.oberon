@@ -5,18 +5,18 @@ TYPE
   
   type2 = RECORD 
     lista: type1;
-    inteiro: INTEGER
+    inteiro: INTEGER;
   END
   
   type3 = RECORD
     mylist: type2;
     age: INTEGER;
     check: BOOLEAN;
-    kleber, bolo: type1
+    kleber, bolo: type1;
   END
 
   type4 = RECORD
-    v1, v2: INTEGER
+    v1, v2: INTEGER;
   END
 
 END UserTypeModule.
