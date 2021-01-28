@@ -1805,7 +1805,7 @@ class ParserTestSuite extends AnyFunSuite {
     module.userTypes.length == ArrayType("arr", 1, IntegerType)
   }
 
-  ignore("Testing the oberon stmt33 code. This module has a record and array type declarations"){
+  test("Testing the oberon stmt33 code. This module has a record and array type declarations"){
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt33.oberon").getFile)
 
     assert(path != null)
@@ -1814,23 +1814,8 @@ class ParserTestSuite extends AnyFunSuite {
     val module = ScalaParser.parse(content)
 
 
-    assert(module.name == "SimpleModule")
-
-    assert(module.stmt.isDefined)
-
-    // assert that the main block contains a sequence of statements
-    module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
-      case _ => fail("we are expecting four stmts in the main block")
-    }
-
-    // now we can assume that the main block contains a sequence of stmts
-    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
-    val stmts = sequence.stmts
-
-    assert(stmts.head == AssignmentStmt(("n"), IntValue(5)))
-    assert(stmts(1) == AssignmentStmt(("value"), IntValue(12)))
-    assert(stmts(2) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), AddExpression(VarExpression("n"),IntValue(1))), VarExpression("value")))
+    assert(module.name == "UserTypeModule")
+    assert(module.userTypes.size == 3)
   }
 
   test("Testing the oberon recordAssignmentStmt01 code") {
