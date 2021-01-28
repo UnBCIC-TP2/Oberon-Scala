@@ -1790,7 +1790,7 @@ class ParserTestSuite extends AnyFunSuite {
 	  assert(stmts(2) == EAssignmentStmt(ArrayAssignment(VarExpression("v"), IntValue(2)), VarExpression("sum")))
   }
 
-  ignore("Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index") {
+  test("Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt05.oberon").getFile)
 
     assert(path != null)
@@ -1800,35 +1800,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    assert(module.userTypes.length == 4)
+    assert(module.userTypes.length == 1)
 
-    val typeList = module.userTypes
-
-    val type1 = ArrayType("type1", 10, IntegerType)
-
-    val type2 = RecordType("type2", List(VariableDeclaration("lista",  ReferenceToUserDefinedType("type1")),
-      VariableDeclaration("inteiro", IntegerType)))
-
-    val type3 = RecordType("type3", List(
-      VariableDeclaration("mylist", ReferenceToUserDefinedType("type2")),
-      VariableDeclaration("age", IntegerType),
-      VariableDeclaration("check", BooleanType),
-      VariableDeclaration("kleber", ReferenceToUserDefinedType("type1")),
-      VariableDeclaration("bolo", ReferenceToUserDefinedType("type1"))))
-
-    val type4 = RecordType("type4", List(
-      VariableDeclaration("v1", IntegerType),
-      VariableDeclaration("v2", IntegerType)))
-
-    val typetoTest = List(type1, type2, type3, type4)
-
-    var it: Int = 0
-
-    typeList.foreach(t => {
-      assert(t == typetoTest(it))
-      it += 1
-    })
-
+    module.userTypes.length == ArrayType("arr", 1, IntegerType)
   }
 
   ignore("Testing the oberon stmt33 code. This module has a record and array type declarations"){
