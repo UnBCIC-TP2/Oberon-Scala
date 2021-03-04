@@ -109,7 +109,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 0)
   }
-  
+
   test ("Test if-else-if statment type checker (invalid condition 'if')"){
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(20))
@@ -120,14 +120,14 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
-  
+
     val stmt04 = IfElseIfStmt(IntValue(34), stmt01, list1, None);
-  
+
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt04.accept(visitor).size == 1)
   }
-  
+
   test ("Test else-if statment type checker (invalid condition 'else-if')"){
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
@@ -135,12 +135,12 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("z", IntegerType)
-  
+
     val stmt03 = ElseIfStmt(IntValue(70), stmt02)
     val list1 = List(stmt03)
-  
+
     val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
-    
+
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt04.accept(visitor).size == 1)
@@ -159,9 +159,9 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt05 = ElseIfStmt(IntValue(58), stmt01)
     val stmt06 = ElseIfStmt(BoolValue(false), stmt01)
     val list1 = List(stmt03, stmt04, stmt05, stmt06)
-    
+
     val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
-    
+
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt07.accept(visitor).size == 2)
@@ -176,20 +176,20 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
-  
+
     val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None)
-    
+
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt04.accept(visitor).size == 1)
   }
-  
+
   test("Test if-else-if statment type checker (invalid else-stmt)"){
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
     val stmt03 = AssignmentStmt("w", IntValue(20))
-    
+
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("z", IntegerType)
 
@@ -222,24 +222,24 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
     assert(stmt07.accept(visitor).size == 5)
   }
-  
+
   test("Test if-else-if statment type checker"){
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(15))
     val stmt02 = AssignmentStmt("y", IntValue(5))
-    
+
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
-  
+
     val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
-  
+
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt04.accept(visitor).size == 0)
-    
+
   }
 
   test("Test while statement type checker (with invalid condition)") {
@@ -556,12 +556,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
    * factorial procedure.
    */
   test("Test invalid procedure declaration") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module  = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/procedure04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -572,7 +567,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   test("Test the type checker of a valid Repeat statement") {
     val visitor = new TypeChecker()
-    
+
     val condition  = LTExpression(VarExpression("x"), IntValue(10))
     val stmt01     = ReadIntStmt("x")
     val repeatStmt = RepeatUntilStmt(condition, stmt01)
@@ -580,37 +575,37 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     visitor.env.setGlobalVariable("x", IntegerType)
 
     assert(stmt01.accept(visitor) == List())
-    assert(repeatStmt.accept(visitor) == List())    
+    assert(repeatStmt.accept(visitor) == List())
   }
 
 
   test("Test the type checker of a valid Repeat statement 2"){
     val visitor = new TypeChecker()
-    
+
     val condition  = EQExpression(VarExpression("x"), IntValue(0))
     val stmt01     = ReadIntStmt("x")
     val repeatStmt = RepeatUntilStmt(condition, stmt01)
-    
+
     visitor.env.setGlobalVariable("x", IntegerType)
-    
+
     assert(stmt01.accept(visitor) == List())
-    assert(repeatStmt.accept(visitor) == List())  
-    
+    assert(repeatStmt.accept(visitor) == List())
+
   }
-  
+
   test("Test the type checker of a valid Repeat statement 3"){
     val visitor = new TypeChecker()
     val stmt01  =  AssignmentStmt("x", IntValue(10))
-    
+
     val stmt02  = RepeatUntilStmt(BoolValue(true), stmt01)
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
-  }  
+  }
 
   test("Test a invalid Repeat statement in the type checker") {
     val visitor = new TypeChecker()
-  
+
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = ReadIntStmt("x")
     val stmt03 = IfElseStmt(BoolValue(false), stmt01, Some(stmt02))
@@ -626,20 +621,20 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt06.accept(visitor).size == 5)
   }
 
-  
+
   test("Test the type checker of a valid Repeat statement 4"){
   val visitor = new TypeChecker()
-  
+
   val condition  = AndExpression(GTEExpression(VarExpression("x"), IntValue(1)),
     LTEExpression(VarExpression("x"), IntValue(10)))
   val stmt01     = ReadIntStmt("x")
   val repeatStmt = RepeatUntilStmt(condition, stmt01)
-  
+
   visitor.env.setGlobalVariable("x", IntegerType)
-  
+
   assert(stmt01.accept(visitor) == List())
-  assert(repeatStmt.accept(visitor) == List())  
-  
+  assert(repeatStmt.accept(visitor) == List())
+
   }
 
   test("Test a valid Repeat statement, with nested Repeat statements") {
@@ -650,7 +645,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
     val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
     val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
-    
+
     visitor.env.setGlobalVariable("x", IntegerType)
     val allStmts = List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
@@ -667,7 +662,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
     val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
     val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
-    
+
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
     allStmts.foreach(stmt => {
@@ -684,7 +679,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     visitor.env.setGlobalVariable("flag", BooleanType)
 
-    assert(repeatStmt.accept(visitor).size == 0) 
+    assert(repeatStmt.accept(visitor).size == 0)
 
   }
 
