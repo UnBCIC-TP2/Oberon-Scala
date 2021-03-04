@@ -28,6 +28,12 @@ object ScalaParser {
     visitor.visitCompilationUnit(parser.compilationUnit())
     visitor.module
   }
+
+  def parseResource(resource: String): OberonModule = {
+    val stream = getClass.getClassLoader.getResourceAsStream(resource)
+    val content = new String(stream.readAllBytes, "utf-8").replaceAll("\r\n", "\n")
+    parse(content)
+  }
 }
 
 class ParserVisitor {

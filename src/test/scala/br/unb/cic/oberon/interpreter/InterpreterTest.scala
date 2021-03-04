@@ -14,12 +14,7 @@ class InterpreterTest extends AnyFunSuite {
   interpreter.setTestEnvironment()
 
   test("Testing interpreter on interpreter_stmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -32,12 +27,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/interpreter_factorial01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -49,12 +39,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial02.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/interpreter_factorial02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -66,12 +51,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+        val module = ScalaParser.parseResource("procedures/interpreter_factorial03.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -83,14 +63,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci01.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule")
+    val module = ScalaParser.parseResource("procedures/interpreter_fibonacci01.oberon")
 
     module.accept(interpreter)
 
@@ -99,12 +72,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt02.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -116,12 +84,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt03.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -133,12 +96,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -150,12 +108,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt05.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt05.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -167,12 +120,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt06.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt06.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -184,12 +132,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt07.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt07.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -201,12 +144,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci02.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/interpreter_fibonacci02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -216,12 +154,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial04.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/interpreter_factorial04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -233,12 +166,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt08.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt08.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -250,12 +178,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt09 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt09.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/interpreter_stmt09.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -267,12 +190,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -283,12 +201,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt02.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -299,12 +212,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt03.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -315,12 +223,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt04.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -331,12 +234,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt05.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -347,12 +245,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt06.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt06.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -363,12 +256,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt07.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt07.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -379,12 +267,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt08.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -395,12 +278,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt01.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -412,12 +290,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt02.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt02.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -429,12 +302,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt03.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -445,12 +313,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt04.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt04.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -461,12 +324,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt05.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt05.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -477,12 +335,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt06.oberon")
 
     assert(module.name == "RepeatUntilModule")
     module.accept(interpreter)
@@ -491,14 +344,9 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(40)));
 
   }
-  
+
   test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt07.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -509,12 +357,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt08.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt08.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
@@ -525,12 +368,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("stmt35") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt35.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt35.oberon")
 
     assert(module.name == "UserTypeModule")
 
@@ -539,12 +377,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("b", 1).contains(IntValue(10)))
   }
   test("stmt36") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt36.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt36.oberon")
 
     assert(module.name == "UserTypeModule")
 
@@ -556,12 +389,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("stmt37") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt37.oberon").getFile.replaceFirst("\\/(.:\\/)", "$1"))
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt37.oberon")
 
     assert(module.name == "UserTypeModule")
 
