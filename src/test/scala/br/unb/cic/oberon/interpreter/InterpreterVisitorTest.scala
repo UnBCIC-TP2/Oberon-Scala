@@ -9,12 +9,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class InterpreterVisitorTest extends AnyFunSuite{
 
   test("Test interpreter on stmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt05.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt05.oberon")
     val interpreter = new Interpreter()
     assert(module.name == "SimpleModule")
 
@@ -26,12 +21,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
   }
 
   test("Test eval on factorial module") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/procedure03.oberon")
     val interpreter = new Interpreter()
     assert(module.name == "Factorial")
 
