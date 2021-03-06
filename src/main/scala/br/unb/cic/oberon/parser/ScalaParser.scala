@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.parser
 
 import org.antlr.v4.runtime._
+import br.unb.cic.oberon.util.Resources
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.OberonParser.StatementContext
 
@@ -30,9 +31,7 @@ object ScalaParser {
   }
 
   def parseResource(resource: String): OberonModule = {
-    val stream = getClass.getClassLoader.getResourceAsStream(resource)
-    val content = new String(stream.readAllBytes, "utf-8").replaceAll("\r\n", "\n")
-    parse(content)
+    parse(Resources.getContent(resource))
   }
 }
 
