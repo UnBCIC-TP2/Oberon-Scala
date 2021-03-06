@@ -52,7 +52,7 @@ class CCodeGenTest extends AnyFunSuite {
   for (i <- 1 to 3) {
     val procedureNumber = "%02d".format(i)
     test(s"Testing C generator for interpreter_factorial$procedureNumber") {
-val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$procedureNumber.oberon")
+      val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$procedureNumber.oberon")
       val codeGen = PaigesBasedGenerator()
       val generatedCCode = codeGen.generateCode(module)
 
@@ -82,7 +82,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
 
 
   test("First RepeatUntil Test") {
-      val module = ScalaParser.parseResource(s"stmts/repeatuntil.oberon")
+    val module = ScalaParser.parseResource(s"stmts/repeatuntil.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -92,7 +92,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   test("RepeatUntil Test with just one loop") {
-      val module = ScalaParser.parseResource(s"stmts/repeatuntil01.oberon")
+    val module = ScalaParser.parseResource(s"stmts/repeatuntil01.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -102,7 +102,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   test("RepeatUntil Nested") {
-      val module = ScalaParser.parseResource(s"stmts/repeatuntil02.oberon")
+    val module = ScalaParser.parseResource(s"stmts/repeatuntil02.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -112,7 +112,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   test("RepeatUntil Compound Exit Condition") {
-      val module = ScalaParser.parseResource(s"stmts/repeatuntil03.oberon")
+    val module = ScalaParser.parseResource(s"stmts/repeatuntil03.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -122,7 +122,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   test("RepeatUntil In Procedure") {
-      val module = ScalaParser.parseResource(s"stmts/repeatuntil04.oberon")
+    val module = ScalaParser.parseResource(s"stmts/repeatuntil04.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -133,7 +133,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
 
 //Tests for IfElseIf
   test("Testing C generator for stmt30") {
-      val module = ScalaParser.parseResource(s"stmts/stmt30.oberon")
+    val module = ScalaParser.parseResource(s"stmts/stmt30.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -142,7 +142,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   test("Testing C generator for ifelseif_stmt31") {
-      val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt31.oberon")
+    val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt31.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -151,7 +151,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   ignore("Testing C generator for stmt32") {
-      val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt32.oberon")
+    val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt32.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -160,7 +160,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   ignore("Testing C generator for stmt33") {
-      val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt33.oberon")
+    val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt33.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
@@ -169,7 +169,7 @@ val module = ScalaParser.parseResource(s"procedures/interpreter_factorial$proced
   }
 
   ignore("Testing C generator for stmt34") {
-      val module = ScalaParser.parseResource(s"stmts/stmt34.oberon")
+    val module = ScalaParser.parseResource(s"stmts/stmt34.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
