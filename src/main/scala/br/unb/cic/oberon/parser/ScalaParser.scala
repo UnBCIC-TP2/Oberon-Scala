@@ -432,6 +432,16 @@ class ParserVisitor {
       ctx.exp.accept(visitor)
       stmt = ReturnStmt(visitor.exp)
     }
+
+    override def visitLoopStmt(ctx: OberonParser.LoopStmtContext): Unit = {
+        val visitor = new ExpressionVisitor()
+
+        ctx.stmt.accept(this)
+        val block = stmt
+
+        stmt = LoopStmt(block)
+    }
+
   }
 
   class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {

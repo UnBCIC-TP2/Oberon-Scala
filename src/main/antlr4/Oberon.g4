@@ -73,6 +73,8 @@ statement
  | 'FOR' var = Id 'IN' min = expression '..' max = expression 'DO' stmt = statement 'END'                                     #ForRangeStmt
  | 'RETURN' exp = expression                                                                                                  #ReturnStmt
  | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt
+ | 'LOOP' stmt = statement 'END'                                                                                              #LoopStmt
+ | 'EXIT'                                                                                                                     #ExitStmt 
  ;
 
  designator
