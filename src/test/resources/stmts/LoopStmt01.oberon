@@ -1,0 +1,9 @@
+MODULE SimpleModule;
+
+BEGIN
+  LOOP
+    out.string("Test");
+  END;
+END
+
+END SimpleModule.
