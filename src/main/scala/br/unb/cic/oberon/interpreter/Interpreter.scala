@@ -91,6 +91,9 @@ class Interpreter extends OberonVisitorAdapter {
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
       case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
+      case LoopStmt(block) => while (true) block.accept(this)
+      case ExitStmt() => //break
+      
       case ProcedureCallStmt(name, args) =>
         // we evaluate the "args" in the current
         // environment.

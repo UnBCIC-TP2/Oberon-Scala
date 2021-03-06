@@ -1,8 +1,13 @@
 MODULE SimpleModule;
 
+VAR
+  y : INTEGER;	
+
 BEGIN
+  y := 0
   LOOP
-    out.string("Test");
+    y := 1 + y
+    IF y > 10 THEN EXIT
   END;
 END
 
