@@ -440,6 +440,10 @@ class ParserVisitor {
         stmt = LoopStmt(block)
     }
 
+    override def visitExitStmt(ctx: OberonParser.ExitStmtContext): Unit = {
+      stmt = ExitStmt()
+    }
+
   }
 
   class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {
