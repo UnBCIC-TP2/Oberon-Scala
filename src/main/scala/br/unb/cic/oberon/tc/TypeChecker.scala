@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, ExitStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, LoopStmt, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -81,6 +81,8 @@ class TypeChecker extends OberonVisitorAdapter {
     case WhileStmt(_, _) => visitWhileStmt(stmt)
     case RepeatUntilStmt(_, _) => visitRepeatUntilStmt(stmt)
     case ForStmt(_, _, _) => visitForStmt(stmt)
+    case LoopStmt(_) => visitLoopStmt(stmt)
+    case ExitStmt() => visitExitStmt()
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
@@ -154,6 +156,12 @@ class TypeChecker extends OberonVisitorAdapter {
       }
       else List((stmt, s"Expression $condition do not have a boolean type"))
   }
+
+  private def visitLoopStmt(stmt: Statement) = stmt match {
+    case LoopStmt(innerStmt) => innerStmt.accept(this)
+  }
+
+  private def visitExitStmt() = List[(br.unb.cic.oberon.ast.Statement, String)]()
 
   private def visitSwitchStmt(stmt: Statement) = stmt match {
     case CaseStmt(exp, cases, elseStmt) =>
