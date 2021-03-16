@@ -1,5 +1,6 @@
 grammar Oberon;
 
+
 compilationUnit
   : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
   ;  
@@ -132,3 +133,4 @@ COMMENT
 LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
     ;
+

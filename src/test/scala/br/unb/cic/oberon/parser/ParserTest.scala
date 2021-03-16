@@ -2273,4 +2273,33 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
 
+  test("Testing LoopStmt stmt on loop_stmt01 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "LoopStmt")
+
+    assert(module.variables.size == 1)
+    assert(module.stmt.isDefined)
+  }
+
+  test("Testing LoopStmt stmt on loop_stmt02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "LoopStmt")
+
+    assert(module.variables.size == 2)
+    assert(module.stmt.isDefined)
+  }
+
+
 }
