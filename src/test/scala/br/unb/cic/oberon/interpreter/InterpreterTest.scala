@@ -524,7 +524,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(10)));
   }
 
-  ignore("Testing LoopStmt stmt on loop_stmt01 program") {
+  test("Testing LoopStmt stmt on loop_stmt01 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").getFile)
 
     assert(path != null)
@@ -538,7 +538,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("x") == Some(IntValue(-1)))
   }
 
-  ignore("Testing LoopStmt stmt on loop_stmt02 program") {
+  test("Testing LoopStmt stmt on loop_stmt02 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").getFile)
 
     assert(path != null)
@@ -551,6 +551,21 @@ class InterpreterTest extends AnyFunSuite {
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(6)))
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
+  }
+
+  test("Testing LoopStmt stmt on loop_stmt03 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "LoopStmt")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(10)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(100)))
   }
 
   test("stmt35") {
