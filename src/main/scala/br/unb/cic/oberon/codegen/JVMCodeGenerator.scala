@@ -6,15 +6,20 @@ import org.typelevel.paiges._
 
 // Testando
 import org.objectweb.asm._
-import org.objectweb.asm.signature._
+// import org.objectweb.asm.signature._
 import org.objectweb.asm.Opcodes._
+
+import java.util.Base64
 
 abstract class JVMCodeGenerator extends CodeGenerator {}
 
 case class PaigeBasedGenerator(lineSpaces: Int = 2) extends JVMCodeGenerator {
   override def generateCode(module: OberonModule): String = {
     val cw = new ClassWriter(0);
-    cw.visit(V1_5, ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE, "pkg/Comparable", null, "java/lang/Object", Array[String] { "pkg/Mesurable"});
+
+    // println(module.name)
+
+    cw.visit(V1_5, ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE, "pkg/Comparable", null, "java/lang/Object", Array[String]{"pkg/Measurable"});
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "LESS", "I", null, new Integer(-1)).visitEnd();
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "EQUAL", "I", null, new Integer(0)).visitEnd();
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "GREATER", "I", null, new Integer(1)).visitEnd();
@@ -25,7 +30,7 @@ case class PaigeBasedGenerator(lineSpaces: Int = 2) extends JVMCodeGenerator {
 
     println(ipaddr)
 
-    return "abelha"
+    return Base64.getEncoder().encodeToString(ipaddr);
   }
 
   // def generateProcedure(procedure: Procedure, lineSpaces: Int = 2): Doc = {
