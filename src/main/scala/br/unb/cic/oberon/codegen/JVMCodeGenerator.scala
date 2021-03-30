@@ -18,9 +18,13 @@ case class PaigeBasedGenerator(lineSpaces: Int = 2) extends JVMCodeGenerator {
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "LESS", "I", null, new Integer(-1)).visitEnd();
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "EQUAL", "I", null, new Integer(0)).visitEnd();
     cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "GREATER", "I", null, new Integer(1)).visitEnd();
+    cw.visitMethod(ACC_PUBLIC + ACC_ABSTRACT, "compareTo","(Ljava/lang/Object;)I", null, null).visitEnd();
     cw.visitEnd();
-    // var ipaddr = Array[Byte](192.toByte, 168.toByte, 1, 9)
+
     var ipaddr = cw.toByteArray();
+
+    println(ipaddr)
+
     return "abelha"
   }
 
