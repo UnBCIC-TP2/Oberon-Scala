@@ -1,0 +1,62 @@
+(LHS)                                   (RHS)
+
+
+==================== Estruturas de repetição ====================
+
+LOOP                                    WHILE TRUE DO
+    stm01                                   stmt01;
+    IF cond THEN EXIT END;      =>          IF cond THEN EXIT END;
+    stmt02;                                 stmt02;
+END                                     END;
+
+
+REPEAT                                  WHILE TRUE DO
+    stmt01                      =>          stm01;
+UNTIL cond                                  IF cond THEN EXIT END;
+END;                                    END;
+
+
+FOR stmt01 TO cond DO                   stmt01
+    stmt02;                     =>      WHILE cond DO
+END                                         stmt02;
+                                        END;
+
+
+FOR y := 0 TO y < x DO                  y := 0;
+    readInt(w);                 =>      WHILE y < x DO
+    v := v + (w * (y+1))                    readInt(w)
+END;                                        v := v + (w * (y+1));
+                                        END;
+
+
+FOR x IN min_val..max_val DO           x := min_val
+    stmt01;                     =>     WHILE x < max_val DO
+END;                                        stmt01;
+                                            x := x + 1
+                                       END;
+
+
+
+==================== Estruturas de condicionais ====================
+
+
+CASE cond ...                           IF cond == case01 THEN
+    case01: ...                 =>          ...
+|   case02: ...                         ELSE
+| case03: ...                               IF cond == case02 THEN
+                                                ...
+                                            ELSE cond == case03
+                                                ...
+                                            END;
+                                        END;
+
+
+IF cond01 THEN                          IF cond01 THEN
+    stmt01                                  stm01
+ELSIF cond02                            ELSE
+    stmt02                                  IF cond02 THEN
+ELSE cond03                     =>              stmt02
+    stmt03                                  ELSE cond03
+END                                             stmt03
+                                            END;
+                                        END;
