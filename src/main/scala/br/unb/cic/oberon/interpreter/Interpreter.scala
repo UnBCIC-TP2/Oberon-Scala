@@ -1,7 +1,6 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-import scala.util.control.Breaks._
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
@@ -25,9 +24,9 @@ import scala.io.StdIn
 class Interpreter extends OberonVisitorAdapter {
   type T = Unit
 
+  var exit = false
   val env = new Environment[Expression]()
   var printStream : PrintStream = new PrintStream(System.out)
-  var exit = false
 
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
@@ -68,7 +67,7 @@ class Interpreter extends OberonVisitorAdapter {
     // of a sequence of stmts. Whenever we achieve a
     // return stmt, we associate in the local variables
     // the name "return" to the return value.
-    if (env.lookup(Values.ReturnKeyWord).isDefined) {
+    if (exit || env.lookup(Values.ReturnKeyWord).isDefined) {
       return
     }
     // otherwise, we pattern-match on the current stmt.
@@ -83,7 +82,7 @@ class Interpreter extends OberonVisitorAdapter {
         }
       }
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
-      case SequenceStmt(stmts) => breakable {stmts.foreach(s => if(!exit) s.accept(this) else break)}
+      case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
       case WriteStmt(exp) => printStream.println(evalExpression(exp))
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
@@ -91,11 +90,10 @@ class Interpreter extends OberonVisitorAdapter {
       case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
       case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
+      case LoopStmt(stmt) => while(!exit) { stmt.accept(this) }; exit = false
+      case ExitStmt() => exit = true
       case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
-      case LoopStmt(block) => while (!exit) block.accept(this); exit = false
-      case ExitStmt() => exit = true
-      
       case ProcedureCallStmt(name, args) =>
         // we evaluate the "args" in the current
         // environment.

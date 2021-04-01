@@ -14,7 +14,7 @@ class InterpreterTest extends AnyFunSuite {
   interpreter.setTestEnvironment()
 
   test("Testing interpreter on interpreter_stmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").toURI)
 
     assert(path != null)
 
@@ -32,7 +32,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").toURI)
 
     assert(path != null)
 
@@ -49,7 +49,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial02.oberon").toURI)
 
     assert(path != null)
 
@@ -66,7 +66,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial03.oberon").toURI)
 
     assert(path != null)
 
@@ -83,7 +83,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci01.oberon").toURI)
 
     assert(path != null)
 
@@ -99,7 +99,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt02.oberon").toURI)
 
     assert(path != null)
 
@@ -116,7 +116,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt03.oberon").toURI)
 
     assert(path != null)
 
@@ -133,7 +133,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt04.oberon").toURI)
 
     assert(path != null)
 
@@ -150,7 +150,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt05.oberon").toURI)
 
     assert(path != null)
 
@@ -167,7 +167,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt06.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt06.oberon").toURI)
 
     assert(path != null)
 
@@ -184,7 +184,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt07.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt07.oberon").toURI)
 
     assert(path != null)
 
@@ -201,7 +201,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_fibonacci02.oberon").toURI)
 
     assert(path != null)
 
@@ -216,7 +216,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial04.oberon").toURI)
 
     assert(path != null)
 
@@ -233,7 +233,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt08.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt08.oberon").toURI)
 
     assert(path != null)
 
@@ -250,7 +250,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt09 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt09.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt09.oberon").toURI)
 
     assert(path != null)
 
@@ -267,7 +267,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
 
     assert(path != null)
 
@@ -283,7 +283,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt02.oberon").toURI)
 
     assert(path != null)
 
@@ -299,7 +299,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
 
     assert(path != null)
 
@@ -315,7 +315,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt04.oberon").toURI)
 
     assert(path != null)
 
@@ -331,7 +331,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
 
     assert(path != null)
 
@@ -347,7 +347,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt06.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt06.oberon").toURI)
 
     assert(path != null)
 
@@ -363,7 +363,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt07.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt07.oberon").toURI)
 
     assert(path != null)
 
@@ -379,7 +379,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").toURI)
 
     assert(path != null)
 
@@ -395,7 +395,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").toURI)
 
     assert(path != null)
 
@@ -412,7 +412,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt02.oberon").toURI)
 
     assert(path != null)
 
@@ -429,7 +429,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt03 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt03.oberon").toURI)
 
     assert(path != null)
 
@@ -445,7 +445,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt04.oberon").toURI)
 
     assert(path != null)
 
@@ -461,7 +461,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt05.oberon").toURI)
 
     assert(path != null)
 
@@ -477,7 +477,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
     assert(path != null)
 
@@ -493,7 +493,7 @@ class InterpreterTest extends AnyFunSuite {
   }
   
   test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").toURI)
 
     assert(path != null)
 
@@ -509,7 +509,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt08.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt08.oberon").toURI)
 
     assert(path != null)
 
@@ -525,7 +525,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing LoopStmt stmt on loop_stmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
     assert(path != null)
 
@@ -539,7 +539,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing LoopStmt stmt on loop_stmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI)
 
     assert(path != null)
 
@@ -551,6 +551,21 @@ class InterpreterTest extends AnyFunSuite {
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(6)))
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
+  }
+
+  test("Testing LoopStmt stmt on loop_stmt03 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "LoopStmt")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(10)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(100)))
   }
 
   test("stmt35") {

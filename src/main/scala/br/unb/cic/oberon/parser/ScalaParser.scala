@@ -295,7 +295,7 @@ class ParserVisitor {
     override def visitIfElseStmt(ctx: OberonParser.IfElseStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
-      ctx.expression().accept(visitor)
+      ctx.cond.accept(visitor)
       val condition = visitor.exp
 
       ctx.thenStmt.accept(this)
@@ -307,6 +307,16 @@ class ParserVisitor {
       } else None
 
       stmt = IfElseStmt(condition, thenStmt, elseStmt)
+    }
+
+    override def visitLoopStmt(ctx: OberonParser.LoopStmtContext): Unit = {
+      ctx.stmt.accept(this)
+      val block = stmt
+      stmt = LoopStmt(block)
+    }
+
+    override def visitExitStmt(ctx: OberonParser.ExitStmtContext): Unit = {
+      stmt = ExitStmt()
     }
 
     override def visitIfElseIfStmt(ctx: OberonParser.IfElseIfStmtContext): Unit = {
@@ -432,18 +442,6 @@ class ParserVisitor {
       ctx.exp.accept(visitor)
       stmt = ReturnStmt(visitor.exp)
     }
-
-    override def visitLoopStmt(ctx: OberonParser.LoopStmtContext): Unit = {
-        ctx.stmt.accept(this)
-        val block = stmt
-
-        stmt = LoopStmt(block)
-    }
-
-    override def visitExitStmt(ctx: OberonParser.ExitStmtContext): Unit = {
-      stmt = ExitStmt()
-    }
-
   }
 
   class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {
