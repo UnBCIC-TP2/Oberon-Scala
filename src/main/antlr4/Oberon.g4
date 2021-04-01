@@ -5,7 +5,11 @@ compilationUnit
   ;  
 
 declarations
-  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  : ('IMPORT' impt+) ? ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  ;
+
+impt
+  : (nameImport += Id (',' nameImport += Id)*) ';'
   ;
 
 userTypeDeclaration
@@ -107,7 +111,7 @@ TRUE  : 'True' ;
 FALSE : 'False'  ;
 
 
-Id : CharDef (CharDef | Digit | '_')* ;
+Id : CharDef (CharDef | Digit | '_' | '.')* ;
 
 fragment CharDef
   : ('a'..'z') | ('A' .. 'Z')

@@ -1,0 +1,4 @@
+MODULE soma;
+    CONST x := 1;
+    write(x);
+END soma.

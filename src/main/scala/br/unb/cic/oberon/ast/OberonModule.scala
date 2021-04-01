@@ -1,9 +1,12 @@
 package br.unb.cic.oberon.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
+import br.unb.cic.oberon.environment.Environment
+import scala.util.Either
 
 /* Abstract representation of an Oberon Module */
 case class OberonModule(name: String,
+                        impt: List[Module], /* map */
                         userTypes: List[UserDefinedType],
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
@@ -28,6 +31,19 @@ case class Procedure(name: String,
 case class FormalArg(name: String, argumentType: Type) {
   def accept(v: OberonVisitor) = v.visit(this)
 }
+
+//case class FormalArg(name: String, argumentType: Type ou UserDefinedType)
+/*
+case class FormalArg(name: String, argumentType: Either[Type:UserDefinedType]) {
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+*/
+
+/* Imports */
+case class Import(name: String){
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+
 
 /* Constant definition */
 case class Constant(name: String, exp: Expression) {
