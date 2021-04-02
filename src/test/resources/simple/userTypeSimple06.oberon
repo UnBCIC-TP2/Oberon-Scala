@@ -1,0 +1,13 @@
+MODULE test_ando;
+
+TYPE
+    cheesewithbread = ARRAY 10 OF INTEGER
+
+    cheesewithoutbread = RECORD
+        var1 : INTEGER;
+        var2 : cheesewithbread
+    END
+
+    cheesewithhalfabread =  ARRAY 100000 OF cheesewithoutbread 
+
+END test_ando.

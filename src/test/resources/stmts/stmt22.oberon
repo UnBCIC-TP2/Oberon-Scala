@@ -1,0 +1,26 @@
+MODULE CaseCaseModule
+
+VAR
+  x : INTEGER;
+
+BEGIN
+  readInt(x);
+
+  CASE x OF:
+    1 .. 10:
+      CASE x OF:
+        1 .. 5:
+          x := 5
+        | 6 .. 10:
+          x := 10
+      END
+      
+    |11 .. 20:
+      x := x * 2
+  END;
+
+  write(x)
+
+END
+
+END CaseCaseModule.

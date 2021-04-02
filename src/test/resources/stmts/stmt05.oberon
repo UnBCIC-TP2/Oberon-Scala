@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  
+BEGIN
+ x := 5;
+ y := 100;
+ WHILE(x < y) DO
+   x := x * x
+ END;
+ write(x)
+END
+
+END SimpleModule.

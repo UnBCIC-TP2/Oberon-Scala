@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+CONST
+  x = 5 + 10 * 3;
+  y = 5 + 10 * 3 / 5;
+
+VAR
+  abc : INTEGER;
+  def : BOOLEAN;
+
+END SimpleModule.
