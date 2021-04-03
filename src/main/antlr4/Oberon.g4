@@ -2,14 +2,18 @@ grammar Oberon;
 
 compilationUnit
   : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
-  ;  
+  ;
 
 declarations
-  : ('IMPORT' impt+) ? ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  : ('IMPORT' impt)? ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
   ;
 
 impt
-  : (nameImport += Id (',' nameImport += Id)*) ';'
+  : (nameImport += imptAliased (',' nameImport += imptAliased)*) ';'
+  ;
+
+imptAliased
+  : name = Id (':=' alias = Id)?
   ;
 
 userTypeDeclaration
@@ -22,15 +26,15 @@ constant
   ;
 
 varDeclaration
-  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
-  ; 
+  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'
+  ;
 
 procedure :
   'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
     declarations    // NOTE: This might support nested procedures
     block
    Id
-  ; 
+  ;
 
 formals
  : formalArg (',' formalArg)*
@@ -39,25 +43,25 @@ formals
 arguments
  : expression (',' expression)*
  ;
- 
-formalArg 
- : (args += Id (',' args += Id)*) ':' argType = oberonType 
+
+formalArg
+ : (args += Id (',' args += Id)*) ':' argType = oberonType
  ; // TODO: we should also support VarBased formal arguments.
- 
+
 block
  : 'BEGIN' statement 'END'
- ; 
-    
+ ;
+
 expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
- | boolValue                                                                              #BooleanValue 
+ | boolValue                                                                              #BooleanValue
  | name = Id                                                                              #Variable
  | name = Id '(' arguments? ')'                                                           #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
- | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
- | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
+ | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
+ | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
 
  ;
@@ -88,11 +92,11 @@ statement
 caseAlternative
  : cond = expression ':' stmt = statement                       #SimpleCase
  | min = expression '..' max = expression ':' stmt = statement  #RangeCase
- ; 
+ ;
 
 elseIfStmt : cond = expression 'THEN' stmt = statement ;
 
-// TODO: NOT, MOD, Relational operators, 
+// TODO: NOT, MOD, Relational operators,
 // <assoc=right> expr '::' expr
 
 intValue : INT ;

@@ -41,7 +41,7 @@ class ParserVisitor {
 
   def visitCompilationUnit(ctx: OberonParser.CompilationUnitContext): Unit = {
     val name = ctx.name
-    val imports = ctx.declarations().impt().asScala.toList.map(i => visitImport(i))
+    val imports = visitImport(ctx.declarations().impt())
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
@@ -69,14 +69,20 @@ class ParserVisitor {
       None
     }
 
-  def visitImport(ctx: OberonParser.ImptContext) = {
-    if(ctx != null){
-      /* comeca a compilar o programa importado */
-      val name = ctx
-      Import(name)
+  def visitImport(ctx: OberonParser.ImptContext): Map[String, String] = {
+    if (ctx != null) {
+      val entries = ctx.nameImport.asScala.toList.map(i => visitImportAliased(i))
+      Map.from(entries)
+    } else {
+      Map.empty
     }
-    else{
-      None
+  }
+
+  def visitImportAliased(i: OberonParser.ImptAliasedContext) = {
+    if (i.alias == null) {
+      i.name.getText -> i.name.getText
+    } else {
+      i.alias.getText -> i.name.getText
     }
   }
 

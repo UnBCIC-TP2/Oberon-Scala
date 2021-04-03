@@ -25,6 +25,7 @@ class Environment[T] {
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
+  private val modules = Map.empty[String, OberonModule]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 

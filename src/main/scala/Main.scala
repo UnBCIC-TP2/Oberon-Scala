@@ -1,5 +1,7 @@
+import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.interpreter.Interpreter
+
 object Main extends App {
-  println("Hello, World!")
 
   // https://stackoverflow.com/a/55032051
   def pprint(obj: Any, depth: Int = 0, paramName: Option[String] = None): Unit = {
@@ -22,13 +24,19 @@ object Main extends App {
 
   val content = """
   MODULE import1;
-      IMPORT soma;
-      write(x);
+  IMPORT Texts := T, Oberon, Oberon;
+
+  VAR
+    x: INTEGER;
+
+  BEGIN
+    x := 0
+  END
   END import1.
   """
 
   val module = ScalaParser.parse(content)
-  // pprint(module)
+  pprint(module)
 
   // val tc = new TypeChecker
   // val errors = tc.visit(module)
@@ -37,7 +45,5 @@ object Main extends App {
   val interpreter = new Interpreter
 
   module.accept(interpreter)
-  // pprint(interpreter.env.lookup("x")) // 6
-  // pprint(interpreter.env.lookup("factorial")) // 120
 
 }
