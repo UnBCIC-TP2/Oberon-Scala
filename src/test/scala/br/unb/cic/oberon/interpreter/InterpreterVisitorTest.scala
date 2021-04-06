@@ -9,7 +9,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class InterpreterVisitorTest extends AnyFunSuite{
 
   test("Test interpreter on stmt05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt05.oberon").toURI)
 
     assert(path != null)
 
@@ -26,7 +26,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
   }
 
   test("Test eval on factorial module") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").toURI)
 
     assert(path != null)
 
