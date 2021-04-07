@@ -1,0 +1,17 @@
+MODULE SimpleModule;
+
+VAR
+  x, y : INTEGER;
+
+BEGIN
+	y := 1;
+    FOR x := 4 TO x > 1 DO
+      CASE x OF
+        1..4: y := y * x
+      END;
+      x := x - 1
+    END;
+    write(y)
+END
+
+END SimpleModule.

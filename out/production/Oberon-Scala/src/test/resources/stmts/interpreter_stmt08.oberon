@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+
+VAR
+  x, z : INTEGER;
+
+BEGIN
+    x := 2;
+    z := 10;
+
+    CASE x OF
+        2: x := 50 - 100
+       |2: x := 9
+    ELSE x := 25
+
+    END
+END
+
+END SimpleModule.

@@ -1,0 +1,11 @@
+MODULE ExpressionNameModule;
+
+VAR
+  result: INTEGER;
+
+BEGIN
+  result := list1.head + list2.tail.head;
+  write(result)
+END
+
+END ExpressionNameModule.

@@ -1,0 +1,21 @@
+MODULE SimpleModule;
+
+VAR
+  xs : INTEGER;
+
+BEGIN
+  readInt(xs);
+
+  CASE xs OF
+      1: xs := 5
+    | 2: xs := 10
+    | 3: xs := 20
+    | 4: xs := 40
+    ELSE xs := 0
+  END;
+
+  write(xs)
+
+END
+
+END SimpleModule.

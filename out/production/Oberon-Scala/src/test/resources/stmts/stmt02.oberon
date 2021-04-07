@@ -1,0 +1,15 @@
+MODULE SimpleModule;
+  
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  z : INTEGER;
+
+BEGIN
+ readInt(x);
+ readInt(y);
+ z := x + y;
+ write(z)
+END
+
+END SimpleModule.

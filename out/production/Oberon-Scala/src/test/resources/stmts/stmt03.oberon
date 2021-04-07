@@ -1,0 +1,15 @@
+MODULE SimpleModule;
+  
+VAR
+  x : INTEGER;
+  max : INTEGER; 
+BEGIN
+ readInt(x);
+ readInt(max);
+ IF(x > max) THEN
+   max := x 
+ END; 
+ write(max)
+END
+
+END SimpleModule.

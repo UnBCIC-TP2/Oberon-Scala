@@ -1,0 +1,16 @@
+MODULE UserTypeModule;
+
+TYPE
+    simple = ARRAY 10 OF INTEGER
+
+    complicated = RECORD
+        variable1 : INTEGER;
+        variable2 : BOOLEAN;
+        variable3 : simple
+    END
+
+VAR
+    x, y : simple;
+    z : complicated;
+
+END UserTypeModule.

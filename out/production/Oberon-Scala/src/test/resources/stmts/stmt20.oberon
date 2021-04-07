@@ -1,0 +1,26 @@
+MODULE ProcedureCaseModule
+
+VAR
+  x: INTEGER;
+
+PROCEDURE factorial(n: INTEGER) : INTEGER;    
+  BEGIN
+    CASE n OF
+        0: RETURN 1
+      | 1: RETURN 1
+      ELSE
+        RETURN n * factorial(n - 1)
+    END;
+
+    RETURN n * factorial(n - 1)
+    
+ END fatorial;
+
+BEGIN
+  x := 5;
+
+  write(factorial(x))
+  
+END
+
+END ProcedureCaseModule.

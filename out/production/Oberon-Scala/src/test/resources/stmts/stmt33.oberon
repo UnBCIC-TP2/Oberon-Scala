@@ -1,0 +1,16 @@
+MODULE UserTypeModule;
+
+TYPE
+  sizes = ARRAY 5 OF INTEGER
+
+  shoes = RECORD
+    id: INTEGER;
+    sizes: sizes;
+    price: INTEGER;
+    stock: INTEGER;
+    limited: BOOLEAN;
+  END
+
+  shoes_array = ARRAY 50 OF shoes
+
+END UserTypeModule.

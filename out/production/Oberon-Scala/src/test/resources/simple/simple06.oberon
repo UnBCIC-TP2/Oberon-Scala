@@ -1,0 +1,10 @@
+MODULE SimpleModule;
+
+CONST
+  z = 5 + 10 * 3;
+
+VAR
+  abc : INTEGER;
+  def : BOOLEAN;
+
+END SimpleModule.

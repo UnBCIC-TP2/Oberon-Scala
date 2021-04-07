@@ -1,0 +1,15 @@
+MODULE SimpleModule;
+
+TYPE
+   arr = ARRAY 1 OF INTEGER
+VAR
+    a : arr;
+    n : INTEGER;
+    value : INTEGER;
+BEGIN
+    n := 5;
+    value := 12;
+    a[n + 1] := value
+END
+
+END SimpleModule.
