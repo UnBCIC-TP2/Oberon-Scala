@@ -79,9 +79,11 @@ object Main {
         //val cFilePath = conf.compile()(1) + "/" + module.name + ".c"
 
         //println("cFilePath = " + cFilePath)
-
-        val cPath = Paths.get(conf.compile()(1))
-
+        var cPath = Paths.get("")
+        if (conf.compile().length == 1) {
+          cPath = Paths.get("compiled.c")  // If path not provided, default path applied
+        } else cPath = Paths.get(conf.compile()(1))
+  
         val writer = Files.newBufferedWriter(cPath)
 
         writer.write(generatedCCode)
