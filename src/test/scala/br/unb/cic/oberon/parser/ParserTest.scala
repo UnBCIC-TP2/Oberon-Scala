@@ -1914,5 +1914,9 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
+  test("Testing the A and B oberon modules") {
+    val moduleA = ScalaParser.parseResource("import/A.oberon")
+    val moduleB = ScalaParser.parseResource("import/B.oberon")
 
+  }
 }
