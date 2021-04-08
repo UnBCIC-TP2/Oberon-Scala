@@ -8,12 +8,12 @@ import java.nio.file.{Files, Paths}
 
 class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
-  version("Oberon")
-  banner("""Interpretador Oberon""".stripMargin)
-  footer("\nFor all other tricks, consult the documentation!")
+  version("Oberon 0.1.1-SNAPSHOT")
+  banner("""Compiler and interpreter for Oberon""".stripMargin)
+  //footer("\nFor all other tricks, consult the documentation!")
 
   val tyc = opt[String](name = "typeChecker", short = 't', descr = "Check if the oberon code is correctly typed", argName = "Oberon program path")
-  val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path" )
+  val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path Oberon program path" )
   val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path")
 
   verify()
