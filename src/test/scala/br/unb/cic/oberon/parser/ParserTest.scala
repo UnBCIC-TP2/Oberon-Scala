@@ -1915,8 +1915,8 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the A and B oberon modules") {
-    val moduleA = ScalaParser.parseResource("import/A.oberon")
-    val moduleB = ScalaParser.parseResource("import/B.oberon")
+    val moduleA = ScalaParser.parseResource("imports/A.oberon")
+    val moduleB = ScalaParser.parseResource("imports/B.oberon")
 
   }
 }
