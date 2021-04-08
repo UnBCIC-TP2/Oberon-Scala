@@ -5,6 +5,6 @@ VAR
 
 BEGIN
     x := 1;
-END.
+END
 
 END A.

@@ -3,6 +3,6 @@ MODULE B;
 
 BEGIN
     write(A::x);
-END.
+END
 
 END B.
