@@ -15,11 +15,34 @@ object JVMCodeGenerator extends CodeGenerator {
     //TODO: next steps:
     //      (a) generate fields from variables (deadline: 13/04).
     //      (b) generate methods from procedures (27/04).
+    module.variables.filter(_.variableType == IntegerType).map {
+      case (intVar) => cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, intVar.name, "I", null, new Integer(0)).visitEnd();
+    }
+
     cw.visitEnd();
 
     Base64.getEncoder().encodeToString(cw.toByteArray);
   }
 
+  // def generateDeclarations(
+  //     variables: List[VariableDeclaration],
+  //     lineSpaces: Int = 2
+  // ): Doc = {
 
+    
+
+  //   val boolVariables = variables.filter(_.variableType == BooleanType).map {
+  //     case (boolVar) => Doc.text(boolVar.name)
+  //   }
+  //   val boolDeclaration =
+  //     if (boolVariables.nonEmpty)
+  //       formatLine(lineSpaces) + Doc.text("bool ") + Doc.intercalate(
+  //         Doc.comma + Doc.space,
+  //         boolVariables
+  //       ) + Doc.char(';') + Doc.line
+  //     else Doc.empty
+
+  //   intDeclaration + boolDeclaration
+  // }
 }
 
