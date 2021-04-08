@@ -19,9 +19,9 @@ object JVMCodeGenerator extends CodeGenerator {
       case (intVar) => cw.visitField(ACC_PUBLIC, intVar.name, "I", null, new Integer(0)).visitEnd();
     }
 
-    // module.variables.filter(_.variableType == BooleanType).map {
-    //   case (boolVar) => cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, boolVar.name, "Z", null, Boolean).visitEnd();
-    // }
+    module.variables.filter(_.variableType == BooleanType).map {
+      case (boolVar) => cw.visitField(ACC_PUBLIC, boolVar.name, "Z", null, false).visitEnd();
+    }
 
     cw.visitEnd();
 
