@@ -18,8 +18,8 @@ object JVMCodeGenerator extends CodeGenerator {
 
     cw.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
 
-    generateDeclarations(module.variables)
     generateConstants(module.constants)
+    generateDeclarations(module.variables)
 
     cw.visitEnd();
 
@@ -28,15 +28,12 @@ object JVMCodeGenerator extends CodeGenerator {
   }
 
   def generateDeclarations(variables: List[VariableDeclaration]): Unit = {
-
-    variables.filter(_.variableType == IntegerType).map {
-      case (intVar) => cw.visitField(ACC_PUBLIC, intVar.name, "I", null, new Integer(0)).visitEnd();
-    }
-
-    variables.filter(_.variableType == BooleanType).map {
-      case (boolVar) => cw.visitField(ACC_PUBLIC, boolVar.name, "Z", null, false).visitEnd();
-    }
-
+    variables.foreach((v : VariableDeclaration) =>
+      v.variableType match {
+        case IntegerType =>  cw.visitField(ACC_PUBLIC, v.name, "I", null, new Integer(0)).visitEnd()
+        case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
+      }
+    )
   }
 
   def generateConstants(constants: List[Constant]): Unit = {
