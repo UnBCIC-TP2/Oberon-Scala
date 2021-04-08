@@ -1,4 +1,0 @@
-MODULE import1;
-    IMPORT soma, sub;
-    write(x);
-END import1.
