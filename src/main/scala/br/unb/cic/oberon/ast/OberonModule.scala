@@ -25,7 +25,7 @@ case class Procedure(name: String,
 }
 
 /* formal argument definition */
-case class FormalArg(name: String, argumentType: Type) {
+case class FormalArg(name: String, argumentType: Type, reference: Boolean = False) {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
@@ -74,7 +74,6 @@ trait Statement {
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
-case class AssignmentByRefStmt(varName: String, exp: Expression) extends Statement
 case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
