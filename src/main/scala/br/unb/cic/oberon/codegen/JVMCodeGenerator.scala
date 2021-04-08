@@ -11,13 +11,17 @@ object JVMCodeGenerator extends CodeGenerator {
   override def generateCode(module: OberonModule): String = {
     val cw = new ClassWriter(0);
 
-    cw.visit(V1_5, ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE, module.name, null, "java/lang/Object", null);
+    cw.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
     //TODO: next steps:
     //      (a) generate fields from variables (deadline: 13/04).
     //      (b) generate methods from procedures (27/04).
     module.variables.filter(_.variableType == IntegerType).map {
-      case (intVar) => cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, intVar.name, "I", null, new Integer(0)).visitEnd();
+      case (intVar) => cw.visitField(ACC_PUBLIC, intVar.name, "I", null, new Integer(0)).visitEnd();
     }
+
+    // module.variables.filter(_.variableType == BooleanType).map {
+    //   case (boolVar) => cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, boolVar.name, "Z", null, Boolean).visitEnd();
+    // }
 
     cw.visitEnd();
 
