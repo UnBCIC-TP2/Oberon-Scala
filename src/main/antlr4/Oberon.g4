@@ -119,7 +119,7 @@ TRUE  : 'True' ;
 FALSE : 'False'  ;
 
 
-Id : CharDef (CharDef | Digit | '_' | '.')* ;
+Id : CharDef (CharDef | Digit | '_')* ;
 
 fragment CharDef
   : ('a'..'z') | ('A' .. 'Z')
