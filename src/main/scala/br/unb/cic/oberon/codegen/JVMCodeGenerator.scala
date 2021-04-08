@@ -7,25 +7,42 @@ import org.objectweb.asm.Opcodes._
 
 import java.util.Base64
 
+//TODO: next steps:
+//      (a) generate fields from variables (deadline: 13/04).
+//      (b) generate methods from procedures (27/04).
+
 object JVMCodeGenerator extends CodeGenerator {
+  val cw = new ClassWriter(0);
   override def generateCode(module: OberonModule): String = {
-    val cw = new ClassWriter(0);
+
 
     cw.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
-    //TODO: next steps:
-    //      (a) generate fields from variables (deadline: 13/04).
-    //      (b) generate methods from procedures (27/04).
-    module.variables.filter(_.variableType == IntegerType).map {
-      case (intVar) => cw.visitField(ACC_PUBLIC, intVar.name, "I", null, new Integer(0)).visitEnd();
-    }
 
-    module.variables.filter(_.variableType == BooleanType).map {
-      case (boolVar) => cw.visitField(ACC_PUBLIC, boolVar.name, "Z", null, false).visitEnd();
-    }
+    generateDeclarations(module.variables)
+    generateConstants(module.constants)
 
     cw.visitEnd();
 
     Base64.getEncoder().encodeToString(cw.toByteArray);
+    
+  }
+
+  def generateDeclarations(variables: List[VariableDeclaration]): Unit = {
+
+    variables.filter(_.variableType == IntegerType).map {
+      case (intVar) => cw.visitField(ACC_PUBLIC, intVar.name, "I", null, new Integer(0)).visitEnd();
+    }
+
+    variables.filter(_.variableType == BooleanType).map {
+      case (boolVar) => cw.visitField(ACC_PUBLIC, boolVar.name, "Z", null, false).visitEnd();
+    }
+
+  }
+
+  def generateConstants(constants: List[Constant]): Unit = {
+    constants.map {
+      case (constant) => cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(0)).visitEnd();
+    }
   }
 
   // def generateDeclarations(
