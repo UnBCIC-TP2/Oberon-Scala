@@ -56,14 +56,18 @@ expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
  | boolValue                                                                              #BooleanValue
- | name = Id                                                                              #Variable
- | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | name = qualifiedName                                                                   #Variable
+ | name = qualifiedName '(' arguments? ')'                                                #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ ;
 
+qualifiedName
+ : Id
+ | Id '::' Id
  ;
 
 statement
