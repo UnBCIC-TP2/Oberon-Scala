@@ -1856,9 +1856,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.userTypes.length == 1)
   }
 
-  ignore("Testing the oberon stmt34 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").toURI)
-
+  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
 
     assert(path != null)
 
@@ -1868,21 +1867,13 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "UserTypeModule")
 
-    assert(module.stmt.isDefined)
+    assert(!module.stmt.isDefined)
 
-    // assert that the main block contains a sequence of statements
-    module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
-      case _ => fail("we are expecting 4 stmt in the main block")
-    }
+    assert(module.userTypes.size == 5)
 
-    // now we can assume that the main block contains a sequence of stmts
-    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
-    val stmts = sequence.stmts
+    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
 
-    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("year"), "last"), IntValue(2019)))
-    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("year"), "actual"), IntValue(2020)))
-    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("year"), "next"), IntValue(2021)))
+    //TODO: add the new assets 
   }
 
   test("Testing the oberon recordAssignmentStmt03 code") {
