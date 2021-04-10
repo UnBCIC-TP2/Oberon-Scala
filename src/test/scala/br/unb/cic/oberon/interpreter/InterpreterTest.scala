@@ -398,4 +398,15 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
+  /*
+  test("B"){
+    val module = ScalaParser.parseResource("imports/B.oberon")
+
+    assert(module.name == "B")
+
+    module.accept(interpreter)
+    //assert(interpreter.env.lookup("x").isDefined)
+    //assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+  }
+  */
 }

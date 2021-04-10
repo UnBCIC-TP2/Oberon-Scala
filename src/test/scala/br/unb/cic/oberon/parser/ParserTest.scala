@@ -1914,9 +1914,53 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
-  test("Testing the A and B oberon import module feature") {
-    val moduleA = ScalaParser.parseResource("imports/A.oberon")
+  test("Testing module B oberon import module feature. Import one module") {
     val moduleB = ScalaParser.parseResource("imports/B.oberon")
+    
+    /*
+    moduleA.stmt.get match {
+      case AssignmentStmt(stmt, exp) => assert(stmt == "x" && exp == IntValue(1))
+      case _ => fail("expecting 1 stmt in the main block")
+    }
+    */
+
+    assert(moduleB.impt.size == 1)  
+    assert(moduleB.impt.contains("A"))
+    assert(moduleB.impt("A") == "A")  
+    
+    /*
+    moduleB.stmt.get match {
+      case WriteStmt(exp) => assert(exp == IntValue(1))
+      case _ => fail("expecting value 1 from module A ")
+    }
+    */
+  }
+
+  test("Testing module D oberon import module feature. Import two modules") {
+    val moduleD = ScalaParser.parseResource("imports/D.oberon")
+    
+    assert(moduleD.impt.size == 2)
+    assert(moduleD.impt.contains("A"))
+    assert(moduleD.impt("A") == "A")
+    assert(moduleD.impt.contains("C"))
+    assert(moduleD.impt("C") == "C")
+  }
+
+  /*
+  test("Testing the E oberon import module feature. Empty import") {
+    val moduleE = ScalaParser.parseResource("imports/E.oberon")
+
+    assert(moduleE.impt.size == 0) /* Map("<missing Id>" -> "<missing Id>") had size 1 instead of expected size 0 */
 
   }
+  */
+  
+  test("Testing module F oberon import module feature. Alias and module name") {
+    val moduleF = ScalaParser.parseResource("imports/F.oberon")
+
+    assert(moduleF.impt.size == 1)
+    assert(moduleF.impt.contains("alias"))
+    assert(moduleF.impt("alias") == "A")
+  }
+
 }

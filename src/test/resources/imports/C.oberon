@@ -1,10 +1,10 @@
-MODULE A;
+MODULE C;
 
 VAR
     x : INTEGER;
 
 BEGIN
-    x := 1
+    x := 2;
 END
 
-END A.
+END C.

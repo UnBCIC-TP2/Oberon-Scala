@@ -1,0 +1,8 @@
+MODULE F;
+    IMPORT A := alias;
+
+BEGIN
+    write(alias::x);
+END
+
+END F.

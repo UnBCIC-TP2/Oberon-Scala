@@ -33,6 +33,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
+    //module.impt.foreach(i => i.accept(this))
 
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
@@ -55,6 +56,10 @@ class Interpreter extends OberonVisitorAdapter {
 
   override def visit(procedure: Procedure): Unit = {
     env.declareProcedure(procedure)
+  }
+
+  override def visit(impt: Import): Unit = {
+    //env....
   }
 
   // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
