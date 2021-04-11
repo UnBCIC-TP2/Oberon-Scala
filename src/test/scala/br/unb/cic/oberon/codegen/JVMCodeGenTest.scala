@@ -19,6 +19,7 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
     assert(module.variables.size == 2)
+    assert(module.constants.size == 1)
 
     val codeGen = JVMCodeGenerator
 
