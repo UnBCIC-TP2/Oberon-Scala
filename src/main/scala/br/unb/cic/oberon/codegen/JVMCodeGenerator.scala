@@ -1,5 +1,7 @@
 package br.unb.cic.oberon.codegen
 
+import br.unb.cic.oberon.interpreter._
+
 import br.unb.cic.oberon.ast._
 
 import org.objectweb.asm._
@@ -37,8 +39,23 @@ object JVMCodeGenerator extends CodeGenerator {
   }
 
   def generateConstants(constants: List[Constant]): Unit = {
+    val interpreter = new Interpreter()
+
+    val visitor = new EvalExpressionVisitor(interpreter)
+
     constants.map {
-      case (constant) => cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(0)).visitEnd();
+      case (constant) => 
+        val v = constant.exp.accept(visitor)
+        v.isInstanceOf[IntValue] match {
+          case true => {
+            val value = v.asInstanceOf[IntValue].value
+            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(value)).visitEnd();
+          }
+          case false => {
+            val value = v.asInstanceOf[BoolValue].value
+            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
+          } 
+        }
     }
   }
 
