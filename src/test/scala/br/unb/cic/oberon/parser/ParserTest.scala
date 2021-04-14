@@ -1963,4 +1963,29 @@ class ParserTestSuite extends AnyFunSuite {
     assert(moduleF.impt("alias") == "A")
   }
 
+  test("Testing module G oberon import module feature. Two 'IMPORT's"){
+    val moduleG = ScalaParser.parseResource("imports/G.oberon")
+
+    assert(moduleG.impt.size == 1)
+    assert(moduleG.impt.contains("aliasA"))
+    assert(moduleG.impt("aliasA") == "A")
+
+    assert( !(moduleG.impt.contains("aliasC")) )
+    
+  }
+
+  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
+    val moduleH = ScalaParser.parseResource("imports/H.oberon")
+
+    assert(moduleH.impt.size == 3)
+    assert(moduleH.impt.contains("aliasA"))
+    assert(moduleH.impt("aliasA") == "A")
+
+    assert(moduleH.impt.contains("aliasC"))
+    assert(moduleH.impt("aliasC") == "C")
+
+    assert(moduleH.impt.contains("D"))
+    assert(moduleH.impt("D") == "D")
+  }
+
 }
