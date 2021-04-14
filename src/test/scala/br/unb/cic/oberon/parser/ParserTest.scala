@@ -1916,7 +1916,8 @@ class ParserTestSuite extends AnyFunSuite {
 
   test("Testing module B oberon import module feature. Import one module") {
     val moduleB = ScalaParser.parseResource("imports/B.oberon")
-    
+
+    // TODO: tirar esses comentários
     /*
     moduleA.stmt.get match {
       case AssignmentStmt(stmt, exp) => assert(stmt == "x" && exp == IntValue(1))
@@ -1924,10 +1925,9 @@ class ParserTestSuite extends AnyFunSuite {
     }
     */
 
-    assert(moduleB.impt.size == 1)  
-    assert(moduleB.impt.contains("A"))
-    assert(moduleB.impt("A") == "A")  
-    
+    val expectedImpt = Map("A" -> "A")
+    assert(moduleB.impt == expectedImpt)
+
     /*
     moduleB.stmt.get match {
       case WriteStmt(exp) => assert(exp == IntValue(1))
@@ -1938,14 +1938,15 @@ class ParserTestSuite extends AnyFunSuite {
 
   test("Testing module D oberon import module feature. Import two modules") {
     val moduleD = ScalaParser.parseResource("imports/D.oberon")
-    
-    assert(moduleD.impt.size == 2)
-    assert(moduleD.impt.contains("A"))
-    assert(moduleD.impt("A") == "A")
-    assert(moduleD.impt.contains("C"))
-    assert(moduleD.impt("C") == "C")
+
+    val expectedImpt = Map(
+      "A" -> "A",
+      "C" -> "C"
+    )
+    assert(moduleD.impt == expectedImpt)
   }
 
+  // TODO: Tirar esses comentários
   /*
   test("Testing the E oberon import module feature. Empty import") {
     val moduleE = ScalaParser.parseResource("imports/E.oberon")
@@ -1954,38 +1955,33 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
   */
-  
+
   test("Testing module F oberon import module feature. Alias and module name") {
     val moduleF = ScalaParser.parseResource("imports/F.oberon")
 
-    assert(moduleF.impt.size == 1)
-    assert(moduleF.impt.contains("alias"))
-    assert(moduleF.impt("alias") == "A")
+    val expectedImpt = Map("alias" -> "A")
+    assert(moduleF.impt == expectedImpt)
   }
 
-  test("Testing module G oberon import module feature. Two 'IMPORT's"){
+  // ignore() pq o G.oberon não existe ainda
+  ignore("Testing module G oberon import module feature. Two 'IMPORT's"){
     val moduleG = ScalaParser.parseResource("imports/G.oberon")
 
-    assert(moduleG.impt.size == 1)
-    assert(moduleG.impt.contains("aliasA"))
-    assert(moduleG.impt("aliasA") == "A")
-
-    assert( !(moduleG.impt.contains("aliasC")) )
-    
+    //! Igual ao teste do módulo F
+    val expectedImpt = Map("aliasA" -> "A")
+    assert(moduleG.impt == expectedImpt)
   }
 
-  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
+  // ignore() pq o H.oberon não existe ainda
+  ignore("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
     val moduleH = ScalaParser.parseResource("imports/H.oberon")
 
-    assert(moduleH.impt.size == 3)
-    assert(moduleH.impt.contains("aliasA"))
-    assert(moduleH.impt("aliasA") == "A")
-
-    assert(moduleH.impt.contains("aliasC"))
-    assert(moduleH.impt("aliasC") == "C")
-
-    assert(moduleH.impt.contains("D"))
-    assert(moduleH.impt("D") == "D")
+    val expectedImpt = Map(
+      "aliasA" -> "A",
+      "aliasC" -> "C",
+      "D" -> "D"
+    )
+    assert(moduleH.impt == expectedImpt)
   }
 
 }
