@@ -2292,5 +2292,17 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.isDefined)
   }
 
+  test("Testing the parser for simple expressions") {
+    val intValue1 = "1"
+    val sum = "x + 4"
+
+    val exp1 = ScalaParser.parseExpression(intValue1)
+    assert(exp1 == IntValue(1))
+
+    val exp2 = ScalaParser.parseExpression(sum)
+
+    assert(exp2 == AddExpression(VarExpression("x"), IntValue(4)))
+  }
+
 
 }

@@ -28,6 +28,22 @@ object ScalaParser {
     visitor.visitCompilationUnit(parser.compilationUnit())
     visitor.module
   }
+
+  def parseExpression(input: String): Expression = {
+    val charStream = new ANTLRInputStream(input)
+    val lexer = new OberonLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new OberonParser(tokens)
+
+    val expCtx = parser.expression();
+
+    val visitor = new ParserVisitor
+    val expVisitor = new visitor.ExpressionVisitor
+
+    expCtx.accept(expVisitor)
+
+    expVisitor.exp
+  }
 }
 
 class ParserVisitor {
