@@ -1,19 +1,23 @@
 grammar Oberon;
 
 compilationUnit
-  : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
+  : 'MODULE' name = Id ';' imports? declarations block? 'END' Id '.'
   ;
 
-declarations
-  : ('IMPORT' impt)? ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+imports
+  : 'IMPORT' imptList ';'
   ;
 
-impt
-  : (nameImport += imptAliased (',' nameImport += imptAliased)*) ';'
+imptList
+  : (impt += imptAliased (',' impt += imptAliased)*)
   ;
 
 imptAliased
   : name = Id (':=' alias = Id)?
+  ;
+
+declarations
+  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
   ;
 
 userTypeDeclaration

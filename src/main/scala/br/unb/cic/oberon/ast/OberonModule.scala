@@ -6,7 +6,7 @@ import scala.util.Either
 
 /* Abstract representation of an Oberon Module */
 case class OberonModule(name: String,
-                        impt: Map[String, String],
+                        impt: Map[String, String], // TODO: Map[String, OberonModule]
                         userTypes: List[UserDefinedType],
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
