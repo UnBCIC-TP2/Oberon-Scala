@@ -4,9 +4,12 @@ import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
+import scala.::
+import scala.collection.immutable.Nil.:::
 import scala.io.StdIn
 
 /**
@@ -25,7 +28,13 @@ class Interpreter extends OberonVisitorAdapter {
   type T = Unit
 
   val env = new Environment[Expression]()
+
+  var importList: List[String] = List()
+  //var importMap = Map[String, OberonModule]
   var printStream : PrintStream = new PrintStream(System.out)
+
+  // filepath of the current module in execution
+  private val filepath: String = ""
 
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
@@ -33,7 +42,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
-    //module.impt.foreach(i => i.accept(this))
+    module.impt.foreach(i => loadModule(i._2))
 
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
@@ -58,8 +67,16 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
-  override def visit(impt: Import): Unit = {
-    //env....
+  override def visit(module: Import): Unit = {
+    if (!importList.contains(module.name)) {
+      importList = importList :+ module.name
+
+      val content = ""
+      val importedModule = ScalaParser.parse(content)
+
+
+      env.modules += (module.name -> importedModule)
+    }
   }
 
   // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
@@ -104,6 +121,10 @@ class Interpreter extends OberonVisitorAdapter {
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
+  }
+
+  private def loadModule(module : String): Unit = {
+
   }
 
   private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {
