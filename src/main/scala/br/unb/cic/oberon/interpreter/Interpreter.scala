@@ -8,8 +8,6 @@ import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
-import scala.::
-import scala.collection.immutable.Nil.:::
 import scala.io.StdIn
 
 /**
@@ -35,6 +33,7 @@ class Interpreter extends OberonVisitorAdapter {
 
   // filepath of the current module in execution
   private val filepath: String = ""
+  private val filepathImports = List("$HOME/.oberon/std")
 
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
