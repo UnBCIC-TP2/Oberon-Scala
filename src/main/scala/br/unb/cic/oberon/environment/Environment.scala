@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType,Undef}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -21,11 +21,12 @@ import scala.collection.mutable.ListBuffer
  */
 class Environment[T] {
 
+  val modules = Map.empty[String, OberonModule]
+
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
-  // private val modules = Map.empty[String, OberonModule]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
