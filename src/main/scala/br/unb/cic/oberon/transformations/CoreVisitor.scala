@@ -37,15 +37,27 @@ class CoreVisitor extends OberonVisitorAdapter {
         case other => return IfElseStmt(elseIfStmt.head.condtion, elseIfStmt.head.thenStmt, coreIfElse(elseIfStmt.tail, elseStmt))
     }
 */
-    def coreStmts(stmts: List[Statement]): List[Statement] = {
+    def coreStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): List[Statement] = {
+
         val coreVisitor = new CoreVisitor()
-        var coreStmts = new ListBuffer[Statement]()
-        
-        for (i <- stmts) coreStmts += i.accept(coreVisitor)
 
-        return coreStmts.toList
+        if (!stmtsList.isEmpty){
+        // TODO: Fix type erasure that happens here. Could be a problem if head 
+        // is of made of something different than Statement 
+            if (stmtsList.head.isInstanceOf[List[Statement]]){
+                stmtsCore :: coreStmts(stmtsList.tail, stmtsCore)
+            }
+            else {
+                    stmtsCore += stmtsList.head.accept(coreVisitor)
+                    stmtsCore +: coreStmts(stmtsList.tail, stmtsCore)
+            }
+        }
+        else {
+            return Nil
+        }
+
+        return stmtsCore.toList
+
     }
-
-    
  
 }
