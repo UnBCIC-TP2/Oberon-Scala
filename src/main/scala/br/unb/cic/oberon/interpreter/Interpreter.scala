@@ -58,6 +58,10 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
+  override def visit(ffi: Ffi): Unit = {
+    env.declareFfi(ffi)
+  }
+
   // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
 
 
@@ -94,6 +98,11 @@ class Interpreter extends OberonVisitorAdapter {
       case ExitStmt() => exit = true
       case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
+      case FfiCallStmt(name, args) =>
+        val actualArguments = args.map(a => evalExpression(a))
+        env.push() 
+        visitFfiCall(name, actualArguments) // then we execute the ffi.
+        env.pop() 
       case ProcedureCallStmt(name, args) =>
         // we evaluate the "args" in the current
         // environment.
@@ -165,6 +174,21 @@ class Interpreter extends OberonVisitorAdapter {
     updateEnvironmentWithProcedureCall(procedure, args)
     procedure.stmt.accept(this)
   }
+
+  def visitFfiCall(name: String, args: List[Expression]): Unit = {
+    val ffi = env.findFfi(name)
+    updateEnvironmentWithFfiCall(ffi, args)
+
+    println("entrei")
+    //ffi.stmt.accept(this)
+  }
+
+  def updateEnvironmentWithFfiCall(ffi: Ffi, args: List[Expression]): Unit = {
+    ffi.args.map(formal => formal.name)
+      .zip(args)
+      .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+  }
+
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
     procedure.args.map(formal => formal.name)
@@ -238,7 +262,22 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
       val exp = visitFunctionCall(name, actualArguments)
       interpreter.env.pop()
       exp
+    } 
+    case ReturnFfiCallExpression(name, args) => {
+      val actualArguments = args.map(a => a.accept(this))
+      interpreter.env.push()
+      val exp = visitReturnFfiCall(name, actualArguments)
+      interpreter.env.pop()
+      exp
     }
+  }
+
+  def visitReturnFfiCall(name: String, args: List[Expression]): Expression = {
+    interpreter.visitFfiCall(name, args)
+
+    val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
+    assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
+    returnValue.get
   }
 
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {

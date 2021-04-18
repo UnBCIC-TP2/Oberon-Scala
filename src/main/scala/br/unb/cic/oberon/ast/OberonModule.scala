@@ -8,6 +8,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
+                        ffis: List[Ffi],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
@@ -23,6 +24,17 @@ case class Procedure(name: String,
                     ) {
   def accept(v: OberonVisitor) = v.visit(this)
 }
+
+case class Ffi(name: String,
+                     args: List[FormalArg],
+                     returnType: Option[Type],
+                     //constants: List[Constant],
+                     //variables: List[VariableDeclaration],
+                     //stmt: Statement
+                    ) {
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+
 
 /* formal argument definition */
 case class FormalArg(name: String, argumentType: Type) {
@@ -55,6 +67,7 @@ case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class VarExpression(name: String) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
+case class ReturnFfiCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
 case class NEQExpression(left:  Expression, right: Expression) extends Expression
 case class GTExpression(left:  Expression, right: Expression) extends Expression
@@ -79,6 +92,7 @@ case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
+case class FfiCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
 case class IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) extends Statement
 case class ElseIfStmt(condition: Expression, thenStmt: Statement) extends Statement

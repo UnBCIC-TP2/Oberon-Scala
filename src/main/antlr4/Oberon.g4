@@ -6,7 +6,7 @@ compilationUnit
   ;  
 
 declarations
-  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
+  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure* ? ffi*
   ;
 
 userTypeDeclaration
@@ -22,14 +22,15 @@ varDeclaration
   : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
   ; 
 
-// Foreign Function Interface
+// Foreign Function Interface ffi: 'FOREIGN 'lib = Id' IMPORT' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'; 
 ffi: 'FOREIGN IMPORT' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'; 
 
-procedure :
-  'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
+procedure 
+: 'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'       
     declarations    // NOTE: This might support nested procedures
     block
-   Id
+   Id                                                                                    
+  
   ; 
   
 
@@ -55,6 +56,7 @@ expression
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
  | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | name = Id '(' arguments? ')'                                                           #ReturnFfiCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
@@ -70,6 +72,7 @@ statement
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
+ | name = Id '(' arguments? ')'                                                                                               #FfiCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSIF' elsifs += elseIfStmt)+ ('ELSE' elseStmt = statement)? 'END'    #IfElseIfStmt
  | 'WHILE' cond = expression 'DO' stmt = statement 'END'                                                                      #WhileStmt

@@ -1,4 +1,4 @@
-MODULE Ffi;
+MODULE SimpleModule;
   
 VAR
   x : INTEGER;
@@ -11,4 +11,4 @@ BEGIN
  write(abs(n))
 END
 
-END Ffi.
+END SimpleModule.

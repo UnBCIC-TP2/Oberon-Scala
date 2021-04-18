@@ -2301,5 +2301,30 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.isDefined)
   }
 
+  // ffi tests
+
+  test("Testing abs stmt on c_functions01 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedure = module.ffis.head
+
+    assert(ffiProcedure.name == "abs")
+    assert(ffiProcedure.args.length == 1)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+    //assert(ffiProcedure.variables.length == 1)
+    //assert(ffiProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
+
+    //assert(module.variables.size == 2)
+    //assert(module.stmt.isDefined)
+  }
+
+
 
 }
