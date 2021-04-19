@@ -2318,12 +2318,45 @@ class ParserTestSuite extends AnyFunSuite {
     assert(ffiProcedure.name == "abs")
     assert(ffiProcedure.args.length == 1)
     assert(ffiProcedure.returnType == Some(IntegerType))
-    //assert(ffiProcedure.variables.length == 1)
-    //assert(ffiProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
 
-    //assert(module.variables.size == 2)
-    //assert(module.stmt.isDefined)
+    assert(module.variables.size == 4)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ansa", IntegerType))
+    assert(module.variables(3) == VariableDeclaration("ansb", IntegerType))
+
+    /*assert(module.stmt.isDefined)
+
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head == ReadIntStmt("a"))
+    assert(stmts(1) == ReadIntStmt("b"))*/
+
   }
+
+  test("Testing div stmt on c_functions02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedure = module.ffis.head
+
+    assert(ffiProcedure.name == "div")
+    assert(ffiProcedure.args.length == 2)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+  }
+
 
 
 

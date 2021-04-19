@@ -1,14 +1,16 @@
-MODULE SimpleModule;
+MODULE Ffi;
   
 VAR
-  x : INTEGER;
-  y : INTEGER;
+  a : INTEGER;
+  b : INTEGER;
+  ans : INTEGER 
 
-FOREIGN IMPORT abs(n: INTEGER): INTEGER;
+FOREIGN IMPORT div(a: INTEGER, b: INTEGER): INTEGER;
 
 BEGIN
- readInt(n);
- write(abs(n))
+ a := 6
+ b := 2
+ ans := div(a, b)
 END
 
-END SimpleModule.
+END Ffi.

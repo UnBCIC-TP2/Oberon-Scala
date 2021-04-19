@@ -1,14 +1,16 @@
 MODULE Ffi;
   
 VAR
-  x : INTEGER;
-  y : INTEGER;
+  a : INTEGER;
+  b : INTEGER;
+  ansa : INTEGER;
+  ansb : INTEGER;
 
 FOREIGN IMPORT abs(n: INTEGER): INTEGER;
 
 BEGIN
- readInt(n);
- write(abs(n))
+ readInt(a);
+ readInt(b);
 END
 
 END Ffi.

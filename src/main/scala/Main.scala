@@ -1,31 +1,29 @@
 import com.sun.jna._
 
-//import com.github.nadavwr.ffi._
-
  
 trait lib extends Library {
-  def open(path:String, flag:Int):Int
-  def close(fd:Int):Unit
-  def lseek(fildes:Int, offset:Long, whence:Int):Long
 
-  def ioctl(fd:Int, request:Int):Int
-  def ioctl(fd:Int, request:Int, args:Array[_]):Int
-  def ioctl(fd:Int, request:Int, ptr:Pointer):Int
-  def malloc(size:Int):Pointer
-  def calloc(nitems:Int, size:Int):Pointer
-  def free(ptr:Pointer):Unit
-
-  // nossas alterações
   def abs(n: Int): Int
-  def powf(a: Float, b: Float): Float
-  def max(a: Int, b: Int): Int
+  def div(numerator: Int, denominator: Int): Int
+  def isalnum(c: Int): Int
+  def isalpha(c: Int): Int
+  def isascii(c: Int): Int
+  def isblank(c: Int): Int 
+  def islower(c: Int): Int
+  def isprint(c: Int): Int 
+  def ispunct(c: Int): Int 
+  def isspace(c: Int): Int 
+  def isupper(c: Int): Int
+  def isxdigit(c: Int): Int 
+  def rand(): Int
+  def srand(seed: Int): Unit
 }
 
 object interface {
   private var _lib:lib = null
   def run():lib = {
     if ( _lib == null ) {
-      _lib = Native.loadLibrary("c++", classOf[lib]).asInstanceOf[lib]
+      _lib = Native.loadLibrary("c", classOf[lib]).asInstanceOf[lib]
     }
     _lib
   }
@@ -43,27 +41,50 @@ object interface {
 
 object Main extends App {
 
-/* libffi
-  val libc = Module.open("libc.so") // "libc.so" for Linux
-  val pow = libc.prepare[CInt, CInt, CInt]("pow")
-  val num = stackalloc[CInt]; !num = 10
-  val denom = stackalloc[CInt]; !denom = 4
-  val result = stackalloc[Cint]
-  pow(num, denom)(result) // last argument points to result
-    
-  println(s"pow(10, 4) = ${result})")
- end libffi */
-
-
 
 
   val ans1 = interface.run.abs(-100)
-  println(ans1)
+  println(ans1) 
 
-  val ans2 = interface.run.powf(2, -5)
+  val ans2 = interface.run.div(34, 3)
   println(ans2)
   
-  val d = interface.run.max(8, 4)
-  println(d)
+  val ans3 = interface.run.isalnum('-')
+  println(ans3)
+
+  val ans4 = interface.run.isalpha('b')
+  println(ans4)
+
+  val ans5 = interface.run.isascii('&')
+  println(ans5)
+
+  val ans6 = interface.run.isblank(' ')
+  println(ans6)
+
+  val ans7 = interface.run.islower('A')
+  println(ans7)
+
+  val ans8 = interface.run.isprint('a')
+  println(ans8)
+
+  val ans9 = interface.run.ispunct('.')
+  println(ans9)
+
+  val ans10 = interface.run.isspace('-')
+  println(ans10)
+
+  val ans11 = interface.run.isupper('l')
+  println(ans11)
+
+  val ans12 = interface.run.isxdigit('0')
+  println(ans12)
+
+  interface.run.srand(3423)
+
+  val ans13 = interface.run.rand()
+  println(ans13)
+
+ 
+ 
 }
 
