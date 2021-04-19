@@ -62,7 +62,7 @@ case class ArrayValue(v: List[Expression]) extends Value[List[Expression]](v)
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
-case class VarExpression(name: String) extends Expression
+case class VarExpression(name: QualifiedName) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
 case class NEQExpression(left:  Expression, right: Expression) extends Expression

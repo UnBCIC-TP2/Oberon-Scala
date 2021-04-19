@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.environment
 
 import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
-import br.unb.cic.oberon.parser.ModuleLoader
+import br.unb.cic.oberon.parser.{ModuleLoader, QualifiedName}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -22,31 +22,31 @@ import scala.collection.mutable.ListBuffer
  */
 class Environment[T](val modloader: ModuleLoader) {
 
-  private val global = Map.empty[String, T]
-  private val stack = Stack.empty[Map[String, T]]
-  private val procedures = Map.empty[String, Procedure]
-  private val userDefinedTypes = Map.empty[String, UserDefinedType]
+  private val global = Map.empty[QualifiedName, T]
+  private val stack = Stack.empty[Map[QualifiedName, T]]
+  private val procedures = Map.empty[QualifiedName, Procedure]
+  private val userDefinedTypes = Map.empty[QualifiedName, UserDefinedType]
 
-  private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
+  private val userArrayTypes = Map.empty[QualifiedName, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
+  def setGlobalVariable(name: QualifiedName, value: T) : Unit = global += name -> value
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
-    userDefinedTypes  += userDefinedTypeName(userType) -> userType
+    userDefinedTypes += userDefinedTypeName(userType) -> userType
     userType match {
       case ArrayType(name, length, variableType) => userArrayTypes += name -> ListBuffer.fill(length)(Undef())
       case _ => ???
     }
   }
 
-  def setLocalVariable(name: String, value: T) : Unit = {
+  def setLocalVariable(name: QualifiedName, value: T) : Unit = {
     if(stack.size == 0) {
-      stack.push(Map.empty[String, T])
+      stack.push(Map.empty[QualifiedName, T])
     }
     stack.top += name -> value
   }
 
-  def setVariable(name: String, value: T) : Unit = {
+  def setVariable(name: QualifiedName, value: T) : Unit = {
     if(!stack.isEmpty && stack.top.contains(name)) {
       setLocalVariable(name, value)
     }
@@ -56,36 +56,36 @@ class Environment[T](val modloader: ModuleLoader) {
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def lookup(name: String) : Option[T] = {
+  def lookup(name: QualifiedName) : Option[T] = {
     if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
     else None
   }
 
-  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
+  def reassignArray(name: QualifiedName, index: Int, value: Expression) : Unit = {
     if (userArrayTypes.contains(name)) {
       userArrayTypes(name).update(index, value)
     }
   }
 
-  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
+  def lookupArrayIndex(name: QualifiedName, index: Int) : Option[Expression] = {
     if (userArrayTypes.contains(name) && userArrayTypes(name).length > index) {
       Some(userArrayTypes(name)(index))
     }
     else None
   }
 
-  def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
+  def lookupUserDefinedType(name: QualifiedName) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 
-  def findProcedure(name: String): Procedure = procedures(name)
+  def findProcedure(name: QualifiedName): Procedure = procedures(name)
 
-  def push(): Unit = stack.push(Map.empty[String, T])
+  def push(): Unit = stack.push(Map.empty[QualifiedName, T])
 
   def pop(): Unit = stack.pop()
 
-  def userDefinedTypeName(userDefinedType: UserDefinedType) : String =
+  def userDefinedTypeName(userDefinedType: UserDefinedType) : QualifiedName =
      userDefinedType match {
          case ArrayType(name, _, _) => name
          case RecordType(name, _) => name
