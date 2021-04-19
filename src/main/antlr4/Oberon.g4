@@ -70,8 +70,7 @@ expression
  ;
 
 qualifiedName
- : Id
- | Id '::' Id
+ : (module = Id '::')? name = Id
  ;
 
 statement
