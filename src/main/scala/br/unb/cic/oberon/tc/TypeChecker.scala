@@ -3,6 +3,7 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
+import br.unb.cic.oberon.parser.ModuleLoader
 
 class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorAdapter {
   type T = Option[Type]
@@ -56,13 +57,15 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
   }
 }
 
-class TypeChecker extends OberonVisitorAdapter {
+class TypeChecker(val modloader: ModuleLoader = new ModuleLoader) extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
 
-  val env =  new Environment[Type]()
+  val env =  new Environment[Type](modloader)
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {
+    modloader.add(module)
+
     module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.map(p => env.declareProcedure(p))
@@ -108,7 +111,7 @@ class TypeChecker extends OberonVisitorAdapter {
       }
       else List((stmt, s"Expression $condition does not have a boolean type"))
   }
-  
+
   private def visitIfElseIfStmt(stmt: Statement) = stmt match {
     case IfElseIfStmt(condition, thenStmt, elseIfStmt, elseStmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)){

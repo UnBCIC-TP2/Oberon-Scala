@@ -7,6 +7,7 @@ import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import br.unb.cic.oberon.parser.ModuleLoader
 
 import scala.io.StdIn
 
@@ -22,26 +23,22 @@ import scala.io.StdIn
  * We assume the program is well-typed, otherwise,
  * a runtime exception might be thrown.
  */
-class Interpreter extends OberonVisitorAdapter {
+class Interpreter(val modloader: ModuleLoader = new ModuleLoader) extends OberonVisitorAdapter {
   type T = Unit
 
-  val env = new Environment[Expression]()
+  val env = new Environment[Expression](modloader)
 
-  var importList: List[String] = List()
-  //var importMap = Map[String, OberonModule]
   var printStream : PrintStream = new PrintStream(System.out)
 
-  // filepath of the current module in execution
-  private val filepath: String = ""
-  private val filepathImports = List("$HOME/.oberon/std")
-
   override def visit(module: OberonModule): Unit = {
+    modloader.add(module)
+
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
-    module.impt.foreach(i => loadModule(i._2))
+
 
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
@@ -64,18 +61,6 @@ class Interpreter extends OberonVisitorAdapter {
 
   override def visit(procedure: Procedure): Unit = {
     env.declareProcedure(procedure)
-  }
-
-  override def visit(module: Import): Unit = {
-    if (!importList.contains(module.name)) {
-      importList = importList :+ module.name
-
-      val content = ""
-      val importedModule = ScalaParser.parse(content)
-
-
-      env.modules += (module.name -> importedModule)
-    }
   }
 
   // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
@@ -120,10 +105,6 @@ class Interpreter extends OberonVisitorAdapter {
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
-  }
-
-  private def loadModule(module : String): Unit = {
-
   }
 
   private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {

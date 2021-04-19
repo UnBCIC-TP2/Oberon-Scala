@@ -35,20 +35,23 @@ object ScalaParser {
   }
 }
 
+case class QualifiedName(mod: String, name: String)
+
 class ParserVisitor {
 
   var module: OberonModule = _
+  var imptAliases = scala.collection.mutable.Map.empty[String, String] // Map[Module Alias, Module Name]
 
   def visitCompilationUnit(ctx: OberonParser.CompilationUnitContext): Unit = {
     val name = ctx.name
-    val imports = visitImport(ctx.imports())
+    val submodules = visitImport(ctx.imports())
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, imports, userTypes, constants, variables, procedures, block)
+    module = OberonModule(name.getText, submodules, userTypes, constants, variables, procedures, block)
   }
 
   /**
@@ -69,21 +72,22 @@ class ParserVisitor {
       None
     }
 
-  def visitImport(ctx: OberonParser.ImportsContext): Map[String, String] = {
+  def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
     if (ctx != null) {
-      val entries = ctx.imptList.impt.asScala.toList.map(i => visitImportAliased(i))
-      Map.from(entries)
+      val imports = ctx.imptList.impt.asScala.toList
+
+      imports.map(visitImportAlias _)
+
+      val submodules = imports.map(_.name.getText)
+      Set.from(submodules)
     } else {
-      Map.empty
+      Set.empty
     }
   }
 
-  def visitImportAliased(i: OberonParser.ImptAliasedContext) = {
-    if (i.alias == null) {
-      i.name.getText -> i.name.getText
-    } else {
-      i.alias.getText -> i.name.getText
-    }
+  def visitImportAlias(ctx: OberonParser.ImptAliasedContext) = {
+    if (ctx.alias != null)
+      imptAliases += ctx.alias.getText -> ctx.name.getText
   }
 
   /**
