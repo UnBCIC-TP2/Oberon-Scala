@@ -31,6 +31,7 @@ libraryDependencies += "org.scala-graph" %% "graph-dot" % "1.13.0"
 libraryDependencies += "org.scala-sbt.jline3" % "jline-terminal" % "3.16.0-sbt-211a082ed6326908dc84ca017ce4430728f18a8a"
 
 libraryDependencies += "org.ow2.asm" % "asm" % "9.1"
+libraryDependencies += "org.ow2.asm" % "asm-util" % "9.1"
 
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
 

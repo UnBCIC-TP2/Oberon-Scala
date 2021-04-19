@@ -1,0 +1,14 @@
+// class version 49.0 (49)
+// access flags 0x1
+public class SimpleModule {
+
+
+  // access flags 0x11
+  public final I x = 5
+
+  // access flags 0x1
+  public I abc = 0
+
+  // access flags 0x1
+  public Z def = false
+}
