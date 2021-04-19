@@ -14,11 +14,11 @@ class CoreVisitor extends OberonVisitorAdapter {
 
     override def visit(stmt: Statement): Statement = stmt match {
         // Laços de Repetição
-        
+
         case SequenceStmt(stmts) => SequenceStmt(coreStmts(stmts))
-        case LoopStmt(stmt) => WhileStmt(BoolValue(true), stmt)
-        case RepeatUntilStmt(condition, stmt) => WhileStmt(BoolValue(true), SequenceStmt(List(stmt, IfElseStmt(condition, ExitStmt(), None))))
-        case ForStmt(init, condition, block) => SequenceStmt(List(init, WhileStmt(condition, block))) // init = init_stmt
+        case LoopStmt(stmt) => WhileStmt(BoolValue(true), stmt.accept(this))
+        case RepeatUntilStmt(condition, stmt) => WhileStmt(BoolValue(true), SequenceStmt(List(stmt.accept(this), IfElseStmt(condition, ExitStmt(), None))))
+        case ForStmt(init, condition, block) => SequenceStmt(List(init, WhileStmt(condition, block.accept(this)))) // init = init_stmt
 
         // Condicionais
         case ElseIfStmt(condition, thenStmt) =>  IfElseStmt(condition, thenStmt, None) // É necessário?
@@ -30,34 +30,21 @@ class CoreVisitor extends OberonVisitorAdapter {
         case other => stmt
     }
 
-    //TODO
-/*
-    def coreIfElse(elseIfStmt: List[Statement], elseStmt: Option[Statement]): Statement = {
-        case elseIfStmt.tail.isEmpty => return IfElseStmt(elseIfStmt.head.condition, elseIfStmt.head.thenStmt, elseStmt)
-        case other => return IfElseStmt(elseIfStmt.head.condtion, elseIfStmt.head.thenStmt, coreIfElse(elseIfStmt.tail, elseStmt))
-    }
-*/
+
+    // TODO: change method name to more mnemonic name such as CoreVisitor.readListStmts()
     def coreStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): List[Statement] = {
 
-        val coreVisitor = new CoreVisitor()
-
         if (!stmtsList.isEmpty){
-        // TODO: Fix type erasure that happens here. Could be a problem if head 
-        // is of made of something different than Statement 
-            if (stmtsList.head.isInstanceOf[List[Statement]]){
-                stmtsCore :: coreStmts(stmtsList.tail, stmtsCore)
-            }
-            else {
-                    stmtsCore += stmtsList.head.accept(coreVisitor)
-                    stmtsCore +: coreStmts(stmtsList.tail, stmtsCore)
-            }
+            stmtsCore += stmtsList.head.accept(this); 
+            stmtsCore :: coreStmts(stmtsList.tail, stmtsCore)
         }
         else {
             return Nil
         }
 
         return stmtsCore.toList
-
     }
- 
+
+    // TODO: add entrypoint method to users such as CoreVisitor.transform() which receives the whole Module
+
 }
