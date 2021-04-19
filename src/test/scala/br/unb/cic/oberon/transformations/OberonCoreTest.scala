@@ -8,10 +8,10 @@ import java.nio.file.{Files, Paths}
 
 
 class CoreVisitorTest extends AnyFunSuite {
- /**  
-  * Nessa classe tem q ser testado se a transformacao foi correta e se apos a transformacao os valores foram computados corretamente.
-  * 
-  **/
+    /**  
+     * Nessa classe tem q ser testado se a transformacao foi correta 
+     * e se apos a transformacao os valores foram computados corretamente.
+    **/
     /**Loop Test01*/
     test("Testing the loop_stmt01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
@@ -212,7 +212,7 @@ class CoreVisitorTest extends AnyFunSuite {
         println(stmts(2))
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(0)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), AssignmentStmt("i",IntValue(0)), WhileStmt(BoolValue(true), SequenceStmt(List(AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), AssignmentStmt("i",AddExpression(VarExpression("i"),IntValue(1))), IfElseStmt(EQExpression(VarExpression("i"),IntValue(10)),ExitStmt(),None)))), IfElseStmt(EQExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None))))
+        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), AssignmentStmt("i",IntValue(0)), WhileStmt(BoolValue(true), SequenceStmt(List(AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), AssignmentStmt("i",AddExpression(VarExpression("i"),IntValue(1))), IfElseStmt(EQExpression(VarExpression("i"),IntValue(10)),ExitStmt(),None)))), IfElseStmt(EQExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None)))))
     }
 
 
