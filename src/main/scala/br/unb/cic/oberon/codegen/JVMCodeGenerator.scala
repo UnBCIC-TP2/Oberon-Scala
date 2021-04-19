@@ -46,15 +46,12 @@ object JVMCodeGenerator extends CodeGenerator {
     constants.map {
       case (constant) => 
         val v = constant.exp.accept(visitor)
-        v.isInstanceOf[IntValue] match {
-          case true => {
-            val value = v.asInstanceOf[IntValue].value
-            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(value)).visitEnd();
-          }
-          case false => {
-            val value = v.asInstanceOf[BoolValue].value
-            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
-          } 
+        if (v.isInstanceOf[IntValue]) {
+          val value = v.asInstanceOf[IntValue].value
+          cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(value)).visitEnd();
+        } else {
+          val value = v.asInstanceOf[BoolValue].value
+          cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, !(!value)).visitEnd();
         }
     }
   }
