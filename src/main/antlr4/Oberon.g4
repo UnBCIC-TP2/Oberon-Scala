@@ -6,7 +6,7 @@ compilationUnit
   ;  
 
 declarations
-  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure* 
+  : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
   ;
 
 userTypeDeclaration

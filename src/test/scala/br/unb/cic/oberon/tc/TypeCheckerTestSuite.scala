@@ -556,7 +556,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
    * factorial procedure.
    */
   test("Test invalid procedure declaration") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").toURI)
 
     assert(path != null)
 
@@ -711,7 +711,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   test("Test a loop statement, from loop_stmt03") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
     assert(path != null)
 
