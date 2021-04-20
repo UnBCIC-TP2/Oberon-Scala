@@ -39,7 +39,7 @@ object interface {
   val SEEK_END     =   2
 }
 
-object Main extends App {
+object External extends App {
 
 
 
