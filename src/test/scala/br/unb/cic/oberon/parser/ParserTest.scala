@@ -2325,18 +2325,18 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(2) == VariableDeclaration("ansa", IntegerType))
     assert(module.variables(3) == VariableDeclaration("ansb", IntegerType))
 
-    /*assert(module.stmt.isDefined)
+    assert(module.stmt.isDefined)
 
-    module.stmt.get match {
+    /*module.stmt.get match {
       case SequenceStmt(stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
-    }
+    }*/
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
     assert(stmts.head == ReadIntStmt("a"))
-    assert(stmts(1) == ReadIntStmt("b"))*/
+    assert(stmts(1) == ReadIntStmt("b"))
 
   }
 
@@ -2354,6 +2354,40 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(ffiProcedure.name == "div")
     assert(ffiProcedure.args.length == 2)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+  }
+
+  test("Testing isalnum stmt on c_functions03 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedure = module.ffis.head
+
+    assert(ffiProcedure.name == "isalnum")
+    assert(ffiProcedure.args.length == 1)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+  }
+
+  test("Testing isalpha stmt on c_functions04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedure = module.ffis.head
+
+    assert(ffiProcedure.name == "isalpha")
+    assert(ffiProcedure.args.length == 1)
     assert(ffiProcedure.returnType == Some(IntegerType))
   }
 

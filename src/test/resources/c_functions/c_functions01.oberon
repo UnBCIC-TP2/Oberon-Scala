@@ -11,6 +11,9 @@ FOREIGN IMPORT abs(n: INTEGER): INTEGER;
 BEGIN
  readInt(a);
  readInt(b);
+
+ ansa := abs(a)
+ ansb := abs(b)
 END
 
 END Ffi.

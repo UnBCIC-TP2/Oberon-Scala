@@ -1,0 +1,14 @@
+MODULE Ffi;
+  
+VAR
+  a : INTEGER;
+  ansa : INTEGER 
+
+FOREIGN IMPORT isalnum(a: INTEGER): INTEGER;
+
+BEGIN
+    readInt(a)
+    ansa := isalnum(a)
+END
+
+END Ffi.
