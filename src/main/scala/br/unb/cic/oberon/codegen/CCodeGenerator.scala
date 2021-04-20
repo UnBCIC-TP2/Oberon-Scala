@@ -12,7 +12,9 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       "#include <stdbool.h>"
     ) + Doc.line + Doc.line
     val procedureDocs = module.procedures.map {
-      case (procedure) => generateProcedure(procedure, lineSpaces)
+      case (procedure) => generateProcedure(procedure match {
+        case ProcedureDeclaration(_, _, _, _, _, _) => procedure.asInstanceOf[ProcedureDeclaration]
+      }, lineSpaces)
     }
     val mainProcedures =
       if (procedureDocs.nonEmpty)
@@ -38,7 +40,8 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
     main.render(60)
   }
 
-  def generateProcedure(procedure: Procedure, lineSpaces: Int = 2): Doc = {
+  def generateProcedure(procedure: ProcedureDeclaration, lineSpaces: Int = 2): Doc = {
+ 
     val returnType = procedure.returnType match {
       case Some(varType) => generateType(varType)
       case None          => Doc.text("void")

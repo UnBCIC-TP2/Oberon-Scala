@@ -19,12 +19,12 @@ case class EndNode() extends GraphNode
 //case class EndNode(label: Int) extends GraphNode
 
 trait ControlFlowGraphBuilder {
-  def createControlFlowGraph(procedure: Procedure): Graph[GraphNode, GraphEdge.DiEdge] // Graph
+  def createControlFlowGraph(procedure: ProcedureDeclaration): Graph[GraphNode, GraphEdge.DiEdge] // Graph
   def createControlFlowGraph(stmt: Statement): Graph[GraphNode, GraphEdge.DiEdge] // Graph
 }
 
 class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
-  override def createControlFlowGraph(procedure: Procedure): Graph[GraphNode, GraphEdge.DiEdge] = {
+  override def createControlFlowGraph(procedure: ProcedureDeclaration): Graph[GraphNode, GraphEdge.DiEdge] = {
     createControlFlowGraph(procedure.stmt)
   }
 

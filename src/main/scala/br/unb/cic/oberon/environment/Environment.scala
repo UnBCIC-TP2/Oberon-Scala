@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Ffi, RecordType, Type, UserDefinedType,Undef}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, ExternalProcedureDeclaration, ProcedureDeclaration, RecordType, Type, UserDefinedType,Undef}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -24,7 +24,6 @@ class Environment[T] {
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
-  private val ffis = Map.empty[String, Ffi]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
@@ -77,13 +76,13 @@ class Environment[T] {
 
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
-  def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
-
-  def declareFfi(ffi: Ffi): Unit = ffis(ffi.name) = ffi
+  def declareProcedure(procedure: Procedure): Unit = 
+    procedure match {
+      case ProcedureDeclaration(name, _, _, _, _, _) => procedures(name) = procedure
+      case ExternalProcedureDeclaration(name, _, _) => procedures(name) = procedure
+    }
 
   def findProcedure(name: String): Procedure = procedures(name)
-
-  def findFfi(name: String): Ffi = ffis(name)
 
   def push(): Unit = stack.push(Map.empty[String, T])
 

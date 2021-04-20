@@ -8,32 +8,28 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
-                        ffis: List[Ffi],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
 
-/* procedure declaration definition */
-case class Procedure(name: String,
-                     args: List[FormalArg],
-                     returnType: Option[Type],
-                     constants: List[Constant],
-                     variables: List[VariableDeclaration],
-                     stmt: Statement
-                    ) {
+trait Procedure {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
-case class Ffi(name: String,
-                     args: List[FormalArg],
-                     returnType: Option[Type],
-                     //constants: List[Constant],
-                     //variables: List[VariableDeclaration],
-                     //stmt: Statement
-                    ) {
-  def accept(v: OberonVisitor) = v.visit(this)
-}
+/* procedure declaration definition */
+case class ProcedureDeclaration(
+  name: String, 
+  args: List[FormalArg], 
+  returnType: Option[Type], 
+  constants: List[Constant], 
+  variables: List[VariableDeclaration], 
+  stmt: Statement) extends Procedure
+
+case class ExternalProcedureDeclaration(
+  name: String, 
+  args: List[FormalArg], 
+  returnType: Option[Type]) extends Procedure 
 
 
 /* formal argument definition */
@@ -67,7 +63,6 @@ case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class VarExpression(name: String) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
-case class ReturnFfiCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
 case class NEQExpression(left:  Expression, right: Expression) extends Expression
 case class GTExpression(left:  Expression, right: Expression) extends Expression
@@ -92,7 +87,6 @@ case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
-case class FfiCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
 case class IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) extends Statement
 case class ElseIfStmt(condition: Expression, thenStmt: Statement) extends Statement

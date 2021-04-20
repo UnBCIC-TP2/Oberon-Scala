@@ -26,16 +26,16 @@ public class OberonParser extends Parser {
 		T__52=53, INT=54, TRUE=55, FALSE=56, Id=57, WS=58, COMMENT=59, LINE_COMMENT=60;
 	public static final int
 		RULE_compilationUnit = 0, RULE_declarations = 1, RULE_userTypeDeclaration = 2, 
-		RULE_constant = 3, RULE_varDeclaration = 4, RULE_ffi = 5, RULE_procedure = 6, 
-		RULE_formals = 7, RULE_arguments = 8, RULE_formalArg = 9, RULE_block = 10, 
-		RULE_expression = 11, RULE_statement = 12, RULE_designator = 13, RULE_caseAlternative = 14, 
-		RULE_elseIfStmt = 15, RULE_intValue = 16, RULE_boolValue = 17, RULE_oberonType = 18;
+		RULE_constant = 3, RULE_varDeclaration = 4, RULE_procedure = 5, RULE_formals = 6, 
+		RULE_arguments = 7, RULE_formalArg = 8, RULE_block = 9, RULE_expression = 10, 
+		RULE_statement = 11, RULE_designator = 12, RULE_caseAlternative = 13, 
+		RULE_elseIfStmt = 14, RULE_intValue = 15, RULE_boolValue = 16, RULE_oberonType = 17;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"compilationUnit", "declarations", "userTypeDeclaration", "constant", 
-			"varDeclaration", "ffi", "procedure", "formals", "arguments", "formalArg", 
-			"block", "expression", "statement", "designator", "caseAlternative", 
-			"elseIfStmt", "intValue", "boolValue", "oberonType"
+			"varDeclaration", "procedure", "formals", "arguments", "formalArg", "block", 
+			"expression", "statement", "designator", "caseAlternative", "elseIfStmt", 
+			"intValue", "boolValue", "oberonType"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -43,8 +43,8 @@ public class OberonParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'MODULE'", "';'", "'END'", "'.'", "'TYPE'", "'CONST'", "'VAR'", 
-			"'='", "'ARRAY'", "'OF'", "'RECORD'", "','", "':'", "'FOREIGN IMPORT'", 
-			"'('", "')'", "'PROCEDURE'", "'BEGIN'", "'['", "']'", "'#'", "'<'", "'<='", 
+			"'='", "'ARRAY'", "'OF'", "'RECORD'", "','", "':'", "'PROCEDURE'", "'('", 
+			"')'", "'FOREIGN IMPORT'", "'BEGIN'", "'['", "']'", "'#'", "'<'", "'<='", 
 			"'>'", "'>='", "'*'", "'/'", "'&&'", "'+'", "'-'", "'||'", "':='", "'readInt'", 
 			"'write'", "'IF'", "'THEN'", "'ELSE'", "'ELSIF'", "'WHILE'", "'DO'", 
 			"'REPEAT'", "'UNTIL'", "'FOR'", "'TO'", "'IN'", "'..'", "'LOOP'", "'RETURN'", 
@@ -139,29 +139,29 @@ public class OberonParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(38);
+			setState(36);
 			match(T__0);
-			setState(39);
+			setState(37);
 			((CompilationUnitContext)_localctx).name = match(Id);
-			setState(40);
+			setState(38);
 			match(T__1);
-			setState(41);
+			setState(39);
 			declarations();
-			setState(43);
+			setState(41);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T__17) {
 				{
-				setState(42);
+				setState(40);
 				block();
 				}
 			}
 
-			setState(45);
+			setState(43);
 			match(T__2);
-			setState(46);
+			setState(44);
 			match(Id);
-			setState(47);
+			setState(45);
 			match(T__3);
 			}
 		}
@@ -182,12 +182,6 @@ public class OberonParser extends Parser {
 		}
 		public ProcedureContext procedure(int i) {
 			return getRuleContext(ProcedureContext.class,i);
-		}
-		public List<FfiContext> ffi() {
-			return getRuleContexts(FfiContext.class);
-		}
-		public FfiContext ffi(int i) {
-			return getRuleContext(FfiContext.class,i);
 		}
 		public List<UserTypeDeclarationContext> userTypeDeclaration() {
 			return getRuleContexts(UserTypeDeclarationContext.class);
@@ -218,108 +212,91 @@ public class OberonParser extends Parser {
 		enterRule(_localctx, 2, RULE_declarations);
 		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(55);
+			setState(53);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T__4) {
 				{
-				setState(49);
+				setState(47);
 				match(T__4);
-				setState(51); 
+				setState(49); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(50);
+					setState(48);
 					userTypeDeclaration();
 					}
 					}
-					setState(53); 
+					setState(51); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==Id );
 				}
 			}
 
-			setState(63);
+			setState(61);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T__5) {
 				{
-				setState(57);
+				setState(55);
 				match(T__5);
-				setState(59); 
+				setState(57); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(58);
+					setState(56);
 					constant();
 					}
 					}
-					setState(61); 
+					setState(59); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==Id );
 				}
 			}
 
-			setState(71);
+			setState(69);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T__6) {
 				{
-				setState(65);
+				setState(63);
 				match(T__6);
-				setState(67); 
+				setState(65); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(66);
+					setState(64);
 					varDeclaration();
 					}
 					}
-					setState(69); 
+					setState(67); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==Id );
 				}
 			}
 
-			setState(76);
-			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
-			while ( _alt!=1 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1+1 ) {
-					{
-					{
-					setState(73);
-					procedure();
-					}
-					} 
-				}
-				setState(78);
-				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
-			}
-			setState(82);
+			setState(74);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__13) {
+			while (_la==T__13 || _la==T__16) {
 				{
 				{
-				setState(79);
-				ffi();
+				setState(71);
+				procedure();
 				}
 				}
-				setState(84);
+				setState(76);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -377,25 +354,25 @@ public class OberonParser extends Parser {
 		enterRule(_localctx, 4, RULE_userTypeDeclaration);
 		int _la;
 		try {
-			setState(101);
+			setState(93);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
 			case 1:
 				_localctx = new ArrayTypeDeclarationContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(85);
+				setState(77);
 				((ArrayTypeDeclarationContext)_localctx).nameType = match(Id);
-				setState(86);
+				setState(78);
 				match(T__7);
 				{
-				setState(87);
+				setState(79);
 				match(T__8);
-				setState(88);
+				setState(80);
 				((ArrayTypeDeclarationContext)_localctx).length = match(INT);
-				setState(89);
+				setState(81);
 				match(T__9);
-				setState(90);
+				setState(82);
 				((ArrayTypeDeclarationContext)_localctx).vartype = oberonType();
 				}
 				}
@@ -404,29 +381,29 @@ public class OberonParser extends Parser {
 				_localctx = new RecordTypeDeclarationContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(91);
+				setState(83);
 				((RecordTypeDeclarationContext)_localctx).nameType = match(Id);
-				setState(92);
+				setState(84);
 				match(T__7);
 				{
-				setState(93);
+				setState(85);
 				match(T__10);
-				setState(95); 
+				setState(87); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(94);
+					setState(86);
 					((RecordTypeDeclarationContext)_localctx).varDeclaration = varDeclaration();
 					((RecordTypeDeclarationContext)_localctx).vars.add(((RecordTypeDeclarationContext)_localctx).varDeclaration);
 					}
 					}
-					setState(97); 
+					setState(89); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==Id );
-				setState(99);
+				setState(91);
 				match(T__2);
 				}
 				}
@@ -463,13 +440,13 @@ public class OberonParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(103);
+			setState(95);
 			((ConstantContext)_localctx).constName = match(Id);
-			setState(104);
+			setState(96);
 			match(T__7);
-			setState(105);
+			setState(97);
 			((ConstantContext)_localctx).exp = expression(0);
-			setState(106);
+			setState(98);
 			match(T__1);
 			}
 		}
@@ -509,100 +486,32 @@ public class OberonParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(108);
+			setState(100);
 			((VarDeclarationContext)_localctx).Id = match(Id);
 			((VarDeclarationContext)_localctx).vars.add(((VarDeclarationContext)_localctx).Id);
-			setState(113);
+			setState(105);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__11) {
 				{
 				{
-				setState(109);
+				setState(101);
 				match(T__11);
-				setState(110);
+				setState(102);
 				((VarDeclarationContext)_localctx).Id = match(Id);
 				((VarDeclarationContext)_localctx).vars.add(((VarDeclarationContext)_localctx).Id);
 				}
 				}
-				setState(115);
+				setState(107);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
 			}
-			setState(116);
+			setState(108);
 			match(T__12);
-			setState(117);
+			setState(109);
 			((VarDeclarationContext)_localctx).varType = oberonType();
-			setState(118);
-			match(T__1);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class FfiContext extends ParserRuleContext {
-		public Token name;
-		public OberonTypeContext procedureType;
-		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
-		public FormalsContext formals() {
-			return getRuleContext(FormalsContext.class,0);
-		}
-		public OberonTypeContext oberonType() {
-			return getRuleContext(OberonTypeContext.class,0);
-		}
-		public FfiContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_ffi; }
-	}
-
-	public final FfiContext ffi() throws RecognitionException {
-		FfiContext _localctx = new FfiContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_ffi);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(120);
-			match(T__13);
-			setState(121);
-			((FfiContext)_localctx).name = match(Id);
-			setState(122);
-			match(T__14);
-			setState(124);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==Id) {
-				{
-				setState(123);
-				formals();
-				}
-			}
-
-			setState(126);
-			match(T__15);
-			setState(129);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==T__12) {
-				{
-				setState(127);
-				match(T__12);
-				setState(128);
-				((FfiContext)_localctx).procedureType = oberonType();
-				}
-			}
-
-			setState(131);
+			setState(110);
 			match(T__1);
 			}
 		}
@@ -618,6 +527,17 @@ public class OberonParser extends Parser {
 	}
 
 	public static class ProcedureContext extends ParserRuleContext {
+		public ProcedureContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_procedure; }
+	 
+		public ProcedureContext() { }
+		public void copyFrom(ProcedureContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class ProcedureDeclarationContext extends ProcedureContext {
 		public Token name;
 		public OberonTypeContext procedureType;
 		public DeclarationsContext declarations() {
@@ -636,57 +556,113 @@ public class OberonParser extends Parser {
 		public OberonTypeContext oberonType() {
 			return getRuleContext(OberonTypeContext.class,0);
 		}
-		public ProcedureContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
+		public ProcedureDeclarationContext(ProcedureContext ctx) { copyFrom(ctx); }
+	}
+	public static class ExternalProcedureDeclarationContext extends ProcedureContext {
+		public Token name;
+		public OberonTypeContext procedureType;
+		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
+		public FormalsContext formals() {
+			return getRuleContext(FormalsContext.class,0);
 		}
-		@Override public int getRuleIndex() { return RULE_procedure; }
+		public OberonTypeContext oberonType() {
+			return getRuleContext(OberonTypeContext.class,0);
+		}
+		public ExternalProcedureDeclarationContext(ProcedureContext ctx) { copyFrom(ctx); }
 	}
 
 	public final ProcedureContext procedure() throws RecognitionException {
 		ProcedureContext _localctx = new ProcedureContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_procedure);
+		enterRule(_localctx, 10, RULE_procedure);
 		int _la;
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(133);
-			match(T__16);
-			setState(134);
-			((ProcedureContext)_localctx).name = match(Id);
-			setState(135);
-			match(T__14);
-			setState(137);
+			setState(140);
 			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==Id) {
+			switch (_input.LA(1)) {
+			case T__13:
+				_localctx = new ProcedureDeclarationContext(_localctx);
+				enterOuterAlt(_localctx, 1);
 				{
-				setState(136);
-				formals();
+				setState(112);
+				match(T__13);
+				setState(113);
+				((ProcedureDeclarationContext)_localctx).name = match(Id);
+				setState(114);
+				match(T__14);
+				setState(116);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==Id) {
+					{
+					setState(115);
+					formals();
+					}
 				}
-			}
 
-			setState(139);
-			match(T__15);
-			setState(142);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==T__12) {
+				setState(118);
+				match(T__15);
+				setState(121);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==T__12) {
+					{
+					setState(119);
+					match(T__12);
+					setState(120);
+					((ProcedureDeclarationContext)_localctx).procedureType = oberonType();
+					}
+				}
+
+				setState(123);
+				match(T__1);
+				setState(124);
+				declarations();
+				setState(125);
+				block();
+				setState(126);
+				match(Id);
+				}
+				break;
+			case T__16:
+				_localctx = new ExternalProcedureDeclarationContext(_localctx);
+				enterOuterAlt(_localctx, 2);
 				{
-				setState(140);
-				match(T__12);
-				setState(141);
-				((ProcedureContext)_localctx).procedureType = oberonType();
+				setState(128);
+				match(T__16);
+				setState(129);
+				((ExternalProcedureDeclarationContext)_localctx).name = match(Id);
+				setState(130);
+				match(T__14);
+				setState(132);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==Id) {
+					{
+					setState(131);
+					formals();
+					}
 				}
-			}
 
-			setState(144);
-			match(T__1);
-			setState(145);
-			declarations();
-			setState(146);
-			block();
-			setState(147);
-			match(Id);
+				setState(134);
+				match(T__15);
+				setState(137);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==T__12) {
+					{
+					setState(135);
+					match(T__12);
+					setState(136);
+					((ExternalProcedureDeclarationContext)_localctx).procedureType = oberonType();
+					}
+				}
+
+				setState(139);
+				match(T__1);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -715,26 +691,26 @@ public class OberonParser extends Parser {
 
 	public final FormalsContext formals() throws RecognitionException {
 		FormalsContext _localctx = new FormalsContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_formals);
+		enterRule(_localctx, 12, RULE_formals);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(149);
+			setState(142);
 			formalArg();
-			setState(154);
+			setState(147);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__11) {
 				{
 				{
-				setState(150);
+				setState(143);
 				match(T__11);
-				setState(151);
+				setState(144);
 				formalArg();
 				}
 				}
-				setState(156);
+				setState(149);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -766,26 +742,26 @@ public class OberonParser extends Parser {
 
 	public final ArgumentsContext arguments() throws RecognitionException {
 		ArgumentsContext _localctx = new ArgumentsContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_arguments);
+		enterRule(_localctx, 14, RULE_arguments);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(157);
+			setState(150);
 			expression(0);
-			setState(162);
+			setState(155);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__11) {
 				{
 				{
-				setState(158);
+				setState(151);
 				match(T__11);
-				setState(159);
+				setState(152);
 				expression(0);
 				}
 				}
-				setState(164);
+				setState(157);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -821,36 +797,36 @@ public class OberonParser extends Parser {
 
 	public final FormalArgContext formalArg() throws RecognitionException {
 		FormalArgContext _localctx = new FormalArgContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_formalArg);
+		enterRule(_localctx, 16, RULE_formalArg);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(165);
+			setState(158);
 			((FormalArgContext)_localctx).Id = match(Id);
 			((FormalArgContext)_localctx).args.add(((FormalArgContext)_localctx).Id);
-			setState(170);
+			setState(163);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__11) {
 				{
 				{
-				setState(166);
+				setState(159);
 				match(T__11);
-				setState(167);
+				setState(160);
 				((FormalArgContext)_localctx).Id = match(Id);
 				((FormalArgContext)_localctx).args.add(((FormalArgContext)_localctx).Id);
 				}
 				}
-				setState(172);
+				setState(165);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
 			}
-			setState(173);
+			setState(166);
 			match(T__12);
-			setState(174);
+			setState(167);
 			((FormalArgContext)_localctx).argType = oberonType();
 			}
 		}
@@ -877,15 +853,15 @@ public class OberonParser extends Parser {
 
 	public final BlockContext block() throws RecognitionException {
 		BlockContext _localctx = new BlockContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_block);
+		enterRule(_localctx, 18, RULE_block);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(176);
+			setState(169);
 			match(T__17);
-			setState(177);
+			setState(170);
 			statement(0);
-			setState(178);
+			setState(171);
 			match(T__2);
 			}
 		}
@@ -915,14 +891,6 @@ public class OberonParser extends Parser {
 		public Token name;
 		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
 		public VariableContext(ExpressionContext ctx) { copyFrom(ctx); }
-	}
-	public static class ReturnFfiCallContext extends ExpressionContext {
-		public Token name;
-		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
-		public ArgumentsContext arguments() {
-			return getRuleContext(ArgumentsContext.class,0);
-		}
-		public ReturnFfiCallContext(ExpressionContext ctx) { copyFrom(ctx); }
 	}
 	public static class BracketsContext extends ExpressionContext {
 		public ExpressionContext expression() {
@@ -1016,27 +984,27 @@ public class OberonParser extends Parser {
 		int _parentState = getState();
 		ExpressionContext _localctx = new ExpressionContext(_ctx, _parentState);
 		ExpressionContext _prevctx = _localctx;
-		int _startState = 22;
-		enterRecursionRule(_localctx, 22, RULE_expression, _p);
+		int _startState = 20;
+		enterRecursionRule(_localctx, 20, RULE_expression, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(200);
+			setState(187);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,21,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,20,_ctx) ) {
 			case 1:
 				{
 				_localctx = new BracketsContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(181);
+				setState(174);
 				match(T__14);
-				setState(182);
+				setState(175);
 				expression(0);
-				setState(183);
+				setState(176);
 				match(T__15);
 				}
 				break;
@@ -1045,7 +1013,7 @@ public class OberonParser extends Parser {
 				_localctx = new IntegerValueContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(185);
+				setState(178);
 				intValue();
 				}
 				break;
@@ -1054,7 +1022,7 @@ public class OberonParser extends Parser {
 				_localctx = new BooleanValueContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(186);
+				setState(179);
 				boolValue();
 				}
 				break;
@@ -1063,7 +1031,7 @@ public class OberonParser extends Parser {
 				_localctx = new VariableContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(187);
+				setState(180);
 				((VariableContext)_localctx).name = match(Id);
 				}
 				break;
@@ -1072,68 +1040,45 @@ public class OberonParser extends Parser {
 				_localctx = new FunctionCallContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(188);
+				setState(181);
 				((FunctionCallContext)_localctx).name = match(Id);
-				setState(189);
+				setState(182);
 				match(T__14);
-				setState(191);
+				setState(184);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__14) | (1L << INT) | (1L << TRUE) | (1L << FALSE) | (1L << Id))) != 0)) {
 					{
-					setState(190);
+					setState(183);
 					arguments();
 					}
 				}
 
-				setState(193);
-				match(T__15);
-				}
-				break;
-			case 6:
-				{
-				_localctx = new ReturnFfiCallContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(194);
-				((ReturnFfiCallContext)_localctx).name = match(Id);
-				setState(195);
-				match(T__14);
-				setState(197);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__14) | (1L << INT) | (1L << TRUE) | (1L << FALSE) | (1L << Id))) != 0)) {
-					{
-					setState(196);
-					arguments();
-					}
-				}
-
-				setState(199);
+				setState(186);
 				match(T__15);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(221);
+			setState(208);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,23,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,22,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(219);
+					setState(206);
 					_errHandler.sync(this);
-					switch ( getInterpreter().adaptivePredict(_input,22,_ctx) ) {
+					switch ( getInterpreter().adaptivePredict(_input,21,_ctx) ) {
 					case 1:
 						{
 						_localctx = new RelExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						((RelExpressionContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(202);
+						setState(189);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(203);
+						setState(190);
 						((RelExpressionContext)_localctx).opr = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__7) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24))) != 0)) ) {
@@ -1144,7 +1089,7 @@ public class OberonParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(204);
+						setState(191);
 						((RelExpressionContext)_localctx).right = expression(4);
 						}
 						break;
@@ -1153,9 +1098,9 @@ public class OberonParser extends Parser {
 						_localctx = new MultExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						((MultExpressionContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(205);
+						setState(192);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(206);
+						setState(193);
 						((MultExpressionContext)_localctx).opr = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__25) | (1L << T__26) | (1L << T__27))) != 0)) ) {
@@ -1166,7 +1111,7 @@ public class OberonParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(207);
+						setState(194);
 						((MultExpressionContext)_localctx).right = expression(3);
 						}
 						break;
@@ -1175,9 +1120,9 @@ public class OberonParser extends Parser {
 						_localctx = new AddExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						((AddExpressionContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(208);
+						setState(195);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(209);
+						setState(196);
 						((AddExpressionContext)_localctx).opr = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__28) | (1L << T__29) | (1L << T__30))) != 0)) ) {
@@ -1188,7 +1133,7 @@ public class OberonParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(210);
+						setState(197);
 						((AddExpressionContext)_localctx).right = expression(2);
 						}
 						break;
@@ -1197,11 +1142,11 @@ public class OberonParser extends Parser {
 						_localctx = new FieldAccessContext(new ExpressionContext(_parentctx, _parentState));
 						((FieldAccessContext)_localctx).exp = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(211);
+						setState(198);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-						setState(212);
+						setState(199);
 						match(T__3);
-						setState(213);
+						setState(200);
 						((FieldAccessContext)_localctx).name = match(Id);
 						}
 						break;
@@ -1210,22 +1155,22 @@ public class OberonParser extends Parser {
 						_localctx = new ArraySubscriptContext(new ExpressionContext(_parentctx, _parentState));
 						((ArraySubscriptContext)_localctx).arrayBase = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
-						setState(214);
+						setState(201);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
-						setState(215);
+						setState(202);
 						match(T__18);
-						setState(216);
+						setState(203);
 						((ArraySubscriptContext)_localctx).index = expression(0);
-						setState(217);
+						setState(204);
 						match(T__19);
 						}
 						break;
 					}
 					} 
 				}
-				setState(223);
+				setState(210);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,23,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,22,_ctx);
 			}
 			}
 		}
@@ -1336,14 +1281,6 @@ public class OberonParser extends Parser {
 		}
 		public ForRangeStmtContext(StatementContext ctx) { copyFrom(ctx); }
 	}
-	public static class FfiCallContext extends StatementContext {
-		public Token name;
-		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
-		public ArgumentsContext arguments() {
-			return getRuleContext(ArgumentsContext.class,0);
-		}
-		public FfiCallContext(StatementContext ctx) { copyFrom(ctx); }
-	}
 	public static class ProcedureCallContext extends StatementContext {
 		public Token name;
 		public TerminalNode Id() { return getToken(OberonParser.Id, 0); }
@@ -1447,27 +1384,27 @@ public class OberonParser extends Parser {
 		int _parentState = getState();
 		StatementContext _localctx = new StatementContext(_ctx, _parentState);
 		StatementContext _prevctx = _localctx;
-		int _startState = 24;
-		enterRecursionRule(_localctx, 24, RULE_statement, _p);
+		int _startState = 22;
+		enterRecursionRule(_localctx, 22, RULE_statement, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(332);
+			setState(313);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,31,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,29,_ctx) ) {
 			case 1:
 				{
 				_localctx = new AssignmentStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(225);
+				setState(212);
 				((AssignmentStmtContext)_localctx).var = match(Id);
-				setState(226);
+				setState(213);
 				match(T__31);
-				setState(227);
+				setState(214);
 				((AssignmentStmtContext)_localctx).exp = expression(0);
 				}
 				break;
@@ -1476,11 +1413,11 @@ public class OberonParser extends Parser {
 				_localctx = new EAssignmentStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(228);
+				setState(215);
 				((EAssignmentStmtContext)_localctx).des = designator();
-				setState(229);
+				setState(216);
 				match(T__31);
-				setState(230);
+				setState(217);
 				((EAssignmentStmtContext)_localctx).exp = expression(0);
 				}
 				break;
@@ -1489,13 +1426,13 @@ public class OberonParser extends Parser {
 				_localctx = new ReadIntStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(232);
+				setState(219);
 				match(T__32);
-				setState(233);
+				setState(220);
 				match(T__14);
-				setState(234);
+				setState(221);
 				((ReadIntStmtContext)_localctx).var = match(Id);
-				setState(235);
+				setState(222);
 				match(T__15);
 				}
 				break;
@@ -1504,13 +1441,13 @@ public class OberonParser extends Parser {
 				_localctx = new WriteStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(236);
+				setState(223);
 				match(T__33);
-				setState(237);
+				setState(224);
 				match(T__14);
-				setState(238);
+				setState(225);
 				expression(0);
-				setState(239);
+				setState(226);
 				match(T__15);
 				}
 				break;
@@ -1519,285 +1456,262 @@ public class OberonParser extends Parser {
 				_localctx = new ProcedureCallContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(241);
+				setState(228);
 				((ProcedureCallContext)_localctx).name = match(Id);
-				setState(242);
+				setState(229);
 				match(T__14);
-				setState(244);
+				setState(231);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__14) | (1L << INT) | (1L << TRUE) | (1L << FALSE) | (1L << Id))) != 0)) {
 					{
-					setState(243);
+					setState(230);
 					arguments();
 					}
 				}
 
-				setState(246);
+				setState(233);
 				match(T__15);
 				}
 				break;
 			case 6:
 				{
-				_localctx = new FfiCallContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(247);
-				((FfiCallContext)_localctx).name = match(Id);
-				setState(248);
-				match(T__14);
-				setState(250);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__14) | (1L << INT) | (1L << TRUE) | (1L << FALSE) | (1L << Id))) != 0)) {
-					{
-					setState(249);
-					arguments();
-					}
-				}
-
-				setState(252);
-				match(T__15);
-				}
-				break;
-			case 7:
-				{
 				_localctx = new IfElseStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(253);
+				setState(234);
 				match(T__34);
-				setState(254);
+				setState(235);
 				((IfElseStmtContext)_localctx).cond = expression(0);
-				setState(255);
+				setState(236);
 				match(T__35);
-				setState(256);
+				setState(237);
 				((IfElseStmtContext)_localctx).thenStmt = statement(0);
-				setState(259);
+				setState(240);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T__36) {
 					{
-					setState(257);
+					setState(238);
 					match(T__36);
-					setState(258);
+					setState(239);
 					((IfElseStmtContext)_localctx).elseStmt = statement(0);
 					}
 				}
 
-				setState(261);
+				setState(242);
 				match(T__2);
 				}
 				break;
-			case 8:
+			case 7:
 				{
 				_localctx = new IfElseIfStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(263);
+				setState(244);
 				match(T__34);
-				setState(264);
+				setState(245);
 				((IfElseIfStmtContext)_localctx).cond = expression(0);
-				setState(265);
+				setState(246);
 				match(T__35);
-				setState(266);
+				setState(247);
 				((IfElseIfStmtContext)_localctx).thenStmt = statement(0);
-				setState(269); 
+				setState(250); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(267);
+					setState(248);
 					match(T__37);
-					setState(268);
+					setState(249);
 					((IfElseIfStmtContext)_localctx).elseIfStmt = elseIfStmt();
 					((IfElseIfStmtContext)_localctx).elsifs.add(((IfElseIfStmtContext)_localctx).elseIfStmt);
 					}
 					}
-					setState(271); 
+					setState(252); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T__37 );
-				setState(275);
+				setState(256);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T__36) {
 					{
-					setState(273);
+					setState(254);
 					match(T__36);
-					setState(274);
+					setState(255);
 					((IfElseIfStmtContext)_localctx).elseStmt = statement(0);
 					}
 				}
 
-				setState(277);
+				setState(258);
+				match(T__2);
+				}
+				break;
+			case 8:
+				{
+				_localctx = new WhileStmtContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(260);
+				match(T__38);
+				setState(261);
+				((WhileStmtContext)_localctx).cond = expression(0);
+				setState(262);
+				match(T__39);
+				setState(263);
+				((WhileStmtContext)_localctx).stmt = statement(0);
+				setState(264);
 				match(T__2);
 				}
 				break;
 			case 9:
 				{
-				_localctx = new WhileStmtContext(_localctx);
+				_localctx = new RepeatUntilStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(279);
-				match(T__38);
-				setState(280);
-				((WhileStmtContext)_localctx).cond = expression(0);
-				setState(281);
-				match(T__39);
-				setState(282);
-				((WhileStmtContext)_localctx).stmt = statement(0);
-				setState(283);
-				match(T__2);
+				setState(266);
+				match(T__40);
+				setState(267);
+				((RepeatUntilStmtContext)_localctx).stmt = statement(0);
+				setState(268);
+				match(T__41);
+				setState(269);
+				((RepeatUntilStmtContext)_localctx).cond = expression(0);
 				}
 				break;
 			case 10:
 				{
-				_localctx = new RepeatUntilStmtContext(_localctx);
+				_localctx = new ForStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(285);
-				match(T__40);
-				setState(286);
-				((RepeatUntilStmtContext)_localctx).stmt = statement(0);
-				setState(287);
-				match(T__41);
-				setState(288);
-				((RepeatUntilStmtContext)_localctx).cond = expression(0);
+				setState(271);
+				match(T__42);
+				setState(272);
+				((ForStmtContext)_localctx).init = statement(0);
+				setState(273);
+				match(T__43);
+				setState(274);
+				((ForStmtContext)_localctx).condition = expression(0);
+				setState(275);
+				match(T__39);
+				setState(276);
+				((ForStmtContext)_localctx).stmt = statement(0);
+				setState(277);
+				match(T__2);
 				}
 				break;
 			case 11:
 				{
-				_localctx = new ForStmtContext(_localctx);
+				_localctx = new ForRangeStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(290);
+				setState(279);
 				match(T__42);
-				setState(291);
-				((ForStmtContext)_localctx).init = statement(0);
-				setState(292);
-				match(T__43);
-				setState(293);
-				((ForStmtContext)_localctx).condition = expression(0);
-				setState(294);
+				setState(280);
+				((ForRangeStmtContext)_localctx).var = match(Id);
+				setState(281);
+				match(T__44);
+				setState(282);
+				((ForRangeStmtContext)_localctx).min = expression(0);
+				setState(283);
+				match(T__45);
+				setState(284);
+				((ForRangeStmtContext)_localctx).max = expression(0);
+				setState(285);
 				match(T__39);
-				setState(295);
-				((ForStmtContext)_localctx).stmt = statement(0);
-				setState(296);
+				setState(286);
+				((ForRangeStmtContext)_localctx).stmt = statement(0);
+				setState(287);
 				match(T__2);
 				}
 				break;
 			case 12:
 				{
-				_localctx = new ForRangeStmtContext(_localctx);
+				_localctx = new LoopStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(298);
-				match(T__42);
-				setState(299);
-				((ForRangeStmtContext)_localctx).var = match(Id);
-				setState(300);
-				match(T__44);
-				setState(301);
-				((ForRangeStmtContext)_localctx).min = expression(0);
-				setState(302);
-				match(T__45);
-				setState(303);
-				((ForRangeStmtContext)_localctx).max = expression(0);
-				setState(304);
-				match(T__39);
-				setState(305);
-				((ForRangeStmtContext)_localctx).stmt = statement(0);
-				setState(306);
+				setState(289);
+				match(T__46);
+				setState(290);
+				((LoopStmtContext)_localctx).stmt = statement(0);
+				setState(291);
 				match(T__2);
 				}
 				break;
 			case 13:
 				{
-				_localctx = new LoopStmtContext(_localctx);
+				_localctx = new ReturnStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(308);
-				match(T__46);
-				setState(309);
-				((LoopStmtContext)_localctx).stmt = statement(0);
-				setState(310);
-				match(T__2);
+				setState(293);
+				match(T__47);
+				setState(294);
+				((ReturnStmtContext)_localctx).exp = expression(0);
 				}
 				break;
 			case 14:
 				{
-				_localctx = new ReturnStmtContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(312);
-				match(T__47);
-				setState(313);
-				((ReturnStmtContext)_localctx).exp = expression(0);
-				}
-				break;
-			case 15:
-				{
 				_localctx = new CaseStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(314);
+				setState(295);
 				match(T__48);
-				setState(315);
+				setState(296);
 				((CaseStmtContext)_localctx).exp = expression(0);
-				setState(316);
+				setState(297);
 				match(T__9);
-				setState(317);
+				setState(298);
 				((CaseStmtContext)_localctx).caseAlternative = caseAlternative();
 				((CaseStmtContext)_localctx).cases.add(((CaseStmtContext)_localctx).caseAlternative);
-				setState(322);
+				setState(303);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T__49) {
 					{
 					{
-					setState(318);
+					setState(299);
 					match(T__49);
-					setState(319);
+					setState(300);
 					((CaseStmtContext)_localctx).caseAlternative = caseAlternative();
 					((CaseStmtContext)_localctx).cases.add(((CaseStmtContext)_localctx).caseAlternative);
 					}
 					}
-					setState(324);
+					setState(305);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(327);
+				setState(308);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T__36) {
 					{
-					setState(325);
+					setState(306);
 					match(T__36);
-					setState(326);
+					setState(307);
 					((CaseStmtContext)_localctx).elseStmt = statement(0);
 					}
 				}
 
-				setState(329);
+				setState(310);
 				match(T__2);
 				}
 				break;
-			case 16:
+			case 15:
 				{
 				_localctx = new ExitStmtContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(331);
+				setState(312);
 				match(T__50);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(343);
+			setState(324);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,33,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,31,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
@@ -1807,9 +1721,9 @@ public class OberonParser extends Parser {
 					_localctx = new SequenceStmtContext(new StatementContext(_parentctx, _parentState));
 					((SequenceStmtContext)_localctx).stmt.add(_prevctx);
 					pushNewRecursionContext(_localctx, _startState, RULE_statement);
-					setState(334);
-					if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
-					setState(337); 
+					setState(315);
+					if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+					setState(318); 
 					_errHandler.sync(this);
 					_alt = 1;
 					do {
@@ -1817,9 +1731,9 @@ public class OberonParser extends Parser {
 						case 1:
 							{
 							{
-							setState(335);
+							setState(316);
 							match(T__1);
-							setState(336);
+							setState(317);
 							((SequenceStmtContext)_localctx).statement = statement(0);
 							((SequenceStmtContext)_localctx).stmt.add(((SequenceStmtContext)_localctx).statement);
 							}
@@ -1828,16 +1742,16 @@ public class OberonParser extends Parser {
 						default:
 							throw new NoViableAltException(this);
 						}
-						setState(339); 
+						setState(320); 
 						_errHandler.sync(this);
-						_alt = getInterpreter().adaptivePredict(_input,32,_ctx);
+						_alt = getInterpreter().adaptivePredict(_input,30,_ctx);
 					} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 					}
 					} 
 				}
-				setState(345);
+				setState(326);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,33,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,31,_ctx);
 			}
 			}
 		}
@@ -1891,16 +1805,16 @@ public class OberonParser extends Parser {
 
 	public final DesignatorContext designator() throws RecognitionException {
 		DesignatorContext _localctx = new DesignatorContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_designator);
+		enterRule(_localctx, 24, RULE_designator);
 		try {
-			setState(356);
+			setState(337);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,34,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,32,_ctx) ) {
 			case 1:
 				_localctx = new VarAssignmentContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(346);
+				setState(327);
 				((VarAssignmentContext)_localctx).var = match(Id);
 				}
 				break;
@@ -1908,13 +1822,13 @@ public class OberonParser extends Parser {
 				_localctx = new ArrayAssignmentContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(347);
+				setState(328);
 				((ArrayAssignmentContext)_localctx).array = expression(0);
-				setState(348);
+				setState(329);
 				match(T__18);
-				setState(349);
+				setState(330);
 				((ArrayAssignmentContext)_localctx).elem = expression(0);
-				setState(350);
+				setState(331);
 				match(T__19);
 				}
 				break;
@@ -1922,11 +1836,11 @@ public class OberonParser extends Parser {
 				_localctx = new RecordAssignmentContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(352);
+				setState(333);
 				((RecordAssignmentContext)_localctx).record = expression(0);
-				setState(353);
+				setState(334);
 				match(T__3);
-				setState(354);
+				setState(335);
 				((RecordAssignmentContext)_localctx).name = match(Id);
 				}
 				break;
@@ -1983,20 +1897,20 @@ public class OberonParser extends Parser {
 
 	public final CaseAlternativeContext caseAlternative() throws RecognitionException {
 		CaseAlternativeContext _localctx = new CaseAlternativeContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_caseAlternative);
+		enterRule(_localctx, 26, RULE_caseAlternative);
 		try {
-			setState(368);
+			setState(349);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,35,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,33,_ctx) ) {
 			case 1:
 				_localctx = new SimpleCaseContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(358);
+				setState(339);
 				((SimpleCaseContext)_localctx).cond = expression(0);
-				setState(359);
+				setState(340);
 				match(T__12);
-				setState(360);
+				setState(341);
 				((SimpleCaseContext)_localctx).stmt = statement(0);
 				}
 				break;
@@ -2004,15 +1918,15 @@ public class OberonParser extends Parser {
 				_localctx = new RangeCaseContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(362);
+				setState(343);
 				((RangeCaseContext)_localctx).min = expression(0);
-				setState(363);
+				setState(344);
 				match(T__45);
-				setState(364);
+				setState(345);
 				((RangeCaseContext)_localctx).max = expression(0);
-				setState(365);
+				setState(346);
 				match(T__12);
-				setState(366);
+				setState(347);
 				((RangeCaseContext)_localctx).stmt = statement(0);
 				}
 				break;
@@ -2046,15 +1960,15 @@ public class OberonParser extends Parser {
 
 	public final ElseIfStmtContext elseIfStmt() throws RecognitionException {
 		ElseIfStmtContext _localctx = new ElseIfStmtContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_elseIfStmt);
+		enterRule(_localctx, 28, RULE_elseIfStmt);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(370);
+			setState(351);
 			((ElseIfStmtContext)_localctx).cond = expression(0);
-			setState(371);
+			setState(352);
 			match(T__35);
-			setState(372);
+			setState(353);
 			((ElseIfStmtContext)_localctx).stmt = statement(0);
 			}
 		}
@@ -2079,11 +1993,11 @@ public class OberonParser extends Parser {
 
 	public final IntValueContext intValue() throws RecognitionException {
 		IntValueContext _localctx = new IntValueContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_intValue);
+		enterRule(_localctx, 30, RULE_intValue);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(374);
+			setState(355);
 			match(INT);
 			}
 		}
@@ -2109,12 +2023,12 @@ public class OberonParser extends Parser {
 
 	public final BoolValueContext boolValue() throws RecognitionException {
 		BoolValueContext _localctx = new BoolValueContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_boolValue);
+		enterRule(_localctx, 32, RULE_boolValue);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(376);
+			setState(357);
 			_la = _input.LA(1);
 			if ( !(_la==TRUE || _la==FALSE) ) {
 			_errHandler.recoverInline(this);
@@ -2162,16 +2076,16 @@ public class OberonParser extends Parser {
 
 	public final OberonTypeContext oberonType() throws RecognitionException {
 		OberonTypeContext _localctx = new OberonTypeContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_oberonType);
+		enterRule(_localctx, 34, RULE_oberonType);
 		try {
-			setState(381);
+			setState(362);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__51:
 				_localctx = new IntegerTypeContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(378);
+				setState(359);
 				match(T__51);
 				}
 				break;
@@ -2179,7 +2093,7 @@ public class OberonParser extends Parser {
 				_localctx = new BooleanTypeContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(379);
+				setState(360);
 				match(T__52);
 				}
 				break;
@@ -2187,7 +2101,7 @@ public class OberonParser extends Parser {
 				_localctx = new ReferenceTypeContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(380);
+				setState(361);
 				((ReferenceTypeContext)_localctx).name = match(Id);
 				}
 				break;
@@ -2208,9 +2122,9 @@ public class OberonParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 11:
+		case 10:
 			return expression_sempred((ExpressionContext)_localctx, predIndex);
-		case 12:
+		case 11:
 			return statement_sempred((StatementContext)_localctx, predIndex);
 		}
 		return true;
@@ -2233,151 +2147,141 @@ public class OberonParser extends Parser {
 	private boolean statement_sempred(StatementContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 5:
-			return precpred(_ctx, 15);
+			return precpred(_ctx, 14);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3>\u0182\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3>\u016f\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
-		"\4\23\t\23\4\24\t\24\3\2\3\2\3\2\3\2\3\2\5\2.\n\2\3\2\3\2\3\2\3\2\3\3"+
-		"\3\3\6\3\66\n\3\r\3\16\3\67\5\3:\n\3\3\3\3\3\6\3>\n\3\r\3\16\3?\5\3B\n"+
-		"\3\3\3\3\3\6\3F\n\3\r\3\16\3G\5\3J\n\3\3\3\7\3M\n\3\f\3\16\3P\13\3\3\3"+
-		"\7\3S\n\3\f\3\16\3V\13\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\6\4b"+
-		"\n\4\r\4\16\4c\3\4\3\4\5\4h\n\4\3\5\3\5\3\5\3\5\3\5\3\6\3\6\3\6\7\6r\n"+
-		"\6\f\6\16\6u\13\6\3\6\3\6\3\6\3\6\3\7\3\7\3\7\3\7\5\7\177\n\7\3\7\3\7"+
-		"\3\7\5\7\u0084\n\7\3\7\3\7\3\b\3\b\3\b\3\b\5\b\u008c\n\b\3\b\3\b\3\b\5"+
-		"\b\u0091\n\b\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\7\t\u009b\n\t\f\t\16\t\u009e"+
-		"\13\t\3\n\3\n\3\n\7\n\u00a3\n\n\f\n\16\n\u00a6\13\n\3\13\3\13\3\13\7\13"+
-		"\u00ab\n\13\f\13\16\13\u00ae\13\13\3\13\3\13\3\13\3\f\3\f\3\f\3\f\3\r"+
-		"\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5\r\u00c2\n\r\3\r\3\r\3\r\3\r"+
-		"\5\r\u00c8\n\r\3\r\5\r\u00cb\n\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3"+
-		"\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\7\r\u00de\n\r\f\r\16\r\u00e1\13\r\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\5\16\u00f7\n\16\3\16\3\16\3\16\3\16\5\16\u00fd"+
-		"\n\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u0106\n\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\6\16\u0110\n\16\r\16\16\16\u0111\3\16\3\16\5"+
-		"\16\u0116\n\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\7\16\u0143\n\16\f\16\16\16\u0146\13\16\3\16\3\16"+
-		"\5\16\u014a\n\16\3\16\3\16\3\16\5\16\u014f\n\16\3\16\3\16\3\16\6\16\u0154"+
-		"\n\16\r\16\16\16\u0155\7\16\u0158\n\16\f\16\16\16\u015b\13\16\3\17\3\17"+
-		"\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\5\17\u0167\n\17\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u0173\n\20\3\21\3\21\3\21\3\21"+
-		"\3\22\3\22\3\23\3\23\3\24\3\24\3\24\5\24\u0180\n\24\3\24\3N\4\30\32\25"+
-		"\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&\2\6\4\2\n\n\27\33\3\2\34"+
-		"\36\3\2\37!\3\29:\2\u01aa\2(\3\2\2\2\49\3\2\2\2\6g\3\2\2\2\bi\3\2\2\2"+
-		"\nn\3\2\2\2\fz\3\2\2\2\16\u0087\3\2\2\2\20\u0097\3\2\2\2\22\u009f\3\2"+
-		"\2\2\24\u00a7\3\2\2\2\26\u00b2\3\2\2\2\30\u00ca\3\2\2\2\32\u014e\3\2\2"+
-		"\2\34\u0166\3\2\2\2\36\u0172\3\2\2\2 \u0174\3\2\2\2\"\u0178\3\2\2\2$\u017a"+
-		"\3\2\2\2&\u017f\3\2\2\2()\7\3\2\2)*\7;\2\2*+\7\4\2\2+-\5\4\3\2,.\5\26"+
-		"\f\2-,\3\2\2\2-.\3\2\2\2./\3\2\2\2/\60\7\5\2\2\60\61\7;\2\2\61\62\7\6"+
-		"\2\2\62\3\3\2\2\2\63\65\7\7\2\2\64\66\5\6\4\2\65\64\3\2\2\2\66\67\3\2"+
-		"\2\2\67\65\3\2\2\2\678\3\2\2\28:\3\2\2\29\63\3\2\2\29:\3\2\2\2:A\3\2\2"+
-		"\2;=\7\b\2\2<>\5\b\5\2=<\3\2\2\2>?\3\2\2\2?=\3\2\2\2?@\3\2\2\2@B\3\2\2"+
-		"\2A;\3\2\2\2AB\3\2\2\2BI\3\2\2\2CE\7\t\2\2DF\5\n\6\2ED\3\2\2\2FG\3\2\2"+
-		"\2GE\3\2\2\2GH\3\2\2\2HJ\3\2\2\2IC\3\2\2\2IJ\3\2\2\2JN\3\2\2\2KM\5\16"+
-		"\b\2LK\3\2\2\2MP\3\2\2\2NO\3\2\2\2NL\3\2\2\2OT\3\2\2\2PN\3\2\2\2QS\5\f"+
-		"\7\2RQ\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2U\5\3\2\2\2VT\3\2\2\2WX\7"+
-		";\2\2XY\7\n\2\2YZ\7\13\2\2Z[\78\2\2[\\\7\f\2\2\\h\5&\24\2]^\7;\2\2^_\7"+
-		"\n\2\2_a\7\r\2\2`b\5\n\6\2a`\3\2\2\2bc\3\2\2\2ca\3\2\2\2cd\3\2\2\2de\3"+
-		"\2\2\2ef\7\5\2\2fh\3\2\2\2gW\3\2\2\2g]\3\2\2\2h\7\3\2\2\2ij\7;\2\2jk\7"+
-		"\n\2\2kl\5\30\r\2lm\7\4\2\2m\t\3\2\2\2ns\7;\2\2op\7\16\2\2pr\7;\2\2qo"+
-		"\3\2\2\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2tv\3\2\2\2us\3\2\2\2vw\7\17\2\2"+
-		"wx\5&\24\2xy\7\4\2\2y\13\3\2\2\2z{\7\20\2\2{|\7;\2\2|~\7\21\2\2}\177\5"+
-		"\20\t\2~}\3\2\2\2~\177\3\2\2\2\177\u0080\3\2\2\2\u0080\u0083\7\22\2\2"+
-		"\u0081\u0082\7\17\2\2\u0082\u0084\5&\24\2\u0083\u0081\3\2\2\2\u0083\u0084"+
-		"\3\2\2\2\u0084\u0085\3\2\2\2\u0085\u0086\7\4\2\2\u0086\r\3\2\2\2\u0087"+
-		"\u0088\7\23\2\2\u0088\u0089\7;\2\2\u0089\u008b\7\21\2\2\u008a\u008c\5"+
-		"\20\t\2\u008b\u008a\3\2\2\2\u008b\u008c\3\2\2\2\u008c\u008d\3\2\2\2\u008d"+
-		"\u0090\7\22\2\2\u008e\u008f\7\17\2\2\u008f\u0091\5&\24\2\u0090\u008e\3"+
-		"\2\2\2\u0090\u0091\3\2\2\2\u0091\u0092\3\2\2\2\u0092\u0093\7\4\2\2\u0093"+
-		"\u0094\5\4\3\2\u0094\u0095\5\26\f\2\u0095\u0096\7;\2\2\u0096\17\3\2\2"+
-		"\2\u0097\u009c\5\24\13\2\u0098\u0099\7\16\2\2\u0099\u009b\5\24\13\2\u009a"+
-		"\u0098\3\2\2\2\u009b\u009e\3\2\2\2\u009c\u009a\3\2\2\2\u009c\u009d\3\2"+
-		"\2\2\u009d\21\3\2\2\2\u009e\u009c\3\2\2\2\u009f\u00a4\5\30\r\2\u00a0\u00a1"+
-		"\7\16\2\2\u00a1\u00a3\5\30\r\2\u00a2\u00a0\3\2\2\2\u00a3\u00a6\3\2\2\2"+
-		"\u00a4\u00a2\3\2\2\2\u00a4\u00a5\3\2\2\2\u00a5\23\3\2\2\2\u00a6\u00a4"+
-		"\3\2\2\2\u00a7\u00ac\7;\2\2\u00a8\u00a9\7\16\2\2\u00a9\u00ab\7;\2\2\u00aa"+
-		"\u00a8\3\2\2\2\u00ab\u00ae\3\2\2\2\u00ac\u00aa\3\2\2\2\u00ac\u00ad\3\2"+
-		"\2\2\u00ad\u00af\3\2\2\2\u00ae\u00ac\3\2\2\2\u00af\u00b0\7\17\2\2\u00b0"+
-		"\u00b1\5&\24\2\u00b1\25\3\2\2\2\u00b2\u00b3\7\24\2\2\u00b3\u00b4\5\32"+
-		"\16\2\u00b4\u00b5\7\5\2\2\u00b5\27\3\2\2\2\u00b6\u00b7\b\r\1\2\u00b7\u00b8"+
-		"\7\21\2\2\u00b8\u00b9\5\30\r\2\u00b9\u00ba\7\22\2\2\u00ba\u00cb\3\2\2"+
-		"\2\u00bb\u00cb\5\"\22\2\u00bc\u00cb\5$\23\2\u00bd\u00cb\7;\2\2\u00be\u00bf"+
-		"\7;\2\2\u00bf\u00c1\7\21\2\2\u00c0\u00c2\5\22\n\2\u00c1\u00c0\3\2\2\2"+
-		"\u00c1\u00c2\3\2\2\2\u00c2\u00c3\3\2\2\2\u00c3\u00cb\7\22\2\2\u00c4\u00c5"+
-		"\7;\2\2\u00c5\u00c7\7\21\2\2\u00c6\u00c8\5\22\n\2\u00c7\u00c6\3\2\2\2"+
-		"\u00c7\u00c8\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9\u00cb\7\22\2\2\u00ca\u00b6"+
-		"\3\2\2\2\u00ca\u00bb\3\2\2\2\u00ca\u00bc\3\2\2\2\u00ca\u00bd\3\2\2\2\u00ca"+
-		"\u00be\3\2\2\2\u00ca\u00c4\3\2\2\2\u00cb\u00df\3\2\2\2\u00cc\u00cd\f\5"+
-		"\2\2\u00cd\u00ce\t\2\2\2\u00ce\u00de\5\30\r\6\u00cf\u00d0\f\4\2\2\u00d0"+
-		"\u00d1\t\3\2\2\u00d1\u00de\5\30\r\5\u00d2\u00d3\f\3\2\2\u00d3\u00d4\t"+
-		"\4\2\2\u00d4\u00de\5\30\r\4\u00d5\u00d6\f\7\2\2\u00d6\u00d7\7\6\2\2\u00d7"+
-		"\u00de\7;\2\2\u00d8\u00d9\f\6\2\2\u00d9\u00da\7\25\2\2\u00da\u00db\5\30"+
-		"\r\2\u00db\u00dc\7\26\2\2\u00dc\u00de\3\2\2\2\u00dd\u00cc\3\2\2\2\u00dd"+
-		"\u00cf\3\2\2\2\u00dd\u00d2\3\2\2\2\u00dd\u00d5\3\2\2\2\u00dd\u00d8\3\2"+
-		"\2\2\u00de\u00e1\3\2\2\2\u00df\u00dd\3\2\2\2\u00df\u00e0\3\2\2\2\u00e0"+
-		"\31\3\2\2\2\u00e1\u00df\3\2\2\2\u00e2\u00e3\b\16\1\2\u00e3\u00e4\7;\2"+
-		"\2\u00e4\u00e5\7\"\2\2\u00e5\u014f\5\30\r\2\u00e6\u00e7\5\34\17\2\u00e7"+
-		"\u00e8\7\"\2\2\u00e8\u00e9\5\30\r\2\u00e9\u014f\3\2\2\2\u00ea\u00eb\7"+
-		"#\2\2\u00eb\u00ec\7\21\2\2\u00ec\u00ed\7;\2\2\u00ed\u014f\7\22\2\2\u00ee"+
-		"\u00ef\7$\2\2\u00ef\u00f0\7\21\2\2\u00f0\u00f1\5\30\r\2\u00f1\u00f2\7"+
-		"\22\2\2\u00f2\u014f\3\2\2\2\u00f3\u00f4\7;\2\2\u00f4\u00f6\7\21\2\2\u00f5"+
-		"\u00f7\5\22\n\2\u00f6\u00f5\3\2\2\2\u00f6\u00f7\3\2\2\2\u00f7\u00f8\3"+
-		"\2\2\2\u00f8\u014f\7\22\2\2\u00f9\u00fa\7;\2\2\u00fa\u00fc\7\21\2\2\u00fb"+
-		"\u00fd\5\22\n\2\u00fc\u00fb\3\2\2\2\u00fc\u00fd\3\2\2\2\u00fd\u00fe\3"+
-		"\2\2\2\u00fe\u014f\7\22\2\2\u00ff\u0100\7%\2\2\u0100\u0101\5\30\r\2\u0101"+
-		"\u0102\7&\2\2\u0102\u0105\5\32\16\2\u0103\u0104\7\'\2\2\u0104\u0106\5"+
-		"\32\16\2\u0105\u0103\3\2\2\2\u0105\u0106\3\2\2\2\u0106\u0107\3\2\2\2\u0107"+
-		"\u0108\7\5\2\2\u0108\u014f\3\2\2\2\u0109\u010a\7%\2\2\u010a\u010b\5\30"+
-		"\r\2\u010b\u010c\7&\2\2\u010c\u010f\5\32\16\2\u010d\u010e\7(\2\2\u010e"+
-		"\u0110\5 \21\2\u010f\u010d\3\2\2\2\u0110\u0111\3\2\2\2\u0111\u010f\3\2"+
-		"\2\2\u0111\u0112\3\2\2\2\u0112\u0115\3\2\2\2\u0113\u0114\7\'\2\2\u0114"+
-		"\u0116\5\32\16\2\u0115\u0113\3\2\2\2\u0115\u0116\3\2\2\2\u0116\u0117\3"+
-		"\2\2\2\u0117\u0118\7\5\2\2\u0118\u014f\3\2\2\2\u0119\u011a\7)\2\2\u011a"+
-		"\u011b\5\30\r\2\u011b\u011c\7*\2\2\u011c\u011d\5\32\16\2\u011d\u011e\7"+
-		"\5\2\2\u011e\u014f\3\2\2\2\u011f\u0120\7+\2\2\u0120\u0121\5\32\16\2\u0121"+
-		"\u0122\7,\2\2\u0122\u0123\5\30\r\2\u0123\u014f\3\2\2\2\u0124\u0125\7-"+
-		"\2\2\u0125\u0126\5\32\16\2\u0126\u0127\7.\2\2\u0127\u0128\5\30\r\2\u0128"+
-		"\u0129\7*\2\2\u0129\u012a\5\32\16\2\u012a\u012b\7\5\2\2\u012b\u014f\3"+
-		"\2\2\2\u012c\u012d\7-\2\2\u012d\u012e\7;\2\2\u012e\u012f\7/\2\2\u012f"+
-		"\u0130\5\30\r\2\u0130\u0131\7\60\2\2\u0131\u0132\5\30\r\2\u0132\u0133"+
-		"\7*\2\2\u0133\u0134\5\32\16\2\u0134\u0135\7\5\2\2\u0135\u014f\3\2\2\2"+
-		"\u0136\u0137\7\61\2\2\u0137\u0138\5\32\16\2\u0138\u0139\7\5\2\2\u0139"+
-		"\u014f\3\2\2\2\u013a\u013b\7\62\2\2\u013b\u014f\5\30\r\2\u013c\u013d\7"+
-		"\63\2\2\u013d\u013e\5\30\r\2\u013e\u013f\7\f\2\2\u013f\u0144\5\36\20\2"+
-		"\u0140\u0141\7\64\2\2\u0141\u0143\5\36\20\2\u0142\u0140\3\2\2\2\u0143"+
-		"\u0146\3\2\2\2\u0144\u0142\3\2\2\2\u0144\u0145\3\2\2\2\u0145\u0149\3\2"+
-		"\2\2\u0146\u0144\3\2\2\2\u0147\u0148\7\'\2\2\u0148\u014a\5\32\16\2\u0149"+
-		"\u0147\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014b\3\2\2\2\u014b\u014c\7\5"+
-		"\2\2\u014c\u014f\3\2\2\2\u014d\u014f\7\65\2\2\u014e\u00e2\3\2\2\2\u014e"+
-		"\u00e6\3\2\2\2\u014e\u00ea\3\2\2\2\u014e\u00ee\3\2\2\2\u014e\u00f3\3\2"+
-		"\2\2\u014e\u00f9\3\2\2\2\u014e\u00ff\3\2\2\2\u014e\u0109\3\2\2\2\u014e"+
-		"\u0119\3\2\2\2\u014e\u011f\3\2\2\2\u014e\u0124\3\2\2\2\u014e\u012c\3\2"+
-		"\2\2\u014e\u0136\3\2\2\2\u014e\u013a\3\2\2\2\u014e\u013c\3\2\2\2\u014e"+
-		"\u014d\3\2\2\2\u014f\u0159\3\2\2\2\u0150\u0153\f\21\2\2\u0151\u0152\7"+
-		"\4\2\2\u0152\u0154\5\32\16\2\u0153\u0151\3\2\2\2\u0154\u0155\3\2\2\2\u0155"+
-		"\u0153\3\2\2\2\u0155\u0156\3\2\2\2\u0156\u0158\3\2\2\2\u0157\u0150\3\2"+
-		"\2\2\u0158\u015b\3\2\2\2\u0159\u0157\3\2\2\2\u0159\u015a\3\2\2\2\u015a"+
-		"\33\3\2\2\2\u015b\u0159\3\2\2\2\u015c\u0167\7;\2\2\u015d\u015e\5\30\r"+
-		"\2\u015e\u015f\7\25\2\2\u015f\u0160\5\30\r\2\u0160\u0161\7\26\2\2\u0161"+
-		"\u0167\3\2\2\2\u0162\u0163\5\30\r\2\u0163\u0164\7\6\2\2\u0164\u0165\7"+
-		";\2\2\u0165\u0167\3\2\2\2\u0166\u015c\3\2\2\2\u0166\u015d\3\2\2\2\u0166"+
-		"\u0162\3\2\2\2\u0167\35\3\2\2\2\u0168\u0169\5\30\r\2\u0169\u016a\7\17"+
-		"\2\2\u016a\u016b\5\32\16\2\u016b\u0173\3\2\2\2\u016c\u016d\5\30\r\2\u016d"+
-		"\u016e\7\60\2\2\u016e\u016f\5\30\r\2\u016f\u0170\7\17\2\2\u0170\u0171"+
-		"\5\32\16\2\u0171\u0173\3\2\2\2\u0172\u0168\3\2\2\2\u0172\u016c\3\2\2\2"+
-		"\u0173\37\3\2\2\2\u0174\u0175\5\30\r\2\u0175\u0176\7&\2\2\u0176\u0177"+
-		"\5\32\16\2\u0177!\3\2\2\2\u0178\u0179\78\2\2\u0179#\3\2\2\2\u017a\u017b"+
-		"\t\5\2\2\u017b%\3\2\2\2\u017c\u0180\7\66\2\2\u017d\u0180\7\67\2\2\u017e"+
-		"\u0180\7;\2\2\u017f\u017c\3\2\2\2\u017f\u017d\3\2\2\2\u017f\u017e\3\2"+
-		"\2\2\u0180\'\3\2\2\2\'-\679?AGINTcgs~\u0083\u008b\u0090\u009c\u00a4\u00ac"+
-		"\u00c1\u00c7\u00ca\u00dd\u00df\u00f6\u00fc\u0105\u0111\u0115\u0144\u0149"+
-		"\u014e\u0155\u0159\u0166\u0172\u017f";
+		"\4\23\t\23\3\2\3\2\3\2\3\2\3\2\5\2,\n\2\3\2\3\2\3\2\3\2\3\3\3\3\6\3\64"+
+		"\n\3\r\3\16\3\65\5\38\n\3\3\3\3\3\6\3<\n\3\r\3\16\3=\5\3@\n\3\3\3\3\3"+
+		"\6\3D\n\3\r\3\16\3E\5\3H\n\3\3\3\7\3K\n\3\f\3\16\3N\13\3\3\4\3\4\3\4\3"+
+		"\4\3\4\3\4\3\4\3\4\3\4\3\4\6\4Z\n\4\r\4\16\4[\3\4\3\4\5\4`\n\4\3\5\3\5"+
+		"\3\5\3\5\3\5\3\6\3\6\3\6\7\6j\n\6\f\6\16\6m\13\6\3\6\3\6\3\6\3\6\3\7\3"+
+		"\7\3\7\3\7\5\7w\n\7\3\7\3\7\3\7\5\7|\n\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3"+
+		"\7\3\7\5\7\u0087\n\7\3\7\3\7\3\7\5\7\u008c\n\7\3\7\5\7\u008f\n\7\3\b\3"+
+		"\b\3\b\7\b\u0094\n\b\f\b\16\b\u0097\13\b\3\t\3\t\3\t\7\t\u009c\n\t\f\t"+
+		"\16\t\u009f\13\t\3\n\3\n\3\n\7\n\u00a4\n\n\f\n\16\n\u00a7\13\n\3\n\3\n"+
+		"\3\n\3\13\3\13\3\13\3\13\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\5"+
+		"\f\u00bb\n\f\3\f\5\f\u00be\n\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f"+
+		"\3\f\3\f\3\f\3\f\3\f\3\f\3\f\7\f\u00d1\n\f\f\f\16\f\u00d4\13\f\3\r\3\r"+
+		"\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3"+
+		"\r\5\r\u00ea\n\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5\r\u00f3\n\r\3\r\3\r\3\r"+
+		"\3\r\3\r\3\r\3\r\3\r\6\r\u00fd\n\r\r\r\16\r\u00fe\3\r\3\r\5\r\u0103\n"+
+		"\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r"+
+		"\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3"+
+		"\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\7\r\u0130\n\r\f\r\16\r\u0133\13\r\3"+
+		"\r\3\r\5\r\u0137\n\r\3\r\3\r\3\r\5\r\u013c\n\r\3\r\3\r\3\r\6\r\u0141\n"+
+		"\r\r\r\16\r\u0142\7\r\u0145\n\r\f\r\16\r\u0148\13\r\3\16\3\16\3\16\3\16"+
+		"\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u0154\n\16\3\17\3\17\3\17\3\17\3\17"+
+		"\3\17\3\17\3\17\3\17\3\17\5\17\u0160\n\17\3\20\3\20\3\20\3\20\3\21\3\21"+
+		"\3\22\3\22\3\23\3\23\3\23\5\23\u016d\n\23\3\23\2\4\26\30\24\2\4\6\b\n"+
+		"\f\16\20\22\24\26\30\32\34\36 \"$\2\6\4\2\n\n\27\33\3\2\34\36\3\2\37!"+
+		"\3\29:\2\u0194\2&\3\2\2\2\4\67\3\2\2\2\6_\3\2\2\2\ba\3\2\2\2\nf\3\2\2"+
+		"\2\f\u008e\3\2\2\2\16\u0090\3\2\2\2\20\u0098\3\2\2\2\22\u00a0\3\2\2\2"+
+		"\24\u00ab\3\2\2\2\26\u00bd\3\2\2\2\30\u013b\3\2\2\2\32\u0153\3\2\2\2\34"+
+		"\u015f\3\2\2\2\36\u0161\3\2\2\2 \u0165\3\2\2\2\"\u0167\3\2\2\2$\u016c"+
+		"\3\2\2\2&\'\7\3\2\2\'(\7;\2\2()\7\4\2\2)+\5\4\3\2*,\5\24\13\2+*\3\2\2"+
+		"\2+,\3\2\2\2,-\3\2\2\2-.\7\5\2\2./\7;\2\2/\60\7\6\2\2\60\3\3\2\2\2\61"+
+		"\63\7\7\2\2\62\64\5\6\4\2\63\62\3\2\2\2\64\65\3\2\2\2\65\63\3\2\2\2\65"+
+		"\66\3\2\2\2\668\3\2\2\2\67\61\3\2\2\2\678\3\2\2\28?\3\2\2\29;\7\b\2\2"+
+		":<\5\b\5\2;:\3\2\2\2<=\3\2\2\2=;\3\2\2\2=>\3\2\2\2>@\3\2\2\2?9\3\2\2\2"+
+		"?@\3\2\2\2@G\3\2\2\2AC\7\t\2\2BD\5\n\6\2CB\3\2\2\2DE\3\2\2\2EC\3\2\2\2"+
+		"EF\3\2\2\2FH\3\2\2\2GA\3\2\2\2GH\3\2\2\2HL\3\2\2\2IK\5\f\7\2JI\3\2\2\2"+
+		"KN\3\2\2\2LJ\3\2\2\2LM\3\2\2\2M\5\3\2\2\2NL\3\2\2\2OP\7;\2\2PQ\7\n\2\2"+
+		"QR\7\13\2\2RS\78\2\2ST\7\f\2\2T`\5$\23\2UV\7;\2\2VW\7\n\2\2WY\7\r\2\2"+
+		"XZ\5\n\6\2YX\3\2\2\2Z[\3\2\2\2[Y\3\2\2\2[\\\3\2\2\2\\]\3\2\2\2]^\7\5\2"+
+		"\2^`\3\2\2\2_O\3\2\2\2_U\3\2\2\2`\7\3\2\2\2ab\7;\2\2bc\7\n\2\2cd\5\26"+
+		"\f\2de\7\4\2\2e\t\3\2\2\2fk\7;\2\2gh\7\16\2\2hj\7;\2\2ig\3\2\2\2jm\3\2"+
+		"\2\2ki\3\2\2\2kl\3\2\2\2ln\3\2\2\2mk\3\2\2\2no\7\17\2\2op\5$\23\2pq\7"+
+		"\4\2\2q\13\3\2\2\2rs\7\20\2\2st\7;\2\2tv\7\21\2\2uw\5\16\b\2vu\3\2\2\2"+
+		"vw\3\2\2\2wx\3\2\2\2x{\7\22\2\2yz\7\17\2\2z|\5$\23\2{y\3\2\2\2{|\3\2\2"+
+		"\2|}\3\2\2\2}~\7\4\2\2~\177\5\4\3\2\177\u0080\5\24\13\2\u0080\u0081\7"+
+		";\2\2\u0081\u008f\3\2\2\2\u0082\u0083\7\23\2\2\u0083\u0084\7;\2\2\u0084"+
+		"\u0086\7\21\2\2\u0085\u0087\5\16\b\2\u0086\u0085\3\2\2\2\u0086\u0087\3"+
+		"\2\2\2\u0087\u0088\3\2\2\2\u0088\u008b\7\22\2\2\u0089\u008a\7\17\2\2\u008a"+
+		"\u008c\5$\23\2\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c\u008d\3\2"+
+		"\2\2\u008d\u008f\7\4\2\2\u008er\3\2\2\2\u008e\u0082\3\2\2\2\u008f\r\3"+
+		"\2\2\2\u0090\u0095\5\22\n\2\u0091\u0092\7\16\2\2\u0092\u0094\5\22\n\2"+
+		"\u0093\u0091\3\2\2\2\u0094\u0097\3\2\2\2\u0095\u0093\3\2\2\2\u0095\u0096"+
+		"\3\2\2\2\u0096\17\3\2\2\2\u0097\u0095\3\2\2\2\u0098\u009d\5\26\f\2\u0099"+
+		"\u009a\7\16\2\2\u009a\u009c\5\26\f\2\u009b\u0099\3\2\2\2\u009c\u009f\3"+
+		"\2\2\2\u009d\u009b\3\2\2\2\u009d\u009e\3\2\2\2\u009e\21\3\2\2\2\u009f"+
+		"\u009d\3\2\2\2\u00a0\u00a5\7;\2\2\u00a1\u00a2\7\16\2\2\u00a2\u00a4\7;"+
+		"\2\2\u00a3\u00a1\3\2\2\2\u00a4\u00a7\3\2\2\2\u00a5\u00a3\3\2\2\2\u00a5"+
+		"\u00a6\3\2\2\2\u00a6\u00a8\3\2\2\2\u00a7\u00a5\3\2\2\2\u00a8\u00a9\7\17"+
+		"\2\2\u00a9\u00aa\5$\23\2\u00aa\23\3\2\2\2\u00ab\u00ac\7\24\2\2\u00ac\u00ad"+
+		"\5\30\r\2\u00ad\u00ae\7\5\2\2\u00ae\25\3\2\2\2\u00af\u00b0\b\f\1\2\u00b0"+
+		"\u00b1\7\21\2\2\u00b1\u00b2\5\26\f\2\u00b2\u00b3\7\22\2\2\u00b3\u00be"+
+		"\3\2\2\2\u00b4\u00be\5 \21\2\u00b5\u00be\5\"\22\2\u00b6\u00be\7;\2\2\u00b7"+
+		"\u00b8\7;\2\2\u00b8\u00ba\7\21\2\2\u00b9\u00bb\5\20\t\2\u00ba\u00b9\3"+
+		"\2\2\2\u00ba\u00bb\3\2\2\2\u00bb\u00bc\3\2\2\2\u00bc\u00be\7\22\2\2\u00bd"+
+		"\u00af\3\2\2\2\u00bd\u00b4\3\2\2\2\u00bd\u00b5\3\2\2\2\u00bd\u00b6\3\2"+
+		"\2\2\u00bd\u00b7\3\2\2\2\u00be\u00d2\3\2\2\2\u00bf\u00c0\f\5\2\2\u00c0"+
+		"\u00c1\t\2\2\2\u00c1\u00d1\5\26\f\6\u00c2\u00c3\f\4\2\2\u00c3\u00c4\t"+
+		"\3\2\2\u00c4\u00d1\5\26\f\5\u00c5\u00c6\f\3\2\2\u00c6\u00c7\t\4\2\2\u00c7"+
+		"\u00d1\5\26\f\4\u00c8\u00c9\f\7\2\2\u00c9\u00ca\7\6\2\2\u00ca\u00d1\7"+
+		";\2\2\u00cb\u00cc\f\6\2\2\u00cc\u00cd\7\25\2\2\u00cd\u00ce\5\26\f\2\u00ce"+
+		"\u00cf\7\26\2\2\u00cf\u00d1\3\2\2\2\u00d0\u00bf\3\2\2\2\u00d0\u00c2\3"+
+		"\2\2\2\u00d0\u00c5\3\2\2\2\u00d0\u00c8\3\2\2\2\u00d0\u00cb\3\2\2\2\u00d1"+
+		"\u00d4\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3\27\3\2\2"+
+		"\2\u00d4\u00d2\3\2\2\2\u00d5\u00d6\b\r\1\2\u00d6\u00d7\7;\2\2\u00d7\u00d8"+
+		"\7\"\2\2\u00d8\u013c\5\26\f\2\u00d9\u00da\5\32\16\2\u00da\u00db\7\"\2"+
+		"\2\u00db\u00dc\5\26\f\2\u00dc\u013c\3\2\2\2\u00dd\u00de\7#\2\2\u00de\u00df"+
+		"\7\21\2\2\u00df\u00e0\7;\2\2\u00e0\u013c\7\22\2\2\u00e1\u00e2\7$\2\2\u00e2"+
+		"\u00e3\7\21\2\2\u00e3\u00e4\5\26\f\2\u00e4\u00e5\7\22\2\2\u00e5\u013c"+
+		"\3\2\2\2\u00e6\u00e7\7;\2\2\u00e7\u00e9\7\21\2\2\u00e8\u00ea\5\20\t\2"+
+		"\u00e9\u00e8\3\2\2\2\u00e9\u00ea\3\2\2\2\u00ea\u00eb\3\2\2\2\u00eb\u013c"+
+		"\7\22\2\2\u00ec\u00ed\7%\2\2\u00ed\u00ee\5\26\f\2\u00ee\u00ef\7&\2\2\u00ef"+
+		"\u00f2\5\30\r\2\u00f0\u00f1\7\'\2\2\u00f1\u00f3\5\30\r\2\u00f2\u00f0\3"+
+		"\2\2\2\u00f2\u00f3\3\2\2\2\u00f3\u00f4\3\2\2\2\u00f4\u00f5\7\5\2\2\u00f5"+
+		"\u013c\3\2\2\2\u00f6\u00f7\7%\2\2\u00f7\u00f8\5\26\f\2\u00f8\u00f9\7&"+
+		"\2\2\u00f9\u00fc\5\30\r\2\u00fa\u00fb\7(\2\2\u00fb\u00fd\5\36\20\2\u00fc"+
+		"\u00fa\3\2\2\2\u00fd\u00fe\3\2\2\2\u00fe\u00fc\3\2\2\2\u00fe\u00ff\3\2"+
+		"\2\2\u00ff\u0102\3\2\2\2\u0100\u0101\7\'\2\2\u0101\u0103\5\30\r\2\u0102"+
+		"\u0100\3\2\2\2\u0102\u0103\3\2\2\2\u0103\u0104\3\2\2\2\u0104\u0105\7\5"+
+		"\2\2\u0105\u013c\3\2\2\2\u0106\u0107\7)\2\2\u0107\u0108\5\26\f\2\u0108"+
+		"\u0109\7*\2\2\u0109\u010a\5\30\r\2\u010a\u010b\7\5\2\2\u010b\u013c\3\2"+
+		"\2\2\u010c\u010d\7+\2\2\u010d\u010e\5\30\r\2\u010e\u010f\7,\2\2\u010f"+
+		"\u0110\5\26\f\2\u0110\u013c\3\2\2\2\u0111\u0112\7-\2\2\u0112\u0113\5\30"+
+		"\r\2\u0113\u0114\7.\2\2\u0114\u0115\5\26\f\2\u0115\u0116\7*\2\2\u0116"+
+		"\u0117\5\30\r\2\u0117\u0118\7\5\2\2\u0118\u013c\3\2\2\2\u0119\u011a\7"+
+		"-\2\2\u011a\u011b\7;\2\2\u011b\u011c\7/\2\2\u011c\u011d\5\26\f\2\u011d"+
+		"\u011e\7\60\2\2\u011e\u011f\5\26\f\2\u011f\u0120\7*\2\2\u0120\u0121\5"+
+		"\30\r\2\u0121\u0122\7\5\2\2\u0122\u013c\3\2\2\2\u0123\u0124\7\61\2\2\u0124"+
+		"\u0125\5\30\r\2\u0125\u0126\7\5\2\2\u0126\u013c\3\2\2\2\u0127\u0128\7"+
+		"\62\2\2\u0128\u013c\5\26\f\2\u0129\u012a\7\63\2\2\u012a\u012b\5\26\f\2"+
+		"\u012b\u012c\7\f\2\2\u012c\u0131\5\34\17\2\u012d\u012e\7\64\2\2\u012e"+
+		"\u0130\5\34\17\2\u012f\u012d\3\2\2\2\u0130\u0133\3\2\2\2\u0131\u012f\3"+
+		"\2\2\2\u0131\u0132\3\2\2\2\u0132\u0136\3\2\2\2\u0133\u0131\3\2\2\2\u0134"+
+		"\u0135\7\'\2\2\u0135\u0137\5\30\r\2\u0136\u0134\3\2\2\2\u0136\u0137\3"+
+		"\2\2\2\u0137\u0138\3\2\2\2\u0138\u0139\7\5\2\2\u0139\u013c\3\2\2\2\u013a"+
+		"\u013c\7\65\2\2\u013b\u00d5\3\2\2\2\u013b\u00d9\3\2\2\2\u013b\u00dd\3"+
+		"\2\2\2\u013b\u00e1\3\2\2\2\u013b\u00e6\3\2\2\2\u013b\u00ec\3\2\2\2\u013b"+
+		"\u00f6\3\2\2\2\u013b\u0106\3\2\2\2\u013b\u010c\3\2\2\2\u013b\u0111\3\2"+
+		"\2\2\u013b\u0119\3\2\2\2\u013b\u0123\3\2\2\2\u013b\u0127\3\2\2\2\u013b"+
+		"\u0129\3\2\2\2\u013b\u013a\3\2\2\2\u013c\u0146\3\2\2\2\u013d\u0140\f\20"+
+		"\2\2\u013e\u013f\7\4\2\2\u013f\u0141\5\30\r\2\u0140\u013e\3\2\2\2\u0141"+
+		"\u0142\3\2\2\2\u0142\u0140\3\2\2\2\u0142\u0143\3\2\2\2\u0143\u0145\3\2"+
+		"\2\2\u0144\u013d\3\2\2\2\u0145\u0148\3\2\2\2\u0146\u0144\3\2\2\2\u0146"+
+		"\u0147\3\2\2\2\u0147\31\3\2\2\2\u0148\u0146\3\2\2\2\u0149\u0154\7;\2\2"+
+		"\u014a\u014b\5\26\f\2\u014b\u014c\7\25\2\2\u014c\u014d\5\26\f\2\u014d"+
+		"\u014e\7\26\2\2\u014e\u0154\3\2\2\2\u014f\u0150\5\26\f\2\u0150\u0151\7"+
+		"\6\2\2\u0151\u0152\7;\2\2\u0152\u0154\3\2\2\2\u0153\u0149\3\2\2\2\u0153"+
+		"\u014a\3\2\2\2\u0153\u014f\3\2\2\2\u0154\33\3\2\2\2\u0155\u0156\5\26\f"+
+		"\2\u0156\u0157\7\17\2\2\u0157\u0158\5\30\r\2\u0158\u0160\3\2\2\2\u0159"+
+		"\u015a\5\26\f\2\u015a\u015b\7\60\2\2\u015b\u015c\5\26\f\2\u015c\u015d"+
+		"\7\17\2\2\u015d\u015e\5\30\r\2\u015e\u0160\3\2\2\2\u015f\u0155\3\2\2\2"+
+		"\u015f\u0159\3\2\2\2\u0160\35\3\2\2\2\u0161\u0162\5\26\f\2\u0162\u0163"+
+		"\7&\2\2\u0163\u0164\5\30\r\2\u0164\37\3\2\2\2\u0165\u0166\78\2\2\u0166"+
+		"!\3\2\2\2\u0167\u0168\t\5\2\2\u0168#\3\2\2\2\u0169\u016d\7\66\2\2\u016a"+
+		"\u016d\7\67\2\2\u016b\u016d\7;\2\2\u016c\u0169\3\2\2\2\u016c\u016a\3\2"+
+		"\2\2\u016c\u016b\3\2\2\2\u016d%\3\2\2\2%+\65\67=?EGL[_kv{\u0086\u008b"+
+		"\u008e\u0095\u009d\u00a5\u00ba\u00bd\u00d0\u00d2\u00e9\u00f2\u00fe\u0102"+
+		"\u0131\u0136\u013b\u0142\u0146\u0153\u015f\u016c";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

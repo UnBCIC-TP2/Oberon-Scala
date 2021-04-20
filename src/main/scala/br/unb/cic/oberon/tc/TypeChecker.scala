@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, ExitStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, LoopStmt, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, ExitStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, IntegerType, LTEExpression, LTExpression, LoopStmt, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, ProcedureDeclaration, ExternalProcedureDeclaration, RangeCase, ReadIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
 
@@ -218,20 +218,25 @@ class TypeChecker extends OberonVisitorAdapter {
       else {
         // check if the type of the formal arguments and the actual arguments
         // match.
-        val formalArgumentTypes = procedure.args.map(a => a.argumentType)
-        val actualArgumentTypes = args.map(a => a.accept(expVisitor).get)
-        // the two lists must have the same size.
-        if(formalArgumentTypes.size != actualArgumentTypes.size) {
-          return List((stmt, s"Wrong number of arguments to the $name procedure"))
+        procedure match {
+          case ProcedureDeclaration(_, _, _, _, _, _) => {
+            val proc = procedure.asInstanceOf[ProcedureDeclaration]
+            val formalArgumentTypes = proc.args.map(a => a.argumentType)
+            val actualArgumentTypes = args.map(a => a.accept(expVisitor).get)
+            // the two lists must have the same size.
+            if(formalArgumentTypes.size != actualArgumentTypes.size) {
+              return List((stmt, s"Wrong number of arguments to the $name procedure"))
+            }
+            val allTypesMatch = formalArgumentTypes.zip(actualArgumentTypes)
+              .map(pair => pair._1 == pair._2)
+              .forall(v => v)
+            if(!allTypesMatch) {
+              return List((stmt, s"The arguments do not match the $name formal arguments"))
+            }
+            // if everything above is ok, lets check the procedure body.
+            proc.stmt.accept(this)
+          }
         }
-        val allTypesMatch = formalArgumentTypes.zip(actualArgumentTypes)
-          .map(pair => pair._1 == pair._2)
-          .forall(v => v)
-        if(!allTypesMatch) {
-          return List((stmt, s"The arguments do not match the $name formal arguments"))
-        }
-        // if everything above is ok, lets check the procedure body.
-        procedure.stmt.accept(this)
       }
   }
 }
