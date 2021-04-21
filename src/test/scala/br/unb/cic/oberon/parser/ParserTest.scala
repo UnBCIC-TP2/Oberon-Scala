@@ -1914,7 +1914,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
-  ignore("Testing module B oberon import module feature. Import one module") {
+  test("Testing module B oberon import module feature. Import one module") {
     val moduleB = ScalaParser.parseResource("imports/B.oberon")
 
     // TODO: tirar esses comentários
@@ -1924,6 +1924,9 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("expecting 1 stmt in the main block")
     }
     */
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleB.submodules)
 
     val expectedImpt = Map("A" -> "A")
     // assert(moduleB.impt == expectedImpt)
@@ -1936,8 +1939,11 @@ class ParserTestSuite extends AnyFunSuite {
     */
   }
 
-  ignore("Testing module D oberon import module feature. Import two modules") {
+  test("Testing module D oberon import module feature. Import two modules") {
     val moduleD = ScalaParser.parseResource("imports/D.oberon")
+
+    val expectedSet = Set("A","C")
+    assert(expectedSet == moduleD.submodules)
 
     val expectedImpt = Map(
       "A" -> "A",
@@ -1956,8 +1962,11 @@ class ParserTestSuite extends AnyFunSuite {
   }
   */
 
-  ignore("Testing module F oberon import module feature. Alias and module name") {
+  test("Testing module F oberon import module feature. Alias and module name") {
     val moduleF = ScalaParser.parseResource("imports/F.oberon")
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleF.submodules)
 
     val expectedImpt = Map("alias" -> "A")
     // assert(moduleF.impt == expectedImpt)
@@ -1973,8 +1982,11 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   // ignore() pq o H.oberon não existe ainda
-  ignore("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
+  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
     val moduleH = ScalaParser.parseResource("imports/H.oberon")
+
+    val expectedSet = Set("A", "C", "D")
+    assert(expectedSet == moduleH.submodules)
 
     val expectedImpt = Map(
       "aliasA" -> "A",
