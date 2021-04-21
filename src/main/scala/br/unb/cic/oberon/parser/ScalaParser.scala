@@ -35,7 +35,7 @@ object ScalaParser {
   }
 }
 
-case class QualifiedName(mod: String, name: String)
+case class String(mod: String, name: String)
 
 class ParserVisitor {
 

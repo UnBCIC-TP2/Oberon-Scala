@@ -8,7 +8,8 @@ import br.unb.cic.oberon.ast.OberonModule
 class ModuleLoader {
 
     var main: Option[String] = None
-    var modules = Map.empty[String, OberonModule]
+    //var modules = Map.empty[String, OberonModule]
+    var modules = Set[String] 
     var readFiles = Set.empty[String]
 
     // TODO: handle case where `file` does not exist or we can't get the content
@@ -18,6 +19,7 @@ class ModuleLoader {
         }
 
         // Read and parse `file`
+        //A.oberon
         readFiles += file
         val input = getContent(file)
         val module = ScalaParser.parse(input)
@@ -37,12 +39,16 @@ class ModuleLoader {
     }
 
     def add(module: OberonModule) = {
-        modules += module.name -> module
+        //modules += module.name -> module
+        modules += module.name
     }
 
     protected def getContent(file: String): String = {
-        // read file
-        ???
+        var content : String
+        for (line <- Source.fromFile(file).getLines) {
+            content += line 
+        }
+        return content
     }
 
     private def findModulePath(basePath: String, moduleId: String) = {

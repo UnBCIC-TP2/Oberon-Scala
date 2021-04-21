@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.environment
 
 import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
-import br.unb.cic.oberon.parser.{ModuleLoader, QualifiedName}
+import br.unb.cic.oberon.parser.{ModuleLoader, String}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
  * or for type checking oberon programs.
  *
  * We have two kinds of memory: global and stack.
- * All global variables reside in the global are;
+ * All global variables reside in the global area;
  * while local variables reside in the stack.
  *
  * Whenever we call a procedure, we push a memory
@@ -22,14 +22,14 @@ import scala.collection.mutable.ListBuffer
  */
 class Environment[T](val modloader: ModuleLoader) {
 
-  private val global = Map.empty[QualifiedName, T]
-  private val stack = Stack.empty[Map[QualifiedName, T]]
-  private val procedures = Map.empty[QualifiedName, Procedure]
-  private val userDefinedTypes = Map.empty[QualifiedName, UserDefinedType]
+  private val global = Map.empty[String, T]
+  private val stack = Stack.empty[Map[String, T]]
+  private val procedures = Map.empty[String, Procedure]
+  private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
-  private val userArrayTypes = Map.empty[QualifiedName, ListBuffer[Expression]]
+  private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: QualifiedName, value: T) : Unit = global += name -> value
+  def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes += userDefinedTypeName(userType) -> userType
@@ -39,14 +39,14 @@ class Environment[T](val modloader: ModuleLoader) {
     }
   }
 
-  def setLocalVariable(name: QualifiedName, value: T) : Unit = {
+  def setLocalVariable(name: String, value: T) : Unit = {
     if(stack.size == 0) {
-      stack.push(Map.empty[QualifiedName, T])
+      stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
   }
 
-  def setVariable(name: QualifiedName, value: T) : Unit = {
+  def setVariable(name: String, value: T) : Unit = {
     if(!stack.isEmpty && stack.top.contains(name)) {
       setLocalVariable(name, value)
     }
@@ -56,36 +56,36 @@ class Environment[T](val modloader: ModuleLoader) {
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def lookup(name: QualifiedName) : Option[T] = {
+  def lookup(name: String) : Option[T] = {
     if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
     else None
   }
 
-  def reassignArray(name: QualifiedName, index: Int, value: Expression) : Unit = {
+  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
     if (userArrayTypes.contains(name)) {
       userArrayTypes(name).update(index, value)
     }
   }
 
-  def lookupArrayIndex(name: QualifiedName, index: Int) : Option[Expression] = {
+  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
     if (userArrayTypes.contains(name) && userArrayTypes(name).length > index) {
       Some(userArrayTypes(name)(index))
     }
     else None
   }
 
-  def lookupUserDefinedType(name: QualifiedName) : Option[UserDefinedType] = userDefinedTypes.get(name)
+  def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
 
-  def findProcedure(name: QualifiedName): Procedure = procedures(name)
+  def findProcedure(name: String): Procedure = procedures(name)
 
-  def push(): Unit = stack.push(Map.empty[QualifiedName, T])
+  def push(): Unit = stack.push(Map.empty[String, T])
 
   def pop(): Unit = stack.pop()
 
-  def userDefinedTypeName(userDefinedType: UserDefinedType) : QualifiedName =
+  def userDefinedTypeName(userDefinedType: UserDefinedType) : String =
      userDefinedType match {
          case ArrayType(name, _, _) => name
          case RecordType(name, _) => name
