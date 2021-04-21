@@ -16,7 +16,6 @@ BEGIN
     x: integer;
     x := 2;
     inc(x);
-    deInc(x);
 
     write(x);
 END
