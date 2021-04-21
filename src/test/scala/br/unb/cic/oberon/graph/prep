@@ -1,0 +1,29 @@
+import br.unb.cic.oberon.ast._;
+import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode};
+import scalax.collection.mutable.Graph;
+import scalax.collection.GraphEdge;
+import scalax.collection.GraphPredef.EdgeAssoc;
+import scala.collection.mutable.ArrayBuffer;
+import br.unb.cic.oberon.analysis.ReachingDefinition;
+
+val s3_1 = AssignmentStmt("max", VarExpression("x"));
+val s1 = ReadIntStmt("x");
+val s2 = ReadIntStmt("max");
+val s3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), s3_1 , None);
+val s4 = WriteStmt(VarExpression("max"));
+
+var g = Graph[Int, GraphEdge.DiEdge]();
+g += 1 ~> 2;
+g += 2 ~> 3;
+g += 2 ~> 4;
+g += 4 ~> 5;
+
+
+var cfg = Graph[GraphNode, GraphEdge.DiEdge]();
+cfg += StartNode() ~> SimpleNode(s1);
+cfg += SimpleNode(s1) ~> SimpleNode(s2);
+cfg += SimpleNode(s2) ~> SimpleNode(s3);
+cfg += SimpleNode(s3) ~> SimpleNode(s3_1);
+cfg += SimpleNode(s3_1) ~> SimpleNode(s4);
+cfg += SimpleNode(s3) ~> SimpleNode(s4);
+cfg += SimpleNode(s4) ~> EndNode();
