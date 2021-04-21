@@ -4,7 +4,7 @@ VAR
     x : INTEGER;
 
 BEGIN
-    x := 2;
+    x := 2
 END
 
 END C.
