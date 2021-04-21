@@ -1,7 +1,6 @@
 package br.unb.cic.oberon.environment
 
 import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
-import br.unb.cic.oberon.parser.{ModuleLoader, String}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -20,7 +19,7 @@ import scala.collection.mutable.ListBuffer
  * area (a hash map) into the stack. Whenever we
  * return from a procedure, we pop the stack.
  */
-class Environment[T](val modloader: ModuleLoader) {
+class Environment[T] {
 
   private val global = Map.empty[String, T]
   private val stack = Stack.empty[Map[String, T]]

@@ -23,16 +23,14 @@ import scala.io.StdIn
  * We assume the program is well-typed, otherwise,
  * a runtime exception might be thrown.
  */
-class Interpreter(val modloader: ModuleLoader = new ModuleLoader) extends OberonVisitorAdapter {
+class Interpreter extends OberonVisitorAdapter {
   type T = Unit
 
-  val env = new Environment[Expression](modloader)
+  val env = new Environment[Expression]()
 
   var printStream : PrintStream = new PrintStream(System.out)
 
   override def visit(module: OberonModule): Unit = {
-    modloader.add(module)
-
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))

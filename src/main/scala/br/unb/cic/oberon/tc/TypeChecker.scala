@@ -57,15 +57,13 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
   }
 }
 
-class TypeChecker(val modloader: ModuleLoader = new ModuleLoader) extends OberonVisitorAdapter {
+class TypeChecker extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
 
-  val env =  new Environment[Type](modloader)
+  val env =  new Environment[Type]()
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {
-    modloader.add(module)
-
     module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.map(p => env.declareProcedure(p))

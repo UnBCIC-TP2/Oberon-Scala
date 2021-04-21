@@ -35,8 +35,6 @@ object ScalaParser {
   }
 }
 
-case class String(mod: String, name: String)
-
 class ParserVisitor {
 
   var module: OberonModule = _
