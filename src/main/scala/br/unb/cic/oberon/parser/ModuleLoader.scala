@@ -1,8 +1,8 @@
 package br.unb.cic.oberon.parser
 
-import org.antlr.v4.runtime._
+import br.unb.cic.oberon.ast.{OberonModule, SequenceStmt, Statement}
 import br.unb.cic.oberon.util.Resources
-import br.unb.cic.oberon.ast.{OberonModule, Statement, SequenceStmt}
+
 import scala.io.Source
 import scala.reflect.io.Path
 
@@ -59,7 +59,7 @@ class ModuleLoader {
 
 }
 
-trait ContentFromResource extends ModuleLoader {
+sealed trait ContentFromResource extends ModuleLoader {
     protected override def getContent(resource: Path): String =
         Resources.getContent(resource.path)
 }
