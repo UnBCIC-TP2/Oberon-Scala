@@ -39,14 +39,14 @@ class Environment[T] {
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
-    if(stack.size == 0) {
+    if(stack.isEmpty) {
       stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
-    if(!stack.isEmpty && stack.top.contains(name)) {
+    if(stack.nonEmpty && stack.top.contains(name)) {
       setLocalVariable(name, value)
     }
     else if(global.contains(name)) {
@@ -56,7 +56,7 @@ class Environment[T] {
   }
 
   def lookup(name: String) : Option[T] = {
-    if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
+    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
     else None
   }
