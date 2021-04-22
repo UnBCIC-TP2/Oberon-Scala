@@ -2348,14 +2348,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp2 == DivExpression(VarExpression("x"), VarExpression("y")))
   }
 
-  test("Testing the parse for a boolean expression") {
+  test("Testing the parser for a boolean expression") {
     val boolValue = "True"
 
     val exp1 = ScalaParser.parseExpression(boolValue)
     assert(exp1 == BoolValue(true))
   }
 
-  test("Testing the parse for and operation expressions") {
+  test("Testing the parser for and operation expressions") {
     val and1 = "True && False"
     val and2 = "x && y"
 
@@ -2366,7 +2366,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp2 == AndExpression(VarExpression("x"), VarExpression("y")))
   }
 
-  test("Testing the parse for or operation expressions") {
+  test("Testing the parser for or operation expressions") {
     val or1 = "True || True"
     val or2 = "x || y"
 
@@ -2377,7 +2377,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp2 == OrExpression(VarExpression("x"), VarExpression("y")))
   }
 
-  test("Testing the parse for equal expressions") {
+  test("Testing the parser for equal expressions") {
     val eq1 = "1 = True"
     val eq2 = "x = y"
 
@@ -2386,6 +2386,25 @@ class ParserTestSuite extends AnyFunSuite {
 
     val exp2 = ScalaParser.parseExpression(eq2)
     assert(exp2 == EQExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for logical bigger and lesser") {
+    val eq1 = "4 > 2";
+    val eq2 = "4 >= 4";
+    val eq3 = "4 < 5";
+    val eq4 = "5 <= 5";
+
+    val exp1 = ScalaParser.parseExpression(eq1)
+    assert(exp1 == GTExpression(IntValue(4), IntValue(2)))
+
+    val exp2 = ScalaParser.parseExpression(eq2)
+    assert(exp2 == GTEExpression(IntValue(4), IntValue(4)))
+
+    val exp3 = ScalaParser.parseExpression(eq3)
+    assert(exp3 == LTExpression(IntValue(4), IntValue(5)))
+
+    val exp4 = ScalaParser.parseExpression(eq4)
+    assert(exp4 == LTEExpression(IntValue(5), IntValue(5)))
   }
 
 }
