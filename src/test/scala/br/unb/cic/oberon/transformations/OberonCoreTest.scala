@@ -5,6 +5,7 @@ import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
+import java.util.concurrent.locks.Condition
 
 
 class CoreVisitorTest extends AnyFunSuite {
@@ -207,9 +208,6 @@ class CoreVisitorTest extends AnyFunSuite {
         val stmts = sequence.stmts
 
 
-        println(stmts(0))
-        println(stmts(1))
-        println(stmts(2))
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(0)))
         assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), AssignmentStmt("i",IntValue(0)), WhileStmt(BoolValue(true), SequenceStmt(List(AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), AssignmentStmt("i",AddExpression(VarExpression("i"),IntValue(1))), IfElseStmt(EQExpression(VarExpression("i"),IntValue(10)),ExitStmt(),None)))), IfElseStmt(EQExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None)))))
@@ -246,6 +244,132 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("sum").contains(IntValue(55)));
     }
 
+    /**RepeatUntil Test 06*/
+    //TODO Checar negação da expressão no condicional do while
+    test("Testing the RepeatUntilStmt06 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "RepeatUntilModule");
+        assert(interpreter.env.lookup("x").contains(IntValue(11)));
+    }
+
+    /**RepeatUntil Test 07*/
+    //TODO Checar negação da expressão no condicional do while
+    test("Testing the RepeatUntilStmt07 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "RepeatUntilModule");
+        assert(interpreter.env.lookup("x").contains(IntValue(20)));
+        assert(interpreter.env.lookup("y").contains(IntValue(20)));
+    }
+
+    /**RepeatUntil Test 0202*/
+    //TODO Checar negação da expressão no condicional do while
+    test("Testing the repeatuntil02 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil02.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "RepeatUntilModule");
+
+        println(interpreter.env.lookup("x"))
+        println(interpreter.env.lookup("y"))
+        
+        assert(interpreter.env.lookup("x").contains(IntValue(10)));
+        assert(interpreter.env.lookup("y").contains(IntValue(19)));
+    }
+
+    /**RepeatUntil Test 0204*/
+    //TODO Checar negação da expressão no condicional do while
+    test("Testing the repeatuntil04 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil04.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "RepeatUntilModule");
+
+        println(interpreter.env.lookup("x"))
+        println(interpreter.env.lookup("y"))
+        
+        assert(interpreter.env.lookup("x").contains(IntValue(2)));
+        assert(interpreter.env.lookup("y").contains(IntValue(2)));
+    }
     
     /**For Test*/
     test("Testing the interpreter_stmt01 conversion to OberonCore") {
@@ -278,6 +402,37 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
     }
 
+    /**For Test 08*/
+    test("Testing the stmt08 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt08.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "SimpleModule")
+        
+        assert(interpreter.env.lookup("x") == Some(IntValue(7))) // FOR TO x
+        assert(interpreter.env.lookup("k") == Some(IntValue(12))) // k = result
+    }
+
+
     /**IfelseIfStmt Test*/
     test("Testing the IfElseIfStmt01 conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
@@ -305,6 +460,66 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(module.name == "SimpleModule")
 
         assert(interpreter.env.lookup("y") == Some(IntValue(1)));
+    }
+
+    /**IfelseIfStmt Test 03*/
+    test("Testing the IfElseIfStmt03 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "SimpleModule")
+
+        assert(interpreter.env.lookup("x") == Some(IntValue(10)));
+        assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+    }
+
+    /**IfelseIfStmt Test 05*/
+    test("Testing the IfElseIfStmt05 conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val stmtcore = module.stmt.get.accept(coreVisitor)
+
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "SimpleModule")
+
+        assert(interpreter.env.lookup("x") == Some(IntValue(55)));
+        assert(interpreter.env.lookup("y") == Some(IntValue(5)));
     }
 
 }
