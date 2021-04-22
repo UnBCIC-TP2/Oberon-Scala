@@ -14,12 +14,12 @@ class ControlFlowGraphTest extends AnyFunSuite {
    * This is the test case for a control-flow graph for the following Oberon Code:
    *
    * BEGIN
-   *   readInt(x);
-   *   readInt(max);
-   *   IF(x > max) THEN
-   *     max := x
-   *   END;
-   *   write(max)
+   * 1   readInt(x); (x,1)                  (x,1)
+   * 2   readInt(max); (x,1), (max,3)       (x,1), (max,3)
+   * 3   IF(x > max) THEN (x,1), (max,3)    (x,1), (max,3)
+   * 4     max := x (x,1), (max,5)
+   *     END;
+   * 5   write(max) (x,1), (max,3)
    * END
    *
    */

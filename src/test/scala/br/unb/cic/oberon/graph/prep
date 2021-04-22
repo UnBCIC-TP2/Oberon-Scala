@@ -27,3 +27,6 @@ cfg += SimpleNode(s3) ~> SimpleNode(s3_1);
 cfg += SimpleNode(s3_1) ~> SimpleNode(s4);
 cfg += SimpleNode(s3) ~> SimpleNode(s4);
 cfg += SimpleNode(s4) ~> EndNode();
+
+var r = new ReachingDefinition;
+r.analyseReachingDefinitions(cfg);
