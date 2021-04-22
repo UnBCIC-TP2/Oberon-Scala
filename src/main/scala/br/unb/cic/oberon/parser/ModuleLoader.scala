@@ -74,9 +74,10 @@ sealed class ModuleMerger(val loader: ModuleLoader) {
 
         val module = loader.modules(modname)
         val submodules = module.submodules
-            .toList
+            .iterator // iterate lazily so `filter` works correctly
             .filterNot(merged contains _) // ignore "already merged" modules
             .map(merge)
+            .toList
 
         val subtree = submodules ++ List(module) // The order is important for `stmt`
 
