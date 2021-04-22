@@ -7,6 +7,9 @@ import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import java.util.Base64
 
+import jdk.internal.org.objectweb.asm.Opcodes._
+import jdk.internal.org.objectweb.asm._
+
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields") {
@@ -28,6 +31,18 @@ class JVMCodeGenTest extends AnyFunSuite {
     val out = new FileOutputStream(createOutputFile(module.name).toFile)
 
     out.write(Base64.getDecoder.decode(byteCodeAsString))
+
+    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
+
+    val v = new ClassVisitorTest(ASM4);
+
+    cr.accept(v, 0);
+
+    assert(3 == v.numberOfFields);
+    assert(1 == v.numberOfIntegerConstants);
+    assert(1 == v.numberOfIntegerVariables);
+    assert(1 == v.numberOfBooleanVariables);
+    assert(0 == v.numberOfBooleanConstants);
 
     //TODO: seria interessante verificar algumas propriedades do
     //      arquivo gerado.

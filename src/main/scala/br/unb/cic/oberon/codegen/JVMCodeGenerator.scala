@@ -21,7 +21,6 @@ object JVMCodeGenerator extends CodeGenerator {
 
   override def generateCode(module: OberonModule): String = {
 
-
     cv.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
 
     generateConstants(module.constants)
@@ -36,7 +35,7 @@ object JVMCodeGenerator extends CodeGenerator {
   def generateDeclarations(variables: List[VariableDeclaration]): Unit = {
     variables.foreach((v : VariableDeclaration) =>
       v.variableType match {
-        case IntegerType =>  cv.visitField(ACC_PUBLIC, v.name, "I", null, new Integer(0)).visitEnd()
+        case IntegerType =>  cv.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
         case BooleanType => cv.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
       }
     )
@@ -50,12 +49,14 @@ object JVMCodeGenerator extends CodeGenerator {
     constants.map {
       case (constant) => 
         val v = constant.exp.accept(visitor)
-        if (v.isInstanceOf[IntValue]) {
-          val value = v.asInstanceOf[IntValue].value
-          cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, new Integer(value)).visitEnd();
-        } else {
-          val value = v.asInstanceOf[BoolValue].value
-          cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, !(!value)).visitEnd();
+
+        v match {
+          case IntValue (value) => {
+            cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, value).visitEnd();
+          }
+          case BoolValue (value) => {
+            cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
+          }
         }
     }
   }
