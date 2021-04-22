@@ -1,0 +1,14 @@
+MODULE SimpleModule;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+BEGIN
+    x := 5000;
+    y := 7;
+    IF (x = y) THEN
+        x := 0
+    ELSIF (x > y) THEN
+        x := 1
+    END
+END

@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+VAR
+  x : REAL;
+  y : REAL;
+BEGIN
+    x := 15.2;
+    y := 2.5;
+    x := x * y
+END
+
+END SimpleModule.

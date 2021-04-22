@@ -3,6 +3,7 @@ package br.unb.cic.oberon.parser
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.OberonParser.StatementContext
+import scala.collection.mutable._
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -31,13 +32,14 @@ object ScalaParser {
 }
 
 class ParserVisitor {
-
+  var tipo = Queue[Int]();
   var module: OberonModule = _
+  var variables : List[br.unb.cic.oberon.ast.VariableDeclaration] = List()
 
   def visitCompilationUnit(ctx: OberonParser.CompilationUnitContext): Unit = {
     val name = ctx.name
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
-    val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
+    variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
@@ -127,11 +129,36 @@ class ParserVisitor {
     if (typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
   }
 
+
   class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
     var baseType: Type = _
 
-    override def visitIntegerType(ctx: OberonParser.IntegerTypeContext): Unit =
+    override def visitIntegerType(ctx: OberonParser.IntegerTypeContext): Unit = {
+      tipo.enqueue(0)
       baseType = IntegerType
+    }
+
+    override def visitRealType(ctx: OberonParser.RealTypeContext): Unit = {
+      tipo.enqueue(1)
+      baseType = RealType
+    }
+
+    override def visitShortType(ctx: OberonParser.ShortTypeContext): Unit = {
+      tipo.enqueue(2)
+      baseType = ShortType
+
+    }
+
+    override def visitLongRealType(ctx: OberonParser.LongRealTypeContext): Unit = {
+      tipo.enqueue(3)
+      baseType = LongRealType
+    }
+
+    override def visitLongType(ctx: OberonParser.LongTypeContext): Unit = {
+      tipo.enqueue(4)
+      baseType = LongType
+
+    }
 
     override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = {
       baseType = BooleanType
@@ -148,7 +175,45 @@ class ParserVisitor {
     var exp: Expression = _
 
     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
-      exp = IntValue(ctx.getText.toInt)
+    {
+      var a = ctx.parent.parent.getText().split(":")(0)
+
+      for(v <- variables)
+      {
+        if(v.name == a)
+        {
+          if(v.variableType == IntegerType)
+            exp = IntValue(ctx.getText.toInt);
+          else if (v.variableType == ShortType)
+            exp = ShortValue(ctx.getText.toShort);
+          else exp = LongValue(ctx.getText.toLong)
+
+          return
+        }
+      }
+      exp = IntValue(ctx.getText.toInt);
+    }
+
+
+    override def visitRealValue(ctx: OberonParser.RealValueContext): Unit =
+      {
+        var a = ctx.parent.parent.getText().split(":")(0)
+
+        for(v <- variables)
+        {
+          if(v.name == a)
+          {
+            if(v.variableType == RealType)
+              exp = RealValue(ctx.getText.toFloat);
+            else
+              exp = LongRealValue(ctx.getText.toDouble)
+
+            return
+          }
+        }
+
+        exp = RealValue(ctx.getText.toFloat);
+      }
 
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")

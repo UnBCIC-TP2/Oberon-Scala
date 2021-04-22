@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x : SHORTINT;
+  y : SHORTINT;
+  
+BEGIN
+  x := 101;
+  y := 5;
+  x := x / y;
+  x := x * y;
+  x := x - y;
+  x := x + x
+END
+
+END SimpleModule.

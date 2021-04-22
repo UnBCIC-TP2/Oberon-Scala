@@ -48,6 +48,7 @@ block
 expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
+ | realValue                                                                              #FloatValue
  | boolValue                                                                              #BooleanValue 
  | name = Id                                                                              #Variable
  | name = Id '(' arguments? ')'                                                           #FunctionCall
@@ -96,15 +97,22 @@ elseIfStmt : cond = expression 'THEN' stmt = statement ;
 
 intValue : INT ;
 
+realValue: REAL ;
+
 boolValue: TRUE | FALSE ;
 
 oberonType
  : 'INTEGER'         #IntegerType
+ | 'REAL'            #RealType
+ | 'SHORTINT'        #ShortType
+ | 'LONGINT'         #LongType
+ | 'LONGREAL'        #LongRealType
  | 'BOOLEAN'         #BooleanType
  | name = Id         #ReferenceType        // Reference for user defined types
  ;
 
 INT : Digit+;
+REAL : Digit+ '.' Digit+;
 
 TRUE  : 'True' ;
 FALSE : 'False'  ;
