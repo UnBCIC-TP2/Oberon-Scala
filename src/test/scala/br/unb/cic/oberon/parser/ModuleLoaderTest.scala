@@ -7,21 +7,40 @@ import br.unb.cic.oberon.ast._
 
 class ModuleLoaderTestSuite extends AnyFunSuite {
 
+  def makeModule(name: String = "",
+                 submodules: Set[String] = Set(),
+                 userTypes: List[UserDefinedType] = List(),
+                 constants: List[Constant] = List(),
+                 variables: List[VariableDeclaration] = List(),
+                 procedures: List[Procedure] = List(),
+                 stmt: Option[Statement] = None
+                 ): OberonModule = {
+    OberonModule(name, submodules, userTypes, constants, variables, procedures, stmt)
+  }
+
   test("Testing if the ModuleLoader imports a file") {
-    val loader = ResourceModuleLoader.load("imports/B.oberon")
+    val module = ResourceModuleLoader.loadAndMerge("imports/A.oberon")
 
-    var file = """MODULE A;
+    val expected = makeModule(
+      name = "A",
+      variables = List(VariableDeclaration("A::x", IntegerType)),
+      stmt = Some(SequenceStmt(List(AssignmentStmt("A::x", IntValue(1)))))
+    )
+    assert(module == expected)
+  }
 
-VAR
-    x : INTEGER;
+  test("Testing if the ModuleLoader loads an import recursively") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/B.oberon")
 
-BEGIN
-    x := 1
-END
-
-END A."""
-
-    assert(loader.modules.get("A") == file)
+    val expected = makeModule(
+      name = "B",
+      variables = List(VariableDeclaration("A::x", IntegerType)),
+      stmt = Some(SequenceStmt(List(
+          AssignmentStmt("A::x", IntValue(1)),
+          WriteStmt(VarExpression("A::x"))
+      )))
+    )
+    assert(module == expected)
   }
 
 }

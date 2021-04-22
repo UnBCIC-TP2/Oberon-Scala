@@ -1942,17 +1942,5 @@ class ParserTestSuite extends AnyFunSuite {
     assert(expectedSet == moduleH.submodules)
   }
 
-  test("Testing if the ModuleLoader loads a single module without imports") {
-    val module = ResourceModuleLoader.loadAndMerge("imports/A.oberon")
-
-    assert(module.variables contains "A::x")
-    assert(!(module.variables contains "x"))
-  }
-
-  test("Testing if the ModuleLoader loads imports recursively") {
-    val module = ResourceModuleLoader.loadAndMerge("imports/B.oberon")
-
-    assert(module.variables contains "A::x")
-  }
 
 }
