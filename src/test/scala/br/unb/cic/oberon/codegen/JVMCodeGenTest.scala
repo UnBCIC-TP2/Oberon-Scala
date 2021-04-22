@@ -38,15 +38,80 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     cr.accept(v, 0);
 
-    assert(3 == v.numberOfFields);
+    assert(3 == v.numberOfTotalFields);
     assert(1 == v.numberOfIntegerConstants);
     assert(1 == v.numberOfIntegerVariables);
     assert(1 == v.numberOfBooleanVariables);
     assert(0 == v.numberOfBooleanConstants);
-
-    //TODO: seria interessante verificar algumas propriedades do
-    //      arquivo gerado.
   }
+
+ // test("Generate code of simple 03 oberon") {
+ //    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").getFile)
+
+ //    assert(path != null)
+
+ //    val content = String.join("\n", Files.readAllLines(path))
+ //    val module = ScalaParser.parse(content)
+
+ //    assert(module.name == "SimpleModule")
+ //    assert(module.variables.size == 2)
+ //    assert(module.constants.size == 3)
+
+ //    val codeGen = JVMCodeGenerator
+
+ //    val byteCodeAsString = codeGen.generateCode(module)
+
+ //    val out = new FileOutputStream(createOutputFile(module.name).toFile)
+
+ //    out.write(Base64.getDecoder.decode(byteCodeAsString))
+
+ //    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
+
+ //    val v = new ClassVisitorTest(ASM4);
+
+ //    cr.accept(v, 0);
+
+ //    assert(5 == v.numberOfTotalFields);
+ //    assert(2 == v.numberOfIntegerConstants);
+ //    assert(1 == v.numberOfIntegerVariables);
+ //    assert(1 == v.numberOfBooleanVariables);
+ //    assert(1 == v.numberOfBooleanConstants);
+
+ //  }
+
+ //  test("Generate code of simple 04 oberon") {
+ //    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").getFile)
+
+ //    assert(path != null)
+
+ //    val content = String.join("\n", Files.readAllLines(path))
+ //    val module = ScalaParser.parse(content)
+
+ //    assert(module.name == "SimpleModule")
+ //    assert(module.variables.size == 2)
+ //    assert(module.constants.size == 3)
+
+ //    val codeGen = JVMCodeGenerator
+
+ //    val byteCodeAsString = codeGen.generateCode(module)
+
+ //    val out = new FileOutputStream(createOutputFile(module.name).toFile)
+
+ //    out.write(Base64.getDecoder.decode(byteCodeAsString))
+
+ //    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
+
+ //    val v = new ClassVisitorTest(ASM4);
+
+ //    cr.accept(v, 0);
+
+ //    assert(5 == v.numberOfTotalFields);
+ //    assert(3 == v.numberOfIntegerConstants);
+ //    assert(1 == v.numberOfIntegerVariables);
+ //    assert(1 == v.numberOfBooleanVariables);
+ //    assert(0 == v.numberOfBooleanConstants);
+
+ //  }
 
 
   /*
