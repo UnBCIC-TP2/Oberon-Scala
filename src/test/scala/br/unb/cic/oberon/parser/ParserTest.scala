@@ -1917,26 +1917,8 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing module B oberon import module feature. Import one module") {
     val moduleB = ScalaParser.parseResource("imports/B.oberon")
 
-    // TODO: tirar esses comentários
-    /*
-    moduleA.stmt.get match {
-      case AssignmentStmt(stmt, exp) => assert(stmt == "x" && exp == IntValue(1))
-      case _ => fail("expecting 1 stmt in the main block")
-    }
-    */
-
     val expectedSet = Set("A")
     assert(expectedSet == moduleB.submodules)
-
-    val expectedImpt = Map("A" -> "A")
-    // assert(moduleB.impt == expectedImpt)
-
-    /*
-    moduleB.stmt.get match {
-      case WriteStmt(exp) => assert(exp == IntValue(1))
-      case _ => fail("expecting value 1 from module A ")
-    }
-    */
   }
 
   test("Testing module D oberon import module feature. Import two modules") {
@@ -1944,56 +1926,20 @@ class ParserTestSuite extends AnyFunSuite {
 
     val expectedSet = Set("A","C")
     assert(expectedSet == moduleD.submodules)
-
-    val expectedImpt = Map(
-      "A" -> "A",
-      "C" -> "C"
-    )
-    // assert(moduleD.impt == expectedImpt)
   }
-
-  // TODO: Tirar esses comentários
-  /*
-  test("Testing the E oberon import module feature. Empty import") {
-    val moduleE = ScalaParser.parseResource("imports/E.oberon")
-
-    assert(moduleE.impt.size == 0) /* Map("<missing Id>" -> "<missing Id>") had size 1 instead of expected size 0 */
-
-  }
-  */
 
   test("Testing module F oberon import module feature. Alias and module name") {
     val moduleF = ScalaParser.parseResource("imports/F.oberon")
 
     val expectedSet = Set("A")
     assert(expectedSet == moduleF.submodules)
-
-    val expectedImpt = Map("alias" -> "A")
-    // assert(moduleF.impt == expectedImpt)
   }
 
-  // ignore() pq o G.oberon não existe ainda
-  ignore("Testing module G oberon import module feature. Two 'IMPORT's"){
-    val moduleG = ScalaParser.parseResource("imports/G.oberon")
-
-    //! Igual ao teste do módulo F
-    val expectedImpt = Map("aliasA" -> "A")
-    // assert(moduleG.impt == expectedImpt)
-  }
-
-  // ignore() pq o H.oberon não existe ainda
   test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
     val moduleH = ScalaParser.parseResource("imports/H.oberon")
 
     val expectedSet = Set("A", "C", "D")
     assert(expectedSet == moduleH.submodules)
-
-    val expectedImpt = Map(
-      "aliasA" -> "A",
-      "aliasC" -> "C",
-      "D" -> "D"
-    )
-    // assert(moduleH.impt == expectedImpt)
   }
 
   test("Testing if the ModuleLoader loads a single module without imports") {
