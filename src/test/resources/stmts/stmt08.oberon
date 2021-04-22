@@ -4,12 +4,14 @@ VAR
   x, y, z, k : INTEGER;	
 
 BEGIN	
-    readInt(y);	
+    y:= 7;
 
     FOR x := 0 TO x < y DO	
         FOR z := 0 TO z < y DO	
-            k := z + x	
-        END	
+            k := z + x;
+            z:=z+1
+        END;
+        x:= x+1
     END;	
 
     write(k)	
