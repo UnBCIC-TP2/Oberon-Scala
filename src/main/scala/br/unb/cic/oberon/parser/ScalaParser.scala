@@ -152,6 +152,17 @@ class ParserVisitor {
     if (typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
   }
 
+  /**
+   * @brief Qualify takes a qualified name and returns a string representation of it. For instance, if we are in a
+   * module A and try to qualify a variable x, this method would return "A::x" as that literal string.
+   */
+  def qualify(ctx: OberonParser.QualifiedNameContext): String = {
+    val module: String = ctx.module.getText
+    val name: String = ctx.name.getText
+
+    module + "::" + name
+  }
+
   class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
     var baseType: Type = _
 
