@@ -37,7 +37,6 @@ class Interpreter extends OberonVisitorAdapter {
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
 
-
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
