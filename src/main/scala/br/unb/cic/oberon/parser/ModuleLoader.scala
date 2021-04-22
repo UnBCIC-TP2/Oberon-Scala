@@ -44,23 +44,28 @@ class ModuleLoader {
         true
     }
 
-    def add(module: OberonModule) = {
+    def add(module: OberonModule): Unit = {
         modules += module.name -> module
     }
 
     protected def getContent(file: Path): String = {
-        Source.fromFile(file.toURI).getLines.mkString("\n")
+        val iterator = Source.fromFile(file.toURI)
+        val content = iterator.getLines().mkString("\n")
+
+        iterator.close()
+
+        content
     }
 
 }
 
 trait ContentFromResource extends ModuleLoader {
-    protected override def getContent(resource: Path) =
+    protected override def getContent(resource: Path): String =
         Resources.getContent(resource.path)
 }
 
 /** Merges the modules loaded by a ModuleLoader into one big module */
-class ModuleMerger(val loader: ModuleLoader) {
+sealed class ModuleMerger(val loader: ModuleLoader) {
     var merged = Set.empty[String]
 
     // Merge the subtree of `modname`
@@ -71,7 +76,7 @@ class ModuleMerger(val loader: ModuleLoader) {
         val submodules = module.submodules
             .toList
             .filterNot(merged contains _) // ignore "already merged" modules
-            .map(merge _)
+            .map(merge)
 
         val subtree = submodules ++ List(module) // The order is important for `stmt`
 
@@ -95,17 +100,17 @@ class ModuleMerger(val loader: ModuleLoader) {
 
 /** Static methods for ModuleLoader */
 object ModuleLoader {
-    def loadAndMerge(file: String) = {
+    def loadAndMerge(file: String): OberonModule = {
         val loader = new ModuleLoader
         loader.load(file)
-        new ModuleMerger(loader).merge
+        new ModuleMerger(loader).merge()
     }
 }
 
 object ResourceModuleLoader {
-    def loadAndMerge(file: String) = {
+    def loadAndMerge(file: String): OberonModule = {
         val loader = new ModuleLoader with ContentFromResource
         loader.load(file)
-        new ModuleMerger(loader).merge
+        new ModuleMerger(loader).merge()
     }
 }
