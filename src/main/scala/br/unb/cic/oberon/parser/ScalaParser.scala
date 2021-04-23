@@ -163,7 +163,7 @@ class ParserVisitor {
       formalArgs = ctx.args.asScala.toList.map(arg => ReferenceArguments(arg.getText, varType))
 
       return formalArgs
-    },
+    }
   }
 
   /* A visitor for parsing expressions */
