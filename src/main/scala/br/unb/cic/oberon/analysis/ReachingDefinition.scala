@@ -20,18 +20,18 @@ class ReachingDefinition {
     // 2. GraphNode -> se for um AssingmentStatment, adicionamos no out uma tupla (var_name, GraphNode)
 
     var reachingDefinitions: Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = initializeReachingDefinitions(cfg)
-    var fixedPointReached = false
+    var fixedPointReached: Boolean = false
     var previousReachingDefinitions: Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = reachingDefinitions
+
     while(!fixedPointReached) {
       cfg.edges.foreach(
         edge => edge.edge match {
           case GraphEdge.DiEdge(previousNodeT, currentNodeT) =>
-            println("\n_______________________________\n")
-            val previousNode = previousNodeT.toOuter
-            val currentNode = currentNodeT.toOuter
-            var previousNodeOut: List[(String, GraphNode)] = reachingDefinitions(previousNode)._2
-            println(s"previousNode: $previousNode\npreviousNodeOut: $previousNodeOut\ncurrentNode: $currentNode\n")
-            var currentNodeGen: (String, GraphNode) = currentNode match {
+            val previousNode: GraphNode = previousNodeT.toOuter
+            val currentNode: GraphNode = currentNodeT.toOuter
+            val previousNodeOut: List[(String, GraphNode)] = reachingDefinitions(previousNode)._2
+
+            val currentNodeGen: (String, GraphNode) = currentNode match {
               case SimpleNode(AssignmentStmt(varName, _)) =>
                 (varName, currentNode)
               case SimpleNode(ReadIntStmt(varName)) =>
@@ -41,17 +41,16 @@ class ReachingDefinition {
             }
 
             // OUT(x) = In(x) + gen(x) - kill(x)
-//            var currentNodeOut: List[(String, GraphNode)] = (currentNodeGen :: previousNodeOut)
-            var currentNodeOut: List[(String, GraphNode)] = if (currentNodeGen != null) (currentNodeGen :: previousNodeOut.filter(definition => definition._1 != currentNodeGen._1)) else previousNodeOut
-            println(s"currentNodeOut: $currentNodeOut")
+            val currentNodeOut: List[(String, GraphNode)] = if(currentNodeGen != null) {
+              currentNodeGen :: previousNodeOut.filter(definition => definition._1 != currentNodeGen._1)
+            } else previousNodeOut
+
             reachingDefinitions = reachingDefinitions + (currentNode -> (previousNodeOut, currentNodeOut))
-            println(s"reachingDefinitions: $reachingDefinitions")
         }
       )
       fixedPointReached = previousReachingDefinitions == reachingDefinitions
       previousReachingDefinitions = reachingDefinitions
     }
-
 
     reachingDefinitions
   }
@@ -67,6 +66,4 @@ class ReachingDefinition {
 
     reachingDefinitions
   }
-
-
 }
