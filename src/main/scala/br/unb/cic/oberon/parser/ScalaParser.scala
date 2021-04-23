@@ -101,7 +101,12 @@ class ParserVisitor {
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val visitor = new FormalArgVisitor()
-    ctx.formalArg.accept(visitor)
+    
+    if(ctx.isInstanceOf[ValueArguments]){
+      return visitor.visitValueArguments(ctx)
+    } else {
+      return visitor.visitValueArguments(ctx)
+    }
   }
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
@@ -144,21 +149,21 @@ class ParserVisitor {
   }
 
   class FormalArgVisitor() extends OberonBaseVisitor[Unit] {
-    var formalArg: FormalArg = _
+    var formalArgs: FormalArg = _
     
     override def visitValueArguments(ctx: OberonParser.ValueArgumentsContext): Unit = {
       val varType = visitOberonType(ctx.argumentType)
-      ctx.args.asScala.toList.map(arg => ValueArguments(arg.getText, varType))
+      formalArgs = ctx.args.asScala.toList.map(arg => ValueArguments(arg.getText, varType))
 
-      formalArg = ValueArguments(ctx.name.getText, varType)
+      return formalArgs
     }
   
     override def visitReferenceArguments(ctx: OberonParser.ReferenceArgumentsContext): Unit = {
       val varType = visitOberonType(ctx.argumentType)
-      ctx.args.asScala.toList.map(arg => ReferenceArguments(arg.getText, varType))
+      formalArgs = ctx.args.asScala.toList.map(arg => ReferenceArguments(arg.getText, varType))
 
-      formalArg = ReferenceArguments(ctx.name.getText, varType)
-    }
+      return formalArgs
+    },
   }
 
   /* A visitor for parsing expressions */
