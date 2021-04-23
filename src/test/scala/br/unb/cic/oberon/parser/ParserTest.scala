@@ -2394,6 +2394,9 @@ class ParserTestSuite extends AnyFunSuite {
     val eq3 = "4 < 5";
     val eq4 = "5 <= 5";
 
+    val eq5 = "x > y";
+    val eq6 = "x < y";
+
     val exp1 = ScalaParser.parseExpression(eq1)
     assert(exp1 == GTExpression(IntValue(4), IntValue(2)))
 
@@ -2405,6 +2408,12 @@ class ParserTestSuite extends AnyFunSuite {
 
     val exp4 = ScalaParser.parseExpression(eq4)
     assert(exp4 == LTEExpression(IntValue(5), IntValue(5)))
+
+    val exp5 = ScalaParser.parseExpression(eq5)
+    assert(exp5 == GTExpression(VarExpression("x"), VarExpression("y")))
+
+    val exp6 = ScalaParser.parseExpression(eq6)
+    assert(exp6 == LTExpression(VarExpression("x"), VarExpression("y")))
   }
 
 }
