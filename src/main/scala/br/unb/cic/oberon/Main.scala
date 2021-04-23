@@ -110,7 +110,6 @@ object Main {
         println(result)
         input = scala.io.StdIn.readLine()
       }
-      println("saiu")
     }
 
   }
