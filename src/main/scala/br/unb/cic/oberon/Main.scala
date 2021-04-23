@@ -1,5 +1,5 @@
 import br.unb.cic.oberon.codegen.PaigesBasedGenerator
-import br.unb.cic.oberon.interpreter.Interpreter
+import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
 import org.rogach.scallop._
@@ -15,6 +15,7 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val tyc = opt[String](name = "typeChecker", short = 't', descr = "Check if the oberon code is correctly typed", argName = "Oberon program path")
   val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path Oberon program path" )
   val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path")
+  val repl = opt[Boolean](name = "repl", short = 'r', descr = "Run repl option")
 
   verify()
 
@@ -95,6 +96,20 @@ object Main {
       }
       //Files.createFile(cPath)
 
+    }
+
+    if (conf.repl.isSupplied) {
+      val interpreter = new EvalExpressionVisitor(new Interpreter)
+      var input = scala.io.StdIn.readLine()
+      while(input != "exit") {
+        if (input == "") input = "0"
+        // println(content)
+        val exp = ScalaParser.parseExpression(input)
+
+        val result = exp.accept(interpreter)
+        println(result)
+        input = scala.io.StdIn.readLine()
+      }
     }
 
   }

@@ -2304,5 +2304,116 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp2 == AddExpression(VarExpression("x"), IntValue(4)))
   }
 
+  test("Testing the parser for addition expressions") {
+    val sum1 = "7 + 14"
+    val sum2 = "x + y"
+
+    val exp1 = ScalaParser.parseExpression(sum1)
+    assert(exp1 == AddExpression(IntValue(7), IntValue(14)))
+
+    val exp2 = ScalaParser.parseExpression(sum2)
+    assert(exp2 == AddExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for subtraction expressions") {
+    val sub1 = "21 - 5"
+    val sub2 = "x - y"
+
+    val exp1 = ScalaParser.parseExpression(sub1)
+    assert(exp1 == SubExpression(IntValue(21), IntValue(5)))
+
+    val exp2 = ScalaParser.parseExpression(sub2)
+    assert(exp2 == SubExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for multiplication expressions") {
+    val multi1 = "3 * 7"
+    val multi2 = "x * y"
+
+    val exp1 = ScalaParser.parseExpression(multi1)
+    assert(exp1 == MultExpression(IntValue(3), IntValue(7)))
+
+    val exp2 = ScalaParser.parseExpression(multi2)
+    assert(exp2 == MultExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for division expressions") {
+    val div1 = "500 / 7"
+    val div2 = "x / y"
+
+    val exp1 = ScalaParser.parseExpression(div1)
+    assert(exp1 == DivExpression(IntValue(500), IntValue(7)))
+
+    val exp2 = ScalaParser.parseExpression(div2)
+    assert(exp2 == DivExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for a boolean expression") {
+    val boolValue = "True"
+
+    val exp1 = ScalaParser.parseExpression(boolValue)
+    assert(exp1 == BoolValue(true))
+  }
+
+  test("Testing the parser for and operation expressions") {
+    val and1 = "True && False"
+    val and2 = "x && y"
+
+    val exp1 = ScalaParser.parseExpression(and1)
+    assert(exp1 == AndExpression(BoolValue(true), BoolValue(false)))
+
+    val exp2 = ScalaParser.parseExpression(and2)
+    assert(exp2 == AndExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for or operation expressions") {
+    val or1 = "True || True"
+    val or2 = "x || y"
+
+    val exp1 = ScalaParser.parseExpression(or1)
+    assert(exp1 == OrExpression(BoolValue(true), BoolValue(true)))
+
+    val exp2 = ScalaParser.parseExpression(or2)
+    assert(exp2 == OrExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for equal expressions") {
+    val eq1 = "1 = True"
+    val eq2 = "x = y"
+
+    val exp1 = ScalaParser.parseExpression(eq1)
+    assert(exp1 == EQExpression(IntValue(1), BoolValue(true)))
+
+    val exp2 = ScalaParser.parseExpression(eq2)
+    assert(exp2 == EQExpression(VarExpression("x"), VarExpression("y")))
+  }
+
+  test("Testing the parser for logical bigger and lesser") {
+    val eq1 = "4 > 2";
+    val eq2 = "4 >= 4";
+    val eq3 = "4 < 5";
+    val eq4 = "5 <= 5";
+
+    val eq5 = "x > y";
+    val eq6 = "x < y";
+
+    val exp1 = ScalaParser.parseExpression(eq1)
+    assert(exp1 == GTExpression(IntValue(4), IntValue(2)))
+
+    val exp2 = ScalaParser.parseExpression(eq2)
+    assert(exp2 == GTEExpression(IntValue(4), IntValue(4)))
+
+    val exp3 = ScalaParser.parseExpression(eq3)
+    assert(exp3 == LTExpression(IntValue(4), IntValue(5)))
+
+    val exp4 = ScalaParser.parseExpression(eq4)
+    assert(exp4 == LTEExpression(IntValue(5), IntValue(5)))
+
+    val exp5 = ScalaParser.parseExpression(eq5)
+    assert(exp5 == GTExpression(VarExpression("x"), VarExpression("y")))
+
+    val exp6 = ScalaParser.parseExpression(eq6)
+    assert(exp6 == LTExpression(VarExpression("x"), VarExpression("y")))
+  }
 
 }
