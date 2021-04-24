@@ -6,9 +6,9 @@ import scalax.collection.GraphEdge
 import scalax.collection.mutable.Graph
 
 class ReachingDefinition {
-  def analyseReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = {
+  def analyseReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])] = {
     // Inicializar In e Out vazio
-    // Map[GraphNode => List[GraphNode]]
+    // Map[GraphNode => Set[GraphNode]]
     // cfg.nodes.foreach(n => inicializar)
     // cfg.edges.foreach(e => e match {
     //    case n1 ~> n2 =>
@@ -19,9 +19,9 @@ class ReachingDefinition {
     // 1. Copiar todas as saídas do nó anterior para a entrada do nó atual
     // 2. GraphNode -> se for um AssingmentStatment, adicionamos no out uma tupla (var_name, GraphNode)
 
-    var reachingDefinitions: Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = initializeReachingDefinitions(cfg)
+    var reachingDefinitions: Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])] = initializeReachingDefinitions(cfg)
     var fixedPointReached: Boolean = false
-    var previousReachingDefinitions: Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = reachingDefinitions
+    var previousReachingDefinitions: Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])] = reachingDefinitions
 
     while(!fixedPointReached) {
       cfg.edges.foreach(
@@ -29,7 +29,7 @@ class ReachingDefinition {
           case GraphEdge.DiEdge(previousNodeT, currentNodeT) =>
             val previousNode: GraphNode = previousNodeT.toOuter
             val currentNode: GraphNode = currentNodeT.toOuter
-            val previousNodeOut: List[(String, GraphNode)] = reachingDefinitions(previousNode)._2
+            val previousNodeOut: Set[(String, GraphNode)] = reachingDefinitions(previousNode)._2
 
             val currentNodeGen: (String, GraphNode) = currentNode match {
               case SimpleNode(AssignmentStmt(varName, _)) =>
@@ -41,7 +41,7 @@ class ReachingDefinition {
             }
 
             // OUT(x) = In(x) + gen(x) - kill(x)
-            val currentNodeOut: List[(String, GraphNode)] = if(currentNodeGen != null) {
+            val currentNodeOut: Set[(String, GraphNode)] = if(currentNodeGen != null) {
               currentNodeGen :: previousNodeOut.filter(definition => definition._1 != currentNodeGen._1)
             } else previousNodeOut
 
@@ -55,12 +55,12 @@ class ReachingDefinition {
     reachingDefinitions
   }
 
-  private def initializeReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = {
-    var reachingDefinitions: Map[GraphNode, (List[(String, GraphNode)], List[(String, GraphNode)])] = Map()
+  private def initializeReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])] = {
+    var reachingDefinitions: Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])] = Map()
 
     cfg.edges.foreach(
       edge => edge.nodes.foreach(
-        node => reachingDefinitions = reachingDefinitions + (node.toOuter -> (List(), List()))
+        node => reachingDefinitions = reachingDefinitions + (node.toOuter -> (Set(), Set()))
       )
     )
 

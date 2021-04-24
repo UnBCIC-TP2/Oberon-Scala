@@ -42,13 +42,13 @@ class ReachingDefinitionTest extends AnyFunSuite {
   * BEGIN
   *   readInt(x);
   *   max := x;
-  *   readInt(x);
+  *   readInt(max);
   * END
   */
   test("simple") {
     val s1 = ReadIntStmt("x")
     val s2 = AssignmentStmt("max", VarExpression("x"))
-    val s3 = ReadIntStmt("x")
+    val s3 = ReadIntStmt("max")
 
     var cfg = Graph[GraphNode, GraphEdge.DiEdge]()
     cfg += StartNode() ~> SimpleNode(s1)
@@ -57,18 +57,17 @@ class ReachingDefinitionTest extends AnyFunSuite {
     cfg += SimpleNode(s3) ~> EndNode()
 
     val expected = Map(
-      StartNode() -> (List(), List()),
-      SimpleNode(s1) -> (List(), List(("x", SimpleNode(s1)))),
-      SimpleNode(s2) -> (List(("x", SimpleNode(s1))), List(("max", SimpleNode(s2)), ("x", SimpleNode(s1)))),
-      SimpleNode(s3) -> (List(("max", SimpleNode(s2)), ("x", SimpleNode(s1))), List(("x", SimpleNode(s3)), ("max", SimpleNode(s2)))),
-      EndNode() -> (List(("x", SimpleNode(s3)), ("max", SimpleNode(s2))), List(("x", SimpleNode(s3)), ("max", SimpleNode(s2)))),
+      StartNode() -> (Set(), Set()),
+      SimpleNode(s1) -> (Set(), Set(("x", SimpleNode(s1)))),
+      SimpleNode(s2) -> (Set(("x", SimpleNode(s1))), Set(("max", SimpleNode(s2)), ("x", SimpleNode(s1)))),
+      SimpleNode(s3) -> (Set(("max", SimpleNode(s2)), ("x", SimpleNode(s1))), Set(("x", SimpleNode(s1)), ("max", SimpleNode(s3)))),
+      EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s3))), Set()),
     )
 
     val reachingDefinition = new ReachingDefinition()
     val reachingDefinitionAnalysis = reachingDefinition.analyseReachingDefinitions(cfg)
 
-//    assert(expected == reachingDefinitionAnalysis)
-    assert(SimpleNode(s1) == SimpleNode(s3))
+    assert(expected == reachingDefinitionAnalysis)
   }
 
   ignore("return a map with fixed point for reaching definitions") {
