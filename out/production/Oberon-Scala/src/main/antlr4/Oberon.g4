@@ -18,7 +18,7 @@ constant
   ;
 
 varDeclaration
-  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
+  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'
   ; 
 
 procedure :
@@ -37,7 +37,8 @@ arguments
  ;
  
 formalArg 
- : (args += Id (',' args += Id)*) ':' argType = oberonType 
+ : (args += Id (',' args += Id)*) ':' argType = oberonType                              #ValueArguments
+ | ('VAR' args += Id (',' args += Id)*) ':' argType = oberonType                        #ReferenceArguments
  ; // TODO: we should also support VarBased formal arguments.
  
 block
@@ -60,7 +61,6 @@ expression
 
 statement
  : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
- | 'VAR' var = Id ':=' exp = expression                                                                                       #AssignmentByRefStmt
  | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt

@@ -1,0 +1,23 @@
+MODULE increment;
+
+PROCEDURE deInc(VAR x: integer)
+BEGIN
+    x := x - 1;
+END deInc
+
+PROCEDURE inc(VAR x: integer)
+BEGIN
+    x := x + 3;
+
+    deInc(x);  
+END inc
+
+BEGIN
+    x: integer;
+    x := 2;
+    inc(x);
+
+    write(x);
+END
+
+END increment;

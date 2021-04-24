@@ -3,6 +3,7 @@ package br.unb.cic.oberon.parser
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.OberonParser.StatementContext
+import org.antlr.stringtemplate.language.FormalArgument
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -101,7 +102,7 @@ class ParserVisitor {
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val visitor = new FormalArgVisitor()
-    ctx.formalArg.accept(visitor)
+    ctx.accept(visitor)
   }
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
@@ -144,20 +145,16 @@ class ParserVisitor {
   }
 
   class FormalArgVisitor() extends OberonBaseVisitor[Unit] {
-    var formalArg: FormalArg = _
-    
+    var formalArg: List[FormalArg] = _
+
     override def visitValueArguments(ctx: OberonParser.ValueArgumentsContext): Unit = {
-      val varType = visitOberonType(ctx.argumentType)
-      ctx.args.asScala.toList.map(arg => ValueArguments(arg.getText, varType))
-
-      formalArg = ValueArguments(ctx.name.getText, varType)
+      val argType = visitOberonType(ctx.argType)
+      formalArg = ctx.args.asScala.toList.map(arg => ValueArguments(arg.getText, argType))
     }
-  
-    override def visitReferenceArguments(ctx: OberonParser.ReferenceArgumentsContext): Unit = {
-      val varType = visitOberonType(ctx.argumentType)
-      ctx.args.asScala.toList.map(arg => ReferenceArguments(arg.getText, varType))
 
-      formalArg = ReferenceArguments(ctx.name.getText, varType)
+    override def visitReferenceArguments(ctx: OberonParser.ReferenceArgumentsContext): Unit = {
+      val argType = visitOberonType(ctx.argType)
+      formalArg = ctx.args.asScala.toList.map(arg => ReferenceArguments(arg.getText, argType))
     }
   }
 
