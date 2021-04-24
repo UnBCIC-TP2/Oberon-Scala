@@ -102,7 +102,16 @@ class ParserVisitor {
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val visitor = new FormalArgVisitor()
+<<<<<<< HEAD
     ctx.accept(visitor)
+=======
+    
+    if(ctx.isInstanceOf[ValueArguments]){
+      return visitor.visitValueArguments(ctx)
+    } else {
+      return visitor.visitValueArguments(ctx)
+    }
+>>>>>>> 6f41f0472dffcf7571b204e849e482e101cd582e
   }
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
