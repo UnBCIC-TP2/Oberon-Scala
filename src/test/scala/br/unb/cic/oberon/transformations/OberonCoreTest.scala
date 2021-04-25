@@ -224,7 +224,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("lim",IntValue(10)))
         assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(
-                            IfElseStmt(EQExpression(IntValue(0), VarExpression("x")),    
+                            IfElseStmt(EQExpression(VarExpression("x"), IntValue(0)),    
                                 AssignmentStmt("sum",IntValue(0)), 
                             Some(AssignmentStmt("sum",AddExpression(VarExpression("sum"),VarExpression("x"))))
                             ), 
@@ -456,8 +456,8 @@ class CoreVisitorTest extends AnyFunSuite {
             case _ => fail("we are expecting three stmts in the main block")
         }
         // now we can assume that the main block contains a sequence of stmts
-        assert(stmts.head == AssignmentStmt("x",IntValue(2)))
-        assert(stmts(1) == AssignmentStmt("y",IntValue(2)))
+        assert(stmts.head == AssignmentStmt("x", IntValue(2)))
+        assert(stmts(1) == AssignmentStmt("y", IntValue(2)))
         assert(stmts(2) == WriteStmt(FunctionCallExpression("power",List(VarExpression("x"), VarExpression("y")))))
     }
     /** ###### RepeatUntil Tests end here ###### */
@@ -484,6 +484,39 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
     }
 
+    test("Testing the interpreter_stmt01 expressions after conversion to While") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 4)
+            case _ => fail("we are expecting four stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(5)))
+        assert(stmts(1) == AssignmentStmt("z", IntValue(0)))
+        assert(stmts(2) == AssignmentStmt("y", IntValue(0)))
+        assert(stmts(3) == WhileStmt(LTEExpression(VarExpression("y"), VarExpression("x")), SequenceStmt(List(
+                            AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))),
+                            AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1)))
+                        ))))
+        assert(stmts(4) == WriteStmt(VarExpression("z")))
+    }
+
+
     test("Testing the stmtForCore01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
 
@@ -502,6 +535,42 @@ class CoreVisitorTest extends AnyFunSuite {
         
         assert(interpreter.env.lookup("x") == Some(IntValue(10))) // FOR TO x
         assert(interpreter.env.lookup("k") == Some(IntValue(18))) // k = result
+    }
+
+    test("Testing the stmtForCore01 expressions after conversion to While") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 2)
+            case _ => fail("we are expecting two stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(0)))
+        assert(stmts(1) == WhileStmt(LTExpression(VarExpression("x"), VarExpression(("y"))), SequenceStmt(List(
+                            WriteStmt(VarExpression("x")),
+                            AssignmentStmt("z", IntValue(0)),
+                            WhileStmt(LTExpression(VarExpression("z"), VarExpression("y")), SequenceStmt(List(
+                                AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x"))),
+                                AssignmentStmt("z", AddExpression(VarExpression("z"), IntValue(1))),
+                                WriteStmt(VarExpression("k"))
+                            ))),
+                            AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+                        ))))
+        
     }
     /** ###### For Tests end here ###### */
 
@@ -523,8 +592,42 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(module.name == "SimpleModule")
 
+        assert(interpreter.env.lookup("x") == Some(IntValue(1)));
         assert(interpreter.env.lookup("y") == Some(IntValue(1)));
     }
+
+    test("Testing the IfElseIfStmt01 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(1)))
+        assert(stmts(1) == IfElseStmt(LTExpression(VarExpression("x"), IntValue(10)), 
+                             AssignmentStmt("y", IntValue(1)),
+                           Some(IfElseStmt(GTExpression(VarExpression("x"), IntValue(10)),
+                             AssignmentStmt("y", IntValue(2)),
+                           Some(AssignmentStmt("y", IntValue(3)))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("y"))))
+    }
+    
 
     test("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
@@ -546,6 +649,38 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("y") == Some(IntValue(3)));
     }
 
+    test("Testing the IfElseIfStmt03 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(10)))
+        assert(stmts(1) == IfElseStmt(LTExpression(VarExpression("x"), IntValue(10)), 
+                             AssignmentStmt("y", IntValue(1)),
+                           Some(IfElseStmt(GTExpression(VarExpression("x"), IntValue(10)),
+                             AssignmentStmt("y", IntValue(2)),
+                           Some(AssignmentStmt("y", IntValue(3)))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("y"))))
+    }
+
     test("Testing the IfElseIfStmt05 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
 
@@ -564,6 +699,42 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(interpreter.env.lookup("x") == Some(IntValue(55)));
         assert(interpreter.env.lookup("y") == Some(IntValue(5)));
+    }
+    
+    test("Testing the IfElseIfStmt05 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(55)))
+        assert(stmts(1) == IfElseStmt(LTExpression(VarExpression("x"), IntValue(13)), 
+                             AssignmentStmt("y", IntValue(1)),
+                           Some(IfElseStmt(LTExpression(VarExpression("x"), IntValue(21)),
+                             AssignmentStmt("y", IntValue(2)),
+                           Some(IfElseStmt(LTExpression(VarExpression("x"), IntValue(35)),
+                             AssignmentStmt("y", IntValue(3)),
+                           Some(IfElseStmt(LTExpression(VarExpression("x"), IntValue(50)),
+                             AssignmentStmt("y", IntValue(4)),
+                           Some(AssignmentStmt("y", IntValue(5)))))))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("y"))))
     }
 
     test("Testing the IfElseIfStmt08 evaluation after conversion to OberonCore") {
@@ -585,11 +756,43 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("y") == Some(IntValue(3)));
         assert(interpreter.env.lookup("x") == Some(IntValue(0)));
     }
+
+    test("Testing the IfElseIfStmt08 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("x", IntValue(0)))
+        assert(stmts(1) == IfElseStmt(LTExpression(VarExpression("x"), IntValue(0)), 
+                             AssignmentStmt("y", IntValue(1)),
+                           Some(IfElseStmt(GTExpression(VarExpression("x"), IntValue(0)),
+                             AssignmentStmt("y", IntValue(2)),
+                           Some(AssignmentStmt("y", IntValue(3)))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("y"))))
+    }
     /** ###### IfElseIf Tests begin here ###### */
 
 
     /** ###### Case Tests begin here ###### */
-    test("Testing the stmt06 evaluation after conversion to StmtCaseCore01") {
+    test("Testing the StmtCaseCore01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore01.oberon").toURI)
 
         assert(path != null)
@@ -607,7 +810,43 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("xs") == Some(IntValue(0)));
     }
 
-    test("Testing the stmt18 evaluation after conversion to StmtCaseCore02") {
+    test("Testing the StmtCaseCore01 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore01.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("xs", IntValue(0)))
+        assert(stmts(1) == IfElseStmt(EQExpression(VarExpression("xs"), IntValue(1)), 
+                             AssignmentStmt("xs", IntValue(5)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(2)),
+                             AssignmentStmt("xs", IntValue(10)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(3)),
+                             AssignmentStmt("xs", IntValue(20)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(4)),
+                             AssignmentStmt("xs", IntValue(40)),
+                           Some(AssignmentStmt("xs", IntValue(0)))))))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("xs"))))
+    }
+
+    test("Testing the StmtCaseCore02 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore02.oberon").toURI)
 
         assert(path != null)
@@ -625,7 +864,44 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("xs") == Some(IntValue(10)));
     }
 
-    test("Testing the stmt18 evaluation after conversion to StmtCaseCore03") {
+    test("Testing the StmtCaseCore02 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore02.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 3)
+            case _ => fail("we are expecting three stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("xs", IntValue(2)))
+        assert(stmts(1) == IfElseStmt(EQExpression(VarExpression("xs"), IntValue(1)), 
+                             AssignmentStmt("xs", IntValue(5)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(2)),
+                             AssignmentStmt("xs", IntValue(10)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(3)),
+                             AssignmentStmt("xs", IntValue(20)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(4)),
+                             AssignmentStmt("xs", IntValue(40)),
+                           Some(AssignmentStmt("xs", IntValue(0)))))))))
+                        ))
+        assert((stmts(2) == WriteStmt(VarExpression("xs"))))
+    }
+
+
+    test("Testing the StmtCaseCore03 evaluation after conversion to OberoCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
 
         assert(path != null)
@@ -643,7 +919,43 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("xs") == Some(IntValue(5)));
     }
 
-    test("Testing the stmt18 evaluation after conversion to StmtCaseCore04") {
+    test("Testing the StmtCaseCore03 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleRangeCaseModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 5)
+            case _ => fail("we are expecting five stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("xs", IntValue(1)))
+        assert(stmts(1) == AssignmentStmt("min", IntValue(10)))
+        assert(stmts(2) == AssignmentStmt("max", IntValue(20)))
+        assert(stmts(3) == IfElseStmt(EQExpression(VarExpression("xs"), IntValue(1)), 
+                             AssignmentStmt("xs", IntValue(5)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(2)),
+                             AssignmentStmt("xs", IntValue(10)),
+                           Some(IfElseStmt(AndExpression(LTEExpression(VarExpression("min"), VarExpression("xs")), LTEExpression(VarExpression("xs"), VarExpression("max"))),
+                             AssignmentStmt("xs", IntValue(20)),
+                           Some(AssignmentStmt("xs", IntValue(0)))))))
+                        ))
+        assert((stmts(4) == WriteStmt(VarExpression("xs"))))
+    }
+
+    test("Testing the StmtCaseCore04 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
 
         assert(path != null)
@@ -659,6 +971,42 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(module.name == "SimpleRangeCaseModule")
 
         assert(interpreter.env.lookup("xs") == Some(IntValue(20)));
+    }
+
+    test("Testing the StmtCaseCore04 expressions after conversion to IfElse") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        assert(coreModule.name == "SimpleRangeCaseModule")
+        assert (coreModule.stmt.isDefined)
+        // assert that the main block contains a sequence of statements
+        module.stmt.get match {
+            case SequenceStmt(stmts) => assert(stmts.length == 5)
+            case _ => fail("we are expecting five stmts in the main block")
+        }
+        // now we can assume that the main block contains a sequence of stmts
+        val sequence = coreModule.stmt.get.asInstanceOf[SequenceStmt]
+        val stmts = sequence.stmts
+
+        assert(stmts.head == AssignmentStmt("xs", IntValue(12)))
+        assert(stmts(1) == AssignmentStmt("min", IntValue(10)))
+        assert(stmts(2) == AssignmentStmt("max", IntValue(20)))
+        assert(stmts(3) == IfElseStmt(EQExpression(VarExpression("xs"), IntValue(1)), 
+                             AssignmentStmt("xs", IntValue(5)),
+                           Some(IfElseStmt(EQExpression(VarExpression("xs"), IntValue(2)),
+                             AssignmentStmt("xs", IntValue(10)),
+                           Some(IfElseStmt(AndExpression(LTEExpression(VarExpression("min"), VarExpression("xs")), LTEExpression(VarExpression("xs"), VarExpression("max"))),
+                             AssignmentStmt("xs", IntValue(20)),
+                           Some(AssignmentStmt("xs", IntValue(0)))))))
+                        ))
+        assert((stmts(4) == WriteStmt(VarExpression("xs"))))
     }
     /** ###### Case Tests end here ###### */
 

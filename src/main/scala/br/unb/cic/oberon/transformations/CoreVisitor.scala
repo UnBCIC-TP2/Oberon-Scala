@@ -23,11 +23,15 @@ class CoreVisitor extends OberonVisitorAdapter {
         case other => stmt
     }
 
+    //TODO: Criar um visitor para Expressões. Ex: Transformar todos os x > y em y < x 
+    //                                            GTExpression(left, right) => LTExpression(right, left)
+                                               
+
     private def caseAux(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
         
         if (!cases.isEmpty){
             if (cases.head.isInstanceOf[SimpleCase]){
-                return IfElseStmt(EQExpression(cases.head.asInstanceOf[SimpleCase].condition, exp), cases.head.asInstanceOf[SimpleCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
+                return IfElseStmt(EQExpression(exp,     cases.head.asInstanceOf[SimpleCase].condition), cases.head.asInstanceOf[SimpleCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
             }
             else{
                 return IfElseStmt(AndExpression(LTEExpression(cases.head.asInstanceOf[RangeCase].min, exp), LTEExpression(exp, cases.head.asInstanceOf[RangeCase].max)), cases.head.asInstanceOf[RangeCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
