@@ -11,7 +11,7 @@ class CoreVisitor extends OberonVisitorAdapter {
 
     override def visit(stmt: Statement): Statement = stmt match {
         // Laços de Repetição
-        case SequenceStmt(stmts) => SequenceStmt(flatSequenceOfStatements(SequenceStmt(coreStmts(stmts)).stmts))
+        case SequenceStmt(stmts) => SequenceStmt(flatSequenceOfStatements(SequenceStmt(transformListStmts(stmts)).stmts))
         case LoopStmt(stmt) => WhileStmt(BoolValue(true), stmt.accept(this))
         case RepeatUntilStmt(condition, stmt) => WhileStmt(BoolValue(true), SequenceStmt(List(stmt.accept(this), IfElseStmt(condition, ExitStmt(), None))))
         case ForStmt(initStmt, condition, block) => SequenceStmt(List(initStmt, WhileStmt(condition, block.accept(this))))
@@ -23,7 +23,7 @@ class CoreVisitor extends OberonVisitorAdapter {
         case other => stmt
     }
 
-    def caseAux(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
+    private def caseAux(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
         
         if (!cases.isEmpty){
             if (cases.head.isInstanceOf[SimpleCase]){
@@ -37,7 +37,7 @@ class CoreVisitor extends OberonVisitorAdapter {
         }
     }
 
-    def ifAux (elsifStmt: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = { // falta arruamr a entrada da função com os tipos
+    private def ifAux (elsifStmt: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = { // falta arruamr a entrada da função com os tipos
         if (elsifStmt.tail.isEmpty){ // termina a recursividade
             return IfElseStmt(elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt, elseStmt)
         }
@@ -47,11 +47,11 @@ class CoreVisitor extends OberonVisitorAdapter {
     }
 
     // TODO: change method name to more mnemonic name such as CoreVisitor.readListStmts()
-    def coreStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): List[Statement] = {
+    private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): List[Statement] = {
 
         if (!stmtsList.isEmpty){
             stmtsCore += stmtsList.head.accept(this); 
-            stmtsCore :: coreStmts(stmtsList.tail, stmtsCore)
+            stmtsCore :: transformListStmts(stmtsList.tail, stmtsCore)
         }
         else {
             return Nil
@@ -67,6 +67,23 @@ class CoreVisitor extends OberonVisitorAdapter {
         case Nil => List()
       }
 
-    // TODO: add entrypoint method to users such as CoreVisitor.transform() which receives the whole Module
+    def transformModule(module: OberonModule): OberonModule = {
+
+        val stmtcore = module.stmt.get.accept(this)
+        // TODO: Resolver transformação a core das procedures declaradas.
+
+
+        // this might be to much hardcoded and could cause problems in case of changes to OberonModule.
+        val coreModule = OberonModule(
+            name = module.name,
+            userTypes = module.userTypes,
+            constants = module.constants,
+            variables = module.variables,
+            procedures = module.procedures,
+            stmt = Some(stmtcore)
+        )
+
+        return  coreModule
+    }
 
 }
