@@ -156,7 +156,6 @@ class CoreVisitorTest extends AnyFunSuite {
     /** ###### Loop Tests end here ###### */
 
     /** ###### RepeatUntil Tests begin here ###### */
-    //TODO Checar negação da expressão no condicional do while
     test("Testing the RepeatUntilStmt01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").toURI)
 
@@ -405,7 +404,7 @@ class CoreVisitorTest extends AnyFunSuite {
     /** ###### RepeatUntil Tests end here ###### */
 
     /** ###### For Tests begin here ###### */
-    test("Testing the interpreter_stmt01 conversion to OberonCore") {
+    test("Testing the interpreter_stmt01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").toURI)
 
         assert(path != null)
@@ -426,7 +425,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
     }
 
-    test("Testing the stmt08 conversion to OberonCore") {
+    test("Testing the stmt08 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
 
         assert(path != null)
@@ -449,7 +448,7 @@ class CoreVisitorTest extends AnyFunSuite {
 
 
     /** ###### IfElseIf Tests begin here ###### */
-    test("Testing the IfElseIfStmt01 conversion to OberonCore") {
+    test("Testing the IfElseIfStmt01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
 
         assert(path != null)
@@ -468,7 +467,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("y") == Some(IntValue(1)));
     }
 
-    test("Testing the IfElseIfStmt03 conversion to OberonCore") {
+    test("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
 
         assert(path != null)
@@ -488,7 +487,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("y") == Some(IntValue(3)));
     }
 
-    test("Testing the IfElseIfStmt05 conversion to OberonCore") {
+    test("Testing the IfElseIfStmt05 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
 
         assert(path != null)
@@ -507,12 +506,32 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("x") == Some(IntValue(55)));
         assert(interpreter.env.lookup("y") == Some(IntValue(5)));
     }
+
+    test("Testing the IfElseIfStmt08 evaluation after conversion to OberonCore") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+        
+        coreModule.accept(interpreter)
+
+        assert(module.name == "SimpleModule")
+
+        assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+        assert(interpreter.env.lookup("x") == Some(IntValue(0)));
+    }
     /** ###### IfElseIf Tests begin here ###### */
 
 
     /** ###### Case Tests begin here ###### */
-    test("Testing the stmt06 conversion to OberonCore") {
-        val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt06.oberon").toURI)
+    test("Testing the stmt06 evaluation after conversion to StmtCaseCore01") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore01.oberon").toURI)
 
         assert(path != null)
 
@@ -523,17 +542,14 @@ class CoreVisitorTest extends AnyFunSuite {
         
         val coreModule = coreVisitor.transformModule(module)
 
-        /* TODO Reescrever o teste 18 alterando o readint para um atribuição fixa
-         ou encontrar uma forma do readint funcionar
-
-        coreModule.accept(interpreter) */
+        coreModule.accept(interpreter)
         assert(module.name == "SimpleModule")
 
-
+        assert(interpreter.env.lookup("xs") == Some(IntValue(0)));
     }
 
-    test("Testing the stmt18 conversion to OberonCore") {
-        val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt18.oberon").toURI)
+    test("Testing the stmt18 evaluation after conversion to StmtCaseCore02") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore02.oberon").toURI)
 
         assert(path != null)
 
@@ -544,14 +560,48 @@ class CoreVisitorTest extends AnyFunSuite {
         
         val coreModule = coreVisitor.transformModule(module)
 
-        /* TODO Reescrever o teste 18 alterando o readint para um atribuição fixa
-         ou encontrar uma forma do readint funcionar
-        
         coreModule.accept(interpreter)
+        assert(module.name == "SimpleModule")
 
+        assert(interpreter.env.lookup("xs") == Some(IntValue(10)));
+    }
+
+    /** ###### Case Tests end here ###### */
+    test("Testing the stmt18 evaluation after conversion to StmtCaseCore03") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        coreModule.accept(interpreter)
         assert(module.name == "SimpleRangeCaseModule")
+
+        assert(interpreter.env.lookup("xs") == Some(IntValue(5)));
+    }
+
+    /** ###### Case Tests end here ###### */
+    test("Testing the stmt18 evaluation after conversion to StmtCaseCore04") {
+        val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+
+        assert(path != null)
+
+        val content = String.join("\n", Files.readAllLines(path))
+        val module = ScalaParser.parse(content)
+        val interpreter = new Interpreter()
+        val coreVisitor = new CoreVisitor()
+        
+        val coreModule = coreVisitor.transformModule(module)
+
+        coreModule.accept(interpreter)
+        assert(module.name == "SimpleRangeCaseModule")
+
         assert(interpreter.env.lookup("xs") == Some(IntValue(20)));
-        */
     }
     /** ###### Case Tests end here ###### */
 
