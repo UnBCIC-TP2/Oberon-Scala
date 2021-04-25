@@ -13,11 +13,11 @@ class CoreVisitor extends OberonVisitorAdapter {
         // Laços de Repetição
         case SequenceStmt(stmts) => SequenceStmt(flatSequenceOfStatements(SequenceStmt(transformListStmts(stmts)).stmts))
         case LoopStmt(stmt) => WhileStmt(BoolValue(true), stmt.accept(this))
-        case RepeatUntilStmt(condition, stmt) => WhileStmt(BoolValue(true), SequenceStmt(List(stmt.accept(this), IfElseStmt(condition, ExitStmt(), None))))
-        case ForStmt(initStmt, condition, block) => SequenceStmt(List(initStmt, WhileStmt(condition, block.accept(this))))
+        case RepeatUntilStmt(condition, stmt) => WhileStmt(BoolValue(true), SequenceStmt(List(stmt.accept(this), IfElseStmt(condition, ExitStmt(), None))).accept((this)))
+        case ForStmt(initStmt, condition, block) => SequenceStmt(List(initStmt.accept(this), WhileStmt(condition, block.accept(this))))
 
         // Condicionais
-        case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => IfElseStmt (condition, thenStmt, Some(ifAux(elsifStmt, elseStmt)))
+        case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => IfElseStmt (condition, thenStmt.accept(this), Some(ifAux(elsifStmt, elseStmt)))
         case CaseStmt(exp, cases, elseStmt) => caseAux(exp, cases, elseStmt)
 
         case other => stmt
@@ -27,10 +27,10 @@ class CoreVisitor extends OberonVisitorAdapter {
         
         if (!cases.isEmpty){
             if (cases.head.isInstanceOf[SimpleCase]){
-                return IfElseStmt(EQExpression(cases.head.asInstanceOf[SimpleCase].condition, exp), cases.head.asInstanceOf[SimpleCase].stmt, Some(caseAux(exp, cases.tail, elseStmt)))
+                return IfElseStmt(EQExpression(cases.head.asInstanceOf[SimpleCase].condition, exp), cases.head.asInstanceOf[SimpleCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
             }
             else{
-                return IfElseStmt(AndExpression(LTEExpression(cases.head.asInstanceOf[RangeCase].min, exp), LTEExpression(exp, cases.head.asInstanceOf[RangeCase].max)), cases.head.asInstanceOf[RangeCase].stmt, Some(caseAux(exp, cases.tail, elseStmt)))
+                return IfElseStmt(AndExpression(LTEExpression(cases.head.asInstanceOf[RangeCase].min, exp), LTEExpression(exp, cases.head.asInstanceOf[RangeCase].max)), cases.head.asInstanceOf[RangeCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
             }
         }else{
             return elseStmt.get.accept(this)
@@ -39,10 +39,10 @@ class CoreVisitor extends OberonVisitorAdapter {
 
     private def ifAux (elsifStmt: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = { // falta arruamr a entrada da função com os tipos
         if (elsifStmt.tail.isEmpty){ // termina a recursividade
-            return IfElseStmt(elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt, elseStmt)
+            return IfElseStmt(elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt.accept(this), Some(elseStmt.get.accept((this))))
         }
         else{
-            return IfElseStmt (elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt, Some(ifAux(elsifStmt.tail, elseStmt)))
+            return IfElseStmt (elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt.accept(this), Some(ifAux(elsifStmt.tail, Some(elseStmt.get.accept(this)))))
         }
     }
 

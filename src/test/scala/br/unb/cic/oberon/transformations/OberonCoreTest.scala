@@ -7,7 +7,6 @@ import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.locks.Condition
 
-
 class CoreVisitorTest extends AnyFunSuite {
     /**  
      * Nessa classe tem q ser testado se a transformacao foi correta 
@@ -56,7 +55,13 @@ class CoreVisitorTest extends AnyFunSuite {
         val stmts = sequence.stmts
 
         assert(stmts.head == AssignmentStmt("x",IntValue(10)))
-        assert(stmts(1) == WhileStmt(BoolValue(true),SequenceStmt(List(WriteStmt(VarExpression("x")), IfElseStmt(LTExpression(VarExpression("x"),IntValue(0)),ExitStmt(),None), AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1)))))))
+        assert(stmts(1) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                                WriteStmt(VarExpression("x")), 
+                                IfElseStmt(LTExpression(VarExpression("x"),IntValue(0)),
+                                    ExitStmt(),
+                                None), 
+                                AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1)))
+                            ))))
     }
 
     test("Testing the loop_stmt02 evaluation after conversion to OberonCore") {
@@ -103,7 +108,13 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(stmts.head == AssignmentStmt("x",IntValue(2)))
         assert(stmts(1) == AssignmentStmt("factorial",IntValue(1)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(IfElseStmt(GTExpression(VarExpression("x"),IntValue(5)),ExitStmt(),None), AssignmentStmt("factorial",MultExpression(VarExpression("factorial"),VarExpression("x"))), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1)))))))
+        assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                            IfElseStmt(GTExpression(VarExpression("x"), IntValue(5)),
+                                ExitStmt(),
+                            None), 
+                            AssignmentStmt("factorial", MultExpression(VarExpression("factorial"),VarExpression("x"))), 
+                            AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+                        ))))
     }
 
     test("Testing the loop_stmt03 evaluation after conversion to OberonCore") {
@@ -150,7 +161,20 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(0)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), AssignmentStmt("i",IntValue(0)), WhileStmt(BoolValue(true), SequenceStmt(List(AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), AssignmentStmt("i",AddExpression(VarExpression("i"),IntValue(1))), IfElseStmt(EQExpression(VarExpression("i"),IntValue(10)),ExitStmt(),None)))), IfElseStmt(EQExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None)))))
+        assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                            AssignmentStmt("x", AddExpression(VarExpression("x"),IntValue(1))), 
+                            AssignmentStmt("i",IntValue(0)), 
+                            WhileStmt(BoolValue(true), SequenceStmt(List(
+                                AssignmentStmt("y", AddExpression(VarExpression("y"),IntValue(1))), 
+                                AssignmentStmt("i", AddExpression(VarExpression("i"),IntValue(1))), 
+                                IfElseStmt(EQExpression(VarExpression("i"), IntValue(10)), 
+                                    ExitStmt(), 
+                                None)
+                            ))), 
+                            IfElseStmt(EQExpression(VarExpression("x"), IntValue(10)),
+                                ExitStmt(),
+                            None)
+                        ))))
     }
 
     /** ###### Loop Tests end here ###### */
@@ -199,7 +223,16 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("lim",IntValue(10)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(SequenceStmt(List(IfElseStmt(EQExpression(IntValue(0),VarExpression("x")),AssignmentStmt("sum",IntValue(0)),Some(AssignmentStmt("sum",AddExpression(VarExpression("sum"),VarExpression("x"))))), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))), IfElseStmt(GTExpression(VarExpression("x"),VarExpression("lim")),ExitStmt(),None)))))
+        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(
+                            IfElseStmt(EQExpression(IntValue(0), VarExpression("x")),    
+                                AssignmentStmt("sum",IntValue(0)), 
+                            Some(AssignmentStmt("sum",AddExpression(VarExpression("sum"),VarExpression("x"))))
+                            ), 
+                            AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))), 
+                            IfElseStmt(GTExpression(VarExpression("x"),VarExpression("lim")),
+                                ExitStmt(),
+                            None)
+                        ))))
         assert(stmts(3) == WriteStmt(VarExpression("sum")))
     }
     
@@ -247,7 +280,16 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(0)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(SequenceStmt(List(IfElseStmt(GTExpression(VarExpression("x"),IntValue(5)),AssignmentStmt("y",AddExpression(VarExpression("y"),VarExpression("x"))),None), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))), IfElseStmt(GTExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None)))))
+        assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                                IfElseStmt(GTExpression(VarExpression("x"),IntValue(5)),
+                                    AssignmentStmt("y", AddExpression(VarExpression("y"), VarExpression("x"))),
+                                None
+                                ), 
+                                AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))),
+                                IfElseStmt(GTExpression(VarExpression("x"), IntValue(10)),
+                                    ExitStmt(),
+                                None)
+                            ))))
         assert(stmts(3) == WriteStmt(VarExpression("y")))
     }
 
@@ -295,7 +337,12 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(20)))
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), IfElseStmt(EQExpression(VarExpression("x"),VarExpression("y")),ExitStmt(),None)))))
+        assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                            AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))), 
+                            IfElseStmt(EQExpression(VarExpression("x"), VarExpression("y")),
+                                ExitStmt(),
+                            None)
+                        ))))
         assert(stmts(3) == WriteStmt(VarExpression("x")))
     }
 
@@ -347,7 +394,19 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(stmts.head == AssignmentStmt("x",IntValue(0)))
         assert(stmts(1) == AssignmentStmt("y",IntValue(0)))
 
-        assert(stmts(2) == WhileStmt(BoolValue(true),SequenceStmt(List(SequenceStmt(List(AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), IfElseStmt(GTEExpression(VarExpression("y"),IntValue(10)),ExitStmt(),None)))))), IfElseStmt(GTEExpression(VarExpression("x"),IntValue(10)),ExitStmt(),None)))))
+        assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
+                            AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))), 
+                            WhileStmt(BoolValue(true), SequenceStmt(List(
+                                AssignmentStmt("y",AddExpression(VarExpression("y"),IntValue(1))), 
+                                IfElseStmt(GTEExpression(VarExpression("y"),IntValue(10)),
+                                    ExitStmt(),
+                                None
+                                )
+                            ))),
+                            IfElseStmt(GTEExpression(VarExpression("x"),IntValue(10)),
+                                ExitStmt(),
+                            None)
+                        ))))
         assert(stmts(3) == WriteStmt(VarExpression("x")))
         assert(stmts(4) == WriteStmt(VarExpression("y")))
     }
@@ -425,7 +484,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
     }
 
-    test("Testing the stmt08 evaluation after conversion to OberonCore") {
+    test("Testing the stmtForCore01 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
 
         assert(path != null)
@@ -441,8 +500,8 @@ class CoreVisitorTest extends AnyFunSuite {
 
         assert(module.name == "SimpleModule")
         
-        assert(interpreter.env.lookup("x") == Some(IntValue(20))) // FOR TO x
-        assert(interpreter.env.lookup("k") == Some(IntValue(27))) // k = result
+        assert(interpreter.env.lookup("x") == Some(IntValue(10))) // FOR TO x
+        assert(interpreter.env.lookup("k") == Some(IntValue(18))) // k = result
     }
     /** ###### For Tests end here ###### */
 
@@ -566,7 +625,6 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("xs") == Some(IntValue(10)));
     }
 
-    /** ###### Case Tests end here ###### */
     test("Testing the stmt18 evaluation after conversion to StmtCaseCore03") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
 
@@ -585,7 +643,6 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(interpreter.env.lookup("xs") == Some(IntValue(5)));
     }
 
-    /** ###### Case Tests end here ###### */
     test("Testing the stmt18 evaluation after conversion to StmtCaseCore04") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
 
