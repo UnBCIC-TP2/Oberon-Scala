@@ -10,7 +10,7 @@ import scalax.collection.mutable.Graph
 
 class ReachingDefinitionTest extends AnyFunSuite {
 
-  test("return a map number of keys equals to number of graph nodes") {
+  test("return a map with number of keys equal to number of graph nodes") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("max")
@@ -35,6 +35,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
 
     assert(numberOfNodes == numberOfMapKeys)
   }
+
   /*
   * BEGIN
   *   readInt(x);
@@ -42,7 +43,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
   *   readInt(max);
   * END
   */
-  test("simple") {
+  test("return a map with reaching definitions for each graph node (example 1)") {
     val s1 = ReadIntStmt("x")
     val s2 = AssignmentStmt("max", VarExpression("x"))
     val s3 = ReadIntStmt("max")
@@ -80,7 +81,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
    * END
    *
    */
-  test("return a map with fixed point for reaching definitions") {
+  test("return a map with reaching definitions for each graph node (example 2)") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("max")
@@ -111,5 +112,4 @@ class ReachingDefinitionTest extends AnyFunSuite {
 
     assert(expected == reachingDefinitionAnalysis)
   }
-
 }
