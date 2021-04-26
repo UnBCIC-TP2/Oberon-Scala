@@ -15,33 +15,30 @@ import java.util.Base64
 //      (b) generate methods from procedures (27/04).
 
 object JVMCodeGenerator extends CodeGenerator {
-  val cw = new ClassWriter(0);
-  val printWriter = new PrintWriter("file.txt");
-  val cv = new TraceClassVisitor(cw, printWriter);
-
   override def generateCode(module: OberonModule): String = {
+    val cw = new ClassWriter(0);
 
-    cv.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
+    cw.visit(V1_5, ACC_PUBLIC, module.name, null, "java/lang/Object", null);
 
-    generateConstants(module.constants)
-    generateDeclarations(module.variables)
+    generateConstants(module.constants, cw)
+    generateDeclarations(module.variables, cw)
 
-    cv.visitEnd();
+    cw.visitEnd();
 
     Base64.getEncoder().encodeToString(cw.toByteArray);
     
   }
 
-  def generateDeclarations(variables: List[VariableDeclaration]): Unit = {
+  def generateDeclarations(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
     variables.foreach((v : VariableDeclaration) =>
       v.variableType match {
-        case IntegerType =>  cv.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
-        case BooleanType => cv.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
+        case IntegerType =>  cw.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
+        case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
       }
     )
   }
 
-  def generateConstants(constants: List[Constant]): Unit = {
+  def generateConstants(constants: List[Constant], cw: ClassWriter): Unit = {
     val interpreter = new Interpreter()
 
     val visitor = new EvalExpressionVisitor(interpreter)
@@ -52,10 +49,10 @@ object JVMCodeGenerator extends CodeGenerator {
 
         v match {
           case IntValue (value) => {
-            cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, value).visitEnd();
+            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, value).visitEnd();
           }
           case BoolValue (value) => {
-            cv.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
+            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
           }
         }
     }
