@@ -103,8 +103,9 @@ class ParserVisitor {
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val visitor = new FormalArgVisitor()
     ctx.accept(visitor)
-    }
+    visitor.formalArg
   }
+
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
     val userTypeVisitor = new UserDefinedTypeVisitor()
