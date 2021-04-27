@@ -556,7 +556,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
    * factorial procedure.
    */
   test("Test invalid procedure declaration") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure04.oberon").toURI)
 
     assert(path != null)
 
@@ -708,6 +708,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     assert(stmt02.accept(visitor).size == 4)
+  }
+
+  test("Test a loop statement, from loop_stmt03") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "LoopStmt")
+
+    val visitor = new TypeChecker()
+
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
   }
 
 }
