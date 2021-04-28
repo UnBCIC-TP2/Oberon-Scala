@@ -188,6 +188,8 @@ class ParserVisitor {
 
     override def visitBrackets(ctx: OberonParser.BracketsContext): Unit = {
       ctx.expression().accept(this)
+      val subExp = exp
+      exp = Brackets(subExp)
     }
 
     override def visitFunctionCall(ctx: OberonParser.FunctionCallContext): Unit = {
