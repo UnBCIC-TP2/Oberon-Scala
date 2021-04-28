@@ -8,8 +8,8 @@ import org.scalatest.funsuite.AnyFunSuite
 class CCodeGenTest extends AnyFunSuite {
 
   // Tests for C code generator for stmt01.oberon - stmt16.oberon
-  val successfulTests = (1 to 10).toList ++ List(13, 14)
-  val unsuccessfulTests = List(11, 12, 15, 16)
+  val successfulTests = (1 to 16).toList
+  val unsuccessfulTests = List()
   for (i <- successfulTests) {
     val stmtNumber = "%02d".format(i)
     test(s"Testing C generator for stmt$stmtNumber") {
@@ -40,7 +40,7 @@ class CCodeGenTest extends AnyFunSuite {
 
   for (i <- unsuccessfulTests) {
     val stmtNumber = "%02d".format(i)
-    ignore(s"Testing C generator for stmt$stmtNumber") {
+    test(s"Testing C generator for stmt$stmtNumber") {
       val oberonPath = Paths.get(
         getClass.getClassLoader
           .getResource(s"stmts/stmt$stmtNumber.oberon")
@@ -375,7 +375,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  ignore("Testing C generator for stmt32") {
+  test("Testing C generator for stmt32") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/ifelseif_stmt32.oberon")
@@ -400,7 +400,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  ignore("Testing C generator for stmt33") {
+  test("Testing C generator for stmt33") {
     val oberonPath = Paths.get(
       getClass.getClassLoader
         .getResource("stmts/ifelseif_stmt33.oberon")
