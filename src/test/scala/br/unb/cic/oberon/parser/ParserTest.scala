@@ -303,7 +303,7 @@ class ParserTestSuite extends AnyFunSuite {
     // the third stmt must be an IfElseStmt
     stmts(2) match {
       case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
+        assert(cond == Brackets(GTExpression(VarExpression("x"),VarExpression("max"))))
         assert(s1 == AssignmentStmt("max",VarExpression("x")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
@@ -340,7 +340,7 @@ class ParserTestSuite extends AnyFunSuite {
     // the third stmt must be an WhileStmt
     stmts(2) match {
       case WhileStmt(cond, stmt) =>
-        assert(cond == LTExpression(VarExpression("x"),VarExpression("y")))
+        assert(cond == Brackets(LTExpression(VarExpression("x"),VarExpression("y"))))
         assert(stmt == AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x"))))
       case _ => fail("expecting an if-then stmt")
     }
@@ -575,7 +575,7 @@ class ParserTestSuite extends AnyFunSuite {
     val stmts = sequence.stmts
 
     val code1 = ReadIntStmt("z")
-    val add = AddExpression(VarExpression("y"), IntValue(1))
+    val add = Brackets(AddExpression(VarExpression("y"), IntValue(1)))
     val code2 = AssignmentStmt("z", DivExpression(VarExpression("z"), add))
     val code3 = WriteStmt(VarExpression("z"))
 
@@ -615,7 +615,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmts = sequence.stmts
 
-    val multiplica = MultExpression(VarExpression("w"), AddExpression(VarExpression("y"), IntValue(1)))
+    val multiplica = Brackets(MultExpression(VarExpression("w"), Brackets(AddExpression(VarExpression("y"), IntValue(1)))))
     val codiguinho = AddExpression(VarExpression("v"), multiplica)
     val codee = ReadIntStmt("w");
     val code = AssignmentStmt("v", codiguinho);
@@ -746,7 +746,7 @@ class ParserTestSuite extends AnyFunSuite {
     val stmts = sequence.stmts
 
     val code = ReadIntStmt("z")
-    val adicao = MultExpression(VarExpression("y"), VarExpression("x"))
+    val adicao = Brackets(MultExpression(VarExpression("y"), VarExpression("x")))
     val code1 = AssignmentStmt("z", DivExpression(VarExpression("z"), adicao))
 
     assert(stmts.head == ReadIntStmt("x"))
@@ -786,7 +786,7 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("z", AddExpression(VarExpression("z"), DivExpression(VarExpression("z"), VarExpression("y"))))
+    val code = AssignmentStmt("z", AddExpression(VarExpression("z"), Brackets(DivExpression(VarExpression("z"), VarExpression("y")))))
     val code1 = AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)))
 
     assert(stmts.head == ReadIntStmt("x"))
@@ -1227,7 +1227,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     val myWhileStmt = sequenceStmts(2).asInstanceOf[WhileStmt];
 
-    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), VarExpression("lim")))
+    assert(myWhileStmt.condition == Brackets(LTExpression(VarExpression("x"), VarExpression("lim"))))
 
     myWhileStmt.stmt match {
       case SequenceStmt(stmts) => assert(stmts.length == 2)
@@ -1436,11 +1436,11 @@ class ParserTestSuite extends AnyFunSuite {
 
     stmts(1) match {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
+        assert(cond == Brackets(LTExpression(VarExpression("x"), IntValue(5))))
         assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(7))))
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(elseIfs(1).condition == Brackets(LTExpression(VarExpression("x"), IntValue(9))))
         assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
         assert(elseStmt.contains(AssignmentStmt("y", IntValue(4))))
       case _ => fail("expecting an if-then stmt")
@@ -1475,9 +1475,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     stmts(1) match {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == GTExpression(VarExpression("x"), IntValue(1)))
+        assert(cond == Brackets(GTExpression(VarExpression("x"), IntValue(1))))
         assert(thenStmt == AssignmentStmt("y", IntValue(0)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(3)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(3))))
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
         assert(elseStmt == None)
       case _ => fail("expecting an if-then stmt")
@@ -1512,27 +1512,27 @@ class ParserTestSuite extends AnyFunSuite {
 
     stmts(1) match {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
+        assert(cond == Brackets(LTExpression(VarExpression("x"), IntValue(5))))
         assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(7))))
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(elseIfs(1).condition == Brackets(LTExpression(VarExpression("x"), IntValue(9))))
         assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
-        assert(elseIfs(2).condition == LTExpression(VarExpression("x"), IntValue(11)))
+        assert(elseIfs(2).condition == Brackets(LTExpression(VarExpression("x"), IntValue(11))))
         assert(elseIfs(2).thenStmt == AssignmentStmt("y", IntValue(4)))
-        assert(elseIfs(3).condition == LTExpression(VarExpression("x"), IntValue(13)))
+        assert(elseIfs(3).condition == Brackets(LTExpression(VarExpression("x"), IntValue(13))))
         assert(elseIfs(3).thenStmt == AssignmentStmt("y", IntValue(5)))
-        assert(elseIfs(4).condition == LTExpression(VarExpression("x"), IntValue(15)))
+        assert(elseIfs(4).condition == Brackets(LTExpression(VarExpression("x"), IntValue(15))))
         assert(elseIfs(4).thenStmt == AssignmentStmt("y", IntValue(6)))
-        assert(elseIfs(5).condition == LTExpression(VarExpression("x"), IntValue(17)))
+        assert(elseIfs(5).condition == Brackets(LTExpression(VarExpression("x"), IntValue(17))))
         assert(elseIfs(5).thenStmt == AssignmentStmt("y", IntValue(7)))
-        assert(elseIfs(6).condition == LTExpression(VarExpression("x"), IntValue(19)))
+        assert(elseIfs(6).condition == Brackets(LTExpression(VarExpression("x"), IntValue(19))))
         assert(elseIfs(6).thenStmt == AssignmentStmt("y", IntValue(8)))
-        assert(elseIfs(7).condition == LTExpression(VarExpression("x"), IntValue(21)))
+        assert(elseIfs(7).condition == Brackets(LTExpression(VarExpression("x"), IntValue(21))))
         assert(elseIfs(7).thenStmt == AssignmentStmt("y", IntValue(9)))
-        assert(elseIfs(8).condition == LTExpression(VarExpression("x"), IntValue(23)))
+        assert(elseIfs(8).condition == Brackets(LTExpression(VarExpression("x"), IntValue(23))))
         assert(elseIfs(8).thenStmt == AssignmentStmt("y", IntValue(10)))
-        assert(elseIfs(9).condition == EQExpression(VarExpression("x"), IntValue(25)))
+        assert(elseIfs(9).condition == Brackets(EQExpression(VarExpression("x"), IntValue(25))))
         assert(elseIfs(9).thenStmt == AssignmentStmt("y", IntValue(11)))
         assert(elseStmt == Some(AssignmentStmt("y", IntValue(12))))
       case _ => fail("expecting an if-then stmt")
@@ -1631,8 +1631,8 @@ class ParserTestSuite extends AnyFunSuite {
 
     val SequenceStmt(stmts) = procedure.stmt // pattern matching...
     assert(stmts.size == 2)
-
-    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
+  
+    assert(stmts.head == IfElseStmt(Brackets(EQExpression(VarExpression("i"), IntValue(1))), ReturnStmt(IntValue(1)), None))
     assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
 
     module.stmt.get match {
@@ -1664,7 +1664,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   // Parser doesn't create Bracket Expression objects.
-  ignore("Testing simple10.oberon - Bracket Expression") {
+  test("Testing simple10.oberon - Bracket Expression") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon")
       .getFile
       .replaceFirst("\\/(.:\\/)", "$1"))
@@ -1739,7 +1739,7 @@ class ParserTestSuite extends AnyFunSuite {
     // the third stmt must be an IfElseStmt
     stmts(2) match {
       case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
+        assert(cond == Brackets(GTExpression(VarExpression("x"),VarExpression("max"))))
 		assert(s1 == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
@@ -1857,7 +1857,8 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").toURI)
+
 
     assert(path != null)
 
@@ -1871,9 +1872,16 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.userTypes.size == 5)
 
-    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
+    val listDeclaration = List(VariableDeclaration("t_id", IntegerType),
+      VariableDeclaration("members", ReferenceToUserDefinedType("m_id")),
+      VariableDeclaration("n_members", IntegerType),
+      VariableDeclaration("full", BooleanType))
 
-    //TODO: add the new assets 
+    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
+    assert(module.userTypes(1) == RecordType("team", listDeclaration))
+    assert(module.userTypes(2) == ArrayType("team_array", 20, ReferenceToUserDefinedType("team")))
+    assert(module.userTypes(3) == ArrayType("test_array", 20, IntegerType))
+    assert(module.userTypes(4) == ArrayType("second_test", 20, ReferenceToUserDefinedType("test_array")))
   }
 
   test("Testing the oberon recordAssignmentStmt03 code") {
@@ -1963,7 +1971,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
     stmts(4) match {
       case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("n"), IntValue(2)))
+        assert(cond == Brackets(GTExpression(VarExpression("n"), IntValue(2))))
 		assert(s1 == EAssignmentStmt(ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
