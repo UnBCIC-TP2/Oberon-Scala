@@ -6,10 +6,10 @@ void main() {
 
   scanf("%d", &x);
   scanf("%d", &y);
-  if (x > y) {
+  if ((x > y)) {
     gt = 2;
   }
-  else if (x < y) {
+  else if ((x < y)) {
     gt = 1;
   }
   else {

@@ -4,10 +4,10 @@
 int power(int b, int e) {
   int r;
   r = b;
-  if (b < 0 | e < 0) {
+  if ((b < 0 | e < 0)) {
     return 0;
   }
-  if (e == 0) {
+  if ((e == 0)) {
     return 1;
   }
   do {
