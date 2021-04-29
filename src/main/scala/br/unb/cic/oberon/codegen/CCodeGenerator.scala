@@ -112,32 +112,32 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       padSpaces: Int = 2
   ): Doc = {
     statement match {
-      case AssignmentStmt(varName, expression) =>
+      case AssignmentStmt(label, varName, expression) =>
         formatLine(startSpaces) + Doc.text(varName) + Doc.space + Doc.char(
           '='
         ) + Doc.space + generateExpression(expression) + Doc.char(
           ';'
         ) + Doc.line
-      case SequenceStmt(stmts) => {
+      case SequenceStmt(label, stmts) => {
         val multipleStmts = stmts.map {
           case (stmt) => generateStatement(stmt, startSpaces, padSpaces)
         }
         Doc.intercalate(Doc.empty, multipleStmts)
       }
-      case ReadIntStmt(varName) =>
+      case ReadIntStmt(label, varName) =>
         formatLine(startSpaces) + Doc.text("scanf(\"%d\", &") + Doc.text(
           varName
         ) + Doc.text(
           ");"
         ) + Doc.line
-      case WriteStmt(expression) => {
+      case WriteStmt(label, expression) => {
         formatLine(startSpaces) + Doc.text(
           "printf(\"%d\\n\", "
         ) + generateExpression(
           expression
         ) + Doc.text(");") + Doc.line
       }
-      case ProcedureCallStmt(name, args) => {
+      case ProcedureCallStmt(label, name, args) => {
         val expressions = args.map {
           case (arg) =>
             generateExpression(arg)
@@ -149,7 +149,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           Doc.text(");")
         ) + Doc.line
       }
-      case IfElseStmt(condition, thenStmt, elseStmt) => {
+      case IfElseStmt(label, condition, thenStmt, elseStmt) => {
         val ifCond =
           formatLine(startSpaces) + Doc.text("if (") + generateExpression(
             condition
@@ -173,7 +173,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         }
         ifCond + elseCond
       }
-      case WhileStmt(condition, stmt) => {
+      case WhileStmt(label, condition, stmt) => {
         formatLine(startSpaces) + Doc.text("while (") + generateExpression(
           condition
         ) + Doc.text(")") +
@@ -183,15 +183,15 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           padSpaces
         ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
       }
-      case RepeatUntilStmt(condition, stmt) => {
+      case RepeatUntilStmt(label, condition, stmt) => {
         formatLine(startSpaces) + Doc.text("do {") + Doc.line +
           generateStatement(stmt, startSpaces + padSpaces, padSpaces) +
           formatLine(startSpaces) + Doc.text("} while (!(") +
           generateExpression(condition) + Doc.text("));") + Doc.line
       }
-      case ForStmt(init: Statement, condition, stmt) => {
+      case ForStmt(label, init: Statement, condition, stmt) => {
         init match {
-          case AssignmentStmt(varName, expression) => {
+          case AssignmentStmt(label, varName, expression) => {
             formatLine(startSpaces) + Doc.text("for (") + Doc.text(
               varName
             ) + Doc.space + Doc.char('=') + Doc.space +
@@ -213,13 +213,13 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         }
       }
 
-      case ReturnStmt(exp) =>
+      case ReturnStmt(label, exp) =>
         formatLine(startSpaces) + Doc.text("return ") + generateExpression(
           exp
         ) + Doc
           .char(';') + Doc.line
 
-      case CaseStmt(exp, cases, elseStmt) => {
+      case CaseStmt(label, exp, cases, elseStmt) => {
         val caseStmts = cases.map {
           case SimpleCase(condition, stmt) =>
             formatLine(startSpaces) + Doc.text("case ") + generateExpression(
@@ -264,7 +264,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         ) + Doc.line
       }
 
-      case IfElseIfStmt(condition, thenStmt, elsifStmt, elseStmt) => {
+      case IfElseIfStmt(label, condition, thenStmt, elsifStmt, elseStmt) => {
         val ifCond =
           formatLine(startSpaces) + Doc.text("if (") + generateExpression(
             condition
@@ -277,7 +277,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
 
         val elsifCond = elsifStmt.map {
-          case ElseIfStmt(elsifCondition, elsifThenStmt) =>
+          case ElseIfStmt(_, elsifCondition, elsifThenStmt) =>
             formatLine(startSpaces) + Doc.text("else if (") + generateExpression(
               elsifCondition
             ) + Doc.text(

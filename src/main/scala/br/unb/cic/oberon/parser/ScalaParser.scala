@@ -234,12 +234,18 @@ class ParserVisitor {
   /* a visitor for parsing statements */
   class StatementVisitor extends OberonBaseVisitor[Unit] {
     var stmt: Statement = _
+    var label: Int = 0
+
+    def generateLabel(): Int = {
+      label += 1
+      return label
+    }
 
     override def visitAssignmentStmt(ctx: OberonParser.AssignmentStmtContext): Unit = {
       val varName = ctx.`var`.getText
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
-      stmt = AssignmentStmt(varName, visitor.exp)
+      stmt = AssignmentStmt(generateLabel(), varName, visitor.exp)
     }
 
     override def visitEAssignmentStmt(ctx: OberonParser.EAssignmentStmtContext): Unit = {
@@ -251,7 +257,7 @@ class ParserVisitor {
       ctx.designator.accept(EAssignmentVisitor)
       val designator = EAssignmentVisitor.assignmentAlt
 
-      stmt = EAssignmentStmt(designator, visitor.exp)
+      stmt = EAssignmentStmt(generateLabel(), designator, visitor.exp)
     }
 
     override def visitSequenceStmt(ctx: OberonParser.SequenceStmtContext): Unit = {
@@ -261,25 +267,25 @@ class ParserVisitor {
         s.accept(this)
         stmts += stmt
       })
-      stmt = SequenceStmt(flatSequenceOfStatements(stmts.toList))
+      stmt = SequenceStmt(generateLabel(), flatSequenceOfStatements(stmts.toList))
     }
 
     def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] =
       stmts match {
-        case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
+        case SequenceStmt(label, ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
         case s :: rest => s :: flatSequenceOfStatements(rest)
         case Nil => List()
       }
 
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
-      stmt = ReadIntStmt(varName)
+      stmt = ReadIntStmt(generateLabel(), varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
       ctx.expression().accept(visitor)
-      stmt = WriteStmt(visitor.exp)
+      stmt = WriteStmt(generateLabel(), visitor.exp)
     }
 
     override def visitProcedureCall(ctx: OberonParser.ProcedureCallContext): Unit = {
@@ -291,7 +297,7 @@ class ParserVisitor {
         e.accept(visitor)
         args += visitor.exp
       })
-      stmt = ProcedureCallStmt(name, args.toList)
+      stmt = ProcedureCallStmt(generateLabel(), name, args.toList)
     }
 
     override def visitIfElseStmt(ctx: OberonParser.IfElseStmtContext): Unit = {
@@ -308,17 +314,17 @@ class ParserVisitor {
         Some(stmt)
       } else None
 
-      stmt = IfElseStmt(condition, thenStmt, elseStmt)
+      stmt = IfElseStmt(generateLabel(), condition, thenStmt, elseStmt)
     }
 
     override def visitLoopStmt(ctx: OberonParser.LoopStmtContext): Unit = {
       ctx.stmt.accept(this)
       val block = stmt
-      stmt = LoopStmt(block)
+      stmt = LoopStmt(generateLabel(), block)
     }
 
     override def visitExitStmt(ctx: OberonParser.ExitStmtContext): Unit = {
-      stmt = ExitStmt()
+      stmt = ExitStmt(generateLabel())
     }
 
     override def visitIfElseIfStmt(ctx: OberonParser.IfElseIfStmtContext): Unit = {
@@ -335,7 +341,7 @@ class ParserVisitor {
         val elsifCondition = visitor.exp
         e.stmt.accept(this)
         val elsifThenStmt = stmt
-        elsifStmt += ElseIfStmt(elsifCondition, elsifThenStmt)
+        elsifStmt += ElseIfStmt(generateLabel(), elsifCondition, elsifThenStmt)
       })
 
       val elseStmt = if (ctx.elseStmt != null) {
@@ -343,7 +349,7 @@ class ParserVisitor {
         Some(stmt)
       } else None
 
-      stmt = IfElseIfStmt(condition, thenStmt, elsifStmt.toList, elseStmt)
+      stmt = IfElseIfStmt(generateLabel(), condition, thenStmt, elsifStmt.toList, elseStmt)
     }
 
     override def visitCaseStmt(ctx: OberonParser.CaseStmtContext): Unit = {
@@ -365,7 +371,7 @@ class ParserVisitor {
         Some(stmt)
       } else None
 
-      stmt = CaseStmt(caseExp, cases.toList, elseStmt)
+      stmt = CaseStmt(generateLabel(), caseExp, cases.toList, elseStmt)
     }
 
     override def visitWhileStmt(ctx: OberonParser.WhileStmtContext): Unit = {
@@ -377,7 +383,7 @@ class ParserVisitor {
       ctx.stmt.accept(this)
       val whileStmt = stmt
 
-      stmt = WhileStmt(condition, whileStmt)
+      stmt = WhileStmt(generateLabel(), condition, whileStmt)
     }
 
 
@@ -390,7 +396,7 @@ class ParserVisitor {
       ctx.stmt.accept(this)
       val repeatUntilStmt = stmt
 
-      stmt = RepeatUntilStmt(condition, repeatUntilStmt)
+      stmt = RepeatUntilStmt(generateLabel(), condition, repeatUntilStmt)
     }
 
     override def visitForStmt(ctx: OberonParser.ForStmtContext): Unit = {
@@ -405,7 +411,7 @@ class ParserVisitor {
       ctx.stmt.accept(this)
       val block = stmt
 
-      stmt = ForStmt(init, condition, block)
+      stmt = ForStmt(generateLabel(), init, condition, block)
     }
 
     override def visitForRangeStmt(ctx: OberonParser.ForRangeStmtContext): Unit = {
@@ -426,24 +432,24 @@ class ParserVisitor {
       // Instantiating the values for the basic ForStmt
 
       // var := rangeMin
-      val init = AssignmentStmt(variable.name, rangeMin)
+      val init = AssignmentStmt(generateLabel(), variable.name, rangeMin)
 
       // var <= rangeMax
       val condition = LTEExpression(variable, rangeMax)
 
       // var := var + 1
-      val accumulator = AssignmentStmt(variable.name, AddExpression(variable, IntValue(1)))
+      val accumulator = AssignmentStmt(generateLabel(), variable.name, AddExpression(variable, IntValue(1)))
 
       // stmt; var := var + 1
-      val realBlock = SequenceStmt(List(block, accumulator))
+      val realBlock = SequenceStmt(generateLabel(), List(block, accumulator))
 
-      stmt = ForStmt(init, condition, realBlock)
+      stmt = ForStmt(generateLabel(), init, condition, realBlock)
     }
 
     override def visitReturnStmt(ctx: OberonParser.ReturnStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
       ctx.exp.accept(visitor)
-      stmt = ReturnStmt(visitor.exp)
+      stmt = ReturnStmt(generateLabel(), visitor.exp)
     }
   }
 

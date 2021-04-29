@@ -75,24 +75,24 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   override def visit(stmt: Statement) = stmt match {
-    case AssignmentStmt(_, _) => visitAssignment(stmt)
-    case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
-    case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
-    case WhileStmt(_, _) => visitWhileStmt(stmt)
-    case RepeatUntilStmt(_, _) => visitRepeatUntilStmt(stmt)
-    case ForStmt(_, _, _) => visitForStmt(stmt)
-    case LoopStmt(_) => visitLoopStmt(stmt)
-    case ExitStmt() => visitExitStmt()
-    case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
-    case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
-    case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
-    case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
-    case ReadIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
-    case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case AssignmentStmt(_, _, _) => visitAssignment(stmt)
+    case IfElseStmt(_, _, _, _) => visitIfElseStmt(stmt)
+    case IfElseIfStmt(_, _, _, _, _) => visitIfElseIfStmt(stmt)
+    case WhileStmt(_, _, _) => visitWhileStmt(stmt)
+    case RepeatUntilStmt(_, _, _) => visitRepeatUntilStmt(stmt)
+    case ForStmt(_, _, _, _) => visitForStmt(stmt)
+    case LoopStmt(_, _) => visitLoopStmt(stmt)
+    case ExitStmt(_) => visitExitStmt()
+    case ProcedureCallStmt(_, _, _) => procedureCallStmt(stmt)
+    case CaseStmt(_, _, _, _) => visitSwitchStmt(stmt)
+    case SequenceStmt(_, stmts) => stmts.flatMap(s => s.accept(this))
+    case ReturnStmt(_, exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case ReadIntStmt(_, v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
+    case WriteStmt(_, exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
   }
 
   private def visitAssignment(stmt: Statement) = stmt match {
-    case AssignmentStmt(v, exp) =>
+    case AssignmentStmt(label, v, exp) =>
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined)
           List()
@@ -102,7 +102,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {
-    case IfElseStmt(condition, thenStmt, elseStmt) =>
+    case IfElseStmt(label, condition, thenStmt, elseStmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)) {
         val list1 = thenStmt.accept(this)
         val list2 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
@@ -112,7 +112,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
   
   private def visitIfElseIfStmt(stmt: Statement) = stmt match {
-    case IfElseIfStmt(condition, thenStmt, elseIfStmt, elseStmt) =>
+    case IfElseIfStmt(label, condition, thenStmt, elseIfStmt, elseStmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)){
         val list1 = thenStmt.accept(this)
         var list2 = List[(br.unb.cic.oberon.ast.Statement, String)]()
@@ -132,7 +132,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
-    case WhileStmt(condition, stmt) =>
+    case WhileStmt(label, condition, stmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)) {
         stmt.accept(this)
       }
@@ -140,7 +140,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitRepeatUntilStmt(stmt: Statement) = stmt match {
-    case RepeatUntilStmt(condition, stmt) =>
+    case RepeatUntilStmt(label, condition, stmt) =>
       if(condition.accept(expVisitor).getOrElse(None) == BooleanType) {
         stmt.accept(this)
       }
@@ -148,7 +148,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitForStmt(stmt: Statement) = stmt match {
-    case ForStmt(init, condition, stmt) =>
+    case ForStmt(label, init, condition, stmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)) {
         val list1 = init.accept(this)
         val list2 = stmt.accept(this)
@@ -158,13 +158,13 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitLoopStmt(stmt: Statement) = stmt match {
-    case LoopStmt(innerStmt) => innerStmt.accept(this)
+    case LoopStmt(label, innerStmt) => innerStmt.accept(this)
   }
 
   private def visitExitStmt() = List[(br.unb.cic.oberon.ast.Statement, String)]()
 
   private def visitSwitchStmt(stmt: Statement) = stmt match {
-    case CaseStmt(exp, cases, elseStmt) =>
+    case CaseStmt(label, exp, cases, elseStmt) =>
       if(exp.accept(expVisitor).contains(IntegerType)){
       var list2 = List[(br.unb.cic.oberon.ast.Statement, String)]()
         cases.foreach (c =>
@@ -212,7 +212,7 @@ class TypeChecker extends OberonVisitorAdapter {
    * @return Our error representation (statement + string with the error message)
    */
   private def procedureCallStmt(stmt: Statement): List[(Statement, String)] = stmt match {
-    case ProcedureCallStmt(name, args) =>
+    case ProcedureCallStmt(label, name, args) =>
       val procedure = env.findProcedure(name)
       if(procedure == null) return List((stmt, s"Procedure $name has not been declared."))
       else {

@@ -70,25 +70,26 @@ case class AndExpression(left: Expression, right: Expression) extends Expression
 
 /* Statements */
 trait Statement {
+  def label: Int
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
-case class AssignmentStmt(varName: String, exp: Expression) extends Statement
-case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
-case class SequenceStmt(stmts: List[Statement]) extends Statement
-case class ReadIntStmt(varName: String) extends Statement
-case class WriteStmt(expression: Expression) extends Statement
-case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
-case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
-case class IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) extends Statement
-case class ElseIfStmt(condition: Expression, thenStmt: Statement) extends Statement
-case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
-case class RepeatUntilStmt(condition: Expression, stmt: Statement) extends Statement
-case class ForStmt(init: Statement, condition: Expression, stmt: Statement) extends Statement
-case class LoopStmt(stmt: Statement) extends Statement
-case class ReturnStmt(exp: Expression) extends Statement
-case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) extends Statement
-case class ExitStmt() extends Statement
+case class AssignmentStmt(label: Int, varName: String, exp: Expression) extends Statement
+case class EAssignmentStmt(label: Int, designator: AssignmentAlternative, exp: Expression) extends Statement
+case class SequenceStmt(label: Int, stmts: List[Statement]) extends Statement
+case class ReadIntStmt(label: Int, varName: String) extends Statement
+case class WriteStmt(label: Int, expression: Expression) extends Statement
+case class ProcedureCallStmt(label: Int, name: String, args: List[Expression]) extends Statement
+case class IfElseStmt(label: Int, condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
+case class IfElseIfStmt(label: Int, condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) extends Statement
+case class ElseIfStmt(label: Int, condition: Expression, thenStmt: Statement) extends Statement
+case class WhileStmt(label: Int, condition: Expression, stmt: Statement) extends Statement
+case class RepeatUntilStmt(label: Int, condition: Expression, stmt: Statement) extends Statement
+case class ForStmt(label: Int, init: Statement, condition: Expression, stmt: Statement) extends Statement
+case class LoopStmt(label: Int, stmt: Statement) extends Statement
+case class ReturnStmt(label: Int, exp: Expression) extends Statement
+case class CaseStmt(label: Int, exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) extends Statement
+case class ExitStmt(label: Int) extends Statement
 
 trait CaseAlternative {
   def accept(v: OberonVisitor) = v.visit(this)

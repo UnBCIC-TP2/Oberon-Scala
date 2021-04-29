@@ -72,7 +72,7 @@ class Interpreter extends OberonVisitorAdapter {
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
-      case EAssignmentStmt(indexDesignator, exp) => {
+      case EAssignmentStmt(_, indexDesignator, exp) => {
         indexDesignator match {
           case ArrayAssignment(arrayExpression, indexExpression) => {
             env.reassignArray(arrayExpression.asInstanceOf[VarExpression].name, evalExpression(indexExpression).asInstanceOf[IntValue].value, evalExpression(exp))
@@ -81,20 +81,20 @@ class Interpreter extends OberonVisitorAdapter {
           case _ => ???
         }
       }
-      case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
-      case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
-      case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
-      case WriteStmt(exp) => printStream.println(evalExpression(exp))
-      case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
-      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
-      case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
-      case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
-      case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
-      case LoopStmt(stmt) => while(!exit) { stmt.accept(this) }; exit = false
-      case ExitStmt() => exit = true
-      case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
-      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
-      case ProcedureCallStmt(name, args) =>
+      case AssignmentStmt(_, name, exp) => env.setVariable(name, evalExpression(exp))
+      case SequenceStmt(_, stmts) => stmts.foreach(s => s.accept(this))
+      case ReadIntStmt(_, name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
+      case WriteStmt(_, exp) => printStream.println(evalExpression(exp))
+      case IfElseStmt(_, condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
+      case IfElseIfStmt(_, condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
+      case WhileStmt(_, condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
+      case RepeatUntilStmt(_, condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
+      case ForStmt(_, init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
+      case LoopStmt(_, stmt) => while(!exit) { stmt.accept(this) }; exit = false
+      case ExitStmt(_) => exit = true
+      case CaseStmt(_, exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
+      case ReturnStmt(_, exp: Expression) => setReturnExpression(evalExpression(exp))
+      case ProcedureCallStmt(_, name, args) =>
         // we evaluate the "args" in the current
         // environment.
         val actualArguments = args.map(a => evalExpression(a))
@@ -115,7 +115,7 @@ class Interpreter extends OberonVisitorAdapter {
 
       while (i < listOfElseIf.size && !matched) {
         listOfElseIf(i) match {
-          case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
+          case ElseIfStmt(_,condition, stmt) => if (evalCondition(condition)) {
             stmt.accept(this)
             matched = true
           }
