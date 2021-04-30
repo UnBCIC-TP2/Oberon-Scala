@@ -3,7 +3,7 @@ package br.unb.cic.oberon.analysis
 import br.unb.cic.oberon.ast.{AssignmentStmt, ReadIntStmt}
 import br.unb.cic.oberon.cfg.{GraphNode, SimpleNode}
 
-object ControlFlowGraphAnalysis {
+trait ControlFlowGraphAnalysis {
   type NodeDefinitionSet = Set[(String, GraphNode)]
   type ReachingDefinitionMapping = Map[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])]
 

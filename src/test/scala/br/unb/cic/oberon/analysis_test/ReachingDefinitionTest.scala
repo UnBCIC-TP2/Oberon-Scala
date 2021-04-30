@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.analysis_test
 
-import br.unb.cic.oberon.analysis.ReachingDefinition
+import br.unb.cic.oberon.analysis.algorithms.ReachingDefinition
 import br.unb.cic.oberon.ast.{AssignmentStmt, GTExpression, IfElseStmt, ReadIntStmt, VarExpression, WriteStmt}
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode, StartNode}
 import org.scalatest.funsuite.AnyFunSuite

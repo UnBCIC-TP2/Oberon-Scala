@@ -1,11 +1,11 @@
-package br.unb.cic.oberon.analysis
+package br.unb.cic.oberon.analysis.algorithms
 
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode}
 import scalax.collection.GraphEdge
 import scalax.collection.mutable.Graph
-import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis._
+import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 
-class ReachingDefinition {
+case class ReachingDefinition() extends ControlFlowGraphAnalysis {
   def analyseReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionMapping = {
     var reachingDefinitions: ReachingDefinitionMapping = initializeReachingDefinitions(cfg)
     var fixedPointReached: Boolean = false
