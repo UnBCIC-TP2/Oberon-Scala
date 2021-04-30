@@ -27,6 +27,8 @@ case class Procedure(name: String,
 /* formal argument definition */
 trait FormalArg{
   def accept(v: OberonVisitor) = v.visit(this)
+  def name: String
+  def argumentType: Type
 }
 
 case class ValueArguments(name: String, argumentType: Type) extends FormalArg
