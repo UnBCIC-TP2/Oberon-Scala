@@ -9,7 +9,6 @@ import scalax.collection.GraphPredef.EdgeAssoc
 import scalax.collection.mutable.Graph
 
 class ReachingDefinitionTest extends AnyFunSuite {
-
   test("return a map with number of keys equal to number of graph nodes") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
@@ -28,10 +27,10 @@ class ReachingDefinitionTest extends AnyFunSuite {
 
     val numberOfNodes = 7
 
-    val reachingDefinition = new ReachingDefinition()
-    val reachingDefinitionAnalysis = reachingDefinition.analyseReachingDefinitions(cfg)
+    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
-    val numberOfMapKeys = reachingDefinitionAnalysis.keySet.size
+    val numberOfMapKeys = reachingDefinitionsAnalysis.keySet.size
 
     assert(numberOfNodes == numberOfMapKeys)
   }
@@ -62,10 +61,10 @@ class ReachingDefinitionTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s3))), Set()),
     )
 
-    val reachingDefinition = new ReachingDefinition()
-    val reachingDefinitionAnalysis = reachingDefinition.analyseReachingDefinitions(cfg)
+    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
-    assert(expected == reachingDefinitionAnalysis)
+    assert(expected == reachingDefinitionsAnalysis)
   }
 
   /**
@@ -107,9 +106,9 @@ class ReachingDefinitionTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s2)), ("max", SimpleNode(s3_1))), Set())
     )
 
-    val reachingDefinition = new ReachingDefinition()
-    val reachingDefinitionAnalysis = reachingDefinition.analyseReachingDefinitions(cfg)
+    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
-    assert(expected == reachingDefinitionAnalysis)
+    assert(expected == reachingDefinitionsAnalysis)
   }
 }

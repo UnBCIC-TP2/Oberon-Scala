@@ -5,48 +5,61 @@ import scalax.collection.GraphEdge
 import scalax.collection.mutable.Graph
 import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 
+import scala.annotation.tailrec
+import scala.collection.immutable.HashMap
+
 case class ReachingDefinition() extends ControlFlowGraphAnalysis {
-  def analyseReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionMapping = {
-    var reachingDefinitions: ReachingDefinitionMapping = initializeReachingDefinitions(cfg)
-    var fixedPointReached: Boolean = false
-    var previousReachingDefinitions: ReachingDefinitionMapping = reachingDefinitions
+  type NodeDefinitionSet = NodeAnalysisSet
+  type ReachingDefinitionsMapping = AnalysisMapping
 
-    while(!fixedPointReached) {
-      cfg.edges.foreach(
-        edge => edge.edge match {
-          case GraphEdge.DiEdge(previousNodeT, currentNodeT) =>
-            val previousNode: GraphNode = previousNodeT.toOuter
-            val currentNode: GraphNode = currentNodeT.toOuter
-            val currentNodeIn: NodeDefinitionSet = calculateNodeDefinitionIn(reachingDefinitions, currentNode, previousNode)
-            val currentNodeGen: NodeDefinitionSet = calculateNodeGenDefinitions(currentNode)
-            val currentNodeKill: NodeDefinitionSet = calculateNodeKillDefinitions(currentNodeIn, currentNodeGen)
-
-            // OUT(x) = In(x) + gen(x) - kill(x)
-            val currentNodeOut: NodeDefinitionSet =
-              if(currentNode != EndNode())
-                currentNodeIn ++ currentNodeGen -- currentNodeKill
-              else
-                Set()
-
-            reachingDefinitions = reachingDefinitions + (currentNode -> (currentNodeIn, currentNodeOut))
-        }
-      )
-      fixedPointReached = previousReachingDefinitions == reachingDefinitions
-      previousReachingDefinitions = reachingDefinitions
-    }
-
-    reachingDefinitions
+  def analyse(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionsMapping = {
+    val emptyReachDef: ReachingDefinitionsMapping = initializeReachingDefinitions(cfg)
+    analyse(cfg, emptyReachDef, fixedPoint = false)
   }
 
-  private def initializeReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionMapping = {
-    var reachingDefinitions: ReachingDefinitionMapping = Map()
+  @tailrec
+  private def analyse(cfg: Graph[GraphNode, GraphEdge.DiEdge],
+                      prevReachDefs: ReachingDefinitionsMapping,
+                      fixedPoint: Boolean): ReachingDefinitionsMapping = {
+    if (fixedPoint) {
+      prevReachDefs
+    } else {
+      var reachDefs: ReachingDefinitionsMapping = prevReachDefs
+      cfg.edges.foreach(
+        e => {
+          val GraphEdge.DiEdge(prevNodeT, currNodeT) = e.edge
+          val prevNode: GraphNode = prevNodeT.value
+          val currNode: GraphNode = currNodeT.value
+          reachDefs = reachDefs + computeNodeInOutSets(prevNode, currNode, reachDefs)
+        }
+      )
+      analyse(cfg, reachDefs, reachDefs == prevReachDefs)
+    }
+  }
+
+  private def initializeReachingDefinitions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionsMapping = {
+    var reachDefs: ReachingDefinitionsMapping = HashMap()
 
     cfg.edges.foreach(
       edge => edge.nodes.foreach(
-        node => reachingDefinitions = reachingDefinitions + (node.toOuter -> (Set(), Set()))
+        node => reachDefs = reachDefs + (node.value -> (Set(), Set()))
       )
     )
 
-    reachingDefinitions
+    reachDefs
+  }
+
+  private def computeNodeInOutSets(prevNode: GraphNode,
+                                   currNode: GraphNode,
+                                   reachDefs: ReachingDefinitionsMapping): (GraphNode, (NodeDefinitionSet, NodeDefinitionSet)) = {
+    val currNodeIn: NodeDefinitionSet = computeNodeDefinitionIn(reachDefs, currNode, prevNode)
+    val currNodeGen: NodeDefinitionSet = computeNodeGenDefinitions(currNode)
+    val currNodeKill: NodeDefinitionSet = computeNodeKillDefinitions(currNodeIn, currNodeGen)
+
+    // OUT(x) = In(x) + gen(x) - kill(x)
+    val currNodeOut: NodeDefinitionSet =
+      if (currNode != EndNode()) currNodeIn ++ currNodeGen -- currNodeKill else Set()
+
+    currNode -> (currNodeIn, currNodeOut)
   }
 }
