@@ -9,6 +9,11 @@ import scalax.collection.GraphPredef.EdgeAssoc
 import scalax.collection.mutable.Graph
 
 class ReachingDefinitionTest extends AnyFunSuite {
+  // x = int(input())
+  // max = int(input())
+  // if x > max:
+  //    max = x
+  // print(max)
   test("return a map with number of keys equal to number of graph nodes") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
