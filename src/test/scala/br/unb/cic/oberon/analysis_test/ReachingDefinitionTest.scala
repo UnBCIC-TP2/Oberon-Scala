@@ -9,11 +9,16 @@ import scalax.collection.GraphPredef.EdgeAssoc
 import scalax.collection.mutable.Graph
 
 class ReachingDefinitionTest extends AnyFunSuite {
-  // x = int(input())
-  // max = int(input())
-  // if x > max:
-  //    max = x
-  // print(max)
+  /**
+   * BEGIN
+   *   readInt(x);
+   *   readInt(max);
+   *   IF(x > max) THEN
+   *     max := x
+   *   END;
+   *   write(max)
+   * END
+   */
   test("return a map with number of keys equal to number of graph nodes") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
@@ -21,7 +26,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
     val s3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), s3_1 , None)
     val s4 = WriteStmt(VarExpression("max"))
 
-    var cfg = Graph[GraphNode, GraphEdge.DiEdge]()
+    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
     cfg += StartNode() ~> SimpleNode(s1)
     cfg += SimpleNode(s1) ~> SimpleNode(s2)
     cfg += SimpleNode(s2) ~> SimpleNode(s3)
@@ -52,7 +57,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
     val s2 = AssignmentStmt("max", VarExpression("x"))
     val s3 = ReadIntStmt("max")
 
-    var cfg = Graph[GraphNode, GraphEdge.DiEdge]()
+    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
     cfg += StartNode() ~> SimpleNode(s1)
     cfg += SimpleNode(s1) ~> SimpleNode(s2)
     cfg += SimpleNode(s2) ~> SimpleNode(s3)
@@ -73,8 +78,6 @@ class ReachingDefinitionTest extends AnyFunSuite {
   }
 
   /**
-   * This test case simulates the following oberon code:
-   *
    * BEGIN
    *   readInt(x);
    *   readInt(max);
@@ -83,7 +86,6 @@ class ReachingDefinitionTest extends AnyFunSuite {
    *   END;
    *   write(max)
    * END
-   *
    */
   test("return a map with reaching definitions for each graph node (example 2)") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
@@ -92,7 +94,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
     val s3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), s3_1 , None)
     val s4 = WriteStmt(VarExpression("max"))
 
-    var cfg = Graph[GraphNode, GraphEdge.DiEdge]()
+    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
     cfg += StartNode() ~> SimpleNode(s1)
     cfg += SimpleNode(s1) ~> SimpleNode(s2)
     cfg += SimpleNode(s2) ~> SimpleNode(s3)

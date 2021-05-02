@@ -13,8 +13,9 @@ case class ReachingDefinition() extends ControlFlowGraphAnalysis {
   type ReachingDefinitionsMapping = AnalysisMapping
 
   def analyse(cfg: Graph[GraphNode, GraphEdge.DiEdge]): ReachingDefinitionsMapping = {
-    val emptyReachDef: ReachingDefinitionsMapping = initializeReachingDefinitions(cfg)
-    analyse(cfg, emptyReachDef, fixedPoint = false)
+    val emptyReachDefs: ReachingDefinitionsMapping = initializeReachingDefinitions(cfg)
+
+    analyse(cfg, emptyReachDefs, fixedPoint = false)
   }
 
   @tailrec
@@ -25,14 +26,14 @@ case class ReachingDefinition() extends ControlFlowGraphAnalysis {
       prevReachDefs
     } else {
       var reachDefs: ReachingDefinitionsMapping = prevReachDefs
+
       cfg.edges.foreach(
         e => {
           val GraphEdge.DiEdge(prevNodeT, currNodeT) = e.edge
-          val prevNode: GraphNode = prevNodeT.value
-          val currNode: GraphNode = currNodeT.value
-          reachDefs = reachDefs + computeNodeInOutSets(prevNode, currNode, reachDefs)
+          reachDefs = reachDefs + computeNodeInOutSets(prevNodeT.value, currNodeT.value, reachDefs)
         }
       )
+
       analyse(cfg, reachDefs, reachDefs == prevReachDefs)
     }
   }
