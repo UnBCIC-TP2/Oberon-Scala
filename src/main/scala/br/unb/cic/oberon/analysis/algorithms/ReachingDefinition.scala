@@ -56,7 +56,7 @@ case class ReachingDefinition() extends ControlFlowGraphAnalysis {
     val currNodeGen: NodeDefinitionSet = computeNodeGenDefinitions(currNode)
     val currNodeKill: NodeDefinitionSet = computeNodeKillDefinitions(currNodeIn, currNodeGen)
 
-    // OUT(x) = In(x) + gen(x) - kill(x)
+    // OUT(x) = In(x) + Gen(x) - Kill(x)
     val currNodeOut: NodeDefinitionSet =
       if (currNode != EndNode()) currNodeIn ++ currNodeGen -- currNodeKill else Set()
 
