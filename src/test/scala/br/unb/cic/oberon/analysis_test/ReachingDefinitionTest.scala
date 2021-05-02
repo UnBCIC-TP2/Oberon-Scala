@@ -73,7 +73,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
   }
 
   /**
-   * This is test case simulates the following oberon code:
+   * This test case simulates the following oberon code:
    *
    * BEGIN
    *   readInt(x);
