@@ -84,7 +84,12 @@ class Interpreter extends OberonVisitorAdapter {
       }
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
       case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
+      case ReadLongRealStmt(name) => env.setVariable(name, LongRealValue(StdIn.readLine().toDouble))
+      case ReadRealStmt(name) => env.setVariable(name, RealValue(StdIn.readLine().toFloat))
+      case ReadLongIntStmt(name) => env.setVariable(name, LongValue(StdIn.readLine().toLong))
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
+      case ReadShortIntStmt(name) => env.setVariable(name, ShortValue(StdIn.readLine().toShort))
+      case ReadCharStmt(name) => env.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
       case WriteStmt(exp) => printStream.println(evalExpression(exp))
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
       case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
@@ -227,6 +232,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case LongRealValue(v) => LongRealValue(v)
     case LongValue(v) => LongValue(v)
     case ShortValue(v) => ShortValue(v)
+    case CharValue(v) => CharValue(v)
     case BoolValue(v) => BoolValue(v)
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
@@ -259,8 +265,8 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   }
 
   def aritmeticLogicExpression(left: Expression, right: Expression, op: Int) : Expression = {
-    var vl = left.accept(this).asInstanceOf[Value[T]]
-    var vr = right.accept(this).asInstanceOf[Value[T]]
+    var vl = left.accept(this).asInstanceOf[Primitive[T]]
+    var vr = right.accept(this).asInstanceOf[Primitive[T]]
 
     // [long real, real, long int, int, short int]
 
@@ -272,70 +278,71 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
       vl.isInstanceOf[ShortValue]    || vr.isInstanceOf[ShortValue]
     )
 
-    val v1 = vl.value.toString
-    val v2 = vr.value.toString
-
     op match {
       case 1 => {
-        if (types(0) == true) LongRealValue((v1.toDouble + v2.toDouble).toDouble)
-        else if (types(1) == true) RealValue((v1.toFloat + v2.toFloat).toFloat)
-        else if (types(2) == true) LongValue((v1.toLong + v2.toLong).toLong)
-        else if (types(3) == true) IntValue((v1.toInt + v2.toInt).toInt)
-        else ShortValue((v1.toShort + v2.toShort).toShort)
+        if (types(0) == true) LongRealValue((vl.toDouble + vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat + vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong + vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt + vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort + vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
       }
 
       case 2 => {
-        if (types(0) == true) LongRealValue((v1.toDouble - v2.toDouble).toDouble)
-        else if (types(1) == true) RealValue((v1.toFloat - v2.toFloat).toFloat)
-        else if (types(2) == true) LongValue((v1.toLong - v2.toLong).toLong)
-        else if (types(3) == true) IntValue((v1.toInt - v2.toInt).toInt)
-        else ShortValue((v1.toShort - v2.toShort).toShort)
+        if (types(0) == true) LongRealValue((vl.toDouble - vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat - vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong - vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt - vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort - vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
       }
 
       case 3 => {
-        if (types(0) == true) LongRealValue((v1.toDouble * v2.toDouble).toDouble)
-        else if (types(1) == true) RealValue((v1.toFloat * v2.toFloat).toFloat)
-        else if (types(2) == true) LongValue((v1.toLong * v2.toLong).toLong)
-        else if (types(3) == true) IntValue((v1.toInt * v2.toInt).toInt)
-        else ShortValue((v1.toShort * v2.toShort).toShort)
+        if (types(0) == true) LongRealValue((vl.toDouble * vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat * vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong * vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt * vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort * vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
       }
 
       case 4 => {
-        if (types(0) == true) LongRealValue((v1.toDouble / v2.toDouble).toDouble)
-        else if (types(1) == true) RealValue((v1.toFloat / v2.toFloat).toFloat)
-        else if (types(2) == true) LongValue((v1.toLong / v2.toLong).toLong)
-        else if (types(3) == true) IntValue((v1.toInt / v2.toInt).toInt)
-        else ShortValue((v1.toShort / v2.toShort).toShort)
+        if (types(0) == true) LongRealValue((vl.toDouble / vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat / vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong / vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt / vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort / vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
       }
 
       case 5 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble == v2.toDouble)
-        else BoolValue(v1.toLong == v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble == vr.toDouble)
+        else BoolValue(vl.toLong == vr.toLong)
       }
 
       case 6 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble != v2.toDouble)
-        else BoolValue(v1.toLong != v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble != vr.toDouble)
+        else BoolValue(vl.toLong != vr.toLong)
       }
 
       case 7 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble > v2.toDouble)
-        else BoolValue(v1.toLong > v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble > vr.toDouble)
+        else BoolValue(vl.toLong > vr.toLong)
       }
 
       case 8 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble < v2.toDouble)
-        else BoolValue(v1.toLong < v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble < vr.toDouble)
+        else BoolValue(vl.toLong < vr.toLong)
       }
 
       case 9 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble >= v2.toDouble)
-        else BoolValue(v1.toLong >= v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble >= vr.toDouble)
+        else BoolValue(vl.toLong >= vr.toLong)
       }
 
       case 10 => {
-        if (types(0) == true || types(1) == true) BoolValue(v1.toDouble <= v2.toDouble)
-        else BoolValue(v1.toLong <= v2.toLong)
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble <= vr.toDouble)
+        else BoolValue(vl.toLong <= vr.toLong)
       }
     }
   }

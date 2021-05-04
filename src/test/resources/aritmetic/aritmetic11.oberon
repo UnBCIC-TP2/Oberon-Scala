@@ -5,7 +5,7 @@ VAR
   y : INTEGER;
 BEGIN
     x := 10.00000000000005;
-    y := 5;
+    y := -5;
     x := x * y
 END
 

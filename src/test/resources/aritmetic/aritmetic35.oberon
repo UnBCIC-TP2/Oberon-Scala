@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+  
+VAR
+  v : LONGREAL;
+  w : REAL;
+  x : LONGINT;
+  y : INTEGER;
+  z : SHORTINT;
+
+BEGIN
+ readLongReal(v);
+ readReal(w);
+ readLongInt(x);
+ readInt(y);
+ readShortInt(z)
+END
+
+END SimpleModule.

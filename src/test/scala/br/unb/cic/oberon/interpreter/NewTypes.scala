@@ -2,11 +2,11 @@ package br.unb.cic.oberon.interpreter
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{IntValue, RealValue, LongValue, ShortValue, LongRealValue, OberonModule, Value}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
-class WakaWaka extends AnyFunSuite{
+class NewTypesTest extends AnyFunSuite{
 
   val interpreter = new Interpreter()
 
@@ -200,7 +200,7 @@ class WakaWaka extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(LongRealValue((10.00000000000005D * 5).toDouble))) // FOR TO x
+    assert(interpreter.env.lookup("x") == Some(LongRealValue((10.00000000000005D * -5).toDouble))) // FOR TO x
   }
 
   test("Testing LONGREAL and INTEGER /") {
@@ -510,6 +510,24 @@ class WakaWaka extends AnyFunSuite{
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(RealValue(3.8.toFloat))) // FOR TO x
+  }
+
+  test("Five atributions out of order") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("v") == Some(LongRealValue(2.21D)))
+    assert(interpreter.env.lookup("w") == Some(RealValue(4.1.toFloat)))
+    assert(interpreter.env.lookup("x") == Some(LongValue(51310L)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(10)))
+    assert(interpreter.env.lookup("z") == Some(ShortValue(2.toShort)))
   }
 
   test("Comparing REAL and REAL <") {
@@ -1005,5 +1023,54 @@ class WakaWaka extends AnyFunSuite{
     assert(interpreter.env.lookup("e") == Some(ShortValue(1.toShort))) // FOR TO x
     assert(interpreter.env.lookup("f") == Some(ShortValue(1.toShort))) // FOR TO x
     assert(interpreter.env.lookup("g") == Some(ShortValue(1.toShort))) // FOR TO x
+  }
+  
+  test("Test CHAR") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple11.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(CharValue('a')))
+  }
+
+  test("Comparing CHAR and CHAR") {
+    val path = Paths.get(getClass.getClassLoader.getResource("boolean/boolean31.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    module.accept(interpreter)  
+    assert(interpreter.env.lookup("b") == Some(IntValue(1))) // FOR TO x
+    assert(interpreter.env.lookup("c") == Some(IntValue(1))) // FOR TO x
+    assert(interpreter.env.lookup("d") == Some(IntValue(1))) // FOR TO x
+    assert(interpreter.env.lookup("e") == Some(IntValue(1))) // FOR TO x
+    assert(interpreter.env.lookup("f") == Some(IntValue(1))) // FOR TO x
+    assert(interpreter.env.lookup("g") == Some(IntValue(1))) // FOR TO x
+  }
+
+  test("Reading CHAR") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic36.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head == ReadCharStmt("v"))
+    assert(stmts(1) == WriteStmt(VarExpression("v")))
   }
 }

@@ -32,7 +32,6 @@ object ScalaParser {
 }
 
 class ParserVisitor {
-  var tipo = Queue[Int]();
   var module: OberonModule = _
   var variables : List[br.unb.cic.oberon.ast.VariableDeclaration] = List()
 
@@ -134,34 +133,33 @@ class ParserVisitor {
     var baseType: Type = _
 
     override def visitIntegerType(ctx: OberonParser.IntegerTypeContext): Unit = {
-      tipo.enqueue(0)
       baseType = IntegerType
     }
 
     override def visitRealType(ctx: OberonParser.RealTypeContext): Unit = {
-      tipo.enqueue(1)
       baseType = RealType
     }
 
     override def visitShortType(ctx: OberonParser.ShortTypeContext): Unit = {
-      tipo.enqueue(2)
       baseType = ShortType
 
     }
 
     override def visitLongRealType(ctx: OberonParser.LongRealTypeContext): Unit = {
-      tipo.enqueue(3)
       baseType = LongRealType
     }
 
     override def visitLongType(ctx: OberonParser.LongTypeContext): Unit = {
-      tipo.enqueue(4)
       baseType = LongType
 
     }
 
     override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = {
       baseType = BooleanType
+    }
+
+    override def visitCharacterType(ctx: OberonParser.CharacterTypeContext): Unit = {
+      baseType = CharacterType
     }
 
     override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
@@ -217,6 +215,9 @@ class ParserVisitor {
 
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")
+
+    override def visitCharValue(ctx: OberonParser.CharValueContext): Unit = 
+      exp = CharValue(ctx.getText.charAt(1))
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
@@ -334,9 +335,34 @@ class ParserVisitor {
         case Nil => List()
       }
 
+    override def visitReadCharStmt(ctx: OberonParser.ReadCharStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadCharStmt(varName)
+    }
+
+    override def visitReadLongRealStmt(ctx: OberonParser.ReadLongRealStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadLongRealStmt(varName)
+    }
+
+    override def visitReadRealStmt(ctx: OberonParser.ReadRealStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadRealStmt(varName)
+    }
+
+    override def visitReadLongIntStmt(ctx: OberonParser.ReadLongIntStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadLongIntStmt(varName)
+    }
+
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadIntStmt(varName)
+    }
+
+    override def visitReadShortIntStmt(ctx: OberonParser.ReadShortIntStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadShortIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {

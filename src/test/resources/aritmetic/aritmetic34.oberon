@@ -1,0 +1,23 @@
+MODULE SimpleModule;
+
+VAR
+  v : LONGREAL;
+  w : REAL;
+  x : LONGINT;
+  y : INTEGER;
+  z : SHORTINT;
+
+BEGIN
+  y := 10;
+  z := 2;
+  v := 2.21;
+  x := 51310;
+  w := 4.1;
+  write(v);
+  write(w);
+  write(x);
+  write(y);
+  write(z)
+END
+
+END SimpleModule.
