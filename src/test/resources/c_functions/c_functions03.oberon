@@ -2,13 +2,15 @@ MODULE Ffi;
   
 VAR
   a : INTEGER;
-  ansa : INTEGER 
+  ansa : INTEGER; 
 
-FOREIGN IMPORT isalnum(a: INTEGER): INTEGER;
+
+FOREIGN IMPORT srand(c: INTEGER);
+
 
 BEGIN
-    readInt(a)
-    ansa := isalnum(a)
+    srand(394827);
+
 END
 
 END Ffi.

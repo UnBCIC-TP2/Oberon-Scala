@@ -2,7 +2,7 @@ package br.unb.cic.oberon.parser
 
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.parser.OberonParser.StatementContext
+import br.unb.cic.oberon.parser.OberonParser.{ExternalProcedureDeclarationContext, ProcedureDeclarationContext, StatementContext}
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -88,66 +88,14 @@ class ParserVisitor {
   }
 
   def visitProcedure(ctx: OberonParser.ProcedureContext): Procedure = {
-    val procedureTypeVisitor = new ProcedureVisitor()
+    val visitor = new ProcedureVisitor()
 
-    ctx.accept(procedureTypeVisitor)
-    procedureTypeVisitor.uType
-  }
-
-  class ProcedureVisitor extends OberonBaseVisitor[Unit] {
-    var uType: Procedure = _
-
-    override def visitProcedureDeclaration(ctx: OberonParser.ProcedureDeclarationContext): Unit = {
-      val name = ctx.name.getText
-      val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten 
-      val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
-      val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
-      val block = visitModuleBlock(ctx.block())
-
-      val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
-
-      uType = ProcedureDeclaration(name, args, returnType, constants, variables, block.get)
+    if(ctx.isInstanceOf[ProcedureDeclarationContext]) {
+      return visitor.visitProcedureDeclaration(ctx.asInstanceOf[ProcedureDeclarationContext])
     }
-
-    override def visitExternalProcedureDeclaration(ctx: OberonParser.ExternalProcedureDeclarationContext): Unit = {
-      val name = ctx.name.getText
-      val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten      
-
-      val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
-
-      uType = ExternalProcedureDeclaration(name, args, returnType)
-    }
+    
+    visitor.visitExternalProcedureDeclaration(ctx.asInstanceOf[ExternalProcedureDeclarationContext])
   }
-
-  // def visitProcedure(ctx: OberonParser.ProcedureContext): Procedure = {
-  //   var constants = null;
-  //   var variables = null;
-  //   var block = null;
-  //   var __ctx = ctx;
-  //   if(__ctx.getClass.getSimpleName.equals("ProcedureDeclaration")) {
-  //     constants = OberonParser.ProcedureDeclarationContext.declarations().constant().asScala.toList.map(c => visitConstant(c))
-  //     variables = OberonParser.ProcedureDeclarationContext.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
-  //     block = visitModuleBlock(OberonParser.ProcedureDeclarationContext.block())
-  //   } else {
-  //     __ctx = OberonParser.ExternalProcedureContext;
-  //   }
-  //   val name = __ctx.name.getText
-  //   val args = __ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
-  // }
-
-  //  chamada ffi
-  // def visitFfiDeclaration(ctx: OberonParser.FfiContext): Ffi = {
-  //   val name = ctx.name.getText
-  //   val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
-  //   //val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
-  //   //val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
-  //   //val block = visitModuleBlock(ctx.block())
-
-  //   val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
-    
-    
-  //   Ffi(name, args, returnType)//, constants, variables), block.get)
-  // }
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val argType = visitOberonType(ctx.argType)
@@ -175,6 +123,29 @@ class ParserVisitor {
     ctx.accept(typeVisitor)
 
     if (typeVisitor.baseType == null) UndefinedType else typeVisitor.baseType
+  }
+
+  class ProcedureVisitor extends ParserVisitor {
+     def visitProcedureDeclaration(ctx: OberonParser.ProcedureDeclarationContext): Procedure = {
+      val name = ctx.name.getText
+      val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
+      val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
+      val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
+      val block = visitModuleBlock(ctx.block())
+
+      val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
+
+      ProcedureDeclaration(name, args, returnType, constants, variables, block.get)
+    }
+
+    def visitExternalProcedureDeclaration(ctx: OberonParser.ExternalProcedureDeclarationContext): Procedure = {
+      val name = ctx.name.getText
+      val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
+
+      val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
+   
+      ExternalProcedureDeclaration(name, args, returnType)
+    }
   }
 
   class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
@@ -244,10 +215,14 @@ class ParserVisitor {
       val name = ctx.name.getText
       val args = new ListBuffer[Expression]
 
+
       ctx.arguments().expression().forEach(e => {
         e.accept(this)
         args += exp
       })
+
+
+      
       exp = FunctionCallExpression(name, args.toList)
     }
 
@@ -335,10 +310,14 @@ class ParserVisitor {
       val args = new ListBuffer[Expression]
       val visitor = new ExpressionVisitor()
 
+
       ctx.arguments().expression().asScala.map(e => {
         e.accept(visitor)
         args += visitor.exp
-      })
+      })  
+
+
+
       stmt = ProcedureCallStmt(name, args.toList)
     }
 

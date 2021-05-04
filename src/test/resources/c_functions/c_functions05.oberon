@@ -1,14 +1,14 @@
 MODULE Ffi;
   
 VAR
-  a, ans : INTEGER;
+  a : INTEGER;
+  ansa : INTEGER;
 
 FOREIGN IMPORT abs(a: INTEGER): INTEGER;
 
 BEGIN
- a := (1-6);
- ans := abs(a);
-
+    readInt(a);
+    ansa := abs(a);
 END
 
 END Ffi.

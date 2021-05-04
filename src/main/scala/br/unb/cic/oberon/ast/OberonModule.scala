@@ -12,7 +12,6 @@ case class OberonModule(name: String,
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
-
 trait Procedure {
   def accept(v: OberonVisitor) = v.visit(this)
 }

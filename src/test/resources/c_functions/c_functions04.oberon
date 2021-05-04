@@ -2,13 +2,13 @@ MODULE Ffi;
   
 VAR
   a : INTEGER;
-  ansa : INTEGER 
+  ansa : INTEGER;
 
 FOREIGN IMPORT isalpha(a: INTEGER): INTEGER;
 
 BEGIN
-    readInt(a)
-    ansa := isalpha(a)
+    readInt(a);
+    ansa := isalpha(a);
 END
 
 END Ffi.

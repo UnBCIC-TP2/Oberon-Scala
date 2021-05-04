@@ -76,11 +76,12 @@ class Environment[T] {
 
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
-  def declareProcedure(procedure: Procedure): Unit = 
+  def declareProcedure(procedure: Procedure): Unit = {
     procedure match {
       case ProcedureDeclaration(name, _, _, _, _, _) => procedures(name) = procedure
       case ExternalProcedureDeclaration(name, _, _) => procedures(name) = procedure
     }
+  }
 
   def findProcedure(name: String): Procedure = procedures(name)
 

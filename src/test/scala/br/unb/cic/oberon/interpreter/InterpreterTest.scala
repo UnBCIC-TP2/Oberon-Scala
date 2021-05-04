@@ -614,4 +614,45 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
+  ignore("c_functions_01") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions01.oberon").getFile)
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(2)))
+  }
+
+  ignore("Testing abs stmt on c_functions02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedure = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(5)))
+  }
+
+  test("Testing the oberon c_functions03 code.") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions03.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    //assert(interpreter.env.lookup("ansa") == Some(IntValue(5)))
+  }
+
 }

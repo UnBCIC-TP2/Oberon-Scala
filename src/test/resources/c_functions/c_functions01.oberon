@@ -1,16 +1,15 @@
 MODULE Ffi;
   
 VAR
-  a : INTEGER;
-  b : INTEGER;
-  ansa : INTEGER;
-  ansb : INTEGER;
+  a, b, ans : INTEGER;
 
-FOREIGN IMPORT abs(n: INTEGER): INTEGER;
+
+FOREIGN IMPORT div(a: INTEGER, b: INTEGER): INTEGER;
 
 BEGIN
- readInt(a);
- readInt(b);
+  a := 6;
+  b := 3;
+  ans := div(a, b);
 END
 
 END Ffi.
