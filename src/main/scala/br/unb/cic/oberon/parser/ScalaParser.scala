@@ -44,6 +44,23 @@ object ScalaParser {
 
     expVisitor.exp
   }
+
+  def parseStatments(input: String): Statement = {
+    val charStream = new ANTLRInputStream(input)
+    val lexer = new OberonLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new OberonParser(tokens)
+
+    val stmtCtx = parser.statement()
+
+    val visitor = new ParserVisitor
+    val stmtVisitor = new visitor.StatementVisitor
+
+    stmtCtx.accept(stmtVisitor)
+
+    stmtVisitor.stmt
+  }
+
 }
 
 class ParserVisitor {

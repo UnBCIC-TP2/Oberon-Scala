@@ -1,3 +1,5 @@
+package br.unb.cic.oberon
+
 import br.unb.cic.oberon.codegen.PaigesBasedGenerator
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
@@ -16,6 +18,7 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path Oberon program path" )
   val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path")
   val repl = opt[Boolean](name = "repl", short = 'r', descr = "Run repl option")
+  val repl2 = opt[Boolean](name = "repl2", short = 'R', descr = "Run repl option")
 
   verify()
 
@@ -112,5 +115,39 @@ object Main {
       }
     }
 
+    if(conf.args.isEmpty) {
+      val replObject = new Repl()
+      replObject.runREPL()
+    }
+
   }
+}
+
+class Repl {
+
+  def runREPL(): Unit = {
+    var keepRunning = true
+    var input = ""
+    val interpreter = new EvalExpressionVisitor(new Interpreter)
+
+    while(keepRunning) {
+      print("Oberon> ")
+      input = scala.io.StdIn.readLine()
+      if(input == "exit") keepRunning = false
+      else if(input == "") print("")
+      else {
+        try {
+          val exp = ScalaParser.parseExpression(input)
+          val result = exp.accept(interpreter)
+          println(result)
+        }
+        catch {
+          //case a: NullPointerException => println("")
+          case c: NoSuchElementException => println("Invalid input")
+          case e: Throwable => println(e)
+        }
+      }
+    }
+  }
+
 }

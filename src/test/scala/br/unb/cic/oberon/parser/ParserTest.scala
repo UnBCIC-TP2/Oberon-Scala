@@ -2416,4 +2416,48 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp6 == LTExpression(VarExpression("x"), VarExpression("y")))
   }
 
+  test("Testing the parser for assignment statments") {
+    val assign1 = "a := 2"
+    val assign2 = "b := 2 + 3"
+    val assign3 = "c := a + 3"
+
+    val stmt1 = ScalaParser.parseStatments(assign1)
+    assert(stmt1 == AssignmentStmt("a", IntValue(2)))
+
+    val stmt2 = ScalaParser.parseStatments(assign2)
+    assert(stmt2 == AssignmentStmt("b", AddExpression(IntValue(2),IntValue(3))))
+
+    val stmt3 = ScalaParser.parseStatments(assign3)
+    assert(stmt3 == AssignmentStmt("c", AddExpression(VarExpression("a"),IntValue(3))))
+  }
+
+  test("Testing the parser for ReadIntStmt statments") {
+    val read1 = "readInt(x)"
+
+    val stmt1 = ScalaParser.parseStatments(read1)
+    assert(stmt1 == ReadIntStmt("x"))
+  }
+
+  test("Testing the parser for ProcedureCallStmt statments") {
+    val procedure1 = "sum(x,y)"
+
+    val stmt1 = ScalaParser.parseStatments(procedure1)
+    assert(stmt1 == ProcedureCallStmt("sum",List(VarExpression("x"),VarExpression("y"))))
+  }
+
+  test("Testing the parser for WriteStmt statments") {
+    val write1 = "write(1)"
+    val write2 = "write(2 + a)"
+    val write3 = "write(sum(x,y))"
+
+    val stmt1 = ScalaParser.parseStatments(write1)
+    assert(stmt1 == WriteStmt(IntValue(1)))
+
+    val stmt2 = ScalaParser.parseStatments(write2)
+    assert(stmt2 == WriteStmt(AddExpression(IntValue(2),VarExpression("a"))))
+
+    val stmt3 = ScalaParser.parseStatments(write3)
+    assert(stmt3 == WriteStmt(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y")))))
+  }
+
 }
