@@ -1,0 +1,7 @@
+MODULE ExpressionNameModule;
+
+BEGIN
+	write(variable.tail.tail.tail.name)
+END
+
+END ExpressionNameModule.

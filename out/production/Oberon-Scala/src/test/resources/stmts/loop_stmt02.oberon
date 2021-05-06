@@ -1,0 +1,17 @@
+MODULE LoopStmt;
+
+VAR	
+  x : INTEGER;
+  factorial : INTEGER;
+
+BEGIN	
+    x := 2;
+    factorial := 1;
+	LOOP
+	    IF x > 5 THEN EXIT END;
+	    factorial := factorial * x;
+	    x := x + 1
+	END
+END	
+
+END LoopStmt.

@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+VAR
+    record
+        day: INTEGER;
+    d1 : record;
+BEGIN
+    d1.day := 5;
+END
+
+END SimpleModule.

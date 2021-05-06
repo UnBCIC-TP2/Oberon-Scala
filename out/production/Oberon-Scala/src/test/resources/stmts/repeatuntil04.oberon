@@ -1,0 +1,31 @@
+MODULE RepeatUntilModule;	
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+
+PROCEDURE power(b, e : INTEGER) : INTEGER;
+	VAR r : INTEGER;
+	BEGIN
+		r := b;
+		IF (b < 0 || e < 0) THEN
+			RETURN 0
+		END;
+		IF (e = 0) THEN
+			RETURN 1
+		END;
+		REPEAT
+			r := r * b;
+			e := e - 1
+		UNTIL e <= 1;
+		RETURN r
+	END power
+
+BEGIN
+	x := 2;
+	y := 2;
+	write(power(x,y))
+END
+
+END RepeatUntilModule.
+

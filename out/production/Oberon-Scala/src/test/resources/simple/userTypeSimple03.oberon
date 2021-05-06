@@ -1,0 +1,16 @@
+MODULE test;
+
+TYPE
+    test_array = ARRAY 5 OF BOOLEAN
+    
+    tipo1 = RECORD
+        num : INTEGER
+        numum : test_array
+    END 
+
+    tipo2 = RECORD
+        num_record : tipo1
+    END
+
+
+END test

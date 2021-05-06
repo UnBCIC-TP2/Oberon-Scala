@@ -1,0 +1,14 @@
+MODULE UserTypeModule;
+
+TYPE
+    cplusplus = ARRAY 10 OF BOOLEAN
+
+    java = RECORD
+        size : INTEGER;
+        variables : cplusplus;
+        Varinho : myType
+    END
+
+    python = ARRAY -5 OF java // The compiler doesn't recognize negative values !!!
+
+END UserTypeModule.

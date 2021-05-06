@@ -1,0 +1,28 @@
+MODULE SimpleModule;
+
+VAR
+    record
+    salaA : INTEGER
+
+    vagas : record;
+
+    record2
+    alunoA : INTEGER
+    alunoB : INTEGER
+    alunoC : INTEGER
+
+    matricula: record2;
+
+    
+       
+BEGIN
+    vagas.salaA := 20;
+    vagas.salaB := 30;
+    matricula.alunoA := 180047205;
+    matricula.alunoB := 180108531;
+    
+    
+
+END
+
+END SimpleModule.

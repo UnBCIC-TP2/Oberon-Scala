@@ -1,0 +1,27 @@
+MODULE SimpleModule;
+
+VAR
+  i, n, ant, prox, soma : INTEGER;
+
+BEGIN
+	ant := 0;
+	prox := 1;
+	soma := 0;
+	n := 10;
+    i := 1;
+
+   WHILE i <= n DO
+
+        CASE i OF
+            i..n: soma := prox + ant
+        END;
+
+        ant := prox;
+	    prox := soma;
+        i := i+1
+    END;
+	
+    write(ant)
+END
+
+END SimpleModule.

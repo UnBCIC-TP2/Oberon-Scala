@@ -1,0 +1,10 @@
+MODULE UserTypeModule;
+
+TYPE
+    myType = RECORD
+        size : INTEGER;
+        variables : ARRAY 10 OF BOOLEAN;
+        Varinho : myType
+    END
+
+END UserTypeModule.

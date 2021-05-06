@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+
+VAR
+    x, y : INTEGER;
+
+BEGIN
+    readInt(x);
+
+    FOR y := x TO y < 100 DO
+        y := y * y
+
+    END;
+    
+    write(y)
+    
+END
+
+END SimpleModule.

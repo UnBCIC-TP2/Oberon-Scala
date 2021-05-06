@@ -1,0 +1,10 @@
+MODULE SimpleModule;
+
+VAR
+  x : INTEGER;
+  
+BEGIN
+	x := (1 + 1)
+END
+
+END SimpleModule.

@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+CONST
+  x = 5;
+  y = 10;
+  z = True;
+
+VAR
+  abc : INTEGER;
+  def : BOOLEAN;
+
+END SimpleModule.

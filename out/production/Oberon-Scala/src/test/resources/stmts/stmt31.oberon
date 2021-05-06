@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+
+BEGIN
+ readInt(x);
+ readInt(y);
+ REPEAT
+   x := x * x
+ UNTIL x < y;
+ write(x)
+END
+
+END SimpleModule.

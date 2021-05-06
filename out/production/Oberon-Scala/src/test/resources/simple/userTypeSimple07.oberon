@@ -1,0 +1,21 @@
+MODULE UserTypeModule;
+
+TYPE
+  simple = ARRAY 10 OF INTEGER
+
+PROCEDURE initialize_array(pogArray : simple) : simple;
+  VAR
+    i : INTEGER;
+
+  BEGIN
+    i := 0;
+
+    REPEAT
+      pogArray[i] = i*5;
+      i := i + 1
+    UNTIL i < 10;
+
+    RETURN pogArray
+  END
+
+END UserTypeModule.

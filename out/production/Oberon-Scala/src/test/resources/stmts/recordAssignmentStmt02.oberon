@@ -1,0 +1,17 @@
+MODULE SimpleModule;
+
+TYPE
+    history = RECORD
+        last: INTEGER;
+        actual: INTEGER;
+        next: INTEGER;
+    END
+VAR
+   years: history;
+BEGIN
+    years.last := 2019;
+    years.actual := 2020;
+    years.next := 2021
+END
+
+END SimpleModule.

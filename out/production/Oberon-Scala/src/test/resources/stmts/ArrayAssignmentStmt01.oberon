@@ -1,0 +1,8 @@
+MODULE SimpleModule;
+
+BEGIN
+ readInt(x);
+ array[0] := x
+END
+
+END SimpleModule.

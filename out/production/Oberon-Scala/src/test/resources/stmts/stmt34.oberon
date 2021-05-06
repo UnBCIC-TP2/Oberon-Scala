@@ -1,0 +1,16 @@
+MODULE UserTypeModule;
+
+TYPE
+  m_id = ARRAY 15 OF INTEGER
+
+  team = RECORD
+    t_id: INTEGER;
+    members: m_id;
+    n_members: INTEGER;
+    full: BOOLEAN
+  END
+  
+  team_array = ARRAY 20 OF team
+  test_array = ARRAY 20 OF INTEGER
+  second_test = ARRAY 20 OF test_array
+END UserTypeModule.

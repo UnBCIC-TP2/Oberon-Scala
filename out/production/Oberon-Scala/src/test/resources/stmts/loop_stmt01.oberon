@@ -1,0 +1,15 @@
+MODULE LoopStmt;
+
+VAR	
+  x : INTEGER;	
+
+BEGIN	
+    x := 10;
+	LOOP
+	  write(x);
+	  IF x < 0 THEN EXIT END;
+	  x := x - 1
+	END
+END	
+
+END LoopStmt.

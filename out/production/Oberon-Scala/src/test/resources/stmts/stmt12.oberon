@@ -1,0 +1,27 @@
+MODULE SimpleModule;
+
+VAR
+    u, v, y, z, x, w : INTEGER;
+
+BEGIN
+    readInt(x);
+    v := 0;
+
+    FOR y := 0 TO y < x DO
+        readInt(w);
+        v := v + (w * (y+1))
+    END;
+    v := v / x;
+
+    FOR  z:= 0 TO z < x DO
+        readInt(w);
+        u := u + w
+    END;
+    u := u / x;
+
+    write(v);
+    write(u)
+    
+END
+
+END SimpleModule.
