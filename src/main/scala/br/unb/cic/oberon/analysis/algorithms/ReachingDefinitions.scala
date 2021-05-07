@@ -8,7 +8,7 @@ import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap
 
-case class ReachingDefinition() extends ControlFlowGraphAnalysis {
+case class ReachingDefinitions() extends ControlFlowGraphAnalysis {
   type NodeDefinitionSet = NodeAnalysisSet
   type ReachingDefinitionsMapping = AnalysisMapping
 

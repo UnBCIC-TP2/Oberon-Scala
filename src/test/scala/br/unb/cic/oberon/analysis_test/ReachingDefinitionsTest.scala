@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.analysis_test
 
-import br.unb.cic.oberon.analysis.algorithms.ReachingDefinition
+import br.unb.cic.oberon.analysis.algorithms.ReachingDefinitions
 import br.unb.cic.oberon.ast.{AssignmentStmt, GTExpression, IfElseStmt, ReadIntStmt, VarExpression, WriteStmt}
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode, StartNode}
 import org.scalatest.funsuite.AnyFunSuite
@@ -8,7 +8,7 @@ import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
 import scalax.collection.mutable.Graph
 
-class ReachingDefinitionTest extends AnyFunSuite {
+class ReachingDefinitionsTest extends AnyFunSuite {
   /**
    * BEGIN
    *   readInt(x);
@@ -37,7 +37,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
 
     val numberOfNodes = 7
 
-    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitions = new ReachingDefinitions()
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
     val numberOfMapKeys = reachingDefinitionsAnalysis.keySet.size
@@ -71,7 +71,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s3))), Set()),
     )
 
-    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitions = new ReachingDefinitions()
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
     assert(expected == reachingDefinitionsAnalysis)
@@ -113,7 +113,7 @@ class ReachingDefinitionTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s2)), ("max", SimpleNode(s3_1))), Set())
     )
 
-    val reachingDefinitions = new ReachingDefinition()
+    val reachingDefinitions = new ReachingDefinitions()
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
     assert(expected == reachingDefinitionsAnalysis)
