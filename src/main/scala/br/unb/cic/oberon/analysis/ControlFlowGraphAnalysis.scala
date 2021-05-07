@@ -22,15 +22,6 @@ trait ControlFlowGraphAnalysis {
   def computeNodeDefinitionIn(reachingDefinitions: AnalysisMapping, currentNode: GraphNode, previousNode: GraphNode): NodeAnalysisSet =
     getNodeDefinitionIn(reachingDefinitions, currentNode) | getNodeDefinitionOut(reachingDefinitions, previousNode)
 
-  def computeNodeGenDefinitions(currentNode: GraphNode): NodeAnalysisSet = currentNode match {
-    case SimpleNode(AssignmentStmt(varName, _)) =>
-      Set((varName, currentNode))
-    case SimpleNode(ReadIntStmt(varName)) =>
-      Set((varName, currentNode))
-    case _ =>
-      Set()
-  }
-
   def computeNodeKillDefinitions(nodeIn: NodeAnalysisSet, nodeGen: NodeAnalysisSet): NodeAnalysisSet = {
     if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
   }

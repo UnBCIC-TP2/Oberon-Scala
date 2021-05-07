@@ -1,9 +1,10 @@
 package br.unb.cic.oberon.analysis.algorithms
 
-import br.unb.cic.oberon.cfg.{EndNode, GraphNode}
+import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode}
 import scalax.collection.GraphEdge
 import scalax.collection.mutable.Graph
 import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
+import br.unb.cic.oberon.ast.{AssignmentStmt, ReadIntStmt}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap
@@ -62,5 +63,14 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis {
       if (currNode != EndNode()) currNodeIn ++ currNodeGen -- currNodeKill else Set()
 
     currNode -> (currNodeIn, currNodeOut)
+  }
+
+  private def computeNodeGenDefinitions(currentNode: GraphNode): NodeAnalysisSet = currentNode match {
+    case SimpleNode(AssignmentStmt(varName, _)) =>
+      Set((varName, currentNode))
+    case SimpleNode(ReadIntStmt(varName)) =>
+      Set((varName, currentNode))
+    case _ =>
+      Set()
   }
 }
