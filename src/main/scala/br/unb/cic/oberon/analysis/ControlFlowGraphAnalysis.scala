@@ -1,28 +1,17 @@
 package br.unb.cic.oberon.analysis
 
-import br.unb.cic.oberon.ast.{AssignmentStmt, ReadIntStmt}
-import br.unb.cic.oberon.cfg.{GraphNode, SimpleNode}
+import br.unb.cic.oberon.cfg.GraphNode
 import scalax.collection.GraphEdge
 import scalax.collection.mutable.Graph
 
-import scala.collection.immutable.HashMap
-
-trait ControlFlowGraphAnalysis {
-  type NodeAnalysisSet = Set[(Any, Any)]
-  type AnalysisMapping = HashMap[GraphNode, (NodeAnalysisSet, NodeAnalysisSet)]
-
+abstract class ControlFlowGraphAnalysis[AnalysisMapping, NodeAnalysis] {
   def analyse(cfg: Graph[GraphNode, GraphEdge.DiEdge]): AnalysisMapping
 
-  def getNodeDefinitionIn(reachingDefinitions: AnalysisMapping, Node: GraphNode): NodeAnalysisSet =
-    reachingDefinitions(Node)._1
+  def getNodeIn(analysis: AnalysisMapping, Node: GraphNode): NodeAnalysis
 
-  def getNodeDefinitionOut(reachingDefinitions: AnalysisMapping, Node: GraphNode): NodeAnalysisSet =
-    reachingDefinitions(Node)._2
+  def getNodeOut(analysis: AnalysisMapping, Node: GraphNode): NodeAnalysis
 
-  def computeNodeDefinitionIn(reachingDefinitions: AnalysisMapping, currentNode: GraphNode, previousNode: GraphNode): NodeAnalysisSet =
-    getNodeDefinitionIn(reachingDefinitions, currentNode) | getNodeDefinitionOut(reachingDefinitions, previousNode)
+  def computeNodeIn(analysis: AnalysisMapping, currentNode: GraphNode, previousNode: GraphNode): NodeAnalysis
 
-  def computeNodeKillDefinitions(nodeIn: NodeAnalysisSet, nodeGen: NodeAnalysisSet): NodeAnalysisSet = {
-    if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
-  }
+  def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis
 }
