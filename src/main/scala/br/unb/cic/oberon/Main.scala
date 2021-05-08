@@ -6,7 +6,9 @@ import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
 import org.rogach.scallop._
 
+import java.beans.Expression
 import java.nio.file.{Files, Paths}
+import java.sql.Statement
 
 class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
@@ -18,7 +20,6 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path Oberon program path" )
   val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path")
   val repl = opt[Boolean](name = "repl", short = 'r', descr = "Run repl option")
-  val repl2 = opt[Boolean](name = "repl2", short = 'R', descr = "Run repl option")
 
   verify()
 
@@ -101,20 +102,7 @@ object Main {
 
     }
 
-    if (conf.repl.isSupplied) {
-      val interpreter = new EvalExpressionVisitor(new Interpreter)
-      var input = scala.io.StdIn.readLine()
-      while(input != "exit") {
-        if (input == "") input = "0"
-        // println(content)
-        val exp = ScalaParser.parseExpression(input)
-
-        val result = exp.accept(interpreter)
-        println(result)
-        input = scala.io.StdIn.readLine()
-      }
-    }
-
+    //Versao nova repl, a titulo de teste ele roda sempre que o se chama o programa sem nenhum comando passado - mudar depois?
     if(conf.args.isEmpty) {
       val replObject = new Repl()
       replObject.runREPL()
@@ -128,7 +116,12 @@ class Repl {
   def runREPL(): Unit = {
     var keepRunning = true
     var input = ""
-    val interpreter = new EvalExpressionVisitor(new Interpreter)
+    val interpreter = new Interpreter
+    val expressionEval = new EvalExpressionVisitor(interpreter)
+
+    var tryConstant = false
+    var tryStatement = false
+    var tryExpression = false
 
     while(keepRunning) {
       print("Oberon> ")
@@ -136,18 +129,57 @@ class Repl {
       if(input == "exit") keepRunning = false
       else if(input == "") print("")
       else {
-        try {
-          val exp = ScalaParser.parseExpression(input)
-          val result = exp.accept(interpreter)
-          println(result)
-        }
-        catch {
-          //case a: NullPointerException => println("")
-          case c: NoSuchElementException => println("Invalid input")
-          case e: Throwable => println(e)
+
+          try {
+            val variable = ScalaParser.parseVarDeclaration(input)
+            variable.foreach(v => v.accept(interpreter))
+          }
+          catch {
+            case e: NullPointerException => tryStatement = true
+            case d: Throwable => println(d)
+          }
+          /*  Declaracao de constante, nao lanca excecao, portanto não é possível detectar se o comando é ou não desse tipo
+          if(tryConstant == true) {
+            tryConstant = false
+           try {
+              val constant = ScalaParser.parseConstDeclaration(input)
+              constant.accept(interpreter)
+           }
+            catch {
+              case e: NullPointerException => tryStatement = true
+              case d: Throwable => println(d)
+           }
+          }
+          */
+          if(tryStatement == true) {
+            tryStatement = false
+            try {
+              val stmt = ScalaParser.parseStatements(input)
+              stmt.accept(interpreter)
+            }
+            catch {
+              case e: NullPointerException => tryExpression = true
+              case c: NoSuchElementException => println(c.getMessage)//println("This input is not valid")
+              case d: RuntimeException => println(d.getMessage)
+            }
+          }
+
+          if(tryExpression == true) {
+            tryExpression = false
+            try {
+              val exp = ScalaParser.parseExpression(input)
+              val result = exp.accept(expressionEval)
+              println(result)
+            }
+            catch {
+              case a: NoSuchElementException => println("The variable is not declared or the operation is not valid")
+              case b: NullPointerException => println("This input is not valid")
+              case e: ClassCastException => println(e.getMessage)
+              case d: Throwable => println(d.getMessage)
+            }
+          }
         }
       }
     }
-  }
 
 }

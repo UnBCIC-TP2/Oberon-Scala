@@ -29,6 +29,30 @@ object ScalaParser {
     visitor.module
   }
 
+  def parseVarDeclaration(input: String): List[VariableDeclaration] = {
+    val charStream = new ANTLRInputStream(input)
+    val lexer = new OberonLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new OberonParser(tokens)
+
+    val visitor = new ParserVisitor
+
+    val declaration = visitor.visitVariableDeclaration(parser.varDeclaration())
+    declaration
+  }
+
+  def parseConstDeclaration(input: String): Constant = {
+    val charStream = new ANTLRInputStream(input)
+    val lexer = new OberonLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new OberonParser(tokens)
+
+    val visitor = new ParserVisitor
+
+    val constant = visitor.visitConstant(parser.constant())
+    constant
+  }
+
   def parseExpression(input: String): Expression = {
     val charStream = new ANTLRInputStream(input)
     val lexer = new OberonLexer(charStream)
@@ -45,7 +69,7 @@ object ScalaParser {
     expVisitor.exp
   }
 
-  def parseStatments(input: String): Statement = {
+  def parseStatements(input: String): Statement = {
     val charStream = new ANTLRInputStream(input)
     val lexer = new OberonLexer(charStream)
     val tokens = new CommonTokenStream(lexer)

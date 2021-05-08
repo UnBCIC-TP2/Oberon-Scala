@@ -2416,48 +2416,116 @@ class ParserTestSuite extends AnyFunSuite {
     assert(exp6 == LTExpression(VarExpression("x"), VarExpression("y")))
   }
 
-  test("Testing the parser for assignment statments") {
+  test("Testing the parser for assignment statements") {
     val assign1 = "a := 2"
     val assign2 = "b := 2 + 3"
     val assign3 = "c := a + 3"
 
-    val stmt1 = ScalaParser.parseStatments(assign1)
+    val stmt1 = ScalaParser.parseStatements(assign1)
     assert(stmt1 == AssignmentStmt("a", IntValue(2)))
 
-    val stmt2 = ScalaParser.parseStatments(assign2)
+    val stmt2 = ScalaParser.parseStatements(assign2)
     assert(stmt2 == AssignmentStmt("b", AddExpression(IntValue(2),IntValue(3))))
 
-    val stmt3 = ScalaParser.parseStatments(assign3)
+    val stmt3 = ScalaParser.parseStatements(assign3)
     assert(stmt3 == AssignmentStmt("c", AddExpression(VarExpression("a"),IntValue(3))))
   }
 
-  test("Testing the parser for ReadIntStmt statments") {
+  test("Testing the parser for ReadIntStmt statements") {
     val read1 = "readInt(x)"
 
-    val stmt1 = ScalaParser.parseStatments(read1)
+    val stmt1 = ScalaParser.parseStatements(read1)
     assert(stmt1 == ReadIntStmt("x"))
   }
 
-  test("Testing the parser for ProcedureCallStmt statments") {
+  test("Testing the parser for ProcedureCallStmt statements") {
     val procedure1 = "sum(x,y)"
 
-    val stmt1 = ScalaParser.parseStatments(procedure1)
+    val stmt1 = ScalaParser.parseStatements(procedure1)
     assert(stmt1 == ProcedureCallStmt("sum",List(VarExpression("x"),VarExpression("y"))))
   }
 
-  test("Testing the parser for WriteStmt statments") {
+  test("Testing the parser for WriteStmt statements") {
     val write1 = "write(1)"
     val write2 = "write(2 + a)"
     val write3 = "write(sum(x,y))"
 
-    val stmt1 = ScalaParser.parseStatments(write1)
+    val stmt1 = ScalaParser.parseStatements(write1)
     assert(stmt1 == WriteStmt(IntValue(1)))
 
-    val stmt2 = ScalaParser.parseStatments(write2)
+    val stmt2 = ScalaParser.parseStatements(write2)
     assert(stmt2 == WriteStmt(AddExpression(IntValue(2),VarExpression("a"))))
 
-    val stmt3 = ScalaParser.parseStatments(write3)
+    val stmt3 = ScalaParser.parseStatements(write3)
     assert(stmt3 == WriteStmt(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y")))))
   }
+
+  test("Testing the parser for IfElseStmt and IfElseIfStmt statements") {
+    val ifElse1 = "IF (x < 0 ) THEN y := 1 ELSE y := 3 END;"
+    val ifELse2 = "IF (x < 0 ) THEN y := 1 ELSIF (x > 0) THEN y := 2 ELSE y := 3 END;"
+
+    val stmt1 = ScalaParser.parseStatements(ifElse1)
+    assert(stmt1 == IfElseStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),Option(AssignmentStmt("y",IntValue(3)))))
+
+    val stmt2 = ScalaParser.parseStatements(ifELse2)
+    assert(stmt2 == IfElseIfStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),List(ElseIfStmt(GTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(2)))),Option(AssignmentStmt("y",IntValue(3)))))
+  }
+
+  test("Testing the parser for WhileStmt statements") {
+    val while1 = "WHILE (x >= 0) DO x := x - 1 END;"
+
+    val stmt1 = ScalaParser.parseStatements(while1)
+    assert(stmt1 == WhileStmt(GTEExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1)))))
+  }
+
+  test("Testing the parser for ReaptUntilStmt statements") {
+    val repeat1 = "REPEAT x := x + 1 UNTIL x > 2"
+
+    val stmt1 = ScalaParser.parseStatements(repeat1)
+    assert(stmt1 == RepeatUntilStmt(GTExpression(VarExpression("x"),IntValue(2)),AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1)))))
+  }
+
+  test("Testing the parser for ForStmt statements") {
+    val for1 = "FOR x IN 0 .. 10 DO write(x) END"
+
+    val stmt1 = ScalaParser.parseStatements(for1)
+    assert(stmt1 == ForStmt(AssignmentStmt("x",IntValue(0)),LTEExpression(VarExpression("x"),IntValue(10)),SequenceStmt(List(WriteStmt(VarExpression("x")), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1)))))))
+  }
+
+  test("Testing the parser for CaseStmt statements") {
+    val case1 = "CASE x OF 0: y := 1 ELSE y := 0 END"
+
+    val stmt1 = ScalaParser.parseStatements(case1)
+    assert(stmt1 == CaseStmt(VarExpression("x"),List(SimpleCase(IntValue(0),AssignmentStmt("y",IntValue(1)))),Some(AssignmentStmt("y",IntValue(0)))))
+  }
+
+  test("Testing the parser for VarDeclaration") {
+    val var1 = "x: INTEGER;"
+    val var2 = "x: BOOLEAN;"
+    val var3 = "x, y: INTEGER;"
+
+    val variable1 = ScalaParser.parseVarDeclaration(var1)
+    assert(variable1 == List(VariableDeclaration("x",IntegerType)))
+
+    val variable2 = ScalaParser.parseVarDeclaration(var2)
+    assert(variable2 == List(VariableDeclaration("x",BooleanType)))
+
+    val variable3= ScalaParser.parseVarDeclaration(var3)
+    assert(variable3 == List(VariableDeclaration("x",IntegerType),VariableDeclaration("y",IntegerType)))
+  }
+
+  test("Testing the parser for Constant declaration") {
+    val const1 = "x = 0;"
+    val const2 = "y = x + 1;"
+
+    val constant1 = ScalaParser.parseConstDeclaration(const1)
+    assert(constant1 == Constant("x",IntValue(0)))
+
+    val constant2 = ScalaParser.parseConstDeclaration(const2)
+    assert(constant2 == Constant("y",AddExpression(VarExpression("x"),IntValue(1))))
+  }
+
+
+
 
 }
