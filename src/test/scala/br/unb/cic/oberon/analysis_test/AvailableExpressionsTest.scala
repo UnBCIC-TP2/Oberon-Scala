@@ -44,7 +44,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
    *   max := x + y
    * END
    */
-  test("return a map with reaching definitions for each graph node (example 1)") {
+  test("return a map with available expressions for each graph node (example 1)") {
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("y")
     val s3 = AssignmentStmt("max", AddExpression(VarExpression("x"), VarExpression("y")))
@@ -79,7 +79,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
    *   write(max)
    * END
    */
-  test("return a map with reaching definitions for each graph node (example 2)") {
+  test("return a map with available expressions for each graph node (example 2)") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("max")
