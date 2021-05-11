@@ -6,6 +6,7 @@ project/target
 target/
 build/
 null/
+out/
 
 # eclipse
 build
