@@ -1,14 +1,19 @@
 MODULE Ffi;
-  
 VAR
   a : INTEGER;
-  ansa : INTEGER;
+  b : INTEGER;
+  ans : INTEGER;
 
-FOREIGN IMPORT isalpha(a: INTEGER): INTEGER;
+FOREIGN IMPORT abs(n: INTEGER): INTEGER;
+
+PROCEDURE teste(v1: INTEGER) : INTEGER;
+ BEGIN     
+   RETURN abs(v1)
+ END sum
 
 BEGIN
-    readInt(a);
-    ansa := isalpha(a);
+ a := (1 - 5);
+ ans := teste(a);
 END
 
 END Ffi.

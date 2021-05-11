@@ -8,6 +8,7 @@ trait lib extends Library {
   def div(numerator: Int, denominator: Int): Int
   def isalnum(c: Int): Int
   def isalpha(c: Int): Int
+  def isdigit(c: Int): Int
   def isascii(c: Int): Int
   def isblank(c: Int): Int 
   def islower(c: Int): Int

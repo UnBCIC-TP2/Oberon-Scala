@@ -1,0 +1,14 @@
+MODULE Ffi;
+
+VAR
+  a : INTEGER;
+  ans : INTEGER;
+
+FOREIGN IMPORT isupper(a: INTEGER): INTEGER;
+
+BEGIN
+ a := 65;
+ ans := isupper(a);
+END
+
+END Ffi.

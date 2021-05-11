@@ -2,15 +2,13 @@ MODULE Ffi;
   
 VAR
   a : INTEGER;
-  ansa : INTEGER; 
+  ans : INTEGER;
 
-
-FOREIGN IMPORT srand(c: INTEGER);
-
+FOREIGN IMPORT isalpha(a: INTEGER): INTEGER;
 
 BEGIN
-    srand(394827);
-
+    a := 43;
+    ans := isalpha(a);
 END
 
 END Ffi.

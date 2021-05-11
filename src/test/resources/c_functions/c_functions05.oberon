@@ -1,14 +1,19 @@
 MODULE Ffi;
-  
+
 VAR
   a : INTEGER;
-  ansa : INTEGER;
+  b : INTEGER;
+  ans : INTEGER;
 
-FOREIGN IMPORT abs(a: INTEGER): INTEGER;
+FOREIGN IMPORT isdigit(n: INTEGER): INTEGER;
+FOREIGN IMPORT abs(n: INTEGER): INTEGER;
 
 BEGIN
-    readInt(a);
-    ansa := abs(a);
+ a := 5 + 4;
+ b := 1 + 0;
+ ans := a + b;
+ ans := isdigit(a);
+ ans := abs(ans);
 END
 
 END Ffi.

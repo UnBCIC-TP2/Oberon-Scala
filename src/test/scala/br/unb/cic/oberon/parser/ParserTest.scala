@@ -2298,7 +2298,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   // External Function tests
 
-  ignore("Testing abs stmt on c_functions01 program") {
+  test("Testing div on c_functions01 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions01.oberon").getFile)
 
     assert(path != null)
@@ -2322,7 +2322,7 @@ class ParserTestSuite extends AnyFunSuite {
     
   }
 
-  ignore("Testing div stmt on c_functions02 program") {
+  test("Testing abs on c_functions02 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions02.oberon").getFile)
 
     assert(path != null)
@@ -2337,27 +2337,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(ffiProcedure.name == "abs")
     assert(ffiProcedure.args.length == 1)
     assert(ffiProcedure.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("ans", IntegerType))
   }
 
-  ignore("Testing isalnum stmt on c_functions03 program") {
+  test("Testing isaplha on c_functions03 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions03.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "Ffi")
-
-    val ffiProcedure = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
-
-    assert(ffiProcedure.name == "isalnum")
-    assert(ffiProcedure.args.length == 1)
-    assert(ffiProcedure.returnType == Some(IntegerType))
-  }
-
-  ignore("Testing isalpha stmt on c_functions04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions04.oberon").getFile)
 
     assert(path != null)
 
@@ -2371,8 +2358,173 @@ class ParserTestSuite extends AnyFunSuite {
     assert(ffiProcedure.name == "isalpha")
     assert(ffiProcedure.args.length == 1)
     assert(ffiProcedure.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("ans", IntegerType))
   }
 
+  test("Testing abs on c_functions04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+   
+    val ffiProcedure = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+    val normalProcedure = module.procedures(1).asInstanceOf[ProcedureDeclaration]
+
+    assert(ffiProcedure.name == "abs")
+    assert(ffiProcedure.args.length == 1)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+
+    assert(normalProcedure.name == "teste")
+    assert(normalProcedure.args.length == 1)
+    assert(normalProcedure.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ans", IntegerType))
+
+  }
+
+
+  test("Testing isdigit and abs on c_functions05 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions05.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+   
+    val ffiProcedureIsDigit = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+    val ffiProcedureAbs = module.procedures(1).asInstanceOf[ExternalProcedureDeclaration]
+
+    assert(ffiProcedureIsDigit.name == "isdigit")
+    assert(ffiProcedureIsDigit.args.length == 1)
+    assert(ffiProcedureIsDigit.returnType == Some(IntegerType))
+
+    assert(ffiProcedureAbs.name == "abs")
+    assert(ffiProcedureAbs.args.length == 1)
+    assert(ffiProcedureAbs.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ans", IntegerType))
+
+  }
+
+  test("Testing isupper on c_functions06 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions06.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+   
+    val ffiProcedure = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+
+    assert(ffiProcedure.name == "isupper")
+    assert(ffiProcedure.args.length == 1)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("ans", IntegerType))
+
+  }
+
+  test("Testing div on c_functions07 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+   
+    val ffiProcedure = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+
+    assert(ffiProcedure.name == "div")
+    assert(ffiProcedure.args.length == 2)
+    assert(ffiProcedure.returnType == Some(IntegerType))
+
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ans", IntegerType))
+  }
+
+  test("Testing div on c_functions08 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions08.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedureDiv = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+    val ffiProcedureAbs = module.procedures(1).asInstanceOf[ExternalProcedureDeclaration]
+
+    assert(ffiProcedureDiv.name == "div")
+    assert(ffiProcedureDiv.args.length == 2)
+    assert(ffiProcedureDiv.returnType == Some(IntegerType))
+
+    assert(ffiProcedureAbs.name == "abs")
+    assert(ffiProcedureAbs.args.length == 1)
+    assert(ffiProcedureAbs.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ans", IntegerType))
+  }
+
+  test("Testing abs and isalnum on c_functions09 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions09.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    val ffiProcedureAbs = module.procedures.head.asInstanceOf[ExternalProcedureDeclaration]
+    val ffiProcedureIsAlnum = module.procedures(1).asInstanceOf[ExternalProcedureDeclaration]
+
+
+    assert(ffiProcedureAbs.name == "abs")
+    assert(ffiProcedureAbs.args.length == 1)
+    assert(ffiProcedureAbs.returnType == Some(IntegerType))
+
+    assert(ffiProcedureIsAlnum.name == "isalnum")
+    assert(ffiProcedureIsAlnum.args.length == 1)
+    assert(ffiProcedureIsAlnum.returnType == Some(IntegerType))
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("b", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("ans", IntegerType))
+  }
 
 
 

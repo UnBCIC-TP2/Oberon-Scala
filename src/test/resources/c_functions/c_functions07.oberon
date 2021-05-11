@@ -1,14 +1,16 @@
 MODULE Ffi;
-  
+
 VAR
-  a, b, ans : INTEGER;
+  a : INTEGER;
+  b : INTEGER;
+  ans : INTEGER;
 
 FOREIGN IMPORT div(a: INTEGER, b: INTEGER): INTEGER;
 
 BEGIN
-  a := 6;
-  b := 3;
-  ans := div(a, b);
+ a := 10;
+ b := 10;
+ ans := div(a,b);
 END
 
 END Ffi.

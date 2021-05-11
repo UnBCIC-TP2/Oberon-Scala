@@ -310,6 +310,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
 
       assert(parametros.length-1 == args.length) 
 
+      println("AQUI")
       var ans: Int = -1
       if(args.length == 1) 
         ans = method(args(0).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
