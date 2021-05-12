@@ -1720,7 +1720,7 @@ class ParserTestSuite extends AnyFunSuite {
     val module = ScalaParser.parse(content)
 
     assert(module.name == "SimpleModule")
-    println(">>>" + module.stmt)
+
     assert(module.stmt.isDefined)
 
     // assert that the main block contains a sequence of statements
