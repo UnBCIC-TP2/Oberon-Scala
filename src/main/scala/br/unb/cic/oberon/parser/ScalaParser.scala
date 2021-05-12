@@ -230,11 +230,11 @@ class ParserVisitor {
       exp = constructor(lhs, rhs) // assign the result to exp, using the 'constructor' to set the actual expression
     }
   }
-
+  var label: Int = 0
   /* a visitor for parsing statements */
   class StatementVisitor extends OberonBaseVisitor[Unit] {
     var stmt: Statement = _
-    var label: Int = 0
+    
 
     def generateLabel(): Int = {
       label += 1

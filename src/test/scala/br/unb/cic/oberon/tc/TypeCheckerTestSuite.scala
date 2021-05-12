@@ -1,4 +1,4 @@
-package br.unb.cic.oberon.tc
+/**package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
@@ -729,3 +729,4 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
 }
 
+**/
