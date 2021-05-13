@@ -1,0 +1,21 @@
+MODULE RepeatReference;
+
+PROCEDURE RepeatRef(VAR X: integer, i: integer)
+BEGIN
+    REPEAT
+        X := X + 1;
+        i := i - 1;
+    UNTIL i != 0;
+END attribution
+
+BEGIN
+    X, i: INTEGER;
+    X := 0;
+    i := 0;
+
+    RepeatRef(X, i);
+
+    write(X));
+END
+
+END RepeatReference;

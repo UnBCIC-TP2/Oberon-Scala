@@ -1,0 +1,19 @@
+MODULE WriteOnProcedure;
+
+PROCEDURE WriteOnProc(VAR X: integer)
+BEGIN
+    X := 2;
+    write(X)
+    X := X + 1;
+END WriteOnProc
+
+BEGIN
+    X :INTEGER;
+    X := 1;
+    
+    write(X);
+    WriteOnProc(X);
+    write(X);
+END
+
+END WriteOnProcedure;

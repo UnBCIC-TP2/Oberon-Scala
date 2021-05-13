@@ -1,0 +1,15 @@
+MODULE SimpleAttribution;
+
+PROCEDURE attribution(VAR X: integer)
+BEGIN
+    X := 1;
+END attribution
+
+BEGIN
+    X: INTEGER;
+    attribution(X);
+
+    write(X);
+END
+
+END SimpleAttribution;

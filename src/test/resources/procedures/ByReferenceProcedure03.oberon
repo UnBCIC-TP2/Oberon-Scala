@@ -1,23 +1,22 @@
-MODULE increment;
+MODULE ReferenceRecusivity;
 
-PROCEDURE deInc(VAR x: integer)
+PROCEDURE inc(VAR flag: INTEGER, x: INTEGER)
 BEGIN
-    x := x - 1;
-END deInc
-
-PROCEDURE inc(VAR x: integer)
-BEGIN
-    x := x + 3;
-
-    deInc(x);  
+    IF(flag == 0)THEN
+        RETURN 1; 
+    ELSE
+        flag := flag - 1;
+        RETURN X * inc(flag, x)
+    END
 END inc
 
 BEGIN
-    x: integer;
+    x, flag, total: INTEGER;
     x := 2;
-    inc(x);
+    flag = 3;
+    total = inc(x);
 
     write(x);
 END
 
-END increment;
+END ReferenceRecusivity;

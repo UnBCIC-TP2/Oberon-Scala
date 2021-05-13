@@ -1,0 +1,19 @@
+MODULE DivideProcedure;
+
+PROCEDURE divide(VAR X: integer, Y: INTEGER)
+BEGIN
+    IF(Y != 0) THEN
+        X := X/Y
+    END;
+END divide
+
+BEGIN
+    X, Y: INTEGER;
+    X := 2;
+    Y := 3;
+    divide(X, Y);
+
+    write(X);
+END
+
+END DivideProcedure;
