@@ -109,7 +109,6 @@ class ParserVisitor {
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
     val userTypeVisitor = new UserDefinedTypeVisitor()
-
     ctx.accept(userTypeVisitor)
     userTypeVisitor.uType
   }
