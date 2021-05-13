@@ -4,6 +4,7 @@ import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.ast.{OberonModule, EQExpression, LTEExpression, AndExpression, SequenceStmt, BoolValue, ForStmt, LoopStmt, ExitStmt, Statement, WhileStmt, RepeatUntilStmt, CaseStmt, IfElseIfStmt, ElseIfStmt, IfElseStmt, SimpleCase, RangeCase, CaseAlternative, Expression}
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
+import cats.data.State
 
 class CoreVisitor extends OberonVisitorAdapter {
 
@@ -22,10 +23,6 @@ class CoreVisitor extends OberonVisitorAdapter {
 
         case other => stmt
     }
-
-    //TODO: Criar um visitor para Expressões. Ex: Transformar todos os x > y em y < x 
-    //                                            GTExpression(left, right) => LTExpression(right, left)
-                                               
 
     private def caseAux(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
         
@@ -90,4 +87,41 @@ class CoreVisitor extends OberonVisitorAdapter {
         return  coreModule
     }
 
+}
+
+class CoreChecker extends OberonVisitorAdapter {
+    private var isCore = true
+    
+    override type T = Unit
+
+    override def visit(stmt: Statement): Unit = {
+    
+        if (!isCore) {
+            return
+        }
+
+        stmt match {
+            case SequenceStmt(stmts) => transformListStmts(stmts)
+            case LoopStmt(stmt) => isCore = false
+            case RepeatUntilStmt(condition, stmt) => isCore = false
+            case ForStmt(initStmt, condition, block) => isCore = false
+
+            // Condicionais
+            case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => isCore = false;
+            case CaseStmt(exp, cases, elseStmt) => isCore = false
+        }
+    }
+
+    private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): Unit = {
+        if (!stmtsList.isEmpty){
+            stmtsList.head.accept(this); 
+        }
+    }
+
+    def isModuleCore(module: OberonModule): Boolean = {
+        isCore = true
+        module.stmt.get.accept(this)
+
+        return isCore
+    }
 }
