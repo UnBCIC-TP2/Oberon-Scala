@@ -1,0 +1,16 @@
+MODULE increment;
+
+PROCEDURE inc(VAR x: integer)
+BEGIN
+    x := x + 1;
+END inc
+
+BEGIN
+    x: integer;
+    x := 1;
+    inc(x);
+
+    write(x);
+END
+
+END increment;

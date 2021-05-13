@@ -17,3 +17,25 @@ BEGIN
 END
 
 END DivideProcedure;
+MODULE ReferenceRecusivity;
+
+PROCEDURE inc(VAR flag: INTEGER, x: INTEGER)
+BEGIN
+    IF(flag == 0)THEN
+        RETURN 1; 
+    ELSE
+        flag := flag - 1;
+        RETURN X * inc(flag, x)
+    END
+END inc
+
+BEGIN
+    x, flag, total: INTEGER;
+    x := 2;
+    flag = 3;
+    total = inc(x);
+
+    write(x);
+END
+
+END ReferenceRecusivity;
