@@ -268,8 +268,11 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     var vl = left.accept(this).asInstanceOf[Primitive[T]]
     var vr = right.accept(this).asInstanceOf[Primitive[T]]
 
-    // [long real, real, long int, int, short int]
-
+    /*
+      Array to detect the least restrictive type in the expression
+      Least restrictive order: [long real, real, long, int, short, char]
+      With this we are able to do the appropriate operator overload
+    */
     var types = Array(
       vl.isInstanceOf[LongRealValue] || vr.isInstanceOf[LongRealValue],
       vl.isInstanceOf[RealValue]     || vr.isInstanceOf[RealValue],

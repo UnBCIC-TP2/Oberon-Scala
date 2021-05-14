@@ -172,6 +172,11 @@ class ParserVisitor {
   class ExpressionVisitor() extends OberonBaseVisitor[Unit] {
     var exp: Expression = _
 
+    /*
+      Here we differentiate the integer types.
+      'a' is the name of the variable we are looking for and
+      'variables' contains all the variables in current program with its respective type.
+    */
     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
     {
       var a = ctx.parent.parent.getText().split(":")(0)
@@ -193,6 +198,9 @@ class ParserVisitor {
     }
 
 
+    /*
+      Same thing above, but with real types
+    */
     override def visitRealValue(ctx: OberonParser.RealValueContext): Unit =
       {
         var a = ctx.parent.parent.getText().split(":")(0)

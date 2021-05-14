@@ -46,6 +46,9 @@ trait Expression {
 
 abstract class Value[T](val value: T) extends Expression
 
+/*
+  Abstract class to define a primitive type, and also defines numeric conversion methods
+*/
 abstract class Primitive[T](val value: T) extends Expression
 {
   def toInt(): Int

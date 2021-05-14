@@ -172,7 +172,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(LongRealValue(15.00000000000005.toDouble))) // FOR TO x
+    assert(interpreter.env.lookup("x") == Some(LongRealValue(5.00000000000005.toDouble))) // FOR TO x
   }
 
   test("Testing LONGREAL and INTEGER -") {
@@ -186,7 +186,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(LongRealValue(5.00000000000005.toDouble))) // FOR TO x
+    assert(interpreter.env.lookup("x") == Some(LongRealValue(-15.00000000000005.toDouble))) // FOR TO x
   }
 
   test("Testing LONGREAL and INTEGER *") {
@@ -214,7 +214,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(LongRealValue((10.00000000000005D / 5).toDouble))) // FOR TO x
+    assert(interpreter.env.lookup("x") == Some(LongRealValue((-10.00000000000005D / 5).toDouble))) // FOR TO x
   }
 
   test("Testing REAL and INTEGER * -") {
