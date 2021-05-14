@@ -35,18 +35,6 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
       .fold(Set())((acc, predecessorOut) => acc | predecessorOut)
   }
 
-  private def getNodePredecessors(cfg: Graph[GraphNode, GraphEdge.DiEdge], node: GraphNode): mutable.Set[GraphNode] = {
-    cfg.edges
-      .filter(e => {
-        val GraphEdge.DiEdge(_, nodeT) = e.edge
-        nodeT.value == node
-      }
-      ).map(e => {
-      val GraphEdge.DiEdge(prevNodeT, _) = e.edge
-      prevNodeT.value
-    })
-  }
-
   def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
     if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
   }
