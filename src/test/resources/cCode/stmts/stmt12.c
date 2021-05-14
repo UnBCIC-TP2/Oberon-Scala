@@ -8,7 +8,7 @@ void main() {
   v = 0;
   for (y = 0; y < x; y++) {
     scanf("%d", &w);
-    v = v + (w * (y + 1)); //TODO: A expressão do tipo bracket não parece ter sido implementada no parser
+    v = v + (w * (y + 1));
   }
   v = v / x;
   for (z = 0; z < x; z++) {

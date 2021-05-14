@@ -10,7 +10,7 @@ import java.util.Base64
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
 
     assert(path != null)
 

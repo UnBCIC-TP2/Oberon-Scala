@@ -6,7 +6,7 @@ void main() {
 
   scanf("%d", &x);
   scanf("%d", &max);
-  if (x > max) {
+  if ((x > max)) {
     max = x;
   }
   printf("%d\n", max);

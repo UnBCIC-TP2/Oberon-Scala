@@ -19,7 +19,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("x", IntValue(5)))
   }
-
+  
   test("Testing the oberon simple02 code. This module has one constants and two variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
 
@@ -35,7 +35,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
-
+  
   test("Testing the oberon simple03 code. This module has three constants and two variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
 
@@ -179,7 +179,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(3, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
     }
 
@@ -187,8 +187,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),AddExpression(IntValue(2), IntValue(6)))))
-    assert(stmts(1) == WriteStmt(VarExpression("x")))
+    assert(stmts.head == AssignmentStmt(1, "x", ArraySubscript(VarExpression("a"),AddExpression(IntValue(2), IntValue(6)))))
+    assert(stmts(1) == WriteStmt(2, VarExpression("x")))
   }
 
   test("Testing the oberon arrayIndex02 code. This module has a ArrayIndex") {
@@ -208,7 +208,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(3, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
     }
 
@@ -216,8 +216,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),IntValue(8))))
-    assert(stmts(1) == WriteStmt(VarExpression("x")))
+    assert(stmts.head == AssignmentStmt(1, "x", ArraySubscript(VarExpression("a"),IntValue(8))))
+    assert(stmts(1) == WriteStmt(2, VarExpression("x")))
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {
@@ -234,7 +234,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(5, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -242,9 +242,9 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == ReadIntStmt("y"))
-    assert(stmts(2) == WriteStmt(AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == ReadIntStmt(2, "y"))
+    assert(stmts(2) == WriteStmt(3, AddExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the oberon stmt02 code. This module has a block of four statements") {
@@ -261,7 +261,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case SequenceStmt(7, stmts) => assert(stmts.length == 4)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -269,10 +269,10 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == ReadIntStmt("y"))
-    assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
-    assert(stmts(3) == WriteStmt(VarExpression("z")))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == ReadIntStmt(2, "y"))
+    assert(stmts(2) == AssignmentStmt(3, "z", AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(stmts(3) == WriteStmt(4, VarExpression("z")))
   }
 
   test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
@@ -289,7 +289,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case SequenceStmt(8, stmts) => assert(stmts.length == 4)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -297,19 +297,19 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == ReadIntStmt("max"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == ReadIntStmt(2, "max"))
 
     // the third stmt must be an IfElseStmt
     stmts(2) match {
-      case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
-        assert(s1 == AssignmentStmt("max",VarExpression("x")))
+      case IfElseStmt(4, cond, s1, s2) =>
+        assert(cond == Brackets(GTExpression(VarExpression("x"),VarExpression("max"))))
+        assert(s1 == AssignmentStmt(3, "max",VarExpression("x")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
 
-    assert(stmts(3) == WriteStmt(VarExpression("max")))
+    assert(stmts(3) == WriteStmt(5, VarExpression("max")))
   }
 
   test("Testing the oberon stmt04 code. This module has a While statement") {
@@ -326,7 +326,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case SequenceStmt(8, stmts) => assert(stmts.length == 4)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -334,17 +334,17 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == ReadIntStmt("y"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == ReadIntStmt(2, "y"))
 
     // the third stmt must be an WhileStmt
     stmts(2) match {
-      case WhileStmt(cond, stmt) =>
-        assert(cond == LTExpression(VarExpression("x"),VarExpression("y")))
-        assert(stmt == AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x"))))
+      case WhileStmt(4, cond, stmt) =>
+        assert(cond == Brackets(LTExpression(VarExpression("x"),VarExpression("y"))))
+        assert(stmt == AssignmentStmt(3, "x", MultExpression(VarExpression("x"), VarExpression("x"))))
       case _ => fail("expecting an if-then stmt")
     }
-    assert(stmts(3) == WriteStmt(VarExpression("x")))
+    assert(stmts(3) == WriteStmt(5, VarExpression("x")))
   }
 
   test("Testing the oberon stmt06 code. This module has a simple case statement") {
@@ -358,16 +358,15 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.name == "SimpleModule")
 
     assert(!module.stmt.isEmpty)
-    
 
     module.stmt.getOrElse(false) match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(6, stmts) => assert(stmts.length == 3)
       case _ => fail("Expected a sequence of 3 statements!!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
 
-    assert(sequenceStmts(0) == ReadIntStmt("xs"))
+    assert(sequenceStmts(0) == ReadIntStmt(1, "xs"))
 
     val myCaseStmt = sequenceStmts(1).asInstanceOf[CaseStmt]
 
@@ -382,19 +381,19 @@ class ParserTestSuite extends AnyFunSuite {
       val _miniCase = miniCase.asInstanceOf[SimpleCase]
 
       assert(_miniCase.condition == IntValue(caseLabel))
-      assert(_miniCase.stmt == AssignmentStmt("xs", IntValue(caseValAssigment)))
+      assert(_miniCase.stmt == AssignmentStmt(1, "xs", IntValue(caseValAssigment)))
       caseLabel += 1
       caseValAssigment *= 2
     })
 
     myCaseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(2, varName, exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
       case _ => fail("Expected an else on the case statement!")
     }
-    assert(sequenceStmts(2) == WriteStmt(VarExpression("xs")))
+    assert(sequenceStmts(2) == WriteStmt(4, VarExpression("xs")))
 
   }
   
@@ -412,7 +411,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(7, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -421,18 +420,18 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(4, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
-        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+        assert(stmt == AssignmentStmt(3, "z", AddExpression(VarExpression("z"), VarExpression("y"))))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("z")))
+    assert(stmts(2) == WriteStmt(5, VarExpression("z")))
 
   }
 
@@ -450,7 +449,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -459,20 +458,20 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmts = sequence.stmts
     
-    val code = AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x")))
+    val code = AssignmentStmt(4, "k", AddExpression(VarExpression("z"), VarExpression("x")))
 
-    assert(stmts.head == ReadIntStmt("y"))
+    assert(stmts.head == ReadIntStmt(1, "y"))
 
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("x", IntValue(0)))
+      case ForStmt(6, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "x", IntValue(0)))
         assert(cond == LTExpression(VarExpression("x"),VarExpression("y")))
-        assert(stmt == ForStmt(AssignmentStmt("z", IntValue(0)), LTExpression(VarExpression("z"),VarExpression("y")), code))
+        assert(stmt == ForStmt(5, AssignmentStmt(3, "z", IntValue(0)), LTExpression(VarExpression("z"),VarExpression("y")), code))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
  
     
-    assert(stmts(2) == WriteStmt(VarExpression("k")))
+    assert(stmts(2) == WriteStmt(7, VarExpression("k")))
 
   }
 
@@ -490,7 +489,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(5, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
     }
 
@@ -501,14 +500,14 @@ class ParserTestSuite extends AnyFunSuite {
 
     // the third stmt must be an ForStmt
     stmts.head match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(3, init, cond, stmt) =>
+        assert(init == AssignmentStmt(1, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"), IntValue(10)))
-        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+        assert(stmt == AssignmentStmt(2, "z", AddExpression(VarExpression("z"), VarExpression("y"))))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
-    assert(stmts(1) == WriteStmt(VarExpression("z")))
+    assert(stmts(1) == WriteStmt(4, VarExpression("z")))
 
   }
   
@@ -526,7 +525,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -534,21 +533,21 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(2)));
-    val code2 = AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y")));
+    val code = AssignmentStmt(3, "y", AddExpression(VarExpression("y"), IntValue(2)));
+    val code2 = AssignmentStmt(4, "z", AddExpression(VarExpression("z"), VarExpression("y")));
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(6, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
-        assert(stmt == SequenceStmt(List(code, code2)))
+        assert(stmt == SequenceStmt(5, List(code, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt") 
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("z")))
+    assert(stmts(2) == WriteStmt(7, VarExpression("z")))
 
   }
   
@@ -566,7 +565,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -574,19 +573,19 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code1 = ReadIntStmt("z")
-    val add = AddExpression(VarExpression("y"), IntValue(1))
-    val code2 = AssignmentStmt("z", DivExpression(VarExpression("z"), add))
-    val code3 = WriteStmt(VarExpression("z"))
+    val code1 = ReadIntStmt(3, "z")
+    val add = Brackets(AddExpression(VarExpression("y"), IntValue(1)))
+    val code2 = AssignmentStmt(4, "z", DivExpression(VarExpression("z"), add))
+    val code3 = WriteStmt(5, VarExpression("z"))
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(8, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
-        assert(stmt == SequenceStmt(List(code1, code2, code3)))
+        assert(stmt == SequenceStmt(7, List(code1, code2, code3)))
       case _ => fail("expecting: SequenceStmt(List(ReadIntStmt(z), AssignmentStmt(z,DivExpression(VarExpression(z),AddExpression(VarExpression(y),IntValue(1)))), WriteStmt(VarExpression(z))))")
     }
 
@@ -606,7 +605,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 8)
+      case SequenceStmt(23, stmts) => assert(stmts.length == 8)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -615,37 +614,38 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmts = sequence.stmts
 
-    val multiplica = MultExpression(VarExpression("w"), AddExpression(VarExpression("y"), IntValue(1)))
+    val multiplica = Brackets(MultExpression(VarExpression("w"), Brackets(AddExpression(VarExpression("y"), IntValue(1)))))
     val codiguinho = AddExpression(VarExpression("v"), multiplica)
-    val codee = ReadIntStmt("w");
-    val code = AssignmentStmt("v", codiguinho);
+    val codee = ReadIntStmt(4, "w");
+    val code = AssignmentStmt(5, "v", codiguinho);
 
-    val code2 = AssignmentStmt("u", AddExpression(VarExpression("u"),VarExpression("w")));
+    val codee2 = ReadIntStmt(10, "w");
+    val code2 = AssignmentStmt(11, "u", AddExpression(VarExpression("u"),VarExpression("w")));
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == AssignmentStmt("v", IntValue(0)))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == AssignmentStmt(2, "v", IntValue(0)))
 
     stmts(2) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(7, init, cond, stmt) =>
+        assert(init == AssignmentStmt(3, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
-        assert(stmt == SequenceStmt(List(codee, code)))
+        assert(stmt == SequenceStmt(6, List(codee, code)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
     
-    assert(stmts(3) == AssignmentStmt("v", DivExpression(VarExpression("v"), VarExpression("x"))))
+    assert(stmts(3) == AssignmentStmt(8, "v", DivExpression(VarExpression("v"), VarExpression("x"))))
 
     stmts(4) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("z", IntValue(0)))
+      case ForStmt(13, init, cond, stmt) =>
+        assert(init == AssignmentStmt(9, "z", IntValue(0)))
         assert(cond == LTExpression(VarExpression("z"),VarExpression("x")))
-        assert(stmt == SequenceStmt(List(codee, code2)))
+        assert(stmt == SequenceStmt(12, List(codee2, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
-    assert(stmts(5) == AssignmentStmt("u", DivExpression(VarExpression("u"), VarExpression("x")))) 
+    assert(stmts(5) == AssignmentStmt(14, "u", DivExpression(VarExpression("u"), VarExpression("x")))) 
 
-    assert(stmts(6) == WriteStmt(VarExpression("v")))
-    assert(stmts(7) == WriteStmt(VarExpression("u")))
+    assert(stmts(6) == WriteStmt(15, VarExpression("v")))
+    assert(stmts(7) == WriteStmt(16, VarExpression("u")))
   }
 
   test("Testing the oberon stmt13 code. This module has a For statement") {
@@ -662,7 +662,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(7, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -670,18 +670,18 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", VarExpression("x")))
+      case ForStmt(4, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", VarExpression("x")))
         assert(cond == LTExpression(VarExpression("y"), IntValue(100)))
-        assert(stmt == AssignmentStmt("y", MultExpression(VarExpression("y"), VarExpression("y"))))
+        assert(stmt == AssignmentStmt(3, "y", MultExpression(VarExpression("y"), VarExpression("y"))))
       case _ => fail("expecting an assigment stmt and if-then stmt") 
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("y")))
+    assert(stmts(2) == WriteStmt(5, VarExpression("y")))
 
   }
 
@@ -699,7 +699,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(7, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -707,17 +707,17 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)));
-    val code2 = WriteStmt(VarExpression("y"));
+    val code = AssignmentStmt(3, "y", SubExpression(VarExpression("y"), IntValue(2)));
+    val code2 = WriteStmt(4, VarExpression("y"));
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", VarExpression("x")))
+      case ForStmt(6, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", VarExpression("x")))
         assert(cond == GTExpression(VarExpression("y"), IntValue(0)))
-        assert(stmt == SequenceStmt(List(code, code2)))
+        assert(stmt == SequenceStmt(5, List(code, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt") 
     }
 
@@ -737,7 +737,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -745,22 +745,22 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = ReadIntStmt("z")
-    val adicao = MultExpression(VarExpression("y"), VarExpression("x"))
-    val code1 = AssignmentStmt("z", DivExpression(VarExpression("z"), adicao))
+    val code = ReadIntStmt(3, "z")
+    val adicao = Brackets(MultExpression(VarExpression("y"), VarExpression("x")))
+    val code1 = AssignmentStmt(4, "z", DivExpression(VarExpression("z"), adicao))
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", IntValue(0)))
+      case ForStmt(6, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
-        assert(stmt == SequenceStmt(List(code, code1)))
+        assert(stmt == SequenceStmt(5, List(code, code1)))
       case _ => fail("expecting an assigment stmt and if-then stmt") 
     }
 
-     assert(stmts(2) == WriteStmt(VarExpression("z")))
+     assert(stmts(2) == WriteStmt(7, VarExpression("z")))
 
   }
 
@@ -778,7 +778,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -786,21 +786,21 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("z", AddExpression(VarExpression("z"), DivExpression(VarExpression("z"), VarExpression("y"))))
-    val code1 = AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)))
+    val code = AssignmentStmt(3, "z", AddExpression(VarExpression("z"), Brackets(DivExpression(VarExpression("z"), VarExpression("y")))))
+    val code1 = AssignmentStmt(4, "y", SubExpression(VarExpression("y"), IntValue(2)))
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     // the third stmt must be an ForStmt
     stmts(1) match {
-      case ForStmt(init, cond, stmt) =>
-        assert(init == AssignmentStmt("y", VarExpression("x")))
+      case ForStmt(6, init, cond, stmt) =>
+        assert(init == AssignmentStmt(2, "y", VarExpression("x")))
         assert(cond == GTExpression(VarExpression("y"),IntValue(0)))
-        assert(stmt == SequenceStmt(List(code, code1)))
+        assert(stmt == SequenceStmt(5, List(code, code1)))
       case _ => fail("expecting an assigment stmt and if-then stmt") 
     }
 
-     assert(stmts(2) == WriteStmt(VarExpression("z")))
+     assert(stmts(2) == WriteStmt(7, VarExpression("z")))
 
   }
 
@@ -822,15 +822,15 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty);
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case SequenceStmt(7, stmts) => assert(stmts.length == 4)
       case _ => fail("This module should have 4 statements!")
     }
 
     // Verifying the statements
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(sequenceStmts.head == AssignmentStmt("y", IntValue(0)))
-    assert(sequenceStmts(1) == ReadIntStmt("x"))
+    assert(sequenceStmts.head == AssignmentStmt(1, "y", IntValue(0)))
+    assert(sequenceStmts(1) == ReadIntStmt(2, "x"))
 
     val caseStmt = sequenceStmts(2).asInstanceOf[CaseStmt]
 
@@ -844,12 +844,12 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(caseAlts.length == 2)
     assert(caseAlts.head == RangeCase(IntValue(0), IntValue(9),
-      AssignmentStmt("y", MultExpression(IntValue(2), VarExpression("x")))))
+      AssignmentStmt(1, "y", MultExpression(IntValue(2), VarExpression("x")))))
     assert(caseAlts(1) == RangeCase(IntValue(10), IntValue(20),
-      AssignmentStmt("y", MultExpression(IntValue(4), VarExpression("x")))))
+      AssignmentStmt(1, "y", MultExpression(IntValue(4), VarExpression("x")))))
 
     // Verifying the last statement
-    assert(sequenceStmts(3) == WriteStmt(VarExpression("y")))
+    assert(sequenceStmts(3) == WriteStmt(4, VarExpression("y")))
 
   } 
 
@@ -872,16 +872,16 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case SequenceStmt(10, stmts) => assert(stmts.length == 5)
       case _ => fail("This module should have 5 statements!")
     }
 
     // Verifying the statements
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(sequenceStmts.head == ReadIntStmt("xs"))
-    assert(sequenceStmts(1) == ReadIntStmt("min"))
-    assert(sequenceStmts(2) == ReadIntStmt("max"))
+    assert(sequenceStmts.head == ReadIntStmt(1, "xs"))
+    assert(sequenceStmts(1) == ReadIntStmt(2, "min"))
+    assert(sequenceStmts(2) == ReadIntStmt(3, "max"))
 
     val caseStmt = sequenceStmts(3).asInstanceOf[CaseStmt]
 
@@ -894,18 +894,18 @@ class ParserTestSuite extends AnyFunSuite {
     val caseAlts = caseStmt.cases
 
     assert(caseAlts.length == 3)
-    assert(caseAlts.head == SimpleCase(IntValue(1), AssignmentStmt("xs",IntValue(5))))
-    assert(caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt("xs", IntValue(10))))
-    assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
+    assert(caseAlts.head == SimpleCase(IntValue(1), AssignmentStmt(1, "xs",IntValue(5))))
+    assert(caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt(1, "xs", IntValue(10))))
+    assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt(1, "xs", IntValue(20))))
       
     caseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(4, varName, exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
       case _ => fail("Expected an else on the case statement!")
     }
-    assert(sequenceStmts(4) == WriteStmt(VarExpression("xs")))
+    assert(sequenceStmts(4) == WriteStmt(6, VarExpression("xs")))
   
   }
 
@@ -929,14 +929,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case SequenceStmt(11, stmt) => assert(stmt.length == 5)
       case _ => fail("This module should have 5 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(sequenceStmts(0) == ReadIntStmt("x"))
-    assert(sequenceStmts(1) == AssignmentStmt("y", IntValue(1)))
+    assert(sequenceStmts(0) == ReadIntStmt(1, "x"))
+    assert(sequenceStmts(1) == AssignmentStmt(2, "y", IntValue(1)))
 
     // Verifying the first case statement
     val caseStmt1 = sequenceStmts(2).asInstanceOf[CaseStmt]
@@ -948,14 +948,14 @@ class ParserTestSuite extends AnyFunSuite {
       val miniCase = _miniCase.asInstanceOf[SimpleCase]
       
       assert(miniCase == SimpleCase(IntValue(caseLabel),
-        AssignmentStmt("y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
+        AssignmentStmt(1, "y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
         
       caseSum += 5
       caseLabel *= 2
     })
 
     caseStmt1.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(3, varName, exp) => {
         assert(varName == "y")
         assert(exp == IntValue(41))
       }
@@ -971,7 +971,7 @@ class ParserTestSuite extends AnyFunSuite {
       val miniCase = _miniCase.asInstanceOf[RangeCase]
 
       assert(miniCase == RangeCase(IntValue(minCaseValue), IntValue(maxCaseValue),
-        AssignmentStmt("z", IntValue(assignmentValue))))
+        AssignmentStmt(1, "z", IntValue(assignmentValue))))
 
       maxCaseValue *= 2
       minCaseValue = maxCaseValue / 2 + 1
@@ -979,14 +979,14 @@ class ParserTestSuite extends AnyFunSuite {
     })
 
     caseStmt2.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(5, varName, exp) => {
         assert(varName == "z")
         assert(exp == IntValue(1))
       }
       case None => fail("Expected an else on the second case statement!") 
     }
 
-    assert(sequenceStmts(4) == WriteStmt(VarExpression("z")))
+    assert(sequenceStmts(4) == WriteStmt(7, VarExpression("z")))
 
   }
 
@@ -997,7 +997,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
-
+    
     assert(module.name == "ProcedureCaseModule")
 
     // Verifying the factorial procedure
@@ -1018,11 +1018,11 @@ class ParserTestSuite extends AnyFunSuite {
     assert(factorialCaseStmt.exp == VarExpression("n"))
     assert(factorialCaseStmt.cases.length == 2)
     
-    assert(factorialCaseStmt.cases.head == SimpleCase(IntValue(0), ReturnStmt(IntValue(1))))
-    assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(IntValue(1))))
+    assert(factorialCaseStmt.cases.head == SimpleCase(IntValue(0), ReturnStmt(1, IntValue(1))))
+    assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(1, IntValue(1))))
     
     factorialCaseStmt.elseStmt.getOrElse(None) match {
-      case ReturnStmt(MultExpression(left, right)) => {
+      case ReturnStmt(1, MultExpression(left, right)) => {
         assert(left == VarExpression("n"))
 
         assert(right == FunctionCallExpression("factorial", List(
@@ -1033,14 +1033,14 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("Missing an elseStmt in the factorial procedure case")
     }
 
-    assert(factorialStmt(1) == ReturnStmt(MultExpression(VarExpression("n"),
+    assert(factorialStmt(1) == ReturnStmt(3, MultExpression(VarExpression("n"),
       FunctionCallExpression("factorial", List(
         SubExpression(VarExpression("n"), IntValue(1)))))))
     // End of the factorial procedure verification
 
     // Verifying the body module statements
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => succeed 
+      case SequenceStmt(3, stmts) => succeed 
       case _ => fail("Expecting a sequence of statements!")
     }
   }
@@ -1064,16 +1064,16 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty);
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case SequenceStmt(10, stmt) => assert(stmt.length == 5)
       case _ => fail("This module should have 5 statements!")
     }
 
     // Verifying statements 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts  
 
-    assert(sequenceStmts.head == ReadIntStmt("x"))
-    assert(sequenceStmts(1) == AssignmentStmt("aux", DivExpression(VarExpression("x"), IntValue(2))))
-    assert(sequenceStmts(2) == AssignmentStmt("aux", MultExpression(VarExpression("aux"), IntValue(2))))
+    assert(sequenceStmts.head == ReadIntStmt(1, "x"))
+    assert(sequenceStmts(1) == AssignmentStmt(2, "aux", DivExpression(VarExpression("x"), IntValue(2))))
+    assert(sequenceStmts(2) == AssignmentStmt(3, "aux", MultExpression(VarExpression("aux"), IntValue(2))))
 
     // Verifying the case statement
 
@@ -1081,10 +1081,10 @@ class ParserTestSuite extends AnyFunSuite {
     val caseAlts = caseStmt.cases
 
     assert(caseAlts.length == 1)
-    assert(caseAlts.head == SimpleCase(VarExpression("x"), AssignmentStmt("aux",IntValue(0))))
+    assert(caseAlts.head == SimpleCase(VarExpression("x"), AssignmentStmt(1, "aux",IntValue(0))))
 
     caseStmt.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(4, varName, exp) => {
         assert(varName == "aux")
         assert(exp == IntValue(1))
       }
@@ -1092,7 +1092,7 @@ class ParserTestSuite extends AnyFunSuite {
     }
 
     // Verifying the write statement
-    assert(sequenceStmts(4) == WriteStmt(VarExpression("aux")))
+    assert(sequenceStmts(4) == WriteStmt(6, VarExpression("aux")))
 
   }
 
@@ -1113,13 +1113,13 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case SequenceStmt(5, stmt) => assert(stmt.length == 3)
       case _ => fail("This module should have 3 statements!")
     }
 
     // Verifying the statements
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
-    assert(sequenceStmts.head == ReadIntStmt("x"));
+    assert(sequenceStmts.head == ReadIntStmt(1, "x"));
 
     val caseStmt1 = sequenceStmts(1).asInstanceOf[CaseStmt]
     
@@ -1135,16 +1135,16 @@ class ParserTestSuite extends AnyFunSuite {
     assert(caseAlts.length == 2)
     assert(caseStmt1.elseStmt.isEmpty)
 
-    val innerCase = CaseStmt(VarExpression("x"), List(RangeCase(IntValue(1), IntValue(5),
-      AssignmentStmt("x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))), 
+    val innerCase = CaseStmt(1, VarExpression("x"), List(RangeCase(IntValue(1), IntValue(5),
+      AssignmentStmt(1, "x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt(1, "x", IntValue(10)))), 
       None)
 
     assert(caseAlts(0) == RangeCase(IntValue(1), IntValue(10), innerCase))
     
-    assert(caseAlts(1) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("x",MultExpression(VarExpression("x"), IntValue(2)))))
+    assert(caseAlts(1) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt(1, "x",MultExpression(VarExpression("x"), IntValue(2)))))
     
     // Verifying the write statement
-    assert(sequenceStmts(2) == WriteStmt(VarExpression("x")))
+    assert(sequenceStmts(2) == WriteStmt(3, VarExpression("x")))
 
   }
 
@@ -1161,20 +1161,20 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.length == 2)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case SequenceStmt(8, stmt) => assert(stmt.length == 3)
       case _ => fail("This module should have a sequence of 3 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(sequenceStmts(0) == AssignmentStmt("x", IntValue(0)))
+    assert(sequenceStmts(0) == AssignmentStmt(1, "x", IntValue(0)))
 
     val myWhileStmt = sequenceStmts(1).asInstanceOf[WhileStmt];
 
     assert(myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20)))
 
     myWhileStmt.stmt match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(4, stmts) => assert(stmts.length == 2)
       case _ => fail("Expected a sequence of statements in the while statement!")
     }
 
@@ -1182,23 +1182,23 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(innerCase.exp == VarExpression("x"))
 
-    assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+    assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt(1, "sum", IntValue(0))))
 
-    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum", 
+    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt(1, "sum", 
       AddExpression(VarExpression("sum"), VarExpression("x")))))
 
-    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")), 
-      AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
+    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(3, List(WriteStmt(1, VarExpression("sum")), 
+      AssignmentStmt(2, "sum", MultExpression(IntValue(2), IntValue(10)))))))
 
-    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
+    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt(1, "sum", AddExpression(
       VarExpression("sum"), MultExpression(IntValue(2), VarExpression("x"))))))
 
     assert(innerCase.elseStmt == None)
 
     assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+      AssignmentStmt(3, "x", AddExpression(VarExpression("x"), IntValue(1))))
 
-    assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
+    assert(sequenceStmts(2) == WriteStmt(6, VarExpression("sum")))
 
   }
 
@@ -1215,22 +1215,22 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.length == 3)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 4)
+      case SequenceStmt(11, stmt) => assert(stmt.length == 4)
       case _ => fail("This module should have a sequence of 4 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(sequenceStmts.head == AssignmentStmt("x", IntValue(0)))
+    assert(sequenceStmts.head == AssignmentStmt(1, "x", IntValue(0)))
 
-    assert(sequenceStmts(1) == ReadIntStmt("lim"))
+    assert(sequenceStmts(1) == ReadIntStmt(2, "lim"))
 
     val myWhileStmt = sequenceStmts(2).asInstanceOf[WhileStmt];
 
-    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), VarExpression("lim")))
+    assert(myWhileStmt.condition == Brackets(LTExpression(VarExpression("x"), VarExpression("lim"))))
 
     myWhileStmt.stmt match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(6, stmts) => assert(stmts.length == 2)
       case _ => fail("Expected a sequence of statements in the while statement!")
     }
 
@@ -1238,15 +1238,15 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(innerCase.exp == VarExpression("x"))
 
-    assert(innerCase.cases(0) == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+    assert(innerCase.cases(0) == SimpleCase(IntValue(0), AssignmentStmt(1, "sum", IntValue(0))))
 
-    assert(innerCase.elseStmt.getOrElse(None) == AssignmentStmt("sum", AddExpression(
+    assert(innerCase.elseStmt.getOrElse(None) == AssignmentStmt(3, "sum", AddExpression(
       VarExpression("sum"), VarExpression("x"))))
 
     assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+      AssignmentStmt(5, "x", AddExpression(VarExpression("x"), IntValue(1))))
 
-    assert(sequenceStmts(3) == WriteStmt(VarExpression("sum")))
+    assert(sequenceStmts(3) == WriteStmt(8, VarExpression("sum")))
 
   }
 
@@ -1264,10 +1264,10 @@ class ParserTestSuite extends AnyFunSuite {
     assert(None != module.stmt.getOrElse(None))
     val forStmt = module.stmt.get.asInstanceOf[ForStmt]
 
-    assert(AssignmentStmt("x", IntValue(0)) == forStmt.init)
+    assert(AssignmentStmt(2, "x", IntValue(0)) == forStmt.init)
     assert(LTEExpression(VarExpression("x"), IntValue(10)) == forStmt.condition)
-    assert(SequenceStmt(List(WriteStmt(VarExpression("x")),
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))) == forStmt.stmt)
+    assert(SequenceStmt(4, List(WriteStmt(1, VarExpression("x")),
+      AssignmentStmt(3, "x", AddExpression(VarExpression("x"), IntValue(1))))) == forStmt.stmt)
 
   }
 
@@ -1283,23 +1283,23 @@ class ParserTestSuite extends AnyFunSuite {
     assert(3 == module.variables.length)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => assert(3 == stmts.length)
+      case SequenceStmt(9, stmts) => assert(3 == stmts.length)
       case _ => fail("Error! Expected a sequence stmt with 3 statements!!!")
     }
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
-    assert(ReadIntStmt("min") == sequenceStmts.head)
-    assert(ReadIntStmt("max") == sequenceStmts(1))
+    assert(ReadIntStmt(1, "min") == sequenceStmts.head)
+    assert(ReadIntStmt(2, "max") == sequenceStmts(1))
 
     val forRangeStmt = sequenceStmts(2).asInstanceOf[ForStmt]
 
-    val innerInit = AssignmentStmt("x", VarExpression("min"))
+    val innerInit = AssignmentStmt(4, "x", VarExpression("min"))
     val innerCondition = LTEExpression(VarExpression("x"), VarExpression("max"))
-    val innerStmts = List(WriteStmt(VarExpression("x")), AssignmentStmt("x", AddExpression(
+    val innerStmts = List(WriteStmt(3, VarExpression("x")), AssignmentStmt(5, "x", AddExpression(
       VarExpression("x"), IntValue(1))))
 
     val forStmts = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    
+
     assert(innerInit == forRangeStmt.init)
     assert(innerCondition == forRangeStmt.condition)
     assert(innerStmts(0) == forStmts(0))
@@ -1322,24 +1322,24 @@ class ParserTestSuite extends AnyFunSuite {
 
     val forRangeStmt = module.stmt.get.asInstanceOf[ForStmt]
 
-    val initStmt1 = AssignmentStmt("x", IntValue(0))
+    val initStmt1 = AssignmentStmt(6, "x", IntValue(0))
     val condExpr1 = LTEExpression(VarExpression("x"), IntValue(20))
 
     assert(initStmt1 == forRangeStmt.init)
     assert(condExpr1 == forRangeStmt.condition)
 
     val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    assert(AssignmentStmt(7, "x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
     val nestedFor = stmts1.head.asInstanceOf[ForStmt]
 
-    val initStmt2 = AssignmentStmt("y", VarExpression("x"))
+    val initStmt2 = AssignmentStmt(2, "y", VarExpression("x"))
     val condExpr2 = LTEExpression(VarExpression("y"), IntValue(20))
     val stmt2 = nestedFor.stmt.asInstanceOf[SequenceStmt].stmts
 
     assert(initStmt2 == nestedFor.init)
     assert(condExpr2 == nestedFor.condition)
-    assert(WriteStmt(VarExpression("y")) == stmt2(0))
-    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+    assert(WriteStmt(1, VarExpression("y")) == stmt2(0))
+    assert(AssignmentStmt(3, "y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
 
   }
 
@@ -1355,34 +1355,34 @@ class ParserTestSuite extends AnyFunSuite {
     assert(4 == module.variables.length)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => assert(3 == stmts.length)
+      case SequenceStmt(13, stmts) => assert(3 == stmts.length)
       case _ => fail("Expected a sequence of 3 statements!!!")
     }
   
     val sequenceStmts = module.stmt.getOrElse(None).asInstanceOf[SequenceStmt].stmts
-    assert(ReadIntStmt("min") == sequenceStmts.head)
-    assert(ReadIntStmt("max") == sequenceStmts(1))
+    assert(ReadIntStmt(1, "min") == sequenceStmts.head)
+    assert(ReadIntStmt(2, "max") == sequenceStmts(1))
 
     val forRangeStmt = sequenceStmts(2).asInstanceOf[ForStmt]
 
-    val initStmt1 = AssignmentStmt("x", VarExpression("min"))
+    val initStmt1 = AssignmentStmt(8, "x", VarExpression("min"))
     val condExpr1 = LTEExpression(VarExpression("x"), VarExpression("max"))
 
     assert(initStmt1 == forRangeStmt.init)
     assert(condExpr1 == forRangeStmt.condition)
 
     val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    assert(AssignmentStmt(9, "x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
     val nestedFor = stmts1(0).asInstanceOf[ForStmt]
 
-    val initStmt2 = AssignmentStmt("y", VarExpression("x"))
+    val initStmt2 = AssignmentStmt(4, "y", VarExpression("x"))
     val condExpr2 = LTEExpression(VarExpression("y"), VarExpression("max"))
     val stmt2 = nestedFor.stmt.asInstanceOf[SequenceStmt].stmts
 
     assert(initStmt2 == nestedFor.init)
     assert(condExpr2 == nestedFor.condition)
-    assert(WriteStmt(VarExpression("y")) == stmt2(0))
-    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+    assert(WriteStmt(3, VarExpression("y")) == stmt2(0))
+    assert(AssignmentStmt(5, "y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
 
   }
 
@@ -1400,14 +1400,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(None != module.stmt.getOrElse(None))
     val forStmt = module.stmt.get.asInstanceOf[ForStmt]
 
-    val initStmt = AssignmentStmt("x", IntValue(0))
+    val initStmt = AssignmentStmt(2, "x", IntValue(0))
     val condExpr = LTEExpression(VarExpression("x"), IntValue(10))
     val stmts = forStmt.stmt.asInstanceOf[SequenceStmt].stmts
 
     assert(initStmt == forStmt.init)
     assert(condExpr == forStmt.condition)
-    assert(WriteStmt(FunctionCallExpression("squareOf", List(VarExpression("x")))) == stmts(0))
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
+    assert(WriteStmt(1, FunctionCallExpression("squareOf", List(VarExpression("x")))) == stmts(0))
+    assert(AssignmentStmt(3, "x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
   }
 
   test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
@@ -1424,7 +1424,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(11, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -1432,21 +1432,21 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     stmts(1) match {
-      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
-        assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
-        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
-        assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
-        assert(elseStmt.contains(AssignmentStmt("y", IntValue(4))))
+      case IfElseIfStmt(8, cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == Brackets(LTExpression(VarExpression("x"), IntValue(5))))
+        assert(thenStmt == AssignmentStmt(2, "y", IntValue(1)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(7))))
+        assert(elseIfs(0).thenStmt == AssignmentStmt(3, "y", IntValue(2)))
+        assert(elseIfs(1).condition == Brackets(LTExpression(VarExpression("x"), IntValue(9))))
+        assert(elseIfs(1).thenStmt == AssignmentStmt(5, "y", IntValue(3)))
+        assert(elseStmt.contains(AssignmentStmt(7, "y", IntValue(4))))
       case _ => fail("expecting an if-then stmt")
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("y")))
+    assert(stmts(2) == WriteStmt(9, VarExpression("y")))
   }
 
   test("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
@@ -1463,7 +1463,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(8, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -1471,19 +1471,19 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     stmts(1) match {
-      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == GTExpression(VarExpression("x"), IntValue(1)))
-        assert(thenStmt == AssignmentStmt("y", IntValue(0)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(3)))
-        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
+      case IfElseIfStmt(5, cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == Brackets(GTExpression(VarExpression("x"), IntValue(1))))
+        assert(thenStmt == AssignmentStmt(2, "y", IntValue(0)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(3))))
+        assert(elseIfs(0).thenStmt == AssignmentStmt(3, "y", IntValue(2)))
         assert(elseStmt == None)
       case _ => fail("expecting an if-then stmt")
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("y")))
+    assert(stmts(2) == WriteStmt(6, VarExpression("y")))
   }
 
   test("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
@@ -1500,7 +1500,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(27, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting three stmts in the main block")
     }
 
@@ -1508,37 +1508,37 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
 
     stmts(1) match {
-      case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
-        assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
-        assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
-        assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
-        assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
-        assert(elseIfs(2).condition == LTExpression(VarExpression("x"), IntValue(11)))
-        assert(elseIfs(2).thenStmt == AssignmentStmt("y", IntValue(4)))
-        assert(elseIfs(3).condition == LTExpression(VarExpression("x"), IntValue(13)))
-        assert(elseIfs(3).thenStmt == AssignmentStmt("y", IntValue(5)))
-        assert(elseIfs(4).condition == LTExpression(VarExpression("x"), IntValue(15)))
-        assert(elseIfs(4).thenStmt == AssignmentStmt("y", IntValue(6)))
-        assert(elseIfs(5).condition == LTExpression(VarExpression("x"), IntValue(17)))
-        assert(elseIfs(5).thenStmt == AssignmentStmt("y", IntValue(7)))
-        assert(elseIfs(6).condition == LTExpression(VarExpression("x"), IntValue(19)))
-        assert(elseIfs(6).thenStmt == AssignmentStmt("y", IntValue(8)))
-        assert(elseIfs(7).condition == LTExpression(VarExpression("x"), IntValue(21)))
-        assert(elseIfs(7).thenStmt == AssignmentStmt("y", IntValue(9)))
-        assert(elseIfs(8).condition == LTExpression(VarExpression("x"), IntValue(23)))
-        assert(elseIfs(8).thenStmt == AssignmentStmt("y", IntValue(10)))
-        assert(elseIfs(9).condition == EQExpression(VarExpression("x"), IntValue(25)))
-        assert(elseIfs(9).thenStmt == AssignmentStmt("y", IntValue(11)))
-        assert(elseStmt == Some(AssignmentStmt("y", IntValue(12))))
+      case IfElseIfStmt(24, cond, thenStmt, elseIfs, elseStmt) =>
+        assert(cond == Brackets(LTExpression(VarExpression("x"), IntValue(5))))
+        assert(thenStmt == AssignmentStmt(2, "y", IntValue(1)))
+        assert(elseIfs(0).condition == Brackets(LTExpression(VarExpression("x"), IntValue(7))))
+        assert(elseIfs(0).thenStmt == AssignmentStmt(3, "y", IntValue(2)))
+        assert(elseIfs(1).condition == Brackets(LTExpression(VarExpression("x"), IntValue(9))))
+        assert(elseIfs(1).thenStmt == AssignmentStmt(5, "y", IntValue(3)))
+        assert(elseIfs(2).condition == Brackets(LTExpression(VarExpression("x"), IntValue(11))))
+        assert(elseIfs(2).thenStmt == AssignmentStmt(7, "y", IntValue(4)))
+        assert(elseIfs(3).condition == Brackets(LTExpression(VarExpression("x"), IntValue(13))))
+        assert(elseIfs(3).thenStmt == AssignmentStmt(9, "y", IntValue(5)))
+        assert(elseIfs(4).condition == Brackets(LTExpression(VarExpression("x"), IntValue(15))))
+        assert(elseIfs(4).thenStmt == AssignmentStmt(11, "y", IntValue(6)))
+        assert(elseIfs(5).condition == Brackets(LTExpression(VarExpression("x"), IntValue(17))))
+        assert(elseIfs(5).thenStmt == AssignmentStmt(13, "y", IntValue(7)))
+        assert(elseIfs(6).condition == Brackets(LTExpression(VarExpression("x"), IntValue(19))))
+        assert(elseIfs(6).thenStmt == AssignmentStmt(15, "y", IntValue(8)))
+        assert(elseIfs(7).condition == Brackets(LTExpression(VarExpression("x"), IntValue(21))))
+        assert(elseIfs(7).thenStmt == AssignmentStmt(17, "y", IntValue(9)))
+        assert(elseIfs(8).condition == Brackets(LTExpression(VarExpression("x"), IntValue(23))))
+        assert(elseIfs(8).thenStmt == AssignmentStmt(19, "y", IntValue(10)))
+        assert(elseIfs(9).condition == Brackets(EQExpression(VarExpression("x"), IntValue(25))))
+        assert(elseIfs(9).thenStmt == AssignmentStmt(21, "y", IntValue(11)))
+        assert(elseStmt == Some(AssignmentStmt(23, "y", IntValue(12))))
       case _ => fail("expecting an if-then stmt")
     }
 
-    assert(stmts(2) == WriteStmt(VarExpression("y")))
+    assert(stmts(2) == WriteStmt(25, VarExpression("y")))
   }
 
   test("Testing the oberon procedure01 code. This module has a procedure") {
@@ -1561,7 +1561,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(procedure.returnType == Some(IntegerType))
 
     procedure.stmt match {
-      case ReturnStmt(AddExpression(VarExpression("v1"), VarExpression("v2"))) => succeed
+      case ReturnStmt(1, AddExpression(VarExpression("v1"), VarExpression("v2"))) => succeed
       case _ => fail("expecting a return stmt")
     }
 
@@ -1569,9 +1569,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadIntStmt("x"))
-    assert(stmt.stmts(1) == ReadIntStmt("y"))
-    assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
+    assert(stmt.stmts.head == ReadIntStmt(1, "x"))
+    assert(stmt.stmts(1) == ReadIntStmt(2, "y"))
+    assert(stmt.stmts(2) == WriteStmt(3, FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
   }
 
   test("Testing the oberon procedure02 code. This module resembles the code of the LDTA challenge") {
@@ -1594,7 +1594,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(procedure.returnType == Some(IntegerType))
 
     procedure.stmt match {
-      case ReturnStmt(MultExpression(VarExpression("i"), VarExpression("base"))) => succeed
+      case ReturnStmt(1, MultExpression(VarExpression("i"), VarExpression("base"))) => succeed
       case _ => fail("expecting a return i * base stmt")
     }
 
@@ -1602,7 +1602,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadIntStmt("base"))
+    assert(stmt.stmts.head == ReadIntStmt(1, "base"))
   }
 
   test("Testing the oberon procedure03 code. This module implements a fatorial function") {
@@ -1625,20 +1625,20 @@ class ParserTestSuite extends AnyFunSuite {
     assert(procedure.returnType == Some(IntegerType))
 
     procedure.stmt match {
-      case SequenceStmt(_) => succeed
+      case SequenceStmt(4, _) => succeed
       case _ => fail("expecting a sequence of stmts")
     }
 
-    val SequenceStmt(stmts) = procedure.stmt // pattern matching...
+    val SequenceStmt(4, stmts) = procedure.stmt // pattern matching...
     assert(stmts.size == 2)
-
-    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
-    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+  
+    assert(stmts.head == IfElseStmt(2, Brackets(EQExpression(VarExpression("i"), IntValue(1))), ReturnStmt(1, IntValue(1)), None))
+    assert(stmts(1) == ReturnStmt(3, MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
 
     module.stmt.get match {
-      case SequenceStmt(ss) => {
-        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("factorial", List(IntValue(5)))))
-        assert(ss(1) == WriteStmt(VarExpression("res")))
+      case SequenceStmt(3, ss) => {
+        assert(ss.head == AssignmentStmt(1, "res", FunctionCallExpression("factorial", List(IntValue(5)))))
+        assert(ss(1) == WriteStmt(2, VarExpression("res")))
       }
       case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
     }
@@ -1664,7 +1664,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   // Parser doesn't create Bracket Expression objects.
-  ignore("Testing simple10.oberon - Bracket Expression") {
+  test("Testing simple10.oberon - Bracket Expression") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon")
       .getFile
       .replaceFirst("\\/(.:\\/)", "$1"))
@@ -1698,16 +1698,16 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(3, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
     }
 
     // now we can assume that the main block contains a sequence of stmts
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-	
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
+  
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == EAssignmentStmt(2, ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
 
   }
   
@@ -1725,7 +1725,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case SequenceStmt(8, stmts) => assert(stmts.length == 4)
       case _ => fail("we are expecting four stmts in the main block")
     }
 
@@ -1733,19 +1733,19 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == ReadIntStmt("max"))
+    assert(stmts.head == ReadIntStmt(1, "x"))
+    assert(stmts(1) == ReadIntStmt(2, "max"))
 
     // the third stmt must be an IfElseStmt
     stmts(2) match {
-      case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
-		assert(s1 == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
+      case IfElseStmt(4, cond, s1, s2) =>
+        assert(cond == Brackets(GTExpression(VarExpression("x"),VarExpression("max"))))
+    assert(s1 == EAssignmentStmt(3, ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
 
-    assert(stmts(3) == WriteStmt(VarExpression("max")))
+    assert(stmts(3) == WriteStmt(5, VarExpression("max")))
   }
   
   test("Testing the oberon stmt32 code. This module has some user types declarations") {
@@ -1777,7 +1777,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case SequenceStmt(5, stmts) => assert(stmts.length == 3)
       case _ => fail("we are expecting four stmts in the main block")
     }
 
@@ -1785,9 +1785,9 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-	  assert(stmts.head == EAssignmentStmt(ArrayAssignment(VarExpression("v"), IntValue(2)), IntValue(3)))
-	  assert(stmts(1) == AssignmentStmt(("sum"), AddExpression(IntValue(9),IntValue(2))))
-	  assert(stmts(2) == EAssignmentStmt(ArrayAssignment(VarExpression("v"), IntValue(2)), VarExpression("sum")))
+    assert(stmts.head == EAssignmentStmt(1, ArrayAssignment(VarExpression("v"), IntValue(2)), IntValue(3)))
+    assert(stmts(1) == AssignmentStmt(2, ("sum"), AddExpression(IntValue(9),IntValue(2))))
+    assert(stmts(2) == EAssignmentStmt(3, ArrayAssignment(VarExpression("v"), IntValue(2)), VarExpression("sum")))
   }
 
   test("Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index") {
@@ -1832,7 +1832,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case SequenceStmt(2, stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting 2 stmts in the main block")
     }
 
@@ -1840,7 +1840,7 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), IntValue(5)))
+    assert(stmts.head == EAssignmentStmt(1, RecordAssignment(VarExpression("d1"), "day"), IntValue(5)))
   }
 
   test("Testing the oberon recordAssignmentStmt02 code") {
@@ -1857,7 +1857,8 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").toURI)
+
 
     assert(path != null)
 
@@ -1871,9 +1872,16 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.userTypes.size == 5)
 
-    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
+    val listDeclaration = List(VariableDeclaration("t_id", IntegerType),
+      VariableDeclaration("members", ReferenceToUserDefinedType("m_id")),
+      VariableDeclaration("n_members", IntegerType),
+      VariableDeclaration("full", BooleanType))
 
-    //TODO: add the new assets 
+    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
+    assert(module.userTypes(1) == RecordType("team", listDeclaration))
+    assert(module.userTypes(2) == ArrayType("team_array", 20, ReferenceToUserDefinedType("team")))
+    assert(module.userTypes(3) == ArrayType("test_array", 20, IntegerType))
+    assert(module.userTypes(4) == ArrayType("second_test", 20, ReferenceToUserDefinedType("test_array")))
   }
 
   test("Testing the oberon recordAssignmentStmt03 code") {
@@ -1890,7 +1898,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case SequenceStmt(5, stmts) => assert(stmts.length == 5)
       case _ => fail("we are expecting 5 stmt in the main block")
     }
 
@@ -1898,10 +1906,10 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("vagas"), "salaA"), IntValue(20)))
-    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("vagas"), "salaB"), IntValue(30)))
-    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("matricula"), "alunoA"), IntValue(180047205)))
-    assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("matricula"), "alunoB"), IntValue(180108531)))
+    assert(stmts.head == EAssignmentStmt(1, RecordAssignment(VarExpression("vagas"), "salaA"), IntValue(20)))
+    assert(stmts(1) == EAssignmentStmt(2, RecordAssignment(VarExpression("vagas"), "salaB"), IntValue(30)))
+    assert(stmts(2) == EAssignmentStmt(3, RecordAssignment(VarExpression("matricula"), "alunoA"), IntValue(180047205)))
+    assert(stmts(3) == EAssignmentStmt(4, RecordAssignment(VarExpression("matricula"), "alunoB"), IntValue(180108531)))
   }
 
   test("Testing the oberon recordAssignmentStmt04 code") {
@@ -1918,7 +1926,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 5)
+      case SequenceStmt(9, stmts) => assert(stmts.length == 5)
       case _ => fail("we are expecting 5 stmt in the main block")
     }
 
@@ -1926,11 +1934,11 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt(("n"), IntValue(1)))
-    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "A"), IntValue(1)))
-    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "B"), IntValue(3)))
-    assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
-    assert(stmts(4) == EAssignmentStmt(ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
+    assert(stmts.head == AssignmentStmt(1, ("n"), IntValue(1)))
+    assert(stmts(1) == EAssignmentStmt(2, RecordAssignment(VarExpression("passageiros"), "A"), IntValue(1)))
+    assert(stmts(2) == EAssignmentStmt(3, RecordAssignment(VarExpression("passageiros"), "B"), IntValue(3)))
+    assert(stmts(3) == EAssignmentStmt(4, RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
+    assert(stmts(4) == EAssignmentStmt(5, ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
 
 
   }
@@ -1949,7 +1957,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // assert that the main block contains a sequence of statements
     module.stmt.get match {
-      case SequenceStmt(stmts) => assert(stmts.length == 7)
+      case SequenceStmt(8, stmts) => assert(stmts.length == 7)
       case _ => fail("we are expecting one stmt in the main block")
     }
 
@@ -1957,18 +1965,18 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt(("n"), IntValue(1)))
-    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "A"), IntValue(1)))
-    assert(stmts(2) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "B"), IntValue(3)))
-    assert(stmts(3) == EAssignmentStmt(RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
+    assert(stmts.head == AssignmentStmt(1, ("n"), IntValue(1)))
+    assert(stmts(1) == EAssignmentStmt(2, RecordAssignment(VarExpression("passageiros"), "A"), IntValue(1)))
+    assert(stmts(2) == EAssignmentStmt(3, RecordAssignment(VarExpression("passageiros"), "B"), IntValue(3)))
+    assert(stmts(3) == EAssignmentStmt(4, RecordAssignment(VarExpression("passageiros"), "C"), IntValue(2)))
     stmts(4) match {
-      case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("n"), IntValue(2)))
-		assert(s1 == EAssignmentStmt(ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
+      case IfElseStmt(6, cond, s1, s2) =>
+        assert(cond == Brackets(GTExpression(VarExpression("n"), IntValue(2))))
+    assert(s1 == EAssignmentStmt(5, ArrayAssignment(VarExpression("fila"), VarExpression("n")), VarExpression("A")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
-    assert(stmts(5) == WriteStmt(VarExpression("A")))
+    assert(stmts(5) == WriteStmt(7, VarExpression("A")))
 
 
   }
@@ -2013,18 +2021,18 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words"){
-  	val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser3.oberon").toURI)
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser3.oberon").toURI)
 
-  	assert(path != null)
+    assert(path != null)
 
-  	val content = String.join("\n", Files.readAllLines(path))
-  	val module = ScalaParser.parse(content)
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
 
-  	assert(module.name == "ExpressionNameModule")
+    assert(module.name == "ExpressionNameModule")
 
-  	assert(module.stmt.isDefined)
+    assert(module.stmt.isDefined)
 
-  	assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
+    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
 
     assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[FieldAccessExpression])
 
@@ -2069,7 +2077,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].left.isInstanceOf[FieldAccessExpression])
 
-	  assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[FieldAccessExpression])
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[FieldAccessExpression])
 
 
   }
@@ -2104,7 +2112,7 @@ class ParserTestSuite extends AnyFunSuite {
     // val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
     assert(module.name == "test")
-    assert(module.stmt.get.asInstanceOf[ReadIntStmt] == ReadIntStmt("x"))
+    assert(module.stmt.get.asInstanceOf[ReadIntStmt] == ReadIntStmt(1, "x"))
     
     assert(module.userTypes.length == 2)
 
@@ -2291,6 +2299,5 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.size == 2)
     assert(module.stmt.isDefined)
   }
-
 
 }

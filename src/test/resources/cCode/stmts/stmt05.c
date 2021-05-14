@@ -6,7 +6,7 @@ void main() {
 
   x = 5;
   y = 100;
-  while (x < y) {
+  while ((x < y)) {
     x = x * x;
   }
   printf("%d\n", x);

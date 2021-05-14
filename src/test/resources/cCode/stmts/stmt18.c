@@ -7,17 +7,17 @@ void main() {
   scanf("%d", &first);
   scanf("%d", &second);
   scanf("%d", &third);
-  if (first > second) {
+  if ((first > second)) {
     temp = first;
     first = second;
     second = temp;
   }
-  else if (first > third) {
+  else if ((first > third)) {
     temp = first;
     first = third;
     third = temp;
   }
-  else if (second > third) {
+  else if ((second > third)) {
     temp = second;
     second = third;
     third = temp;
