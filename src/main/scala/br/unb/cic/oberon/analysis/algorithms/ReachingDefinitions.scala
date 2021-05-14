@@ -8,6 +8,8 @@ import br.unb.cic.oberon.ast.{AssignmentStmt, ReadIntStmt}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap
+import scala.collection.immutable.Set
+import scala.collection.mutable
 
 case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])], Set[(String, GraphNode)]] {
   type NodeAnalysis = Set[(String, GraphNode)]
@@ -19,14 +21,19 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
     analyse(cfg, emptyReachDefs, fixedPoint = false)
   }
 
-  def getNodeIn(reachingDefinitions: AnalysisMapping, Node: GraphNode): NodeAnalysis =
-    reachingDefinitions(Node)._1
+  def getNodeIn(reachDefs: AnalysisMapping, Node: GraphNode): NodeAnalysis =
+    reachDefs(Node)._1
 
-  def getNodeOut(reachingDefinitions: AnalysisMapping, Node: GraphNode): NodeAnalysis =
-    reachingDefinitions(Node)._2
+  def getNodeOut(reachDefs: AnalysisMapping, Node: GraphNode): NodeAnalysis =
+    reachDefs(Node)._2
 
-  def computeNodeIn(reachingDefinitions: AnalysisMapping, currentNode: GraphNode, previousNode: GraphNode): NodeAnalysis =
-    getNodeIn(reachingDefinitions, currentNode) | getNodeOut(reachingDefinitions, previousNode)
+  def computeNodeIn(cfg: Graph[GraphNode, GraphEdge.DiEdge],
+                    reachDefs: AnalysisMapping,
+                    currentNode: GraphNode): NodeAnalysis = {
+    getNodePredecessors(cfg, currentNode)
+      .map(predecessor => getNodeOut(reachDefs, predecessor))
+      .fold(Set())((acc, predecessorOut) => acc | predecessorOut)
+  }
 
   def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
     if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
@@ -43,8 +50,8 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
 
       cfg.edges.foreach(
         e => {
-          val GraphEdge.DiEdge(prevNodeT, currNodeT) = e.edge
-          reachDefs = reachDefs + computeNodeInOutSets(prevNodeT.value, currNodeT.value, reachDefs)
+          val GraphEdge.DiEdge(_, currNodeT) = e.edge
+          reachDefs = reachDefs + computeNodeInOutSets(cfg, currNodeT.value, reachDefs)
         }
       )
 
@@ -64,10 +71,10 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
     reachDefs
   }
 
-  private def computeNodeInOutSets(prevNode: GraphNode,
+  private def computeNodeInOutSets(cfg: Graph[GraphNode, GraphEdge.DiEdge],
                                    currNode: GraphNode,
                                    reachDefs: AnalysisMapping): (GraphNode, (NodeAnalysis, NodeAnalysis)) = {
-    val currNodeIn: NodeAnalysis = computeNodeIn(reachDefs, currNode, prevNode)
+    val currNodeIn: NodeAnalysis = computeNodeIn(cfg, reachDefs, currNode)
     val currNodeGen: NodeAnalysis = computeNodeGenDefinitions(currNode)
     val currNodeKill: NodeAnalysis = computeNodeKill(currNodeIn, currNodeGen)
 
