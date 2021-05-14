@@ -13,7 +13,7 @@ import scala.collection.immutable.HashMap
 class AvailableExpressionsTest extends AnyFunSuite {
   /**
    * BEGIN
-   *  y := 2 + 1
+   * y := 2 + 1
    * END
    */
   test("getNodeIn returns given node IN set on AnalysisMapping") {
@@ -40,7 +40,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
   /**
    * BEGIN
-   *  y := 2 + 1
+   * y := 2 + 1
    * END
    */
   test("getNodeOut returns given node OUT set on AnalysisMapping") {
@@ -67,7 +67,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
   /**
    * BEGIN
-   *  y := 2 + 1
+   * y := 2 + 1
    * END
    */
   test("computeNodeIn returns given node IN set correctly computed on AnalysisMapping (example 0)") {
@@ -92,12 +92,11 @@ class AvailableExpressionsTest extends AnyFunSuite {
     assert(availableExps.computeNodeIn(cfg, analysisMapping, StartNode()) == startNodeIn)
   }
 
-
   /**
    * BEGIN
-   *   readInt(x);
-   *   readInt(y);
-   *   max := x + y
+   * readInt(x);
+   * readInt(y);
+   * max := x + y
    * END
    */
   test("computeNodeIn returns given node IN set correctly computed on AnalysisMapping (example 1)") {
@@ -132,9 +131,124 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
   /**
    * BEGIN
-   *   readInt(x);
-   *   readInt(y);
-   *   max := x + y
+   * readInt(x);
+   * readInt(y);
+   * max := x + y
+   * END
+   */
+  test("computeNodeGen returns given node generated expressions set") {
+    val s1 = ReadIntStmt("x")
+    val s2 = ReadIntStmt("y")
+    val s3 = AssignmentStmt("max", AddExpression(VarExpression("x"), VarExpression("y")))
+    val s4 = AssignmentStmt("x", MultExpression(VarExpression("x"), IntValue(1)))
+    val s5 = AssignmentStmt("x", AndExpression(VarExpression("x"), VarExpression("y")))
+
+
+    val availableExps = new AvailableExpressions
+
+    assert(availableExps.computeNodeGen(SimpleNode(s1)) == Set())
+    assert(availableExps.computeNodeGen(SimpleNode(s2)) == Set())
+    assert(availableExps.computeNodeGen(SimpleNode(s3)) == Set(AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(availableExps.computeNodeGen(SimpleNode(s4)) == Set(MultExpression(VarExpression("x"), IntValue(1))))
+    assert(availableExps.computeNodeGen(SimpleNode(s5)) == Set(AndExpression(VarExpression("x"), VarExpression("y"))))
+  }
+
+  /**
+   * BEGIN
+   * readInt(x);
+   * readInt(y);
+   * max := x + y
+   * END
+   */
+  test("computeNodeKill returns given node killed expressions set when expressions are simple") {
+    val s1 = ReadIntStmt("x")
+    val s2 = ReadIntStmt("y")
+    val s3 = AssignmentStmt("max", AddExpression(VarExpression("x"), VarExpression("y")))
+    val s4 = AssignmentStmt("x", MultExpression(VarExpression("x"), IntValue(1)))
+    val s5 = AssignmentStmt("y", AndExpression(VarExpression("x"), VarExpression("y")))
+
+    val allExpressionsSet =
+      Set(AddExpression(VarExpression("x"), VarExpression("y")),
+        MultExpression(VarExpression("x"), IntValue(1)),
+        AndExpression(VarExpression("x"), VarExpression("y")))
+
+    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
+    cfg += StartNode() ~> SimpleNode(s1)
+    cfg += SimpleNode(s1) ~> SimpleNode(s2)
+    cfg += SimpleNode(s2) ~> SimpleNode(s3)
+    cfg += SimpleNode(s3) ~> SimpleNode(s4)
+    cfg += SimpleNode(s4) ~> SimpleNode(s5)
+    cfg += SimpleNode(s5) ~> EndNode()
+
+
+    val availableExps = new AvailableExpressions
+
+    assert(availableExps.computeNodeKill(SimpleNode(s1), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s2), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s3), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s4), cfg) == Set(
+      AddExpression(VarExpression("x"), VarExpression("y")),
+      MultExpression(VarExpression("x"), IntValue(1)),
+      AndExpression(VarExpression("x"), VarExpression("y"))))
+
+    assert(availableExps.computeNodeKill(SimpleNode(s5), cfg) == Set(
+      AddExpression(VarExpression("x"), VarExpression("y")),
+      AndExpression(VarExpression("x"), VarExpression("y"))))
+  }
+
+  /**
+   * BEGIN
+   * readInt(x);
+   * readInt(y);
+   * max := (x + y) + 1
+   * x := x * 1
+   * y := ((x + 1) + 1) * x
+   * END
+   */
+  test("computeNodeKill returns given node killed expressions set when expressions are nested") {
+    val s1 = ReadIntStmt("x")
+    val s2 = ReadIntStmt("y")
+    val s3 = AssignmentStmt("max", AddExpression(AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)))
+    val s4 = AssignmentStmt("x", MultExpression(VarExpression("x"), IntValue(1)))
+    val s5 = AssignmentStmt("y", MultExpression(AddExpression(AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)), VarExpression("x")))
+
+    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
+    cfg += StartNode() ~> SimpleNode(s1)
+    cfg += SimpleNode(s1) ~> SimpleNode(s2)
+    cfg += SimpleNode(s2) ~> SimpleNode(s3)
+    cfg += SimpleNode(s3) ~> SimpleNode(s4)
+    cfg += SimpleNode(s4) ~> SimpleNode(s5)
+    cfg += SimpleNode(s5) ~> EndNode()
+
+
+    val availableExps = new AvailableExpressions
+
+    assert(availableExps.computeNodeKill(SimpleNode(s1), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s2), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s3), cfg) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s4), cfg) == Set(
+      AddExpression(AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)),
+      MultExpression(VarExpression("x"), IntValue(1)),
+      MultExpression(
+        AddExpression(
+          AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)
+        ), VarExpression("x")
+      )))
+
+    assert(availableExps.computeNodeKill(SimpleNode(s5), cfg) == Set(
+      AddExpression(AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)),
+      MultExpression(
+        AddExpression(
+          AddExpression(VarExpression("x"), VarExpression("y")), IntValue(1)
+        ), VarExpression("x")
+      )))
+  }
+
+  /**
+   * BEGIN
+   * readInt(x);
+   * readInt(y);
+   * max := x + y
    * END
    */
   test("analyse returns a map with number of keys equal to number of graph nodes") {
@@ -160,7 +274,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
   /**
    * BEGIN
-   *  y := 2 + 1
+   * y := 2 + 1
    * END
    */
   test("analyse returns a map with available expressions for each graph node (example 0)") {
@@ -169,14 +283,11 @@ class AvailableExpressionsTest extends AnyFunSuite {
     val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
     cfg += StartNode() ~> SimpleNode(s1)
     cfg += SimpleNode(s1) ~> EndNode()
-//
-//    HashMap(EndNode() -> (Set((Set(exp)),SimpleNode(s1))),Set((Set(exp)),SimpleNode(s1)))), StartNode() -> (Set(),Set()), SimpleNode(s1) -> (Set(),Set((Set(exp)),SimpleNode(s1)))))
-//    HashMap(EndNode() -> (Set(),Set((Set(exp)),SimpleNode(s1)))), StartNode() -> (Set(),Set((Set(exp)),SimpleNode(s1)))), SimpleNode(s1) -> (Set(),Set((Set(exp)),SimpleNode(s1)))))
 
     val expected = HashMap(
       StartNode() -> (Set(), Set()),
-      SimpleNode(s1) -> (Set(), Set((Set(AddExpression(IntValue(1), IntValue(2))), SimpleNode(s1)))),
-      EndNode() -> (Set((Set(AddExpression(IntValue(1), IntValue(2))), SimpleNode(s1))), Set((Set(AddExpression(IntValue(1), IntValue(2))), SimpleNode(s1)))),
+      SimpleNode(s1) -> (Set(), Set(AddExpression(IntValue(1), IntValue(2)))),
+      EndNode() -> (Set(AddExpression(IntValue(1), IntValue(2))), Set())
     )
 
     val availableExps = new AvailableExpressions
@@ -184,11 +295,12 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
     assert(availableExpsAnalysis == expected)
   }
+
   /**
    * BEGIN
-   *   readInt(x);
-   *   readInt(y);
-   *   max := x + y
+   * readInt(x);
+   * readInt(y);
+   * max := x + y
    * END
    */
   test("analyse returns a map with available expressions for each graph node (example 1)") {
@@ -218,19 +330,19 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
   /**
    * BEGIN
-   *   readInt(x);
-   *   readInt(max);
-   *   IF(x > max) THEN
-   *     max := x
-   *   END;
-   *   write(max)
+   * readInt(x);
+   * readInt(max);
+   * IF(x > max) THEN
+   * max := x
+   * END;
+   * write(max)
    * END
    */
   test("analyse returns a map with available expressions for each graph node (example 2)") {
     val s3_1 = AssignmentStmt("max", VarExpression("x"))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("max")
-    val s3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), s3_1 , None)
+    val s3 = IfElseStmt(GTExpression(VarExpression("x"), VarExpression("max")), s3_1, None)
     val s4 = WriteStmt(VarExpression("max"))
 
     val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
