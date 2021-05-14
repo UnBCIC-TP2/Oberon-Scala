@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x : LONGINT;
+  y : INTEGER;
+  
+BEGIN
+  x := 1000000;
+  y := 5;
+  x := x / y;
+  x := x * y;
+  x := x - y;
+  x := x + y
+END
+
+END SimpleModule.

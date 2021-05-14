@@ -1,0 +1,40 @@
+MODULE SimpleModule;
+
+VAR
+  a : LONGREAL;
+  b : LONGREAL;
+  c : LONGREAL;
+  d : LONGREAL;
+  e : LONGREAL;
+  f : LONGREAL;
+  g : LONGREAL;
+BEGIN
+    a := 5.0;
+    b := 5.0;
+    c := 2.3;
+    d := 9.1;
+    e := 0.0;
+    f := 9.4;
+    g := 3.9;
+
+    IF(a = b) THEN
+      b := 1.0
+    END;
+    IF(a # c) THEN
+      c := 1.0
+    END;
+    IF(a < d) THEN
+      d := 1.0
+    END;
+    IF(a > e) THEN
+      e := 1.0
+    END;
+    IF(a <= f) THEN
+      f := 1.0
+    END;
+    IF(a >= g) THEN
+      g := 1.0
+    END
+END
+
+END SimpleModule.

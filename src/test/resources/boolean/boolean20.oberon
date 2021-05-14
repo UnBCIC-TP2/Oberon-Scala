@@ -1,0 +1,40 @@
+MODULE SimpleModule;
+
+VAR
+  a : REAL;
+  b : SHORTINT;
+  c : SHORTINT;
+  d : SHORTINT;
+  e : SHORTINT;
+  f : SHORTINT;
+  g : SHORTINT;
+BEGIN
+    a := 5.0;
+    b := 5;
+    c := 2;
+    d := 9;
+    e := 0;
+    f := 9;
+    g := 3;
+
+    IF(a = b) THEN
+      b := 1
+    END;
+    IF(a # c) THEN 
+      c := 1
+    END;
+    IF(a < d) THEN
+      d := 1
+    END;
+    IF(a > e) THEN
+      e := 1
+    END;
+    IF(a <= f) THEN
+      f := 1
+    END;
+    IF(a >= g) THEN
+      g := 1
+    END
+END 
+
+END SimpleModule.

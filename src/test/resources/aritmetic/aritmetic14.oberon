@@ -1,0 +1,14 @@
+MODULE SimpleModule;
+
+VAR
+  x : REAL;
+  y : INTEGER;
+BEGIN
+    x := 512.75;
+    y := 7;
+  x := x / y;
+  x := x + y
+
+END
+
+END SimpleModule.

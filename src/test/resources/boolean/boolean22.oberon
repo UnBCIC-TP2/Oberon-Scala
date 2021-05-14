@@ -1,0 +1,40 @@
+MODULE SimpleModule;
+
+VAR
+  t : LONGREAL;
+  u : REAL;
+  v : REAL;
+  w : REAL;
+  x : REAL;
+  y : REAL;
+
+BEGIN
+    t := 3.0;
+    u := 3.0;
+    v := -4.0;
+    w := 10.0;
+    x := -2.4;
+    y := 3.9;
+
+
+    IF(t = u) THEN
+      u := 1.0
+    END;
+    IF(t # v) THEN
+      v := 1.0
+    END;
+    IF(t < w) THEN
+      w := 1.0
+    END;
+    IF(t > x) THEN
+      x := 1.0
+    END;
+    IF(t <= y) THEN
+      y := 1.0
+    END;
+    IF(t >= t) THEN
+      t := 1.0
+    END
+END
+
+END SimpleModule.

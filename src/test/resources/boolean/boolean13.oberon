@@ -1,0 +1,14 @@
+MODULE SimpleModule;
+
+VAR
+  x : INTEGER;
+  y : REAL;
+BEGIN
+    x := 10;
+    y := 10.5;
+    IF (x # y) THEN
+        x := 1
+       END
+END
+
+END SimpleModule.

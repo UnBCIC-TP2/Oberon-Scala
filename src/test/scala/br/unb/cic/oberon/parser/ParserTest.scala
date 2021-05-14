@@ -2160,7 +2160,7 @@ class ParserTestSuite extends AnyFunSuite {
       
   }
 
-  test("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
+  ignore("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple04.oberon").toURI)
 
     assert(path != null)
@@ -2292,5 +2292,41 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.isDefined)
   }
 
+  test("Printing new types on console") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").getFile)
 
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts(5) == WriteStmt(VarExpression("v")))
+    assert(stmts(6) == WriteStmt(VarExpression("w")))
+    assert(stmts(7) == WriteStmt(VarExpression("x")))
+    assert(stmts(8) == WriteStmt(VarExpression("y")))
+    assert(stmts(9) == WriteStmt(VarExpression("z")))
+  }
+
+  test("Reading new types") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head == ReadLongRealStmt("v"))
+    assert(stmts(1) == ReadRealStmt("w"))
+    assert(stmts(2) == ReadLongIntStmt("x"))
+    assert(stmts(3) == ReadIntStmt("y"))
+    assert(stmts(4) == ReadShortIntStmt("z"))
+  }
 }

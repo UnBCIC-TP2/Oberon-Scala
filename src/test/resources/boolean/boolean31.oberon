@@ -1,0 +1,41 @@
+MODULE SimpleModule;
+
+VAR
+  a : INTEGER;
+  b : INTEGER;
+  c : INTEGER;
+  d : INTEGER;
+  e : INTEGER;
+  f : INTEGER;
+  g : INTEGER;
+  x : CHAR;
+  y : CHAR;
+  z : CHAR;
+  w : CHAR;
+BEGIN
+    x := 'b';
+    y := 'b';
+    z := 'a';
+    w := 'c';
+
+    IF(x = y) THEN
+      b := 1
+    END;
+    IF(x # z) THEN 
+      c := 1
+    END;  
+    IF(x < w) THEN
+      d := 1
+    END;  
+    IF(x > z) THEN
+      e := 1
+    END;
+    IF(x <= w) THEN
+      f := 1
+    END;
+    IF(x >= z) THEN
+      g := 1
+    END
+END 
+
+END SimpleModule.

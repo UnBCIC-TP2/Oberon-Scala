@@ -1,0 +1,10 @@
+MODULE SimpleModule;
+
+VAR
+  x : CHAR;
+  
+BEGIN
+	x := 'a'
+END
+
+END SimpleModule.

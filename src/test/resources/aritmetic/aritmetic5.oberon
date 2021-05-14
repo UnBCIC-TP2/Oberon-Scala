@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+VAR
+  x : REAL;
+  y : LONGREAL;
+BEGIN
+    x := 13.5;
+    y := 13.00000000000005;
+    x := x / y
+END
+
+END SimpleModule.

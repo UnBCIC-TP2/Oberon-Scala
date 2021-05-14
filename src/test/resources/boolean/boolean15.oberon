@@ -1,0 +1,16 @@
+MODULE SimpleModule;
+
+VAR
+  x : LONGINT;
+  y : SHORTINT;
+BEGIN
+    x := 10;
+    y := 7;
+    IF(x = y) THEN
+      x := 0
+    ELSIF(x # y) THEN
+      x := 1
+    END
+END
+
+END SimpleModule.
