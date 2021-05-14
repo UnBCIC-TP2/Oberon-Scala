@@ -7,40 +7,48 @@ import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 
 case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])], Set[(String, GraphNode)]] {
-  type SetStructure = Set[(String, GraphNode)]
-  type HashMapStructure  = HashMap[GraphNode, (SetStructure, SetStructure)]
-  type GraphStructure = Graph[GraphNode, GraphEdge.DiEdge]
+	
+	type SetStructure = Set[(String, GraphNode)]
+	type HashMapStructure  = HashMap[GraphNode, (SetStructure, SetStructure)]
+	type GraphStructure = Graph[GraphNode, GraphEdge.DiEdge]
 
-  def analyse(graph: GraphStructure) = {
-    val backwardGraph: GraphStructure = backwardGraph(graph)
-    val initialHashMap: HashMapStructure = initializeHashMap(backwardGraph)
-    val liveVariableHashMap: HashMapStructure = create(backwardGraph, initialHashMap)
-    liveVariableHashMap
-  }
+	def analyse(graph: GraphStructure) = {
 
-  // @tailrec
-  private def backwardGraph(graph: GraphStructure) = {
-    var backwardGraph: GraphStructure
-    graph.edges.foreach(
-      e => {
-        val GraphEdge.DiEdge(previousNode, currentNode) = e.edge
-        backwardGraph += currentNode ~> previousNode
-      }
-    )
-    backwardGraph
-  }
+		val initial_hash_map: HashMapStructure = initializeHashMap(graph)
+		val backward_graph: GraphStructure = backwardGraph(graph)
+		val live_variables_hash_map: HashMapStructure = create(backward_graph, initial_hash_map)
 
-  private def initializeHashMap(graph: GraphStructure) = {
-    var initialHashMap: HashMapStructure = HashMap()
-    graph.edges.foreach(
-      edge => edge.nodes.foreach(
-        node => initialHashMap = initialHashMap + (node.value -> (SetStructure, SetStructure))
-      )
-    )
-    initialHashMap
-  }
+		return live_variables_hash_map
+	}
 
-  private def create(graph: GraphStructure, hashmap: HashMapStructure) = {
-    var liveVariableHashMap: HashMapStructure
-  }
+	def initializeHashMap(graph: GraphStructure) = {
+
+		var initial_hash_map: HashMapStructure
+		
+		graph.nodes.foreach(
+			node => initial_hash_map += (node.value -> (SetStructure, SetStructure))
+		)
+		
+		return initial_hash_map
+	}
+
+	def backwardGraph(graph: GraphStructure) = {
+		
+		var backward_graph: GraphStructure
+		
+		graph.edges.foreach(
+			e => {
+				val GraphEdge.DiEdge(currentNode, nextNode) = e.edge
+				backward_graph += nextNode ~> currentNode
+			}
+		)
+		
+		return backward_graph
+	}
+
+	def create(graph: GraphStructure, hash_map: HashMapStructure) = {
+		var live_variables_hash_map: HashMapStructure
+
+		return live_variables_hash_map
+	}
 }
