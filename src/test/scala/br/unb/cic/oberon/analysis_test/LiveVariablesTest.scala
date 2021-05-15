@@ -29,7 +29,7 @@ class LiveVariablesTest extends AnyFunSuit {
 	val s3_1    = AssignmentStmt("max", VarExpression("x"))
 	val s4      = WriteStmt(VarExpression("max"))
 
-	val graph = GraphStructure
+	var graph: GraphStructure
 	graph += StartNode()      ~> SimpleNode(s1)
 	graph += SimpleNode(s1)   ~> SimpleNode(s2)
 	graph += SimpleNode(s2)   ~> SimpleNode(s3)
@@ -39,26 +39,29 @@ class LiveVariablesTest extends AnyFunSuit {
 	graph += SimpleNode(s4)   ~> EndNode()
 
 	val live_variables = new LiveVariables()
-	val backward_graph_received = live_variables.backwardGraph(graph)
+	val graph_received = live_variables.backwardGraph(graph)
 	val hash_map_received = live_variables.initializeHashMap(graph)
+	val live_variables_received = live_variables.analyse(graph)
 
-    test("CREATE BACKWARD GRAPH") {
+    test("BACKWARD GRAPH") {
 
-		val backward_graph_expected = GraphStructure
-		backward_graph_expected += EndNode()		~> SimpleNode(s4)
-		backward_graph_expected += SimpleNode(s4) 	~> SimpleNode(s3_1)
-		backward_graph_expected += SimpleNode(s4) 	~> SimpleNode(s3)
-		backward_graph_expected += SimpleNode(s3_1)	~> SimpleNode(s3)
-		backward_graph_expected += SimpleNode(s3) 	~> SimpleNode(s2)
-		backward_graph_expected += SimpleNode(s4) 	~> SimpleNode(s1)
-		backward_graph_expected += SimpleNode(s1) 	~> StartNode()
+		var graph_expected: GraphStructure
 
-		assert(backward_graph_expected == backward_graph_received)
+		graph_expected += EndNode()		~> SimpleNode(s4)
+		graph_expected += SimpleNode(s4) 	~> SimpleNode(s3_1)
+		graph_expected += SimpleNode(s4) 	~> SimpleNode(s3)
+		graph_expected += SimpleNode(s3_1)	~> SimpleNode(s3)
+		graph_expected += SimpleNode(s3) 	~> SimpleNode(s2)
+		graph_expected += SimpleNode(s4) 	~> SimpleNode(s1)
+		graph_expected += SimpleNode(s1) 	~> StartNode()
+
+		assert(graph_expected == graph_received)
 	}
 
 	test("INITIALIZE HASH MAP") {
 
-		val hash_map_expected = HashMapStructure
+		var hash_map_expected: HashMapStructure
+
 		hash_map_expected += StartNode() 		~> (SetStructure, SetStructure)
 		hash_map_expected += SimpleNode(s1) 	~> (SetStructure, SetStructure)
 		hash_map_expected += SimpleNode(s2) 	~> (SetStructure, SetStructure)
@@ -68,5 +71,21 @@ class LiveVariablesTest extends AnyFunSuit {
 		hash_map_expected += EndNode() 			~> (SetStructure, SetStructure)
 
 		assert(hash_map_expected == hash_map_received)
+	}
+
+	test("CREATE LIVE VARIABLES HASH MAP") {
+
+		var live_variables_expected: HashMapStructure
+
+		live_variables_expected += StartNode() 		~> (Set(), Set())
+		live_variables_expected += SimpleNode(s1) 	~> (Set(), Set("x", SimpleNode(s1)))
+		live_variables_expected += SimpleNode(s2) 	~> (Set("x", SimpleNode(s1)), Set(("x", SimpleNode(s1)), ("max", SimpleNode(s2))))
+		live_variables_expected += SimpleNode(s3) 	~> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s2))), Set(("max", SimpleNode(s2)), ("x", SimpleNode(s1)))
+		live_variables_expected += SimpleNode(s3_1) ~> (Set("x", SimpleNode(s1)), Set("max", SimpleNode(s3_1)))
+		live_variables_expected += SimpleNode(s4) 	~> (Set(("max", SimpleNode(s2)), ("max", SimpleNode(s3_1))), Set())
+		live_variables_expected += EndNode() 		~> (Set(), Set())
+
+		assert(live_variables_expected == live_variables_received)
+
 	}
 }
