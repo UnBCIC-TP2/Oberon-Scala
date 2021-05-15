@@ -82,7 +82,7 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
 
     currNode match {
       case SimpleNode(stmt) => stmt match {
-        case AssignmentStmt (varName: String, _) => u.filter (exp => expressionUsesVariable (exp, varName) )
+        case AssignmentStmt (varName: String, _) => u.filter (exp => expressionUsesVariable(exp, varName) )
         case _ => Set ()
       }
       case _ => Set()
@@ -92,10 +92,10 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
   private def expressionUsesVariable(exp: Expression, varName: String): Boolean = {
     exp match {
       case Brackets(exp: Expression) => expressionUsesVariable(exp, varName)
-      //      case ArrayValue(v: List[Expression]) => v.flatMap(exp => expressionUsesVariable(exp, varName)).reduceOption((acc, bool) => acc || bool).getOrElse(false)
+      // case ArrayValue(v: List[Expression]) => v.flatMap(exp => expressionUsesVariable(exp, varName)).reduceOption((acc, bool) => acc || bool).getOrElse(false)
       case ArraySubscript(arrayBase: Expression, index: Expression) => expressionUsesVariable(arrayBase, varName) || expressionUsesVariable(index, varName)
       case FieldAccessExpression(exp: Expression, _: String) => expressionUsesVariable(exp, varName)
-      //      case FunctionCallExpression(_: String, args: List[Expression]) => args.flatMap(exp => expressionUsesVariable(exp, varName))
+      // case FunctionCallExpression(_: String, args: List[Expression]) => args.flatMap(exp => expressionUsesVariable(exp, varName))
       case EQExpression(left: Expression, right: Expression) => expressionUsesVariable(left, varName) || expressionUsesVariable(right, varName)
       case NEQExpression(left: Expression, right: Expression) => expressionUsesVariable(left, varName) || expressionUsesVariable(right, varName)
       case GTExpression(left: Expression, right: Expression) => expressionUsesVariable(left, varName) || expressionUsesVariable(right, varName)
@@ -115,33 +115,33 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
 
   private def getExpressions(stmt: Statement): Set[Expression] = {
     val expressions: Set[Expression] = stmt match {
-      case AssignmentStmt(_, exp: Expression) => Set(exp)
-      case EAssignmentStmt(_, exp: Expression) => Set(exp)
+      case AssignmentStmt(_, exp: Expression) => getExpressions(exp)
+      case EAssignmentStmt(_, exp: Expression) => getExpressions(exp)
       case SequenceStmt(stmts: List[Statement]) => stmts.flatMap(stmt => getExpressions(stmt)).toSet
-      case WriteStmt(exp: Expression) => Set(exp)
+      case WriteStmt(exp: Expression) => getExpressions(exp)
       case IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) =>
-        Set(condition) |
+        getExpressions(condition) |
           getExpressions(thenStmt) |
           getOptionalStmtExpressions(elseStmt)
 
       case IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) =>
-        Set(condition) |
+        getExpressions(condition) |
           getExpressions(thenStmt) |
           elseifStmt.flatMap(stmt => getExpressions(stmt)).toSet |
           getOptionalStmtExpressions(elseStmt)
 
-      case ElseIfStmt(condition: Expression, thenStmt: Statement) => Set(condition) | getExpressions(thenStmt)
-      case WhileStmt(condition: Expression, stmt: Statement) => Set(condition) | getExpressions(stmt)
-      case RepeatUntilStmt(condition: Expression, stmt: Statement) => Set(condition) | getExpressions(stmt)
+      case ElseIfStmt(condition: Expression, thenStmt: Statement) => getExpressions(condition) | getExpressions(thenStmt)
+      case WhileStmt(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
+      case RepeatUntilStmt(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
       case ForStmt(init: Statement, condition: Expression, stmt: Statement) =>
         getExpressions(init) |
-          Set(condition) |
+          getExpressions(condition) |
           getExpressions(stmt)
 
       case LoopStmt(stmt: Statement) => getExpressions(stmt)
-      case ReturnStmt(exp: Expression) => Set(exp)
+      case ReturnStmt(exp: Expression) => getExpressions(exp)
       case CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) =>
-        Set(exp) | cases.flatMap(altCase => getCaseAlternativeExpressions(altCase)).toSet | getOptionalStmtExpressions(elseStmt)
+        getExpressions(exp) | cases.flatMap(altCase => getCaseAlternativeExpressions(altCase)).toSet | getOptionalStmtExpressions(elseStmt)
 
       case _ => Set()
     }
@@ -151,32 +151,29 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
       case _ => true
     })
   }
-  //
-  //  private def expressionHasVariable(exp: Expression): Boolean = {
-  //    exp match {
-  //      case Brackets (exp: Expression) =>
-  //      case IntValue (v: Int) =>
-  //      case BoolValue (v: Boolean) =>
-  //      case ArrayValue (v: List[Expression] ) =>
-  //      case ArraySubscript (arrayBase: Expression, index: Expression) =>
-  //      case Undef () =>
-  //      case FieldAccessExpression (exp: Expression, name: String) =>
-  //      case VarExpression (name: String) =>
-  //      case FunctionCallExpression (name: String, args: List[Expression] ) =>
-  //      case EQExpression (left: Expression, right: Expression) =>
-  //      case NEQExpression (left: Expression, right: Expression) =>
-  //      case GTExpression (left: Expression, right: Expression) =>
-  //      case LTExpression (left: Expression, right: Expression) =>
-  //      case GTEExpression (left: Expression, right: Expression) =>
-  //      case LTEExpression (left: Expression, right: Expression) =>
-  //      case AddExpression (left: Expression, right: Expression) =>
-  //      case SubExpression (left: Expression, right: Expression) =>
-  //      case MultExpression (left: Expression, right: Expression) =>
-  //      case DivExpression (left: Expression, right: Expression) =>
-  //      case OrExpression (left: Expression, right: Expression) =>
-  //      case AndExpression (left: Expression, right: Expression) =>
-  //    }
-  //  }
+
+  private def getExpressions(exp: Expression): Set[Expression] = {
+    exp match {
+      case Brackets(exp: Expression) => getExpressions(exp)
+//      case ArrayValue(v: List[Expression]) =>
+      case ArraySubscript(arrayBase: Expression, index: Expression) => getExpressions(arrayBase) | getExpressions(index)
+      case FieldAccessExpression(exp: Expression, _: String) => getExpressions(exp)
+//      case FunctionCallExpression(name: String, args: List[Expression]) =>
+      case EQExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case NEQExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case GTExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case LTExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case GTEExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case LTEExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case AddExpression(left: Expression, right: Expression) => Set(AddExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
+      case SubExpression(left: Expression, right: Expression) => Set(SubExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
+      case MultExpression(left: Expression, right: Expression) => Set(MultExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
+      case DivExpression(left: Expression, right: Expression) => Set(DivExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
+      case OrExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case AndExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case _ => Set()
+    }
+  }
 
   private def getOptionalStmtExpressions(optionalStmt: Option[Statement]): Set[Expression] = {
     if (optionalStmt.isDefined) getExpressions(optionalStmt.get) else Set()
@@ -184,8 +181,8 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
 
   private def getCaseAlternativeExpressions(caseAlternative: CaseAlternative): Set[Expression] = {
     caseAlternative match {
-      case SimpleCase(condition: Expression, stmt: Statement) => Set(condition) | getExpressions(stmt)
-      case RangeCase(min: Expression, max: Expression, stmt: Statement) => Set(min, max) | getExpressions(stmt)
+      case SimpleCase(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
+      case RangeCase(min: Expression, max: Expression, stmt: Statement) => getExpressions(min) | getExpressions(max) | getExpressions(stmt)
     }
   }
 
