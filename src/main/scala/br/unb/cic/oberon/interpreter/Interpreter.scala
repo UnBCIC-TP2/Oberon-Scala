@@ -291,12 +291,11 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     if(returnValue.isDefined) {
       return returnValue.get
     } else {
-      // TODO: tratar erros e generalizar para todas as funções
       val procedure = interpreter.env.findProcedure(name).asInstanceOf[ExternalProcedureDeclaration]
 
       val external = new External()
 
-      external.run.div(3, 5) // para carregar a lib
+      external.run.abs(-1) // para carregar a lib
 
       val rm = ru.runtimeMirror(getClass.getClassLoader)
       val instanceMirror = rm.reflect(external._lib)
@@ -305,19 +304,19 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
       val method = instanceMirror.reflectMethod(methodSymbol) // é o método em C (já pode ser chamado)
       val Retorno = procedure.returnType.get // o tipo de retorno daquele procedimento
 
-
       val parametros = methodSymbol.typeSignature.toString().split(":")
 
       assert(parametros.length-1 == args.length) 
+    
+      val ans = Retorno match {
+        case IntegerType => args.length match { // para cada número de parâmetros
+          case 1 => method(args(0).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+          case 2 => method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+          case 3 => method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value, args(2).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+        }
+      }
 
-      println("AQUI")
-      var ans: Int = -1
-      if(args.length == 1) 
-        ans = method(args(0).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
-      else if(args.length == 2)
-        ans = method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
-      else 
-        ans = method().asInstanceOf[Int]
+      
 
       return IntValue(ans)
     }
