@@ -1,0 +1,19 @@
+MODULE Ffi;
+VAR
+  a : INTEGER;
+  b : INTEGER;
+  ans : INTEGER;
+
+FOREIGN IMPORT abs(n: INTEGER): INTEGER;
+
+PROCEDURE teste(v1: INTEGER) : INTEGER;
+ BEGIN     
+   RETURN abs(v1)
+ END sum
+
+BEGIN
+ a := (1 - 5);
+ ans := teste(a);
+END
+
+END Ffi.

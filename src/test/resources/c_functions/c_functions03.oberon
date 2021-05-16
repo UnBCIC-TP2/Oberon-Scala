@@ -1,0 +1,14 @@
+MODULE Ffi;
+  
+VAR
+  a : INTEGER;
+  ans : INTEGER;
+
+FOREIGN IMPORT isalpha(a: INTEGER): INTEGER;
+
+BEGIN
+    a := 43;
+    ans := isalpha(a);
+END
+
+END Ffi.

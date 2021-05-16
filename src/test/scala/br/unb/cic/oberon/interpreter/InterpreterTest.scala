@@ -614,4 +614,127 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
+
+  // External Function tests
+  test("Testing div on c_functions_01") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions01.oberon").getFile)
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(2)))
+  }
+
+  test("Testing abs on c_functions02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "Ffi")
+
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(5)))
+  }
+
+  test("Testing isalpha on c_functions03 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions03.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    // 43 é o caractere ascii '+' (que não é do alfabeto), a função deve retornar 0
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(0)))
+  }
+
+  test("Testing abs on c_functions04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions04.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("ans") == Some(IntValue(4)))
+  }
+
+  test("Testing abs and isdigit on c_functions05 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions05.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+
+    // pois 10 não está em [0, 9]
+    assert(interpreter.env.lookup("ans") == Some(IntValue(0)))
+  }
+
+  test("Testing isupper on c_functions06 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions06.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    
+    // 65 é o código ascii para 'A'
+    assert(interpreter.env.lookup("ans") != Some(IntValue(0)))
+  }
+
+  test("Testing div on c_functions07 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions07.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    
+    assert(interpreter.env.lookup("ans") == Some(IntValue(1)))
+  }
+
+  test("Testing abs and div on c_functions08 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions08.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    
+    assert(interpreter.env.lookup("ans") == Some(IntValue(123)))
+  }
+
+  test("Testing isalnum and abs on c_functions09 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("c_functions/c_functions09.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    module.accept(interpreter)
+    
+    // 65 é o código ascii para 'A'
+    assert(interpreter.env.lookup("ans") == Some(IntValue(1)))
+  }
+
 }

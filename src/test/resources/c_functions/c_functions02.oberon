@@ -1,0 +1,14 @@
+MODULE Ffi;
+  
+VAR
+  a, ans : INTEGER;
+
+FOREIGN IMPORT abs(a: INTEGER): INTEGER;
+
+BEGIN
+ a := (1-6);
+ ans := abs(a);
+
+END
+
+END Ffi.

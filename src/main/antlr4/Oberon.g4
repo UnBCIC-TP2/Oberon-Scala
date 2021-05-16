@@ -22,12 +22,16 @@ varDeclaration
   : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
   ; 
 
-procedure :
-  'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
-    declarations    // NOTE: This might support nested procedures
-    block
-   Id
-  ; 
+// Foreign Function Interface ffi: 'FOREIGN 'lib = Id' IMPORT' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'; 
+
+procedure: 'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'       
+            declarations    // NOTE: This might support nested procedures
+            block
+            Id                                                                                  #procedureDeclaration                       
+          | 'FOREIGN IMPORT' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'  #externalProcedureDeclaration
+          ;
+
+
 
 formals
  : formalArg (',' formalArg)*

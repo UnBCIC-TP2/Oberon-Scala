@@ -1,0 +1,14 @@
+MODULE Ffi;
+  
+VAR
+  a, b, ans : INTEGER;
+
+FOREIGN IMPORT div(a: INTEGER, b: INTEGER): INTEGER;
+
+BEGIN
+  a := 6;
+  b := 3;
+  ans := div(a, b);
+END
+
+END Ffi.

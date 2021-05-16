@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType,Undef}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, ExternalProcedureDeclaration, ProcedureDeclaration, RecordType, Type, UserDefinedType,Undef}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -76,7 +76,12 @@ class Environment[T] {
 
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
-  def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
+  def declareProcedure(procedure: Procedure): Unit = {
+    procedure match {
+      case ProcedureDeclaration(name, _, _, _, _, _) => procedures(name) = procedure
+      case ExternalProcedureDeclaration(name, _, _) => procedures(name) = procedure
+    }
+  }
 
   def findProcedure(name: String): Procedure = procedures(name)
 

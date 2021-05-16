@@ -6,6 +6,14 @@ version := "0.1.1-SNAPSHOT"
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
 
+// nossas alterações
+libraryDependencies += "net.java.dev.jna" % "jna" % "4.0.0"
+
+resolvers += Resolver.bintrayRepo("nadavwr", "maven")
+libraryDependencies += "com.github.nadavwr" % "libffi-scala-native_native" % "0.3.2.11" % "0.5.0"
+
+// fim
+
 enablePlugins(Antlr4Plugin)
 
 antlr4PackageName in Antlr4 := Some("br.unb.cic.oberon.parser")

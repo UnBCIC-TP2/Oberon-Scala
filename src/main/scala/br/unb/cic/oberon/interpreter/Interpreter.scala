@@ -2,10 +2,15 @@ package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
+import scala.reflect.runtime.{universe => ru}
+import scala.reflect.runtime.universe._
+
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import br.unb.cic.oberon.external.External
+
 
 import scala.io.StdIn
 
@@ -42,7 +47,7 @@ class Interpreter extends OberonVisitorAdapter {
     }
   }
 
-  override def visit(constant: Constant): Unit = {
+  override def visit(constant: br.unb.cic.oberon.ast.Constant): Unit = {
     env.setGlobalVariable(constant.name, constant.exp)
   }
 
@@ -97,8 +102,15 @@ class Interpreter extends OberonVisitorAdapter {
       case ProcedureCallStmt(name, args) =>
         // we evaluate the "args" in the current
         // environment.
+
+        print("HERE")
+        print(args)
         val actualArguments = args.map(a => evalExpression(a))
+
+
+
         env.push() // after that, we can "push", to indicate a procedure call.
+
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
@@ -162,17 +174,40 @@ class Interpreter extends OberonVisitorAdapter {
 
   def visitProcedureCall(name: String, args: List[Expression]): Unit = {
     val procedure = env.findProcedure(name)
-    updateEnvironmentWithProcedureCall(procedure, args)
-    procedure.stmt.accept(this)
+
+    // println("HEREEEEEEEE")
+    // print(procedure)
+
+    if(procedure.isInstanceOf[ProcedureDeclaration]) {
+      updateEnvironmentWithProcedureCall(procedure.asInstanceOf[ProcedureDeclaration], args)
+      procedure.asInstanceOf[ProcedureDeclaration].stmt.accept(this)
+    } else {
+      
+      updateEnvironmentWithProcedureCall(procedure.asInstanceOf[ExternalProcedureDeclaration], args)
+    }
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
-    procedure.args.map(formal => formal.name)
-      .zip(args)
-      .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+    procedure match {
+      case ProcedureDeclaration(_, _, _, _, _, _) => {
+        val proc = procedure.asInstanceOf[ProcedureDeclaration]
+        proc.args.map(formal => formal.name)
+          .zip(args)
+          .foreach(pair => env.setLocalVariable(pair._1, pair._2))
 
-    procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
-    procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
+        proc.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
+        proc.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
+      }
+      case ExternalProcedureDeclaration(_, _, _) => {
+        //println("HEREEEEEE")
+
+        val proc = procedure.asInstanceOf[ExternalProcedureDeclaration]
+        proc.args.map(formal => formal.name)
+          .zip(args)
+          .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+        
+     }
+    }
   }
 
   def evalCondition(expression: Expression): Boolean = {
@@ -234,18 +269,53 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case OrExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value || v2.value))
     case FunctionCallExpression(name, args) => {
       val actualArguments = args.map(a => a.accept(this))
+
       interpreter.env.push()
+
       val exp = visitFunctionCall(name, actualArguments)
       interpreter.env.pop()
       exp
-    }
+    } 
+
   }
 
+  def getTypeTag[T: ru.TypeTag](obj: T) = ru.typeTag[T]
+
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {
+
     interpreter.visitProcedureCall(name, args)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
-    assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
-    returnValue.get
+
+    if(returnValue.isDefined) {
+      return returnValue.get
+    } else {
+      val procedure = interpreter.env.findProcedure(name).asInstanceOf[ExternalProcedureDeclaration]
+
+      val external = new External()
+
+      external.run.abs(-1) // para carregar a lib
+
+      val rm = ru.runtimeMirror(getClass.getClassLoader)
+      val instanceMirror = rm.reflect(external._lib)
+      val tipo = getTypeTag(external._lib).tpe
+      val methodSymbol = tipo.member(TermName(name)).asMethod // a definição do método 
+      val method = instanceMirror.reflectMethod(methodSymbol) // é o método em C (já pode ser chamado)
+      val Retorno = procedure.returnType.get // o tipo de retorno daquele procedimento
+
+      val parametros = methodSymbol.typeSignature.toString().split(":")
+
+      assert(parametros.length-1 == args.length) 
+    
+      val ans = Retorno match {
+        case IntegerType => args.length match { // para cada número de parâmetros
+          case 1 => method(args(0).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+          case 2 => method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+          case 3 => method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value, args(2).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
+        }
+      }
+
+      return IntValue(ans)
+    }
   }
 
   /**

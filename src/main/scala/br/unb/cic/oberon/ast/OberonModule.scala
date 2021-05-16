@@ -12,17 +12,24 @@ case class OberonModule(name: String,
                        ) {
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
-
-/* procedure declaration definition */
-case class Procedure(name: String,
-                     args: List[FormalArg],
-                     returnType: Option[Type],
-                     constants: List[Constant],
-                     variables: List[VariableDeclaration],
-                     stmt: Statement
-                    ) {
+trait Procedure {
   def accept(v: OberonVisitor) = v.visit(this)
 }
+
+/* procedure declaration definition */
+case class ProcedureDeclaration(
+  name: String, 
+  args: List[FormalArg], 
+  returnType: Option[Type], 
+  constants: List[Constant], 
+  variables: List[VariableDeclaration], 
+  stmt: Statement) extends Procedure
+
+case class ExternalProcedureDeclaration(
+  name: String, 
+  args: List[FormalArg], 
+  returnType: Option[Type]) extends Procedure 
+
 
 /* formal argument definition */
 case class FormalArg(name: String, argumentType: Type) {
