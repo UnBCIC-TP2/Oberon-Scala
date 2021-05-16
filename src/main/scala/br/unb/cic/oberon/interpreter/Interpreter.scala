@@ -286,8 +286,6 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     interpreter.visitProcedureCall(name, args)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
 
-    //assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
-
     if(returnValue.isDefined) {
       return returnValue.get
     } else {
@@ -315,8 +313,6 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
           case 3 => method(args(0).accept(this).asInstanceOf[Value[Int]].value, args(1).accept(this).asInstanceOf[Value[Int]].value, args(2).accept(this).asInstanceOf[Value[Int]].value).asInstanceOf[Int]
         }
       }
-
-      
 
       return IntValue(ans)
     }
