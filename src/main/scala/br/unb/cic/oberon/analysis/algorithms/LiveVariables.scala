@@ -4,48 +4,50 @@ import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode}
-import br.unb.cic.oberon.ast.{AssignmentStmt, EAssignmentStmt, WriteStmt, IfElseStmt, IfElseIfStmt, ElseIfStmt, WhileStmt, RepeatUntilStmt, ForStmt, VarExpression, Brackets, EQExpression, NEQExpression, GTExpression, LTExpression, GTEExpression, LTEExpression, AddExpression, SubExpression, MultExpression, DivExpression, OrExpression, AndExpression}
+import br.unb.cic.oberon.ast.{AssignmentStmt, EAssignmentStmt, ReadIntStmt, WriteStmt, IfElseStmt, IfElseIfStmt, ElseIfStmt, WhileStmt, RepeatUntilStmt, ForStmt, VarExpression, Brackets, EQExpression, NEQExpression, GTExpression, LTExpression, GTEExpression, LTEExpression, AddExpression, SubExpression, MultExpression, DivExpression, OrExpression, AndExpression}
+import br.unb.cic.oberon.ast.Expression
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.Set
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])], Set[(String, GraphNode)]] {
+case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (Set[String], Set[String])], Set[String]] {
 	
 	type SetStructure 		= Set[String]
 	type HashMapStructure  	= HashMap[GraphNode, (SetStructure, SetStructure)]
 	type GraphStructure 	= Graph[GraphNode, GraphEdge.DiEdge]
 
 	def analyse(graph: GraphStructure): HashMapStructure = {
-		val initial_hash_map: HashMapStructure = initializeHashMap(graph)
-		val backward_graph: GraphStructure = backwardGraph(graph)
-		val live_variables: HashMapStructure = createLiveVariables(backward_graph, initial_hash_map)
+		var initial_hash_map: HashMapStructure 	= initializeHashMap(graph)
+		var backward_graph: GraphStructure 		= backwardGraph(graph)
+		var live_variables: HashMapStructure 	= createLiveVariables(backward_graph, initial_hash_map)
 		live_variables
 	}
 
 	def initializeHashMap(graph: GraphStructure): HashMapStructure = {
-		var initial_hash_map: HashMapStructure
-		graph.nodes.foreach(node => initial_hash_map += (node.value -> (SetStructure, SetStructure)))
+		var initial_hash_map: HashMapStructure = HashMap()
+		graph.nodes.foreach(node => initial_hash_map = initial_hash_map + (node.value -> (Set(), Set())))
 		initial_hash_map
 	}
 
 	def backwardGraph(graph: GraphStructure): GraphStructure = {
-		var backward_graph: GraphStructure
+		var backward_graph: GraphStructure = Graph()
 		graph.edges.foreach(
 			e => {
-				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				backward_graph += target_node ~> origin_node
+				var GraphEdge.DiEdge(origin_node, target_node) = e.edge
+				backward_graph ++ (target_node ~> origin_node)
 			}
 		)
 		backward_graph
 	}
 
-	def createLiveVariables(graph: GraphStructure, live_variables: HashMapStructure): HashMapStructure = {
+	def createLiveVariables(graph: GraphStructure, initial_hash_map: HashMapStructure): HashMapStructure = {
+		var live_variables: HashMapStructure = initial_hash_map
 		graph.edges.foreach(
 			e => {
-				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				live_variables(target_node.value) += live_variables(origin_node.value) // "output do destino" = "input da origem"
-				live_variables(target_node.value) += use(targetNode) ++ (live_variables(target_node.value) -- define(targetNode)) // "input" = "variaveis usadas" ++ ("output" -- "o que ele mata")
+				var GraphEdge.DiEdge(origin_node, target_node) = e.edge
+				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 , live_variables(target_node.value)._2 ++ live_variables(origin_node.value)._1))
+				//live_variables = live_variables + (target_node.value -> (Set(), Set()))
 			}
 		)
 		live_variables
@@ -84,7 +86,6 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 
 	def define(node: GraphNode): SetStructure = node match {
 		case SimpleNode(AssignmentStmt(variable, _)) => Set(variable)
-		case SimpleNode(EAssignmentStmt(variable, _)) => Set(variable)
 		case SimpleNode(ReadIntStmt(variable)) => Set(variable)
 		case _ => Set()
 	}
