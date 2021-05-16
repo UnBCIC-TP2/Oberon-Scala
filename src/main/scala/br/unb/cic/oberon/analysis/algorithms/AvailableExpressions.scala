@@ -77,6 +77,8 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     case _ => Set()
   }
 
+  //  TODO uncomment and make available on interface
+  //  def computeNodeKill[GraphNode, Graph[GraphNode, GraphEdge.DiEdge]](currNode: GraphNode, cfg: Graph[GraphNode, GraphEdge.DiEdge]): NodeAnalysis = {
   def computeNodeKill(currNode: GraphNode, cfg: Graph[GraphNode, GraphEdge.DiEdge]): NodeAnalysis = {
     val u = buildAllExpressionsSet(cfg)
 

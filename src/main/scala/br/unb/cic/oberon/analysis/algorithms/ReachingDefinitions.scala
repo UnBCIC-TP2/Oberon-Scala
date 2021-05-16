@@ -34,6 +34,8 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
       .fold(Set())((acc, predecessorOut) => acc | predecessorOut)
   }
 
+//  TODO uncomment and make available on interface
+//  def computeNodeKill[NodeAnalysis, NodeAnalysis](nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
   def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
     if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
   }
