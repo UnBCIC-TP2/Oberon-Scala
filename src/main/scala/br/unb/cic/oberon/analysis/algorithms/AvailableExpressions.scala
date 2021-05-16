@@ -50,9 +50,9 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     val currNodeGen: NodeAnalysis = computeNodeGen(currNode)
     val currNodeKill: NodeAnalysis = computeNodeKill(currNode, cfg)
 
-    // OUT(x) = In(x) + Gen(x) - Kill(x)
+    // OUT(x) = Gen(x) + (In(x) - Kill(x))
     val currNodeOut: NodeAnalysis =
-      if (currNode != EndNode()) currNodeIn ++ currNodeGen -- currNodeKill else Set()
+      if (currNode != EndNode()) currNodeGen ++ (currNodeIn -- currNodeKill) else Set()
 
     currNode -> (currNodeIn, currNodeOut)
   }
@@ -89,6 +89,7 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     }
   }
 
+  // TODO verify expressions that need to be iterated
   private def expressionUsesVariable(exp: Expression, varName: String): Boolean = {
     exp match {
       case Brackets(exp: Expression) => expressionUsesVariable(exp, varName)
@@ -119,29 +120,22 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
       case EAssignmentStmt(_, exp: Expression) => getExpressions(exp)
       case SequenceStmt(stmts: List[Statement]) => stmts.flatMap(stmt => getExpressions(stmt)).toSet
       case WriteStmt(exp: Expression) => getExpressions(exp)
-      case IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) =>
-        getExpressions(condition) |
-          getExpressions(thenStmt) |
-          getOptionalStmtExpressions(elseStmt)
+      case IfElseStmt(condition: Expression, _: Statement, _: Option[Statement]) =>
+        getExpressions(condition)
 
-      case IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) =>
-        getExpressions(condition) |
-          getExpressions(thenStmt) |
-          elseifStmt.flatMap(stmt => getExpressions(stmt)).toSet |
-          getOptionalStmtExpressions(elseStmt)
+      case IfElseIfStmt(condition: Expression, _: Statement, _: List[ElseIfStmt], _: Option[Statement]) =>
+        getExpressions(condition)
 
-      case ElseIfStmt(condition: Expression, thenStmt: Statement) => getExpressions(condition) | getExpressions(thenStmt)
-      case WhileStmt(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
-      case RepeatUntilStmt(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
-      case ForStmt(init: Statement, condition: Expression, stmt: Statement) =>
-        getExpressions(init) |
-          getExpressions(condition) |
-          getExpressions(stmt)
+      case ElseIfStmt(condition: Expression, _: Statement) => getExpressions(condition)
+      case WhileStmt(condition: Expression, _: Statement) => getExpressions(condition)
+      case RepeatUntilStmt(condition: Expression, _: Statement) => getExpressions(condition)
+      case ForStmt(init: Statement, condition: Expression, _: Statement) =>
+        getExpressions(init) | getExpressions(condition)
 
       case LoopStmt(stmt: Statement) => getExpressions(stmt)
       case ReturnStmt(exp: Expression) => getExpressions(exp)
-      case CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) =>
-        getExpressions(exp) | cases.flatMap(altCase => getCaseAlternativeExpressions(altCase)).toSet | getOptionalStmtExpressions(elseStmt)
+      case CaseStmt(exp: Expression, cases: List[CaseAlternative], _: Option[Statement]) =>
+        getExpressions(exp) | cases.flatMap(altCase => getCaseAlternativeExpressions(altCase)).toSet
 
       case _ => Set()
     }
@@ -152,13 +146,14 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     })
   }
 
+  // TODO improve similar pattern matches
   private def getExpressions(exp: Expression): Set[Expression] = {
     exp match {
       case Brackets(exp: Expression) => getExpressions(exp)
-//      case ArrayValue(v: List[Expression]) =>
+      case ArrayValue(v: List[Expression]) => v.flatMap(exp => getExpressions(exp)).toSet
       case ArraySubscript(arrayBase: Expression, index: Expression) => getExpressions(arrayBase) | getExpressions(index)
       case FieldAccessExpression(exp: Expression, _: String) => getExpressions(exp)
-//      case FunctionCallExpression(name: String, args: List[Expression]) =>
+      case FunctionCallExpression(_: String, args: List[Expression]) => args.flatMap(exp => getExpressions(exp)).toSet
       case EQExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case NEQExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case GTExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
@@ -175,10 +170,6 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     }
   }
 
-  private def getOptionalStmtExpressions(optionalStmt: Option[Statement]): Set[Expression] = {
-    if (optionalStmt.isDefined) getExpressions(optionalStmt.get) else Set()
-  }
-
   private def getCaseAlternativeExpressions(caseAlternative: CaseAlternative): Set[Expression] = {
     caseAlternative match {
       case SimpleCase(condition: Expression, stmt: Statement) => getExpressions(condition) | getExpressions(stmt)
@@ -193,7 +184,8 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
     cfg.edges.foreach(
       edge => edge.nodes.foreach(
         node => {
-          availableExps = availableExps + (node.value -> (Set(), u))
+          val nodeOut: NodeAnalysis = if (node == StartNode()) Set() else u
+          availableExps = availableExps + (node.value -> (Set(), nodeOut))
         }
       )
     )
