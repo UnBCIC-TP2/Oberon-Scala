@@ -39,8 +39,8 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 	def backwardGraph(graph: GraphStructure): GraphStructure = {
 		var backward_graph: GraphStructure = Graph()
 		graph.edges.foreach(
-			e => {
-				var GraphEdge.DiEdge(origin_node, target_node) = e.edge
+			edge => {
+				var GraphEdge.DiEdge(origin_node, target_node) = edge.edge
 				backward_graph ++ (target_node ~> origin_node)
 			}
 		)
@@ -55,7 +55,6 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 				var node_output = nodeOutput(live_variables, origin_node)
 				var node_input = nodeInput(live_variables, target_node)
 				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
-				// live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 , live_variables(target_node.value)._2 ++ live_variables(origin_node.value)._1))
 			}
 		)
 		live_variables
