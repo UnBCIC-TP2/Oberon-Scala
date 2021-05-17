@@ -9,7 +9,6 @@ import br.unb.cic.oberon.ast.{AssignmentStmt, ReadIntStmt}
 import scala.annotation.tailrec
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.Set
-import scala.collection.mutable
 
 case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (Set[(String, GraphNode)], Set[(String, GraphNode)])], Set[(String, GraphNode)]] {
   type NodeAnalysis = Set[(String, GraphNode)]
@@ -35,6 +34,8 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
       .fold(Set())((acc, predecessorOut) => acc | predecessorOut)
   }
 
+//  TODO uncomment and make available on interface
+//  def computeNodeKill[NodeAnalysis, NodeAnalysis](nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
   def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
     if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
   }
@@ -78,9 +79,9 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
     val currNodeGen: NodeAnalysis = computeNodeGenDefinitions(currNode)
     val currNodeKill: NodeAnalysis = computeNodeKill(currNodeIn, currNodeGen)
 
-    // OUT(x) = In(x) + Gen(x) - Kill(x)
+    // OUT(x) = Gen(x) + (In(x) - Kill(x))
     val currNodeOut: NodeAnalysis =
-      if (currNode != EndNode()) currNodeIn ++ currNodeGen -- currNodeKill else Set()
+      if (currNode != EndNode()) currNodeGen ++ (currNodeIn -- currNodeKill) else Set()
 
     currNode -> (currNodeIn, currNodeOut)
   }
