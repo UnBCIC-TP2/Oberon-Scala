@@ -37,7 +37,7 @@ class ReachingDefinitionsTest extends AnyFunSuite {
 
     val numberOfNodes = 7
 
-    val reachingDefinitions = new ReachingDefinitions()
+    val reachingDefinitions = new ReachingDefinitions
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
     val numberOfMapKeys = reachingDefinitionsAnalysis.keySet.size
@@ -71,10 +71,10 @@ class ReachingDefinitionsTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s3))), Set()),
     )
 
-    val reachingDefinitions = new ReachingDefinitions()
+    val reachingDefinitions = new ReachingDefinitions
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
-    assert(expected == reachingDefinitionsAnalysis)
+    assert(reachingDefinitionsAnalysis == expected)
   }
 
   /**
@@ -113,9 +113,9 @@ class ReachingDefinitionsTest extends AnyFunSuite {
       EndNode() -> (Set(("x", SimpleNode(s1)), ("max", SimpleNode(s2)), ("max", SimpleNode(s3_1))), Set())
     )
 
-    val reachingDefinitions = new ReachingDefinitions()
+    val reachingDefinitions = new ReachingDefinitions
     val reachingDefinitionsAnalysis = reachingDefinitions.analyse(cfg)
 
-    assert(expected == reachingDefinitionsAnalysis)
+    assert(reachingDefinitionsAnalysis == expected)
   }
 }
