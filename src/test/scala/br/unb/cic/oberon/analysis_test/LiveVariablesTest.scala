@@ -1,12 +1,12 @@
 package br.unb.cic.oberon.analysis_test
 
 import br.unb.cic.oberon.analysis.algorithms.LiveVariables
-import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
-import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode, StartNode}
+import br.unb.cic.oberon.cfg.{GraphNode, StartNode, SimpleNode, EndNode}
 import br.unb.cic.oberon.ast.{AssignmentStmt, EAssignmentStmt, ReadIntStmt, WriteStmt, IfElseStmt, IfElseIfStmt, ElseIfStmt, WhileStmt, RepeatUntilStmt, ForStmt, VarExpression, Brackets, EQExpression, NEQExpression, GTExpression, LTExpression, GTEExpression, LTEExpression, AddExpression, SubExpression, MultExpression, DivExpression, OrExpression, AndExpression}
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.Set
