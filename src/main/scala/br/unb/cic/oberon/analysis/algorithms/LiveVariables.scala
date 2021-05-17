@@ -23,6 +23,12 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		var live_variables: HashMapStructure 	= createLiveVariables(backward_graph, initial_hash_map)
 		live_variables
 	}
+	
+	def getNodeIn(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._1
+
+	def getNodeOut(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._2
+
+	def computeNodeIn(graph: GraphStructure, hash_map: HashMapStructure, node: GraphNode): SetStructure = Set()
 
 	def initializeHashMap(graph: GraphStructure): HashMapStructure = {
 		var initial_hash_map: HashMapStructure = HashMap()
@@ -46,11 +52,23 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		graph.edges.foreach(
 			e => {
 				var GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 , live_variables(target_node.value)._2 ++ live_variables(origin_node.value)._1))
-				//live_variables = live_variables + (target_node.value -> (Set(), Set()))
+				var node_output = nodeOutput(live_variables, origin_node)
+				var node_input = nodeInput(live_variables, target_node)
+				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
+				// live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 , live_variables(target_node.value)._2 ++ live_variables(origin_node.value)._1))
 			}
 		)
 		live_variables
+	}
+
+	def nodeOutput(live_variables: HashMapStructure, origin_node: GraphNode): SetStructure = {
+		var node_output: SetStructure = live_variables(origin_node)._1
+		node_output
+	}
+
+	def nodeInput(live_variables: HashMapStructure, target_node: GraphNode): SetStructure = {
+		var node_input: SetStructure = use(target_node) ++ (live_variables(target_node)._2 -- define(target_node))
+		node_input
 	}
 
 	def use(node: GraphNode): SetStructure = node match {
