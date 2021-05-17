@@ -3,7 +3,8 @@ package br.unb.cic.oberon.analysis.algorithms
 import br.unb.cic.oberon.analysis.ControlFlowGraphAnalysis
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
-import br.unb.cic.oberon.cfg.{EndNode, GraphNode, SimpleNode}
+import scalax.collection.GraphPredef.EdgeAssoc
+import br.unb.cic.oberon.cfg.{GraphNode, StartNode, SimpleNode, EndNode}
 import br.unb.cic.oberon.ast.{AssignmentStmt, EAssignmentStmt, ReadIntStmt, WriteStmt, IfElseStmt, IfElseIfStmt, ElseIfStmt, WhileStmt, RepeatUntilStmt, ForStmt, VarExpression, Brackets, EQExpression, NEQExpression, GTExpression, LTExpression, GTEExpression, LTEExpression, AddExpression, SubExpression, MultExpression, DivExpression, OrExpression, AndExpression}
 import br.unb.cic.oberon.ast.Expression
 import scala.collection.immutable.HashMap
@@ -18,17 +19,11 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 	type GraphStructure 	= Graph[GraphNode, GraphEdge.DiEdge]
 
 	def analyse(graph: GraphStructure): HashMapStructure = {
-		var initial_hash_map: HashMapStructure 	= initializeHashMap(graph)
-		var backward_graph: GraphStructure 		= backwardGraph(graph)
-		var live_variables: HashMapStructure 	= createLiveVariables(backward_graph, initial_hash_map)
+		val initial_hash_map: HashMapStructure 	= initializeHashMap(graph)
+		val backward_graph: GraphStructure 		= backwardGraph(graph)
+		val live_variables: HashMapStructure 	= createLiveVariables(backward_graph, initial_hash_map)
 		live_variables
 	}
-	
-	def getNodeIn(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._1
-
-	def getNodeOut(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._2
-
-	def computeNodeIn(graph: GraphStructure, hash_map: HashMapStructure, node: GraphNode): SetStructure = Set()
 
 	def initializeHashMap(graph: GraphStructure): HashMapStructure = {
 		var initial_hash_map: HashMapStructure = HashMap()
@@ -39,9 +34,9 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 	def backwardGraph(graph: GraphStructure): GraphStructure = {
 		var backward_graph: GraphStructure = Graph()
 		graph.edges.foreach(
-			edge => {
-				var GraphEdge.DiEdge(origin_node, target_node) = edge.edge
-				backward_graph ++ (target_node ~> origin_node)
+			e => {
+				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
+				backward_graph += (target_node ~> origin_node)
 			}
 		)
 		backward_graph
@@ -51,22 +46,24 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		var live_variables: HashMapStructure = initial_hash_map
 		graph.edges.foreach(
 			e => {
-				var GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				var node_output = nodeOutput(live_variables, origin_node)
-				var node_input = nodeInput(live_variables, target_node)
-				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
+				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
+				if target_node == SimpleNode {
+					val node_output = nodeOutput(live_variables, origin_node)
+					val node_input = nodeInput(live_variables, target_node)
+					live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
+				}
 			}
 		)
 		live_variables
 	}
 
 	def nodeOutput(live_variables: HashMapStructure, origin_node: GraphNode): SetStructure = {
-		var node_output: SetStructure = live_variables(origin_node)._1
+		val node_output: SetStructure = live_variables(origin_node)._1
 		node_output
 	}
 
 	def nodeInput(live_variables: HashMapStructure, target_node: GraphNode): SetStructure = {
-		var node_input: SetStructure = use(target_node) ++ (live_variables(target_node)._2 -- define(target_node))
+		val node_input: SetStructure = use(target_node) ++ (live_variables(target_node)._2 -- define(target_node))
 		node_input
 	}
 
@@ -106,4 +103,10 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		case SimpleNode(ReadIntStmt(variable)) => Set(variable)
 		case _ => Set()
 	}
+	
+	def getNodeIn(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._1
+
+	def getNodeOut(hash_map: HashMapStructure, node: GraphNode): SetStructure = hash_map(node)._2
+
+	def computeNodeIn(graph: GraphStructure, hash_map: HashMapStructure, node: GraphNode): SetStructure = Set()
 }
