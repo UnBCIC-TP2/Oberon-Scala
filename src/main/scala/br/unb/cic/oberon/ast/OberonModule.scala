@@ -13,13 +13,6 @@ case class OberonModule(name: String,
   def accept(v: OberonVisitor): Unit = v.visit(this)
 }
 
-trait REPL
-
-case class REPLExpression(exp: Expression) extends REPL
-case class REPLStatement(stmt: Statement) extends REPL
-case class REPLVarDeclaration(declarations: List[VariableDeclaration]) extends REPL
-case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
-
 /* procedure declaration definition */
 case class Procedure(name: String,
                      args: List[FormalArg],

@@ -1,6 +1,5 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.ast.{REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration}
 import br.unb.cic.oberon.codegen.PaigesBasedGenerator
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
@@ -15,11 +14,11 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   version("Oberon 0.1.1-SNAPSHOT")
   banner("""Compiler and interpreter for Oberon""".stripMargin)
-  footer("\nRun the program without arguments to start REPL")
+  //footer("\nFor all other tricks, consult the documentation!")
 
   val tyc = opt[String](name = "typeChecker", short = 't', descr = "Check if the oberon code is correctly typed", argName = "Oberon program path")
-  val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path" )
-  val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path> <C program destiny path")
+  val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets the Oberon program", argName = "Oberon program path Oberon program path" )
+  val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compile the Oberon program", argName = "Oberon program path")
   val repl = opt[Boolean](name = "repl", short = 'r', descr = "Run repl option")
 
   verify()
@@ -40,7 +39,6 @@ object Main {
         val visitor = new TypeChecker()
 
         val errors = visitor.visit(module)
-        println(errors)
         if (errors.isEmpty) println("The code is correctly typed")
         else println("Type error detected")
       }
@@ -120,7 +118,10 @@ class Repl {
     var input = ""
     val interpreter = new Interpreter
     val expressionEval = new EvalExpressionVisitor(interpreter)
-    val visitor = new TypeChecker()
+
+    var tryConstant = false
+    var tryStatement = false
+    var tryExpression = false
 
     while(keepRunning) {
       print("Oberon> ")
@@ -128,30 +129,57 @@ class Repl {
       if(input == "exit") keepRunning = false
       else if(input == "") print("")
       else {
-        try {
-          val command = ScalaParser.parserREPL(input)
-          command match {
-            case v: REPLVarDeclaration =>
-              v.declarations.foreach(variable => variable.accept(interpreter))
-            case u: REPLUserTypeDeclaration =>
-              println(u.userTypes)
-              u.userTypes.accept(interpreter)
-            case s: REPLStatement =>
-              println(s.stmt)
-              s.stmt.accept(interpreter)
-            case e: REPLExpression =>
-              val result = e.exp.accept(expressionEval)
-              println(result)
+
+          try {
+            val variable = ScalaParser.parseVarDeclaration(input)
+            variable.foreach(v => v.accept(interpreter))
           }
-        }
-        catch {
-          case v: ClassCastException => println("This is an invalid operation: " + v.getMessage)
-          case e: NoSuchElementException => println("A variable is not defined " + e.getMessage)
-          case n: NullPointerException => println("This is an invalid operation")
-          case d: Throwable => println(d)
+          catch {
+            case e: NullPointerException => tryStatement = true
+            case d: Throwable => println(d)
+          }
+          /*  Declaracao de constante, nao lanca excecao, portanto não é possível detectar se o comando é ou não desse tipo
+          if(tryConstant == true) {
+            tryConstant = false
+           try {
+              val constant = ScalaParser.parseConstDeclaration(input)
+              constant.accept(interpreter)
+           }
+            catch {
+              case e: NullPointerException => tryStatement = true
+              case d: Throwable => println(d)
+           }
+          }
+          */
+          if(tryStatement == true) {
+            tryStatement = false
+            try {
+              val stmt = ScalaParser.parseStatements(input)
+              stmt.accept(interpreter)
+            }
+            catch {
+              case e: NullPointerException => tryExpression = true
+              case c: NoSuchElementException => println(c.getMessage)//println("This input is not valid")
+              case d: RuntimeException => println(d.getMessage)
+            }
+          }
+
+          if(tryExpression == true) {
+            tryExpression = false
+            try {
+              val exp = ScalaParser.parseExpression(input)
+              val result = exp.accept(expressionEval)
+              println(result)
+            }
+            catch {
+              case a: NoSuchElementException => println("The variable is not declared or the operation is not valid")
+              case b: NullPointerException => println("This input is not valid")
+              case e: ClassCastException => println(e.getMessage)
+              case d: Throwable => println(d.getMessage)
+            }
+          }
         }
       }
     }
-  }
 
 }

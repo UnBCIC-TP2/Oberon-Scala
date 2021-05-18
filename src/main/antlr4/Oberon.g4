@@ -78,12 +78,6 @@ statement
  | 'EXIT'                                                                                                                     #ExitStmt
  ;
 
-repl: varDeclaration #REPLVarDeclaration
-      | expression #REPLExpression
-      | statement #REPLStatement
-      | userTypeDeclaration #REPLUserTypeDeclaration
-      ;
-
  designator
   : var = Id                                                          #VarAssignment
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
