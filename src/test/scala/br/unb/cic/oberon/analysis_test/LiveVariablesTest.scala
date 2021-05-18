@@ -32,14 +32,14 @@ class LiveVariablesTest extends AnyFunSuite {
 	val s3_1    = AssignmentStmt("max", VarExpression("x"))
 	val s4      = WriteStmt(VarExpression("max"))
 
-	val graph: GraphStructure = Graph(
+	val graph: GraphStructure = Graph[GraphNode, GraphEdge.DiEdge](
 		StartNode()      ~> SimpleNode(s1),
 		SimpleNode(s1)   ~> SimpleNode(s2),
 		SimpleNode(s2)   ~> SimpleNode(s3),
 		SimpleNode(s3)   ~> SimpleNode(s3_1),
 		SimpleNode(s3)   ~> SimpleNode(s4),
 		SimpleNode(s3_1) ~> SimpleNode(s4),
-		SimpleNode(s4)   ~> EndNode(),
+		SimpleNode(s4)   ~> EndNode()
 	)
 
 	val live_variables = new LiveVariables()
@@ -47,25 +47,17 @@ class LiveVariablesTest extends AnyFunSuite {
 	val hash_map_received = live_variables.initializeHashMap(graph)
 	val live_variables_received = live_variables.analyse(graph)
 
-    test("BACKWARD GRAPH") {
+    test("backward") {
 
-		val graph_expected = Graph(
-			EndNode()			~> SimpleNode(s4),
-			SimpleNode(s4) 		~> SimpleNode(s3_1),
-			SimpleNode(s4) 		~> SimpleNode(s3),
-			SimpleNode(s3_1)	~> SimpleNode(s3),
-			SimpleNode(s3) 		~> SimpleNode(s2),
-			SimpleNode(s2) 		~> SimpleNode(s1),
-			SimpleNode(s1) 		~> StartNode(),
+		val graph_expected = Graph[GraphNode, GraphEdge.DiEdge](
+		 	EndNode()			~> SimpleNode(s4),
+		 	SimpleNode(s4) 		~> SimpleNode(s3_1),
+		 	SimpleNode(s4) 		~> SimpleNode(s3),
+		 	SimpleNode(s3_1)	~> SimpleNode(s3),
+		 	SimpleNode(s3) 		~> SimpleNode(s2),
+		 	SimpleNode(s2) 		~> SimpleNode(s1),
+		 	SimpleNode(s1) 		~> StartNode(),
 		)
-
-		// graph_expected += EndNode()			~> SimpleNode(s4)
-		// graph_expected += SimpleNode(s4) 	~> SimpleNode(s3_1)
-		// graph_expected += SimpleNode(s4) 	~> SimpleNode(s3)
-		// graph_expected += SimpleNode(s3_1)	~> SimpleNode(s3)
-		// graph_expected += SimpleNode(s3) 	~> SimpleNode(s2)
-		// graph_expected += SimpleNode(s2) 	~> SimpleNode(s1)
-		// graph_expected += SimpleNode(s1) 	~> StartNode()
 
 		assert(graph_expected == graph_received)
 	}

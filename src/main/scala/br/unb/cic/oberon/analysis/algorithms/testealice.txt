@@ -1,0 +1,68 @@
+Graph(
+    StartNode(), 
+    SimpleNode(ReadIntStmt(x)), 
+    EndNode(), 
+    SimpleNode(ReadIntStmt(max)), 
+    SimpleNode(WriteStmt(VarExpression(max))), 
+    SimpleNode(AssignmentStmt(max,VarExpression(x))), 
+    SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+    SimpleNode(SimpleNode(ReadIntStmt(x)), StartNode()), 
+    EndNode(EndNode(), SimpleNode(WriteStmt(VarExpression(max)))), 
+    SimpleNode(SimpleNode(ReadIntStmt(max)), SimpleNode(ReadIntStmt(x))), 
+    SimpleNode(SimpleNode(WriteStmt(VarExpression(max))), SimpleNode(AssignmentStmt(max,VarExpression(x)))), 
+    SimpleNode(SimpleNode(WriteStmt(VarExpression(max))), SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None))), 
+    SimpleNode(SimpleNode(AssignmentStmt(max,VarExpression(x))), SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None))), 
+    SimpleNode(SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), SimpleNode(ReadIntStmt(max)))
+) did not equal Graph() (LiveVariablesTest.scala:70)
+
+[info]   Analysis:
+
+[info]   DefaultGraphImpl(
+    missingInRight: [
+        StartNode(), 
+        SimpleNode(ReadIntStmt(x)), 
+        EndNode(), 
+        SimpleNode(ReadIntStmt(max)), 
+        SimpleNode(WriteStmt(VarExpression(max))), 
+        SimpleNode(AssignmentStmt(max,VarExpression(x))), 
+        SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+        SimpleNode(ReadIntStmt(x))~>StartNode(), 
+        EndNode()~>SimpleNode(WriteStmt(VarExpression(max))), 
+        SimpleNode(ReadIntStmt(max))~>SimpleNode(ReadIntStmt(x)), 
+        SimpleNode(WriteStmt(VarExpression(max)))~>SimpleNode(AssignmentStmt(max,VarExpression(x))), 
+        SimpleNode(WriteStmt(VarExpression(max)))~>SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+        SimpleNode(AssignmentStmt(max,VarExpression(x)))~>SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+        SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None))~>SimpleNode(ReadIntStmt(max))
+    ]
+)
+
+
+
+Graph(
+    StartNode(), 
+    SimpleNode(ReadIntStmt(x)), 
+    EndNode(), 
+    SimpleNode(ReadIntStmt(max)), 
+    SimpleNode(WriteStmt(VarExpression(max))), 
+    SimpleNode(AssignmentStmt(max,VarExpression(x))), 
+    SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+    SimpleNode(SimpleNode(ReadIntStmt(x)), StartNode()), 
+    EndNode(EndNode(), SimpleNode(ReadIntStmt(x))), 
+    SimpleNode(SimpleNode(ReadIntStmt(max)), SimpleNode(ReadIntStmt(x))), 
+    SimpleNode(SimpleNode(WriteStmt(VarExpression(max))), SimpleNode(ReadIntStmt(max))), SimpleNode(SimpleNode(WriteStmt(VarExpression(max))), SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None))), SimpleNode(SimpleNode(AssignmentStmt(max,VarExpression(x))), SimpleNode(AssignmentStmt(max,VarExpression(x)))), SimpleNode(SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), SimpleNode(WriteStmt(VarExpression(max))))) did not equal Graph() (LiveVariablesTest.scala:71)
+[info]   Analysis:
+[info]   DefaultGraphImpl(missingInRight: [StartNode(), SimpleNode(ReadIntStmt(x)), EndNode(), SimpleNode(ReadIntStmt(max)), SimpleNode(WriteStmt(VarExpression(max))), SimpleNode(AssignmentStmt(max,VarExpression(x))), SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+
+    SimpleNode(ReadIntStmt(x))~>StartNode(), 
+    EndNode()~>SimpleNode(ReadIntStmt(x)), 
+    SimpleNode(ReadIntStmt(max))~>SimpleNode(ReadIntStmt(x)), 
+    SimpleNode(WriteStmt(VarExpression(max)))~>SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None)), 
+    SimpleNode(WriteStmt(VarExpression(max)))~>SimpleNode(ReadIntStmt(max)), SimpleNode(AssignmentStmt(max,VarExpression(x)))~>SimpleNode(AssignmentStmt(max,VarExpression(x))), SimpleNode(IfElseStmt(GTExpression(VarExpression(x),VarExpression(max)),null,None))~>SimpleNode(WriteStmt(VarExpression(max)))])
+
+val g = Graph(1, 2~3)  // immutable or mutable
+g + 1                  // g unchanged
+g + 0                  // Graph(0, 1, 2, 3, 2~3)
+g + 1.2                // error: overloaded method...
+g + 0~1                // Graph(0, 1, 2, 3, 0~1, 2~3)
+g ++ List(1~2, 2~3)    // Graph(1, 2, 3, 1~2, 2~3)
+g ++ List[Param[Int,UnDiEdge]](1~2, 2~3, 0)

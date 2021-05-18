@@ -9,6 +9,7 @@ import br.unb.cic.oberon.ast.{AssignmentStmt, EAssignmentStmt, ReadIntStmt, Writ
 import br.unb.cic.oberon.ast.Expression
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.Set
+import scala.collection.immutable.List
 import scala.annotation.tailrec
 import scala.collection.mutable
 
@@ -31,12 +32,12 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		initial_hash_map
 	}
 
-	def backwardGraph(graph: GraphStructure): GraphStructure = {
-		var backward_graph: GraphStructure = Graph()
+	def backwardGraph(graph: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
+		var backward_graph = Graph[GraphNode, GraphEdge.DiEdge]()
 		graph.edges.foreach(
 			e => {
 				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				backward_graph += (target_node ~> origin_node)
+				backward_graph = backward_graph += target_node.value ~> origin_node.value
 			}
 		)
 		backward_graph
@@ -47,7 +48,8 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		graph.edges.foreach(
 			e => {
 				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				if target_node == SimpleNode {
+				println(target_node)
+				if (target_node == SimpleNode) {
 					val node_output = nodeOutput(live_variables, origin_node)
 					val node_input = nodeInput(live_variables, target_node)
 					live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
