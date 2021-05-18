@@ -47,7 +47,7 @@ class LiveVariablesTest extends AnyFunSuite {
 	val hash_map_received = live_variables.initializeHashMap(graph)
 	val live_variables_received = live_variables.analyse(graph)
 
-    test("backward") {
+    test("BACKWARD GRAPH") {
 
 		val graph_expected = Graph[GraphNode, GraphEdge.DiEdge](
 		 	EndNode()			~> SimpleNode(s4),
