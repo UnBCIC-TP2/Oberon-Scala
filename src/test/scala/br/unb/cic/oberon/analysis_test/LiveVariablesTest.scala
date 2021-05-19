@@ -110,7 +110,7 @@ class LiveVariablesTest extends AnyFunSuite {
 		val s2_1    = IfElseStmt(GTExpression(VarExpression("x"), IntValue(10)), s2_1_1 , None)
 		val s2_1_1  = WriteStmt(VarExpression("x"))
 		val s2_2    = ReadIntStmt("y")
-		val s2_3    = IfElseStmt(LTExpression(VarExpression("y"), VarExpression("x")), s2_3_1 , s2_3_2)
+		val s2_3    = IfElseStmt(LTExpression(VarExpression("y"), VarExpression("x")), s2_3_1 , Option(s2_3_2))
 		val s2_3_1  = WriteStmt(VarExpression("y"))
 		val s2_3_2  = WriteStmt(VarExpression("x"))
 
