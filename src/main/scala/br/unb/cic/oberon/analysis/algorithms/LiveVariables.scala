@@ -23,8 +23,6 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 		val initial_hash_map: HashMapStructure 	= initializeHashMap(graph)
 		val backward_graph: GraphStructure 		= backwardGraph(graph)
 		val live_variables: HashMapStructure 	= createLiveVariables(backward_graph, initial_hash_map)
-		println("--------------")
-		println(live_variables)
 		live_variables
 	}
 
@@ -42,76 +40,28 @@ case class LiveVariables() extends ControlFlowGraphAnalysis[HashMap[GraphNode, (
 				backward_graph += target_node.value ~> origin_node.value
 			}
 		)
-		println(backward_graph)
 		backward_graph
 	}
 
 	def createLiveVariables(graph: GraphStructure, initial_hash_map: HashMapStructure): HashMapStructure = {
 		// -------- FIXED POINT --------
-		// var live_variables: HashMapStructure = initial_hash_map
-		// fixed_point = False
-		// while (!fixed_point) {
-		// 	fixed_point = True
-		// 	graph.edges.foreach(
-		// 		e => {
-		// 			val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-		// 			val node_output = nodeOutput(live_variables, origin_node.value)
-		// 			val node_input = nodeInput(live_variables, target_node.value, node_output)
-		// 			if (live_variables(target_node.value)._1 != node_input || live_variables(target_node.value)._2 != node_output) {
-		// 				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
-		// 				fixed_point = False
-		// 			}
-		// 			print("\n-------- CHAVES DO HASHMAP --------")
-		// 			println(target_node, node_input, node_output)
-		// 			println()
-		// 		}
-		// 	)
-		// }
-		// live_variables
-		// -------- FIM --------
-
-		// -------- LEITURA POR LARGURA --------
-		// var width_list = new ListBuffer[GraphNode]()
-		// graph.nodes.foreach(
-		// 	origin_node => {
-		// 		if (origin_node.value == EndNode()) {
-		// 			graph.edges.foreach(
-		// 				e => {
-		// 					val GraphEdge.DiEdge(_, target_node) = e.edge(origin_node, _)
-		// 					width_list += target_node.value								
-		// 				}
-		// 			)
-		// 		}
-		// 	}
-		// )
-		// width_list.foreach(
-		// 	node => {
-		// 		graph.edges.foreach(
-		// 			e => {
-		// 				val GraphEdge.DiEdge(_, target_node) = e.edge(node, _)
-		// 				if (!width_list.contains(target_node)) {
-		// 					width_list += target_node
-		// 				}
-		// 			}
-		// 		)
-		// 		val node_output = nodeOutput(live_variables, origin_node.value)
-		// 		val node_input = nodeInput(live_variables, target_node.value, node_output)
-		// 		live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
-		// 	}	
-		// )
-		// -------- FIM --------
-
-		graph.edges.foreach(
-			e => {
-				val GraphEdge.DiEdge(origin_node, target_node) = e.edge
-				println(target_node)
-				val node_output = nodeOutput(live_variables, origin_node.value)
-				val node_input = nodeInput(live_variables, target_node.value, node_output)
-				println(node_input)
-				println(node_output)
-				live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
-			}
-		)	
+		var live_variables: HashMapStructure = initial_hash_map
+		var fixed_point = 0
+		while (fixed_point == 0) {
+			fixed_point = 1
+			graph.edges.foreach(
+				e => {
+					val GraphEdge.DiEdge(origin_node, target_node) = e.edge
+					val node_output = nodeOutput(live_variables, origin_node.value)
+					val node_input = nodeInput(live_variables, target_node.value, node_output)
+					if ((live_variables(target_node.value)._1 != live_variables(target_node.value)._1 ++ node_input) || (live_variables(target_node.value)._2 != live_variables(target_node.value)._2 ++ node_output)) {
+						live_variables = live_variables + (target_node.value -> (live_variables(target_node.value)._1 ++ node_input, live_variables(target_node.value)._2 ++ node_output))
+						fixed_point = 0
+					}
+					
+				}
+			)
+		}
 		live_variables
 	}
 
