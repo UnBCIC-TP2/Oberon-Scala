@@ -13,7 +13,10 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
   type NodeAnalysis = Set[Expression]
   type AnalysisMapping = HashMap[GraphNode, (NodeAnalysis, NodeAnalysis)]
 
+  private var u: NodeAnalysis = Set()
+
   def analyse(cfg: Graph[GraphNode, GraphEdge.DiEdge]): AnalysisMapping = {
+    u = buildAllExpressionsSet(cfg)
     val initAvailExps: AnalysisMapping = initializeAvailableExpressions(cfg)
 
     analyse(cfg, initAvailExps, fixedPoint = false)
@@ -48,7 +51,7 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
                                    availExps: AnalysisMapping): (GraphNode, (NodeAnalysis, NodeAnalysis)) = {
     val currNodeIn: NodeAnalysis = computeNodeIn(cfg, availExps, currNode)
     val currNodeGen: NodeAnalysis = computeNodeGen(currNode)
-    val currNodeKill: NodeAnalysis = computeNodeKill(currNode, cfg)
+    val currNodeKill: NodeAnalysis = computeNodeKill(currNode, currNodeIn)
 
     // OUT(x) = Gen(x) + (In(x) - Kill(x))
     val currNodeOut: NodeAnalysis =
@@ -79,13 +82,13 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
 
   //  TODO uncomment and make available on interface
   //  def computeNodeKill[GraphNode, Graph[GraphNode, GraphEdge.DiEdge]](currNode: GraphNode, cfg: Graph[GraphNode, GraphEdge.DiEdge]): NodeAnalysis = {
-  def computeNodeKill(currNode: GraphNode, cfg: Graph[GraphNode, GraphEdge.DiEdge]): NodeAnalysis = {
-    val u = buildAllExpressionsSet(cfg)
-
+  def computeNodeKill(currNode: GraphNode, nodeIn: NodeAnalysis): NodeAnalysis = {
     currNode match {
       case SimpleNode(stmt) => stmt match {
-        case AssignmentStmt (varName: String, _) => u.filter (exp => expressionUsesVariable(exp, varName) )
-        case _ => Set ()
+        case AssignmentStmt (varName: String, _) =>
+          nodeIn.filter(exp => expressionUsesVariable(exp, varName))
+
+        case _ => Set()
       }
       case _ => Set()
     }
@@ -162,12 +165,12 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
       case LTExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case GTEExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case LTEExpression(left:  Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case OrExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
+      case AndExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case AddExpression(left: Expression, right: Expression) => Set(AddExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
       case SubExpression(left: Expression, right: Expression) => Set(SubExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
       case MultExpression(left: Expression, right: Expression) => Set(MultExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
       case DivExpression(left: Expression, right: Expression) => Set(DivExpression(left, right): Expression) | getExpressions(left) | getExpressions(right)
-      case OrExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
-      case AndExpression(left: Expression, right: Expression) => getExpressions(left) | getExpressions(right)
       case _ => Set()
     }
   }
@@ -181,7 +184,6 @@ case class AvailableExpressions() extends ControlFlowGraphAnalysis[HashMap[Graph
 
   private def initializeAvailableExpressions(cfg: Graph[GraphNode, GraphEdge.DiEdge]): AnalysisMapping = {
     var availableExps: AnalysisMapping = HashMap()
-    val u: NodeAnalysis = buildAllExpressionsSet(cfg)
 
     cfg.edges.foreach(
       edge => edge.nodes.foreach(
