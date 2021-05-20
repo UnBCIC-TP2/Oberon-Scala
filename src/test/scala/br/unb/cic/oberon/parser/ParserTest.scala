@@ -1,7 +1,8 @@
 package br.unb.cic.oberon.parser
 
-import java.nio.file.{Files, Paths}
+import br.unb.cic.oberon.ast
 
+import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
 
@@ -2296,96 +2297,95 @@ class ParserTestSuite extends AnyFunSuite {
     val intValue1 = "1"
     val sum = "x + 4"
 
-    val exp1 = ScalaParser.parseExpression(intValue1)
-    assert(exp1 == IntValue(1))
+    val exp1 = ScalaParser.parserREPL(intValue1)
+    assert(exp1 == REPLExpression(IntValue(1)))
 
-    val exp2 = ScalaParser.parseExpression(sum)
-
-    assert(exp2 == AddExpression(VarExpression("x"), IntValue(4)))
+    val exp2 = ScalaParser.parserREPL(sum)
+    assert(exp2 == REPLExpression(AddExpression(VarExpression("x"), IntValue(4))))
   }
 
   test("Testing the parser for addition expressions") {
     val sum1 = "7 + 14"
     val sum2 = "x + y"
 
-    val exp1 = ScalaParser.parseExpression(sum1)
-    assert(exp1 == AddExpression(IntValue(7), IntValue(14)))
+    val exp1 = ScalaParser.parserREPL(sum1)
+    assert(exp1 == REPLExpression(AddExpression(IntValue(7), IntValue(14))))
 
-    val exp2 = ScalaParser.parseExpression(sum2)
-    assert(exp2 == AddExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(sum2)
+    assert(exp2 == REPLExpression(AddExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for subtraction expressions") {
     val sub1 = "21 - 5"
     val sub2 = "x - y"
 
-    val exp1 = ScalaParser.parseExpression(sub1)
-    assert(exp1 == SubExpression(IntValue(21), IntValue(5)))
+    val exp1 = ScalaParser.parserREPL(sub1)
+    assert(exp1 == REPLExpression(SubExpression(IntValue(21), IntValue(5))))
 
-    val exp2 = ScalaParser.parseExpression(sub2)
-    assert(exp2 == SubExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(sub2)
+    assert(exp2 == REPLExpression(SubExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for multiplication expressions") {
     val multi1 = "3 * 7"
     val multi2 = "x * y"
 
-    val exp1 = ScalaParser.parseExpression(multi1)
-    assert(exp1 == MultExpression(IntValue(3), IntValue(7)))
+    val exp1 = ScalaParser.parserREPL(multi1)
+    assert(exp1 == REPLExpression(MultExpression(IntValue(3), IntValue(7))))
 
-    val exp2 = ScalaParser.parseExpression(multi2)
-    assert(exp2 == MultExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(multi2)
+    assert(exp2 == REPLExpression(MultExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for division expressions") {
     val div1 = "500 / 7"
     val div2 = "x / y"
 
-    val exp1 = ScalaParser.parseExpression(div1)
-    assert(exp1 == DivExpression(IntValue(500), IntValue(7)))
+    val exp1 = ScalaParser.parserREPL(div1)
+    assert(exp1 == REPLExpression(DivExpression(IntValue(500), IntValue(7))))
 
-    val exp2 = ScalaParser.parseExpression(div2)
-    assert(exp2 == DivExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(div2)
+    assert(exp2 == REPLExpression(DivExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for a boolean expression") {
     val boolValue = "True"
 
-    val exp1 = ScalaParser.parseExpression(boolValue)
-    assert(exp1 == BoolValue(true))
+    val exp1 = ScalaParser.parserREPL(boolValue)
+    assert(exp1 == REPLExpression(BoolValue(true)))
   }
 
   test("Testing the parser for and operation expressions") {
     val and1 = "True && False"
     val and2 = "x && y"
 
-    val exp1 = ScalaParser.parseExpression(and1)
-    assert(exp1 == AndExpression(BoolValue(true), BoolValue(false)))
+    val exp1 = ScalaParser.parserREPL(and1)
+    assert(exp1 == REPLExpression(AndExpression(BoolValue(true), BoolValue(false))))
 
-    val exp2 = ScalaParser.parseExpression(and2)
-    assert(exp2 == AndExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(and2)
+    assert(exp2 == REPLExpression(AndExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for or operation expressions") {
     val or1 = "True || True"
     val or2 = "x || y"
 
-    val exp1 = ScalaParser.parseExpression(or1)
-    assert(exp1 == OrExpression(BoolValue(true), BoolValue(true)))
+    val exp1 = ScalaParser.parserREPL(or1)
+    assert(exp1 == REPLExpression(OrExpression(BoolValue(true), BoolValue(true))))
 
-    val exp2 = ScalaParser.parseExpression(or2)
-    assert(exp2 == OrExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(or2)
+    assert(exp2 == REPLExpression(OrExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for equal expressions") {
     val eq1 = "1 = True"
     val eq2 = "x = y"
 
-    val exp1 = ScalaParser.parseExpression(eq1)
-    assert(exp1 == EQExpression(IntValue(1), BoolValue(true)))
+    val exp1 = ScalaParser.parserREPL(eq1)
+    assert(exp1 == REPLExpression(EQExpression(IntValue(1), BoolValue(true))))
 
-    val exp2 = ScalaParser.parseExpression(eq2)
-    assert(exp2 == EQExpression(VarExpression("x"), VarExpression("y")))
+    val exp2 = ScalaParser.parserREPL(eq2)
+    assert(exp2 == REPLExpression(EQExpression(VarExpression("x"), VarExpression("y"))))
   }
 
   test("Testing the parser for logical bigger and lesser") {
@@ -2397,23 +2397,132 @@ class ParserTestSuite extends AnyFunSuite {
     val eq5 = "x > y";
     val eq6 = "x < y";
 
-    val exp1 = ScalaParser.parseExpression(eq1)
-    assert(exp1 == GTExpression(IntValue(4), IntValue(2)))
+    val exp1 = ScalaParser.parserREPL(eq1)
+    assert(exp1 == REPLExpression(GTExpression(IntValue(4), IntValue(2))))
 
-    val exp2 = ScalaParser.parseExpression(eq2)
-    assert(exp2 == GTEExpression(IntValue(4), IntValue(4)))
+    val exp2 = ScalaParser.parserREPL(eq2)
+    assert(exp2 == REPLExpression(GTEExpression(IntValue(4), IntValue(4))))
 
-    val exp3 = ScalaParser.parseExpression(eq3)
-    assert(exp3 == LTExpression(IntValue(4), IntValue(5)))
+    val exp3 = ScalaParser.parserREPL(eq3)
+    assert(exp3 == REPLExpression(LTExpression(IntValue(4), IntValue(5))))
 
-    val exp4 = ScalaParser.parseExpression(eq4)
-    assert(exp4 == LTEExpression(IntValue(5), IntValue(5)))
+    val exp4 = ScalaParser.parserREPL(eq4)
+    assert(exp4 == REPLExpression(LTEExpression(IntValue(5), IntValue(5))))
 
-    val exp5 = ScalaParser.parseExpression(eq5)
-    assert(exp5 == GTExpression(VarExpression("x"), VarExpression("y")))
+    val exp5 = ScalaParser.parserREPL(eq5)
+    assert(exp5 == REPLExpression(GTExpression(VarExpression("x"), VarExpression("y"))))
 
-    val exp6 = ScalaParser.parseExpression(eq6)
-    assert(exp6 == LTExpression(VarExpression("x"), VarExpression("y")))
+    val exp6 = ScalaParser.parserREPL(eq6)
+    assert(exp6 == REPLExpression(LTExpression(VarExpression("x"), VarExpression("y"))))
+  }
+
+  test("Testing the parser for FunctionCallExpression expression") {
+    val procedure1 = "sum(x,y)"
+
+    val exp1 = ScalaParser.parserREPL(procedure1)
+    assert(exp1 == REPLExpression(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y")))))
+  }
+
+  test("Testing the parser for assignment statements") {
+    val assign1 = "a := 2"
+    val assign2 = "b := 2 + 3"
+    val assign3 = "c := a + 3"
+
+    val stmt1 = ScalaParser.parserREPL(assign1)
+    assert(stmt1 == REPLStatement(AssignmentStmt("a", IntValue(2))))
+
+    val stmt2 = ScalaParser.parserREPL(assign2)
+    assert(stmt2 == REPLStatement(AssignmentStmt("b", AddExpression(IntValue(2),IntValue(3)))))
+
+    val stmt3 = ScalaParser.parserREPL(assign3)
+    assert(stmt3 == REPLStatement(AssignmentStmt("c", AddExpression(VarExpression("a"),IntValue(3)))))
+  }
+
+  test("Testing the parser for ReadIntStmt statements") {
+    val read1 = "readInt(x)"
+
+    val stmt1 = ScalaParser.parserREPL(read1)
+    assert(stmt1 == REPLStatement(ReadIntStmt("x")))
+  }
+
+  test("Testing the parser for WriteStmt statements") {
+    val write1 = "write(1)"
+    val write2 = "write(2 + a)"
+    val write3 = "write(sum(x,y))"
+
+    val stmt1 = ScalaParser.parserREPL(write1)
+    assert(stmt1 == REPLStatement(WriteStmt(IntValue(1))))
+
+    val stmt2 = ScalaParser.parserREPL(write2)
+    assert(stmt2 == REPLStatement(WriteStmt(AddExpression(IntValue(2),VarExpression("a")))))
+
+    val stmt3 = ScalaParser.parserREPL(write3)
+    assert(stmt3 == REPLStatement(WriteStmt(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y"))))))
+  }
+
+  test("Testing the parser for IfElseStmt and IfElseIfStmt statements") {
+    val ifElse1 = "IF (x < 0 ) THEN y := 1 ELSE y := 3 END;"
+    val ifELse2 = "IF (x < 0 ) THEN y := 1 ELSIF (x > 0) THEN y := 2 ELSE y := 3 END;"
+
+    val stmt1 = ScalaParser.parserREPL(ifElse1)
+    assert(stmt1 == REPLStatement(IfElseStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),Option(AssignmentStmt("y",IntValue(3))))))
+
+    val stmt2 = ScalaParser.parserREPL(ifELse2)
+    assert(stmt2 == REPLStatement(IfElseIfStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),List(ElseIfStmt(GTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(2)))),Option(AssignmentStmt("y",IntValue(3))))))
+  }
+
+  test("Testing the parser for WhileStmt statements") {
+    val while1 = "WHILE (x >= 0) DO x := x - 1 END;"
+
+    val stmt1 = ScalaParser.parserREPL(while1)
+    assert(stmt1 == REPLStatement(WhileStmt(GTEExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1))))))
+  }
+
+  test("Testing the parser for ReaptUntilStmt statements") {
+    val repeat1 = "REPEAT x := x + 1 UNTIL x > 2"
+
+    val stmt1 = ScalaParser.parserREPL(repeat1)
+    assert(stmt1 == REPLStatement(RepeatUntilStmt(GTExpression(VarExpression("x"),IntValue(2)),AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))))
+  }
+
+  test("Testing the parser for ForStmt statements") {
+    val for1 = "FOR x IN 0 .. 10 DO write(x) END"
+
+    val stmt1 = ScalaParser.parserREPL(for1)
+    assert(stmt1 == REPLStatement(ForStmt(AssignmentStmt("x",IntValue(0)),LTEExpression(VarExpression("x"),IntValue(10)),SequenceStmt(List(WriteStmt(VarExpression("x")), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))))))
+  }
+
+  test("Testing the parser for CaseStmt statements") {
+    val case1 = "CASE x OF 0: y := 1 ELSE y := 0 END"
+
+    val stmt1 = ScalaParser.parserREPL(case1)
+    assert(stmt1 == REPLStatement(CaseStmt(VarExpression("x"),List(SimpleCase(IntValue(0),AssignmentStmt("y",IntValue(1)))),Some(AssignmentStmt("y",IntValue(0))))))
+  }
+
+  test("Testing the parser for VarDeclaration") {
+    val var1 = "x: INTEGER;"
+    val var2 = "x: BOOLEAN;"
+    val var3 = "x, y: INTEGER;"
+
+    val variable1 = ScalaParser.parserREPL(var1)
+    assert(variable1 == REPLVarDeclaration(List(VariableDeclaration("x",IntegerType))))
+
+    val variable2 = ScalaParser.parserREPL(var2)
+    assert(variable2 == REPLVarDeclaration(List(VariableDeclaration("x",BooleanType))))
+
+    val variable3= ScalaParser.parserREPL(var3)
+    assert(variable3 == REPLVarDeclaration(List(VariableDeclaration("x",IntegerType),VariableDeclaration("y",IntegerType))))
+  }
+
+  test("Testing the parser for Constant declaration") {
+    val const1 = "x = 0;"
+    val const2 = "y = x + 1;"
+
+    val constant1 = ScalaParser.parserREPL(const1)
+    assert(constant1 == REPLConstant(Constant("x",IntValue(0))))
+
+    val constant2 = ScalaParser.parserREPL(const2)
+    assert(constant2 == REPLConstant(Constant("y",AddExpression(VarExpression("x"),IntValue(1)))))
   }
 
 }
