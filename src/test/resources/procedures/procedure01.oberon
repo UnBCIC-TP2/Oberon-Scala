@@ -4,7 +4,7 @@ VAR
   x : INTEGER;
   y : INTEGER;
 
-PROCEDURE sum(v1, v2 : INTEGER) : INTEGER;
+PROCEDURE sum(VAR v1, v2 : INTEGER) : INTEGER;
  BEGIN
    RETURN v1 + v2
  END sum

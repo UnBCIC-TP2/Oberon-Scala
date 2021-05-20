@@ -1,11 +1,11 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import org.antlr.stringtemplate.language.FormalArgument
 
 import scala.io.StdIn
 
@@ -23,7 +23,6 @@ import scala.io.StdIn
  */
 class Interpreter extends OberonVisitorAdapter {
   type T = Unit
-  var subst_variables : Procedure = Procedure[]()
 
   val env = new Environment[Expression]()
   var printStream : PrintStream = new PrintStream(System.out)
@@ -95,18 +94,10 @@ class Interpreter extends OberonVisitorAdapter {
       case ProcedureCallStmt(name, args) =>
         // we evaluate the "args" in the current
         // environment.
-
         val actualArguments = args.map(a => evalExpression(a))
         env.push() // after that, we can "push", to indicate a procedure call.
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop, to indicate that a procedure finished its execution.
-
-        subst_variables.args.map(formal => formal.name)
-          .zip(args)
-          .foreach(pair => env.setVariable(pair._1, pair._2))
-
-        subst_variables.variables.foreach(v => env.setVariable(v.name, Undef()))
-        subst_variables.constants.foreach(c => env.setVariable(c.name, c.exp))
     }
   }
 
@@ -176,11 +167,23 @@ class Interpreter extends OberonVisitorAdapter {
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
     procedure.args.map(formal => formal.name)
       .zip(args)
-      .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+      .foreach(pair => {
+          env.setLocalVariable(pair._1, pair._2)
+        }
+      )
+    procedure.args.foreach {
+      case ReferenceArguments(name: String, argumentType: Type) => {
+        procedure.args.map(formal => formal.name)
+          .zip(args)
+          .foreach(pair => {
+            env.setVariableReference(pair._1, pair._2)
+          }
+          )
+      }
+    }
 
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
-    subst_variables = procedure
   }
 
   def evalCondition(expression: Expression): Boolean = {

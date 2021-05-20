@@ -25,6 +25,7 @@ class Environment[T] {
   private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
+  private var variableReference = List[(String, Expression)]()
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
@@ -43,6 +44,10 @@ class Environment[T] {
       stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
+  }
+
+  def setVariableReference(variableName: String, arg: Expression): Unit ={
+    variableReference = variableReference:+((variableName, arg))
   }
 
   def setVariable(name: String, value: T) : Unit = {
