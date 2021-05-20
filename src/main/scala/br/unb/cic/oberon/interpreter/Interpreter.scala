@@ -23,7 +23,7 @@ import scala.io.StdIn
  */
 class Interpreter extends OberonVisitorAdapter {
   type T = Unit
-  var subst_variables: List[VariableDeclaration] = List[VariableDeclaration]()
+  var subst_variables : Procedure = Procedure[]()
 
   val env = new Environment[Expression]()
   var printStream : PrintStream = new PrintStream(System.out)
@@ -100,11 +100,13 @@ class Interpreter extends OberonVisitorAdapter {
         env.push() // after that, we can "push", to indicate a procedure call.
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop, to indicate that a procedure finished its execution.
-        subst_variables.map(formal => formal.name)
-          .zip(args)
-          .foreach(pair => env.setLocalVariable(pair._1, pair._2))
 
-        subst_variables.foreach(v => env.setLocalVariable(v.name, Undef()))
+        subst_variables.args.map(formal => formal.name)
+          .zip(args)
+          .foreach(pair => env.setVariable(pair._1, pair._2))
+
+        subst_variables.variables.foreach(v => env.setVariable(v.name, Undef()))
+        subst_variables.constants.foreach(c => env.setVariable(c.name, c.exp))
     }
   }
 
@@ -178,7 +180,7 @@ class Interpreter extends OberonVisitorAdapter {
 
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
-    subst_variables = procedure.variables
+    subst_variables = procedure
   }
 
   def evalCondition(expression: Expression): Boolean = {
