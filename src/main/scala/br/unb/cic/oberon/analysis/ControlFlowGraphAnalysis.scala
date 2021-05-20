@@ -31,6 +31,5 @@ abstract class ControlFlowGraphAnalysis[AnalysisMapping, NodeAnalysis] {
                     reachDefs: AnalysisMapping,
                     currentNode: GraphNode): NodeAnalysis
 
-//  TODO uncomment and make available on interface
-//  def computeNodeKill[A, B](a: A, b: B): NodeAnalysis
+  def computeNodeKill(currentNode: GraphNode, nodeIn: NodeAnalysis): NodeAnalysis
 }
