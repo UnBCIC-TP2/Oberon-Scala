@@ -192,6 +192,8 @@ class AvailableExpressionsTest extends AnyFunSuite {
    * readInt(x);
    * readInt(y);
    * max := x + y
+   * x := x * 1
+   * y := x && y
    * END
    */
   test("computeNodeKill returns given node killed expressions set when expressions are simple") {
@@ -215,14 +217,21 @@ class AvailableExpressionsTest extends AnyFunSuite {
 
 
     val availableExps = new AvailableExpressions
+    val analysisMapping = HashMap(
+      StartNode() -> (Set(), Set()),
+      SimpleNode(s1) -> (Set(), Set()),
+      SimpleNode(s2) -> (Set(), Set()),
+      SimpleNode(s3) -> (Set(), Set(xPlusY)),
+      SimpleNode(s4) -> (Set(xPlusY), Set()),
+      SimpleNode(s5) -> (Set(), Set()),
+      EndNode() -> (Set(), Set())
+    )
 
-    assert(availableExps.computeNodeKill(SimpleNode(s1), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s2), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s3), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s4), cfg) != Set(xPlusY, xTimes1, xAndY))
-    assert(availableExps.computeNodeKill(SimpleNode(s4), cfg) == Set(xPlusY, xTimes1))
-    assert(availableExps.computeNodeKill(SimpleNode(s5), cfg) != Set(xPlusY,xAndY))
-    assert(availableExps.computeNodeKill(SimpleNode(s5), cfg) == Set(xPlusY))
+    assert(availableExps.computeNodeKill(SimpleNode(s1), Set()) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s2), Set()) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s3), Set(xPlusY)) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s4), Set(xPlusY, xTimes1)) == Set(xPlusY, xTimes1))
+    assert(availableExps.computeNodeKill(SimpleNode(s5), Set()) == Set())
   }
 
   /**
@@ -231,7 +240,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
    * readInt(y);
    * max := (x + y) + 1
    * x := x * 1
-   * y := ((x + 1) + 1) * x
+   * y := ((x + y) + 1) * x
    * END
    */
   test("computeNodeKill returns given node killed expressions set when expressions are nested") {
@@ -246,22 +255,16 @@ class AvailableExpressionsTest extends AnyFunSuite {
     val s4 = AssignmentStmt(x, xTimes1)
     val s5 = AssignmentStmt(y, xPlusYPlus1TimesX)
 
-    val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
-    cfg += StartNode() ~> SimpleNode(s1)
-    cfg += SimpleNode(s1) ~> SimpleNode(s2)
-    cfg += SimpleNode(s2) ~> SimpleNode(s3)
-    cfg += SimpleNode(s3) ~> SimpleNode(s4)
-    cfg += SimpleNode(s4) ~> SimpleNode(s5)
-    cfg += SimpleNode(s5) ~> EndNode()
-
-
     val availableExps = new AvailableExpressions
 
-    assert(availableExps.computeNodeKill(SimpleNode(s1), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s2), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s3), cfg) == Set())
-    assert(availableExps.computeNodeKill(SimpleNode(s4), cfg) == Set(xPlusYPlus1TimesX, xPlusYPlus1, xPlusY, xTimes1))
-    assert(availableExps.computeNodeKill(SimpleNode(s5), cfg) == Set(xPlusYPlus1TimesX, xPlusYPlus1, xPlusY))
+    assert(availableExps.computeNodeKill(SimpleNode(s1), Set()) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s2), Set()) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s3), Set(xPlusYPlus1, xPlusY)) == Set())
+    assert(availableExps.computeNodeKill(SimpleNode(s4), Set(xPlusYPlus1, xPlusY, xTimes1)) ==
+      Set(xPlusYPlus1, xPlusY, xTimes1))
+
+    assert(availableExps.computeNodeKill(SimpleNode(s5), Set(xPlusYPlus1TimesX, xPlusYPlus1, xPlusY)) ==
+      Set(xPlusYPlus1TimesX, xPlusYPlus1, xPlusY))
   }
 
   /**
@@ -408,7 +411,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
    *     max := x - 5 - 3
    *   END
    * END;
-   * x := 5
+   * x := x + 1
    * write(max)
    * END
    */
@@ -421,6 +424,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
     val xTimes2 = MultExpression(xVarExp, IntValue(2))
     val xTimes2Plus3 = AddExpression(xTimes2, IntValue(3))
     val xTimes2Plus3Plus4 = AddExpression(xTimes2Plus3, IntValue(4))
+    val xPlus1 = AddExpression(xVarExp, IntValue(1))
 
     val s3_1 = AssignmentStmt(max, xPlus3Times2)
     val s4_1 = AssignmentStmt(max, xMinus5Minus3)
@@ -428,7 +432,7 @@ class AvailableExpressionsTest extends AnyFunSuite {
     val s2 = ReadIntStmt(max)
     val s3 = IfElseStmt(GTExpression(xVarExp, maxPlus1), s3_1, None)
     val s4 = IfElseStmt(GTExpression(maxVarExp, xTimes2Plus3Plus4), s4_1, None)
-    val s5 = AssignmentStmt(x, IntValue(5))
+    val s5 = AssignmentStmt(x, xPlus1)
     val s6 = WriteStmt(maxVarExp)
 
     val cfg = Graph[GraphNode, GraphEdge.DiEdge]()
@@ -458,9 +462,9 @@ class AvailableExpressionsTest extends AnyFunSuite {
         Set(xPlus3Times2, xPlus3, xTimes2Plus3Plus4, xTimes2, xTimes2Plus3),
         Set(xPlus3Times2, xPlus3, xTimes2Plus3Plus4, xTimes2, xTimes2Plus3, xMinus5Minus3, xMinus5)
       ),
-      SimpleNode(s5) -> (Set(), Set()),
-      SimpleNode(s6) -> (Set(), Set()),
-      EndNode() -> (Set(), Set())
+      SimpleNode(s5) -> (Set(), Set(xPlus1)),
+      SimpleNode(s6) -> (Set(xPlus1), Set(xPlus1)),
+      EndNode() -> (Set(xPlus1), Set())
     )
 
 
