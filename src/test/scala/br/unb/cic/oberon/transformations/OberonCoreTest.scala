@@ -1010,4 +1010,58 @@ class CoreVisitorTest extends AnyFunSuite {
     }
     /** ###### Case Tests end here ###### */
 
+    /** ###### Case Tests for CoreChecker ###### */
+        test("Testing if Core for valid Core for StmtCaseCore04") {
+            val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+
+            assert(path != null)
+
+            val coreVisitor = new CoreVisitor()
+            val content = String.join("\n", Files.readAllLines(path))
+
+            val module = ScalaParser.parse(content)
+            val isCore = CoreChecker.isModuleCore(module)
+
+            val coreModule = coreVisitor.transformModule(module)
+            val isCore2 = CoreChecker.isModuleCore(coreModule)
+
+            assert(!isCore)
+            assert(isCore2)
+        }
+
+        test("Testing if Core for valid Core for loop_stmt01") {
+            val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
+
+            assert(path != null)
+            
+            val coreVisitor = new CoreVisitor()
+            val content = String.join("\n", Files.readAllLines(path))
+
+            val module = ScalaParser.parse(content)
+            val isCore = CoreChecker.isModuleCore(module)
+
+            val coreModule = coreVisitor.transformModule(module)
+            val isCore2 = CoreChecker.isModuleCore(coreModule)
+
+            assert(!isCore)
+            assert(isCore2)
+        }
+
+        test("Testing if Core for valid Core for RepeatUntilStmt06") {
+            val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
+
+            assert(path != null)
+            
+            val coreVisitor = new CoreVisitor()
+            val content = String.join("\n", Files.readAllLines(path))
+
+            val module = ScalaParser.parse(content)
+            val isCore = CoreChecker.isModuleCore(module)
+
+            val coreModule = coreVisitor.transformModule(module)
+            val isCore2 = CoreChecker.isModuleCore(coreModule)
+
+            assert(!isCore)
+            assert(isCore2)
+        }
 }
