@@ -89,7 +89,7 @@ class CoreVisitor extends OberonVisitorAdapter {
 
 }
 
-class CoreChecker extends OberonVisitorAdapter {
+object CoreChecker extends OberonVisitorAdapter {
     private var isCore = true
     
     override type T = Unit
@@ -107,14 +107,25 @@ class CoreChecker extends OberonVisitorAdapter {
             case ForStmt(initStmt, condition, block) => isCore = false
 
             // Condicionais
-            case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => isCore = false;
+            case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => isCore = false
             case CaseStmt(exp, cases, elseStmt) => isCore = false
+
+            // Outros casos com SequenceStmt
+            case WhileStmt(condition, whileStmt) => whileStmt.accept(this)
+            case IfElseStmt(condition, thenStmt, elseStmt) => thenStmt.accept(this); 
+                                                                elseStmt match { 
+                                                                    case Some(f) => Some(elseStmt.get.accept((this)))
+                                                                    case None => true
+                                                                }
+
+            case other => true
         }
     }
 
     private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): Unit = {
         if (!stmtsList.isEmpty){
-            stmtsList.head.accept(this); 
+            stmtsList.head.accept(this);
+            transformListStmts(stmtsList.tail)
         }
     }
 
