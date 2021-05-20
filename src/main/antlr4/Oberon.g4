@@ -79,6 +79,7 @@ statement
  ;
 
 repl: varDeclaration #REPLVarDeclaration
+      | constant #REPLConstant
       | expression #REPLExpression
       | statement #REPLStatement
       | userTypeDeclaration #REPLUserTypeDeclaration

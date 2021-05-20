@@ -18,6 +18,7 @@ trait REPL
 case class REPLExpression(exp: Expression) extends REPL
 case class REPLStatement(stmt: Statement) extends REPL
 case class REPLVarDeclaration(declarations: List[VariableDeclaration]) extends REPL
+case class REPLConstant(constants: Constant) extends REPL
 case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
 
 /* procedure declaration definition */

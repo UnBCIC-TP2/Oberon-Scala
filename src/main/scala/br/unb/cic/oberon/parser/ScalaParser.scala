@@ -40,63 +40,6 @@ object ScalaParser {
 
     replVisitor.visit(parser.repl())
     replVisitor.repl
-
-  }
-
-  def parseVarDeclaration(input: String): List[VariableDeclaration] = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
-
-    val visitor = new ParserVisitor
-
-    val declaration = visitor.visitVariableDeclaration(parser.varDeclaration())
-    declaration
-  }
-
-  def parseConstDeclaration(input: String): Constant = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
-
-    val visitor = new ParserVisitor
-
-    val constant = visitor.visitConstant(parser.constant())
-    constant
-  }
-
-  def parseExpression(input: String): Expression = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
-
-    val expCtx = parser.expression();
-
-    val visitor = new ParserVisitor
-    val expVisitor = new visitor.ExpressionVisitor
-
-    expCtx.accept(expVisitor)
-
-    expVisitor.exp
-  }
-
-  def parseStatements(input: String): Statement = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
-
-    val stmtCtx = parser.statement()
-
-    val visitor = new ParserVisitor
-    val stmtVisitor = new visitor.StatementVisitor
-
-    stmtCtx.accept(stmtVisitor)
-
-    stmtVisitor.stmt
   }
 
 }
@@ -217,24 +160,18 @@ class ParserVisitor {
   class REPLVisitor() extends OberonBaseVisitor[Unit] {
     var repl: REPL = _
 
-    /**
-     * {@inheritDoc  }
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
     override def visitREPLVarDeclaration(ctx: OberonParser.REPLVarDeclarationContext): Unit = {
       val v = ctx.varDeclaration()
       val declarations = visitVariableDeclaration(v)
       repl = REPLVarDeclaration(declarations)
     }
 
-    /**
-     * {@inheritDoc  }
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
+    override def visitREPLConstant(ctx: OberonParser.REPLConstantContext): Unit = {
+      val c = ctx.constant()
+      val constant = ParserVisitor.this.visitConstant(c)
+      repl = REPLConstant(constant)
+    }
+
     override def visitREPLStatement(ctx: OberonParser.REPLStatementContext): Unit = {
       val s = ctx.statement()
       val stmtVisitor = new StatementVisitor
@@ -242,12 +179,6 @@ class ParserVisitor {
       repl = REPLStatement(stmtVisitor.stmt)
     }
 
-    /**
-     * {@inheritDoc  }
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
     override def visitREPLExpression(ctx: OberonParser.REPLExpressionContext): Unit = {
       val e = ctx.expression()
       val expVisitor = new ExpressionVisitor
@@ -255,12 +186,6 @@ class ParserVisitor {
       repl = REPLExpression(expVisitor.exp)
     }
 
-    /**
-     * {@inheritDoc  }
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
     override def visitREPLUserTypeDeclaration(ctx: OberonParser.REPLUserTypeDeclarationContext): Unit = {
       val u = ctx.userTypeDeclaration()
       val userDeclarations = visitUserDefinedType(u)
