@@ -35,8 +35,19 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
       .fold(Set())((acc, predecessorOut) => acc | predecessorOut)
   }
 
-  def computeNodeKill(nodeIn: NodeAnalysis, nodeGen: NodeAnalysis): NodeAnalysis = {
-    if (nodeGen.nonEmpty) nodeIn.filter(definition => definition._1 == nodeGen.head._1) else Set()
+  def computeNodeKill(currNode: GraphNode, nodeIn: NodeAnalysis): NodeAnalysis = {
+    currNode match {
+      case SimpleNode(AssignmentStmt(varName, _)) =>
+        removeTuplesWithVarName(nodeIn, varName)
+      case SimpleNode(ReadIntStmt(varName)) =>
+        removeTuplesWithVarName(nodeIn, varName)
+      case _ =>
+        Set()
+    }
+  }
+
+  private def removeTuplesWithVarName(set: NodeAnalysis, varName: String): NodeAnalysis = {
+    if(set.nonEmpty) set.filter(tuple => tuple._1 == varName) else Set()
   }
 
   @tailrec
@@ -75,8 +86,8 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
                                    currNode: GraphNode,
                                    reachDefs: AnalysisMapping): (GraphNode, (NodeAnalysis, NodeAnalysis)) = {
     val currNodeIn: NodeAnalysis = computeNodeIn(cfg, reachDefs, currNode)
-    val currNodeGen: NodeAnalysis = computeNodeGenDefinitions(currNode)
-    val currNodeKill: NodeAnalysis = computeNodeKill(currNodeIn, currNodeGen)
+    val currNodeGen: NodeAnalysis = computeNodeGen(currNode)
+    val currNodeKill: NodeAnalysis = computeNodeKill(currNode, currNodeIn)
 
     // OUT(x) = In(x) + Gen(x) - Kill(x)
     val currNodeOut: NodeAnalysis =
@@ -85,7 +96,7 @@ case class ReachingDefinitions() extends ControlFlowGraphAnalysis[HashMap[GraphN
     currNode -> (currNodeIn, currNodeOut)
   }
 
-  private def computeNodeGenDefinitions(currentNode: GraphNode): NodeAnalysis = currentNode match {
+  private def computeNodeGen(currentNode: GraphNode): NodeAnalysis = currentNode match {
     case SimpleNode(AssignmentStmt(varName, _)) =>
       Set((varName, currentNode))
     case SimpleNode(ReadIntStmt(varName)) =>
