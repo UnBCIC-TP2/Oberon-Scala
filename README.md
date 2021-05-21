@@ -17,6 +17,7 @@ This program was created for the course "Computer Program Skills 2" (Prof. Rodri
 
 ### ☑ Prerequisite
 - Scala
+- SBT
 
 ### 🎲 Run the program
 ```Scala
