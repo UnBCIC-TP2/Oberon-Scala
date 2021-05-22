@@ -97,6 +97,7 @@ class Interpreter extends OberonVisitorAdapter {
         val actualArguments = args.map(a => evalExpression(a))
         env.push() // after that, we can "push", to indicate a procedure call.
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
+        env.attVariablesReference(actualArguments)
         env.pop() // and we pop, to indicate that a procedure finished its execution.
     }
   }
@@ -171,14 +172,12 @@ class Interpreter extends OberonVisitorAdapter {
           env.setLocalVariable(pair._1, pair._2)
         }
       )
+
+    var index = 0
     procedure.args.foreach {
-      case ReferenceArguments(name: String, argumentType: Type) => {
-        procedure.args.map(formal => formal.name)
-          .zip(args)
-          .foreach(pair => {
-            env.setVariableReference(pair._1, pair._2)
-          }
-          )
+      case arg@ReferenceArguments(name: String, argumentType: Type) => {
+        env.setVariableReference(arg.name, args(index))
+        index += index + 1
       }
     }
 

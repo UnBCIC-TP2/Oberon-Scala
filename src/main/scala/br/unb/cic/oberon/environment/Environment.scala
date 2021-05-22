@@ -50,6 +50,14 @@ class Environment[T] {
     variableReference = variableReference:+((variableName, arg))
   }
 
+  def attVariablesReference(args: List[Expression]): Unit = {
+    args.foreach(arg => {
+      variableReference.foreach(value => {
+        if(value._2 == arg) println("Opa")
+      })
+    })
+  }
+
   def setVariable(name: String, value: T) : Unit = {
     if(!stack.isEmpty && stack.top.contains(name)) {
       setLocalVariable(name, value)
