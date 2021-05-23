@@ -5,6 +5,7 @@ import br.unb.cic.oberon.ast.{OberonModule, EQExpression, LTEExpression, AndExpr
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import cats.data.State
+import br.unb.cic.oberon.ast.Procedure
 
 class CoreVisitor extends OberonVisitorAdapter {
 
@@ -61,6 +62,21 @@ class CoreVisitor extends OberonVisitorAdapter {
         return stmtsCore.toList
     }
 
+    private def transformProcedureListStatement(listProcedures: List[Procedure]): List[Procedure] = {
+
+        var listProceduresCore = ListBuffer[Procedure]()
+
+        for (procedure <- listProcedures){
+            listProceduresCore += Procedure(name = procedure.name,
+                                            args = procedure.args,
+                                            returnType = procedure.returnType,
+                                            constants = procedure.constants,
+                                            variables = procedure.variables,
+                                            stmt = procedure.stmt.accept(this))
+        }
+        return listProceduresCore.toList
+    }
+
     def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] =
       stmts match {
         case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
@@ -73,6 +89,8 @@ class CoreVisitor extends OberonVisitorAdapter {
         val stmtcore = module.stmt.get.accept(this)
         // TODO: Resolver transformação a core das procedures declaradas.
 
+        // recebe lista de procedures. para cada procedure tratar os seus statements
+        val stmtprocedureList = transformProcedureListStatement(module.procedures)
 
         // this might be to much hardcoded and could cause problems in case of changes to OberonModule.
         val coreModule = OberonModule(
@@ -80,7 +98,7 @@ class CoreVisitor extends OberonVisitorAdapter {
             userTypes = module.userTypes,
             constants = module.constants,
             variables = module.variables,
-            procedures = module.procedures,
+            procedures = stmtprocedureList,
             stmt = Some(stmtcore)
         )
 
@@ -91,7 +109,7 @@ class CoreVisitor extends OberonVisitorAdapter {
 
 object CoreChecker extends OberonVisitorAdapter {
     private var isCore = true
-    
+
     override type T = Unit
 
     override def visit(stmt: Statement): Unit = {
@@ -115,10 +133,10 @@ object CoreChecker extends OberonVisitorAdapter {
             case IfElseStmt(condition, thenStmt, elseStmt) => thenStmt.accept(this); 
                                                                 elseStmt match { 
                                                                     case Some(f) => Some(elseStmt.get.accept((this)))
-                                                                    case None => true
+                                                                    case None => ()
                                                                 }
 
-            case other => true
+            case other => ()
         }
     }
 
@@ -129,10 +147,21 @@ object CoreChecker extends OberonVisitorAdapter {
         }
     }
 
+    private def checkProcedureStmts(listProcedures: List[Procedure]): Unit = {
+        for (procedure <- listProcedures){
+            procedure.stmt.accept(this)
+        }
+    }
+
     def isModuleCore(module: OberonModule): Boolean = {
         isCore = true
         module.stmt.get.accept(this)
-
-        return isCore
+        if (!isCore){
+            return isCore
+        }
+        else{
+            module.procedures.foreach{x : Procedure => x.stmt.accept(this)}
+            return isCore
+        }
     }
 }
