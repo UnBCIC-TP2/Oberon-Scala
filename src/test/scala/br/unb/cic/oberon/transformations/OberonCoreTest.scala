@@ -459,6 +459,7 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(stmts.head == AssignmentStmt("x", IntValue(2)))
         assert(stmts(1) == AssignmentStmt("y", IntValue(2)))
         assert(stmts(2) == WriteStmt(FunctionCallExpression("power",List(VarExpression("x"), VarExpression("y")))))
+        assert(coreModule.procedures.head.stmt == SequenceStmt(List(AssignmentStmt("r",VarExpression("b")), IfElseStmt(OrExpression(LTExpression(VarExpression("b"),IntValue(0)),LTExpression(VarExpression("e"),IntValue(0))),ReturnStmt(IntValue(0)),None), IfElseStmt(EQExpression(VarExpression("e"),IntValue(0)),ReturnStmt(IntValue(1)),None), WhileStmt(BoolValue(true),SequenceStmt(List(AssignmentStmt("r",MultExpression(VarExpression("r"),VarExpression("b"))), AssignmentStmt("e",SubExpression(VarExpression("e"),IntValue(1))), IfElseStmt(LTEExpression(VarExpression("e"),IntValue(1)),ExitStmt(),None)))), ReturnStmt(VarExpression("r")))))
     }
     /** ###### RepeatUntil Tests end here ###### */
 
@@ -1049,6 +1050,24 @@ class CoreVisitorTest extends AnyFunSuite {
 
         test("Testing if Core for valid Core for RepeatUntilStmt06") {
             val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
+
+            assert(path != null)
+            
+            val coreVisitor = new CoreVisitor()
+            val content = String.join("\n", Files.readAllLines(path))
+
+            val module = ScalaParser.parse(content)
+            val isCore = CoreChecker.isModuleCore(module)
+
+            val coreModule = coreVisitor.transformModule(module)
+            val isCore2 = CoreChecker.isModuleCore(coreModule)
+
+            assert(!isCore)
+            assert(isCore2)
+        }
+
+        test("Testing if Core for valid Core for RepeatUntil04") {
+            val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil04.oberon").toURI)
 
             assert(path != null)
             
