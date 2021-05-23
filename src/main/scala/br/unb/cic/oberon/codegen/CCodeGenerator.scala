@@ -3,15 +3,20 @@ package br.unb.cic.oberon.codegen
 import br.unb.cic.oberon.ast._
 import scala.annotation.tailrec
 import org.typelevel.paiges._
+import br.unb.cic.oberon.transformations.CoreVisitor
 
 abstract class CCodeGenerator extends CodeGenerator {}
 
 case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
+    // Core Vitor Transformation
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
     val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.text(
       "#include <stdbool.h>"
     ) + Doc.line + Doc.line
-    val procedureDocs = module.procedures.map {
+    val procedureDocs = coreModule.procedures.map {
       case (procedure) => generateProcedure(procedure, lineSpaces)
     }
     val mainProcedures =
@@ -21,18 +26,18 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           procedureDocs
         ) + Doc.line + Doc.line
       else Doc.empty
-    val mainDefines = generateConstants(module.constants)
-    val mainDeclarations = generateDeclarations(module.variables, lineSpaces)
-    val mainBody = module.stmt match {
+    val mainDefines = generateConstants(coreModule.constants)
+    val mainDeclarations = generateDeclarations(coreModule.variables, lineSpaces)
+    val mainBody = coreModule.stmt match {
       case Some(stmt) =>
-        Doc.text("void main() ") + Doc.char(
+        Doc.text("int main() ") + Doc.char(
           '{'
         ) + Doc.line + mainDeclarations + Doc.line + generateStatement(
           stmt,
           lineSpaces,
           lineSpaces
-        ) + Doc.char('}')
-      case None => Doc.text("void main() {}")
+        ) + Doc.text("\n\treturn 0; \n}")
+      case None => Doc.text("int main() {return 0;}")
     }
     val main = mainHeader + mainDefines + mainProcedures + mainBody
     main.render(60)

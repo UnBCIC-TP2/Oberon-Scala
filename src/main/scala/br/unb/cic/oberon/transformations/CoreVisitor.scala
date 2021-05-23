@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.transformations
 
 import br.unb.cic.oberon.interpreter.Interpreter
-import br.unb.cic.oberon.ast.{OberonModule, EQExpression, LTEExpression, AndExpression, SequenceStmt, BoolValue, ForStmt, LoopStmt, ExitStmt, Statement, WhileStmt, RepeatUntilStmt, CaseStmt, IfElseIfStmt, ElseIfStmt, IfElseStmt, SimpleCase, RangeCase, CaseAlternative, Expression}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import cats.data.State

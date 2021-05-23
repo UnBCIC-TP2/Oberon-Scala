@@ -236,8 +236,8 @@ class CoreVisitorTest extends AnyFunSuite {
         assert(stmts(3) == WriteStmt(VarExpression("sum")))
     }
     
-
-    test("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
+    // TODO
+    ignore("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
         assert(path != null)

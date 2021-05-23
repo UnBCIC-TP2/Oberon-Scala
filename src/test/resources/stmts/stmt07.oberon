@@ -5,9 +5,11 @@ VAR
 
 BEGIN
     readInt(x); 
-    
+    z := 0;
+
     FOR y := 0 TO y < x DO
-      z := z + y
+      z := z + y;
+      y := y + 1
     END;
 
     write(z)	
