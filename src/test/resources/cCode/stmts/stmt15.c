@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
-  int x, y, z;
+int main() {
+  int y, z, x;
+
   scanf("%d", &x);
-  for(y = 0; y < x; y++){
+  y = 0;
+  while (y < x) {
     scanf("%d", &z);
-    z = z / (y * x); //TODO: A expressão do tipo bracket não parece ter sido implementada no parser
+    z = z / y * x;
   }
   printf("%d\n", z);
+
+	return 0; 
 }
