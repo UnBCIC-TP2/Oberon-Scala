@@ -1,0 +1,22 @@
+MODULE SimpleModule;	
+
+CONST
+  y = 10;
+
+VAR	
+  x, z, k : INTEGER;	
+
+BEGIN
+  FOR x := 0 TO x < y DO
+    write(x);
+    FOR z := 0 TO z < y DO
+      k := z + x;
+      z := z + 1;
+      write(k)
+    END;
+    x := x + 1
+  END;
+  write(k)
+END
+
+END SimpleModule.

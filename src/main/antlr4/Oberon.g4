@@ -1,5 +1,6 @@
 grammar Oberon;
 
+
 compilationUnit
   : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
   ;  
@@ -71,8 +72,10 @@ statement
  | 'REPEAT' stmt = statement 'UNTIL' cond = expression                                                                        #RepeatUntilStmt
  | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
  | 'FOR' var = Id 'IN' min = expression '..' max = expression 'DO' stmt = statement 'END'                                     #ForRangeStmt
+ | 'LOOP' stmt = statement 'END'                                                                                              #LoopStmt
  | 'RETURN' exp = expression                                                                                                  #ReturnStmt
  | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt
+ | 'EXIT'                                                                                                                     #ExitStmt
  ;
 
  designator
@@ -130,3 +133,4 @@ COMMENT
 LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
     ;
+

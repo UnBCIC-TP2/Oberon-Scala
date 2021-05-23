@@ -1,0 +1,23 @@
+MODULE LoopStmt;
+
+VAR
+ x : INTEGER;
+ y : INTEGER;
+ i : INTEGER;
+
+BEGIN
+ x := 0;
+ y := 0;
+ LOOP
+  x := x + 1;
+  i := 0;
+  LOOP
+   y := y + 1;
+   i := i + 1;
+   IF i = 10 THEN EXIT END
+  END;
+  IF x = 10 THEN EXIT END
+ END
+END
+
+END LoopStmt.

@@ -39,3 +39,6 @@ project/metals.sbt
 .vscode/
 .bloop/
 .scalafmt.conf
+
+#antlr4
+.antlr/

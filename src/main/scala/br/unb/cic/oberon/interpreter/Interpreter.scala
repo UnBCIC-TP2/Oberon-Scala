@@ -24,6 +24,7 @@ import scala.io.StdIn
 class Interpreter extends OberonVisitorAdapter {
   type T = Unit
 
+  var exit = false
   val env = new Environment[Expression]()
   var printStream : PrintStream = new PrintStream(System.out)
 
@@ -66,7 +67,7 @@ class Interpreter extends OberonVisitorAdapter {
     // of a sequence of stmts. Whenever we achieve a
     // return stmt, we associate in the local variables
     // the name "return" to the return value.
-    if (env.lookup(Values.ReturnKeyWord).isDefined) {
+    if (exit || env.lookup(Values.ReturnKeyWord).isDefined) {
       return
     }
     // otherwise, we pattern-match on the current stmt.
@@ -86,9 +87,11 @@ class Interpreter extends OberonVisitorAdapter {
       case WriteStmt(exp) => printStream.println(evalExpression(exp))
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
       case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
-      case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
+      case WhileStmt(condition, whileStmt) => while (evalCondition(condition) && !exit) whileStmt.accept(this); exit = false
       case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
       case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
+      case LoopStmt(stmt) => while(!exit) { stmt.accept(this) }; exit = false
+      case ExitStmt() => exit = true
       case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
       case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
       case ProcedureCallStmt(name, args) =>
