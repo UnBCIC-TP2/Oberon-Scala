@@ -8,9 +8,11 @@ int factorial(int i) {
   return i * factorial(i - 1);
 }
 
-void main() {
+int main() {
   int res;
 
   res = factorial(5);
   printf("%d\n", res);
+
+	return 0; 
 }

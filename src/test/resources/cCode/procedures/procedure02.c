@@ -7,7 +7,7 @@ int calcmult(int i, int base) {
   return i * base;
 }
 
-void main() {
+int main() {
   int base, count, mult;
 
   scanf("%d", &base);
@@ -16,4 +16,6 @@ void main() {
     mult = calcmult(count, base);
     printf("%d\n", mult);
   }
+
+	return 0; 
 }

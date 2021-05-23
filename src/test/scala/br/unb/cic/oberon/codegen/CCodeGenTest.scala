@@ -73,12 +73,11 @@ class CCodeGenTest extends AnyFunSuite {
     }
 
 
-    // TODO: 01, 02, 03
     // Tests for C code generator for interpreter_factorial01.oberon - interpreter_factorial03.oberon
     for (i <- 1 to 3) {
         val procedureNumber = "%02d".format(i)
 
-        ignore(s"Testing C generator for interpreter_factorial$procedureNumber") {
+        test(s"Testing C generator for interpreter_factorial$procedureNumber") {
             val oberonPath = Paths.get(
                 getClass.getClassLoader.getResource(
                 s"procedures/interpreter_factorial$procedureNumber.oberon")
@@ -108,9 +107,8 @@ class CCodeGenTest extends AnyFunSuite {
     }
 
 
-    // TODO: 01
     // Test for C code generator for interpreter_fibonacci01.oberon
-    ignore(s"Testing C generator for interpreter_fibonacci01") {
+    test(s"Testing C generator for interpreter_fibonacci01") {
         val oberonPath = Paths.get(
           getClass.getClassLoader
             .getResource(s"procedures/interpreter_fibonacci01.oberon")
