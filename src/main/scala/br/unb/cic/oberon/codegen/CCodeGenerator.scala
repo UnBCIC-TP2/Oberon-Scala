@@ -224,6 +224,9 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         ) + Doc
           .char(';') + Doc.line
 
+      case ExitStmt() =>
+        formatLine(startSpaces) + Doc.text("break;") + Doc.line
+
       case CaseStmt(exp, cases, elseStmt) => {
         val caseStmts = cases.map {
           case SimpleCase(condition, stmt) =>

@@ -161,8 +161,7 @@ class CCodeGenTest extends AnyFunSuite {
         assert(generatedCCode == cCode)
     }
 
-    // TODO:  Os RepeatUntil não estão gerando o "break" para sair do while, no código em C.
-    ignore("First RepeatUntil Test") {
+    test("First RepeatUntil Test") {
         val oberonPath = Paths.get(
             getClass.getClassLoader
             .getResource("stmts/repeatuntil.oberon")
@@ -183,12 +182,10 @@ class CCodeGenTest extends AnyFunSuite {
         )
         assert(cPath != null)
         val cCode = String.join("\n", Files.readAllLines(cPath))
-
         assert(generatedCCode == cCode)
     }
 
-    // TODO
-    ignore("RepeatUntil Test with just one loop") {
+    test("RepeatUntil Test with just one loop") {
         val oberonPath = Paths.get(
             getClass.getClassLoader.getResource("stmts/repeatuntil01.oberon")
             .getFile
@@ -213,8 +210,7 @@ class CCodeGenTest extends AnyFunSuite {
         assert(generatedCCode == cCode)
     }
 
-    // TODO
-    ignore("RepeatUntil Nested") {
+    test("RepeatUntil Nested") {
         val oberonPath = Paths.get(
             getClass.getClassLoader
             .getResource("stmts/repeatuntil02.oberon")
@@ -240,8 +236,7 @@ class CCodeGenTest extends AnyFunSuite {
         assert(generatedCCode == cCode)
     }
 
-    // TODO
-    ignore("RepeatUntil Compound Exit Condition") {
+    test("RepeatUntil Compound Exit Condition") {
         val oberonPath = Paths.get(
             getClass.getClassLoader
             .getResource("stmts/repeatuntil03.oberon")
@@ -267,8 +262,7 @@ class CCodeGenTest extends AnyFunSuite {
         assert(generatedCCode == cCode)
     }
 
-    // TODO
-      ignore("RepeatUntil In Procedure") {
+    test("RepeatUntil In Procedure") {
         val oberonPath = Paths.get(
             getClass.getClassLoader
             .getResource("stmts/repeatuntil04.oberon")
