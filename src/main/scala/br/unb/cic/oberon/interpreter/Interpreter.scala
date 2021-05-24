@@ -1,11 +1,11 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import org.antlr.stringtemplate.language.FormalArgument
 
 import scala.io.StdIn
 
@@ -57,7 +57,6 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
-  // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
 
 
   override def visit(stmt: Statement): Unit = {
@@ -154,19 +153,24 @@ class Interpreter extends OberonVisitorAdapter {
    * in the local variables, assigning
    * "return" -> exp.
    */
-  private def setReturnExpression(exp: Expression): Unit =
+  private def setReturnExpression(exp: Expression): Unit = {
     env.setLocalVariable(Values.ReturnKeyWord, exp)
+  }
 
   def visitProcedureCall(name: String, args: List[Expression]): Unit = {
     val procedure = env.findProcedure(name)
     updateEnvironmentWithProcedureCall(procedure, args)
     procedure.stmt.accept(this)
+    env.attVariablesReference()
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
     procedure.args.map(formal => formal.name)
       .zip(args)
-      .foreach(pair => env.setLocalVariable(pair._1, pair._2))
+      .foreach(pair => {
+          env.setLocalVariable(pair._1, pair._2)
+        }
+      )
 
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))

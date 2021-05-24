@@ -2271,6 +2271,74 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.variables.length == 1)
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
+  test("Testing the oberon byReferenceProcedure01 code. This module implements the inc e deInc") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "increment")
+
+    // Verifying the inc procedure
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+
+    val procedure = module.procedures.head
+    assert(procedure.name == "inc")
+    assert(procedure.args.size == 1)
+    assert(procedure.returnType.isEmpty)
+
+    procedure.stmt match {
+      case AssignmentStmt("y", AddExpression(VarExpression("y"),IntValue(1))) => succeed
+      case _ => fail("expecting a return stmt")
+    }
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
 
 
+    assert(module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.head == AssignmentStmt("x", IntValue(1)))
+    assert(stmt.stmts(1) == ProcedureCallStmt("inc",List(VarExpression("x"))))
+    assert(stmt.stmts(2) == WriteStmt(VarExpression("x")))
+
+  }
+  test("Testing the oberon byReferenceProcedure02 code. This module implements the inc e deInc") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "increment")
+
+    // Verifying the inc procedure
+    assert(module.procedures.size == 2)
+    assert(module.stmt.isDefined)
+
+    val subProcedure = module.procedures.head
+    assert(subProcedure.name == "deInc")
+    assert(subProcedure.args.size == 1)
+
+    val addProcedure = module.procedures(1)
+    assert(addProcedure.name == "inc")
+    assert(addProcedure.args.size == 1)
+
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
+
+
+    assert(module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.head == AssignmentStmt("x", IntValue(2)))
+    assert(stmt.stmts(1) == ProcedureCallStmt("inc",List(VarExpression("x"))))
+    assert(stmt.stmts(2) == ProcedureCallStmt("deInc",List(VarExpression("x"))))
+    assert(stmt.stmts(3) == WriteStmt(VarExpression("x")))
+
+  }
 }

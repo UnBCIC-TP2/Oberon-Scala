@@ -1,0 +1,20 @@
+MODULE DivideProcedure;
+
+VAR
+     x,y: INTEGER;
+
+PROCEDURE divide(VAR x: integer, y: INTEGER);
+BEGIN
+    IF(y > 0) THEN
+        x := x/y
+    END
+END divide
+
+BEGIN
+    x := 6;
+    y := 3;
+    divide(x, y);
+    write(x)
+END
+
+END DivideProcedure.

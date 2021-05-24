@@ -1,16 +1,22 @@
 MODULE increment;
 
-PROCEDURE inc(VAR x: integer)
-BEGIN
+CONST
+    a = 10;
+VAR
+    x,y,z: INTEGER;
+
+PROCEDURE inc(VAR x , y , a: INTEGER);
+ BEGIN
     x := x + 1;
-END inc
+    a := a + 1
+ END inc
 
 BEGIN
-    x: integer;
-    x := 1;
-    inc(x);
-
-    write(x);
+    x:= 2;
+    y:= 3;
+    z:= 4;
+    inc(x,y,a);
+    write(x)
 END
 
-END increment;
+END increment.

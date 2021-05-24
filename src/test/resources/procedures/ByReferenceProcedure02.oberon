@@ -1,22 +1,23 @@
 MODULE increment;
 
-PROCEDURE deInc(VAR x: integer)
-BEGIN
-    x := x - 1;
-END deInc
+VAR
+    x: INTEGER;
 
-PROCEDURE inc(VAR x: integer)
-BEGIN
-    x := x + 1;
-END inc
+PROCEDURE deInc(VAR x: INTEGER);
+ BEGIN
+    x := x - 1
+ END deInc
+
+PROCEDURE inc(VAR x: INTEGER);
+ BEGIN
+    x := x + 1
+ END inc
 
 BEGIN
-    x: integer;
     x := 2;
     inc(x);
     deInc(x);
-
-    write(x);
+    write(x)
 END
 
-END increment;
+END increment.

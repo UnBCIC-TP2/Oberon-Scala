@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType,Undef}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, IntValue, Procedure, RecordType, Type, Undef, UserDefinedType}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -29,7 +29,7 @@ class Environment[T] {
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
-
+  def removeGlobalVariable(name: String) : Unit = global -= name
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes  += userDefinedTypeName(userType) -> userType
     userType match {
@@ -43,6 +43,19 @@ class Environment[T] {
       stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
+  }
+
+  def attVariablesReference(): Unit = {
+    stack.foreach(m => {
+      m.foreach(s =>{
+        global.foreach(t =>{
+          if(t._1 == s._1){
+            removeGlobalVariable(s._1)
+            setGlobalVariable(s._1 , s._2)
+          }
+        })
+      })
+    })
   }
 
   def setVariable(name: String, value: T) : Unit = {

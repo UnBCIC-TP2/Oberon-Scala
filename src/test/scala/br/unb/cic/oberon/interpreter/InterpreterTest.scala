@@ -31,6 +31,96 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
+  test("Testing interpreter on ByReferenceProcedure01 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure01.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "increment")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(3))) // FOR TO x
+    assert(interpreter.env.lookup("y") == Some(IntValue(3))) // FOR TO x
+    assert(interpreter.env.lookup("z") == Some(IntValue(4))) // FOR TO x
+
+
+  }
+  test("Testing interpreter on ByReferenceProcedure02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure02.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "increment")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(2)))
+
+  }
+  test("Testing interpreter on ByReferenceProcedure04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure04.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "DivideProcedure")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(2)))
+
+
+  }
+  test("Testing interpreter on ByReferenceProcedure05 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure05.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleAttribution")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
+
+
+  }
+  test("Testing interpreter on ByReferenceProcedure06 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure06.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "RepeatReference")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(3)))
+    assert(interpreter.env.lookup("i") == Some(IntValue(0)))
+
+
+  }
+  test("Testing interpreter on ByReferenceProcedure07 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure07.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "WriteOnProcedure")
+
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("x") == Some(IntValue(3)))
+  }
   test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").getFile)
 
