@@ -45,9 +45,8 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("x") == Some(IntValue(3))) // FOR TO x
     assert(interpreter.env.lookup("y") == Some(IntValue(3))) // FOR TO x
     assert(interpreter.env.lookup("z") == Some(IntValue(4))) // FOR TO x
-
-
   }
+
   test("Testing interpreter on ByReferenceProcedure02 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure02.oberon").getFile)
 
@@ -62,8 +61,9 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("x") == Some(IntValue(2)))
 
   }
-  test("Testing interpreter on ByReferenceProcedure04 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure04.oberon").getFile)
+
+  test("Testing interpreter on ByReferenceProcedure03 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure03.oberon").getFile)
 
     assert(path != null)
 
@@ -74,11 +74,10 @@ class InterpreterTest extends AnyFunSuite {
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(2)))
-
-
   }
-  test("Testing interpreter on ByReferenceProcedure05 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure05.oberon").getFile)
+
+  test("Testing interpreter on ByReferenceProcedure04 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure04.oberon").getFile)
 
     assert(path != null)
 
@@ -89,11 +88,10 @@ class InterpreterTest extends AnyFunSuite {
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-
-
   }
-  test("Testing interpreter on ByReferenceProcedure06 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure06.oberon").getFile)
+
+  test("Testing interpreter on ByReferenceProcedure05 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure05.oberon").getFile)
 
     assert(path != null)
 
@@ -105,22 +103,22 @@ class InterpreterTest extends AnyFunSuite {
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(3)))
     assert(interpreter.env.lookup("i") == Some(IntValue(0)))
-
-
   }
-  test("Testing interpreter on ByReferenceProcedure07 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure07.oberon").getFile)
+
+  test("Testing interpreter on ByReferenceProcedure06 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure05.oberon").getFile)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "WriteOnProcedure")
+    assert(module.name == "RepeatReference")
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(3)))
   }
+
   test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/interpreter_factorial01.oberon").getFile)
 
@@ -135,7 +133,6 @@ class InterpreterTest extends AnyFunSuite {
 
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
     assert(interpreter.env.lookup("y") == Some(IntValue(120)))
-
   }
 
   test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
@@ -152,7 +149,6 @@ class InterpreterTest extends AnyFunSuite {
 
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
     assert(interpreter.env.lookup("y") == Some(IntValue(1)))
-
   }
 
   test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
@@ -169,7 +165,6 @@ class InterpreterTest extends AnyFunSuite {
 
     assert(interpreter.env.lookup("x") == Some(IntValue(0)))
     assert(interpreter.env.lookup("y") == Some(IntValue(1)))
-
   }
 
   test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {

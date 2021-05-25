@@ -1,20 +1,15 @@
-MODULE DivideProcedure;
+MODULE SimpleAttribution;
 
 VAR
-     x,y: INTEGER;
-
-PROCEDURE divide(VAR x: integer, y: INTEGER);
+    x: INTEGER;
+PROCEDURE attribution(VAR x: integer);
 BEGIN
-    IF(y > 0) THEN
-        x := x/y
-    END
-END divide
+    x := 1
+END attribution
 
 BEGIN
-    x := 6;
-    y := 3;
-    divide(x, y);
+    attribution(x);
     write(x)
 END
 
-END DivideProcedure.
+END SimpleAttribution.

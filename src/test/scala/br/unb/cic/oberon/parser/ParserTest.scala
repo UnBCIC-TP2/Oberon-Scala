@@ -1,9 +1,10 @@
 package br.unb.cic.oberon.parser
 
 import java.nio.file.{Files, Paths}
-
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
+import com.sun.jdi.IntegerValue
+import org.antlr.stringtemplate.language.FormalArgument
 
 class ParserTestSuite extends AnyFunSuite {
 
@@ -2271,7 +2272,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.variables.length == 1)
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
-  test("Testing the oberon byReferenceProcedure01 code. This module implements the inc e deInc") {
+
+  test("Testing the oberon byReferenceProcedure01 code. This module implements a method to increment variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure01.oberon").getFile)
 
     assert(path != null)
@@ -2281,32 +2283,37 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.name == "increment")
 
-    // Verifying the inc procedure
     assert(module.procedures.size == 1)
     assert(module.stmt.isDefined)
 
     val procedure = module.procedures.head
     assert(procedure.name == "inc")
-    assert(procedure.args.size == 1)
-    assert(procedure.returnType.isEmpty)
+    assert(procedure.args.size == 3)
 
-    procedure.stmt match {
-      case AssignmentStmt("y", AddExpression(VarExpression("y"),IntValue(1))) => succeed
-      case _ => fail("expecting a return stmt")
-    }
+    val procedure_stmt = procedure.stmt.asInstanceOf[SequenceStmt].stmts
+    assert(procedure_stmt.length == 2)
+    assert(procedure_stmt.head == AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+    assert(procedure_stmt(1) == AssignmentStmt("a", AddExpression(VarExpression("a"), IntValue(1))))
+
+    assert(module.constants.head == Constant("a", IntValue(10)))
+
     assert(module.variables.head == VariableDeclaration("x", IntegerType))
-
+    assert(module.variables(1) == VariableDeclaration("y", IntegerType))
+    assert(module.variables(2) == VariableDeclaration("z", IntegerType))
 
     assert(module.stmt.get.isInstanceOf[SequenceStmt])
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == AssignmentStmt("x", IntValue(1)))
-    assert(stmt.stmts(1) == ProcedureCallStmt("inc",List(VarExpression("x"))))
-    assert(stmt.stmts(2) == WriteStmt(VarExpression("x")))
+    assert(stmt.stmts.head == AssignmentStmt("x", IntValue(2)))
+    assert(stmt.stmts(1) == AssignmentStmt("y", IntValue(3)))
+    assert(stmt.stmts(2) == AssignmentStmt("z", IntValue(4)))
+    assert(stmt.stmts(3) == ProcedureCallStmt("inc", List(VarExpression("x"), VarExpression("y"), VarExpression("a"))))
+    assert(stmt.stmts(4) == WriteStmt(VarExpression("x")))
 
   }
-  test("Testing the oberon byReferenceProcedure02 code. This module implements the inc e deInc") {
+
+  test("Testing the oberon byReferenceProcedure02 code. This module implements two methods to increment and decrement the variables") {
     val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure02.oberon").getFile)
 
     assert(path != null)
@@ -2315,30 +2322,74 @@ class ParserTestSuite extends AnyFunSuite {
     val module = ScalaParser.parse(content)
 
     assert(module.name == "increment")
-
-    // Verifying the inc procedure
     assert(module.procedures.size == 2)
     assert(module.stmt.isDefined)
-
-    val subProcedure = module.procedures.head
-    assert(subProcedure.name == "deInc")
-    assert(subProcedure.args.size == 1)
-
-    val addProcedure = module.procedures(1)
-    assert(addProcedure.name == "inc")
-    assert(addProcedure.args.size == 1)
-
+    assert(module.variables.size == 1)
     assert(module.variables.head == VariableDeclaration("x", IntegerType))
 
+    val decrease_procedure = module.procedures.head
+    assert(decrease_procedure.name == "deInc")
+    assert(decrease_procedure.args.size == 1)
+    val decrease_proc_stmt = decrease_procedure.stmt.asInstanceOf[AssignmentStmt]
+    assert(decrease_proc_stmt == AssignmentStmt("x", SubExpression(VarExpression("x"), IntValue(1))))
+    assert(decrease_procedure.returnType.isEmpty)
+
+    val increase_procedure = module.procedures(1)
+    assert(increase_procedure.name == "inc")
+    assert(increase_procedure.args.size == 1)
+
+    val increase_proc_stmt = increase_procedure.stmt.asInstanceOf[AssignmentStmt]
+    assert(increase_proc_stmt == AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+    assert(decrease_procedure.returnType.isEmpty)
+
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
 
     assert(module.stmt.get.isInstanceOf[SequenceStmt])
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
     assert(stmt.stmts.head == AssignmentStmt("x", IntValue(2)))
-    assert(stmt.stmts(1) == ProcedureCallStmt("inc",List(VarExpression("x"))))
-    assert(stmt.stmts(2) == ProcedureCallStmt("deInc",List(VarExpression("x"))))
+    assert(stmt.stmts(1) == ProcedureCallStmt("inc", List(VarExpression("x"))))
+    assert(stmt.stmts(2) == ProcedureCallStmt("deInc", List(VarExpression("x"))))
     assert(stmt.stmts(3) == WriteStmt(VarExpression("x")))
+  }
 
+  test("Testing the oberon byReferenceProcedure03 code. This module implements a method to divide an value to another one.") {
+    val path = Paths.get(getClass.getClassLoader.getResource("procedures/ByReferenceProcedure03.oberon").getFile)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "DivideProcedure")
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("x", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("y", IntegerType))
+
+    val module_stmt = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+    assert(module_stmt.head == AssignmentStmt("x", IntValue(6)))
+    assert(module_stmt(1) == AssignmentStmt("y", IntValue(3)))
+    assert(module_stmt(2) == ProcedureCallStmt("divide", List(VarExpression("x"), VarExpression("y"))))
+    assert(module_stmt(3) == WriteStmt(VarExpression("x")))
+
+    val procedure = module.procedures.head
+    assert(procedure.args.size == 2)
+    procedure.args.head match {
+      case ReferenceArguments(name, argumentType) => {
+        assert(name == "x")
+        assert(argumentType == ReferenceToUserDefinedType("integer"))
+      }
+      case _ => fail
+    }
+    val proc_stmt = procedure.stmt.asInstanceOf[IfElseStmt]
+    assert(proc_stmt == IfElseStmt(
+      GTExpression(
+        VarExpression("y"), IntValue(0)),
+      AssignmentStmt("x",
+          DivExpression(VarExpression("x"), VarExpression("y"))),
+      None))
   }
 }
