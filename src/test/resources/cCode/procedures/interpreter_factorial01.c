@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int x, y;
 
   y = 1;
-  for (x = 5; x > 1; x++) {
+  x = 5;
+  while (x > 1) {
     y = y * x;
     x = x - 1;
   }
   printf("%d\n", y);
+
+	return 0; 
 }

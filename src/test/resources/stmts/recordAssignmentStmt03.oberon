@@ -2,14 +2,14 @@ MODULE SimpleModule;
 
 VAR
     record
-    salaA : INTEGER
+    salaA : INTEGER;
 
     vagas : record;
 
     record2
-    alunoA : INTEGER
-    alunoB : INTEGER
-    alunoC : INTEGER
+    alunoA : INTEGER;
+    alunoB : INTEGER;
+    alunoC : INTEGER;
 
     matricula: record2;
 

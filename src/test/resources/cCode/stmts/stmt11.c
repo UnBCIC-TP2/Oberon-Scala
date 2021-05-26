@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int y, z, x;
 
   scanf("%d", &x);
-  for (y = 0; y < x; y++) {
+  y = 0;
+  while (y < x) {
     scanf("%d", &z);
-    z = z / (y + 1);
+    z = z / y + 1;
     printf("%d\n", z);
   }
+
+	return 0; 
 }

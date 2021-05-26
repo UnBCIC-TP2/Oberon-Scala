@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int a, b, c;
 
   scanf("%d", &a);
@@ -10,13 +10,19 @@ void main() {
   if (a > b) {
     printf("%d\n", a);
   }
-  else if (b > a) {
-    printf("%d\n", b);
-  }
-  else if (a > c) {
-    printf("%d\n", c);
-  }
   else {
-    printf("%d\n", c);
-  }
+    if (b > a) {
+      printf("%d\n", b);
+    }
+    else {
+      if (a > c) {
+        printf("%d\n", c);
+      }
+      else {
+        printf("%d\n", c);
+}
+}
+}
+
+	return 0; 
 }

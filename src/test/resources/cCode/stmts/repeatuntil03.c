@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int x, y;
 
   x = 0;
   y = 0;
-  do {
+  while (true) {
     x = x + 1;
     y = y + 1;
-  } while (!(x >= 10 & y >= 20));
+    if (x >= 10 & y >= 20) {
+      break;
+    }
+  }
   printf("%d\n", x);
   printf("%d\n", y);
+
+	return 0; 
 }

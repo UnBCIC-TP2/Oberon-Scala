@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int x, y;
 
   x = 5;
@@ -10,4 +10,6 @@ void main() {
     x = x * x;
   }
   printf("%d\n", x);
+
+	return 0; 
 }

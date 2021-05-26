@@ -9,10 +9,12 @@ void print(int v1) {
   printf("%d\n", v1);
 }
 
-void main() {
+int main() {
   int x, y;
 
   scanf("%d", &x);
   scanf("%d", &y);
   print(sum(x, y));
+
+	return 0; 
 }

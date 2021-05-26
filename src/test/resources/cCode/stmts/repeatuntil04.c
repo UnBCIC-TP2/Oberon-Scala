@@ -10,17 +10,22 @@ int power(int b, int e) {
   if (e == 0) {
     return 1;
   }
-  do {
+  while (true) {
     r = r * b;
     e = e - 1;
-  } while (!(e <= 1));
+    if (e <= 1) {
+      break;
+    }
+  }
   return r;
 }
 
-void main() {
+int main() {
   int x, y;
 
   x = 2;
   y = 2;
   printf("%d\n", power(x, y));
+
+	return 0; 
 }

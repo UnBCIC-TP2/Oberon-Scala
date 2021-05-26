@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
   int x, max;
 
   scanf("%d", &x);
@@ -10,4 +10,6 @@ void main() {
     max = x;
   }
   printf("%d\n", max);
+
+	return 0; 
 }
