@@ -1,6 +1,0 @@
-MODULE SimpleModule;
-
-CONST
-  x = 5;
-
-END SimpleModule.

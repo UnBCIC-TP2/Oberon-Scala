@@ -1,7 +1,0 @@
-MODULE ExpressionNameModule;
-
-BEGIN
-    write(variable.name)
-END
-
-END ExpressionNameModule.
