@@ -237,7 +237,7 @@ class CoreVisitorTest extends AnyFunSuite {
     }
     
     // TODO
-    ignore("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
+    test("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
         val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
         assert(path != null)
