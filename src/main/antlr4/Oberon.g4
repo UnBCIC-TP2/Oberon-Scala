@@ -48,7 +48,9 @@ block
 expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
+ | realValue                                                                              #FloatValue
  | boolValue                                                                              #BooleanValue 
+ | charValue                                                                              #CharacterValue 
  | name = Id                                                                              #Variable
  | name = Id '(' arguments? ')'                                                           #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
@@ -63,7 +65,12 @@ statement
  : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
  | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
- | 'readInt'  '(' var = Id ')'                                                                                                #ReadIntStmt
+ | 'readLongReal'   '(' var = Id ')'                                                                                          #ReadLongRealStmt
+ | 'readReal'       '(' var = Id ')'                                                                                          #ReadRealStmt
+ | 'readLongInt'    '(' var = Id ')'                                                                                          #ReadLongIntStmt
+ | 'readInt'        '(' var = Id ')'                                                                                          #ReadIntStmt
+ | 'readShortInt'   '(' var = Id ')'                                                                                          #ReadShortIntStmt
+ | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
@@ -96,15 +103,26 @@ elseIfStmt : cond = expression 'THEN' stmt = statement ;
 
 intValue : INT ;
 
+realValue: REAL ;
+
 boolValue: TRUE | FALSE ;
+
+charValue: CHAR ;
 
 oberonType
  : 'INTEGER'         #IntegerType
+ | 'REAL'            #RealType
+ | 'SHORTINT'        #ShortType
+ | 'LONGINT'         #LongType
+ | 'LONGREAL'        #LongRealType
+ | 'CHAR'            #CharacterType
  | 'BOOLEAN'         #BooleanType
  | name = Id         #ReferenceType        // Reference for user defined types
  ;
 
-INT : Digit+;
+INT : '-'? Digit+;
+REAL : '-'? Digit+ '.' Digit+;
+CHAR : '\'' CharDef '\'';
 
 TRUE  : 'True' ;
 FALSE : 'False'  ;

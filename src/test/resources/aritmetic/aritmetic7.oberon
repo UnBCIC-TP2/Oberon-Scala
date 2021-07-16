@@ -1,0 +1,13 @@
+MODULE SimpleModule;
+
+VAR
+  x : LONGREAL;
+  y : SHORTINT;
+  
+BEGIN
+    x := 13.552647;
+    y := 5;
+  x := x * y
+END
+
+END SimpleModule.

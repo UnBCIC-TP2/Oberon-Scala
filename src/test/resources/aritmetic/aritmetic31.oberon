@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+VAR
+  x : REAL;
+  y : INTEGER;
+BEGIN
+   x := 15.2;
+    y := 4;
+    x := x - y
+END
+
+END SimpleModule.

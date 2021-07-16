@@ -27,10 +27,11 @@ class Interpreter extends OberonVisitorAdapter {
   var exit = false
   val env = new Environment[Expression]()
   var printStream : PrintStream = new PrintStream(System.out)
-
+  var variaveis = List.empty[VariableDeclaration]
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
+    variaveis = module.variables
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
@@ -83,7 +84,12 @@ class Interpreter extends OberonVisitorAdapter {
       }
       case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
       case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
+      case ReadLongRealStmt(name) => env.setVariable(name, LongRealValue(StdIn.readLine().toDouble))
+      case ReadRealStmt(name) => env.setVariable(name, RealValue(StdIn.readLine().toFloat))
+      case ReadLongIntStmt(name) => env.setVariable(name, LongValue(StdIn.readLine().toLong))
       case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
+      case ReadShortIntStmt(name) => env.setVariable(name, ShortValue(StdIn.readLine().toShort))
+      case ReadCharStmt(name) => env.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
       case WriteStmt(exp) => printStream.println(evalExpression(exp))
       case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
       case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
@@ -189,6 +195,11 @@ class Interpreter extends OberonVisitorAdapter {
     val evalVisitor = new EvalExpressionVisitor(interpreter = this)
     expression.accept(evalVisitor).asInstanceOf[IntValue].value
   }
+  
+  // def evalCaseAlt(expression: Expression): Float = {
+  //   val evalVisitor = new EvalExpressionVisitor(interpreter = this)
+  //   expression.accept(evalVisitor).asInstanceOf[RealValue].value
+  // }
 
   /*
    * This method is mostly useful for testing purpose.
@@ -217,19 +228,24 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   override def visit(exp: Expression): Expression = exp match {
     case Brackets(expression) => expression.accept(this)
     case IntValue(v) => IntValue(v)
+    case RealValue(v) => RealValue(v)
+    case LongRealValue(v) => LongRealValue(v)
+    case LongValue(v) => LongValue(v)
+    case ShortValue(v) => ShortValue(v)
+    case CharValue(v) => CharValue(v)
     case BoolValue(v) => BoolValue(v)
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
-    case EQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value == v2.value))
-    case NEQExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value != v2.value))
-    case GTExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value > v2.value))
-    case LTExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value < v2.value))
-    case GTEExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value >= v2.value))
-    case LTEExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => BoolValue(v1.value <= v2.value))
-    case AddExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value + v2.value))
-    case SubExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value - v2.value))
-    case MultExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value * v2.value))
-    case DivExpression(left, right) => binExpression(left, right, (v1: Value[Int], v2: Value[Int]) => IntValue(v1.value / v2.value))
+    case AddExpression(left, right) => aritmeticLogicExpression(left, right, 1) //(v1: Value[Number], v2: Value[Number])  => sum(v1, v2)
+    case SubExpression(left, right) => aritmeticLogicExpression(left, right, 2) //(v1: Value[Number], v2: Value[Number])  => sum(v1, v2)
+    case MultExpression(left, right) => aritmeticLogicExpression(left, right, 3)
+    case DivExpression(left, right) => aritmeticLogicExpression(left, right, 4)
+    case EQExpression(left, right) => aritmeticLogicExpression(left, right, 5)
+    case NEQExpression(left, right) => aritmeticLogicExpression(left, right, 6)
+    case GTExpression(left, right) => aritmeticLogicExpression(left, right, 7)
+    case LTExpression(left, right) => aritmeticLogicExpression(left, right, 8)
+    case GTEExpression(left, right) => aritmeticLogicExpression(left, right, 9)
+    case LTEExpression(left, right) => aritmeticLogicExpression(left, right, 10)
     case AndExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value && v2.value))
     case OrExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value || v2.value))
     case FunctionCallExpression(name, args) => {
@@ -248,6 +264,92 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     returnValue.get
   }
 
+  def aritmeticLogicExpression(left: Expression, right: Expression, op: Int) : Expression = {
+    var vl = left.accept(this).asInstanceOf[Primitive[T]]
+    var vr = right.accept(this).asInstanceOf[Primitive[T]]
+
+    /*
+      Array to detect the least restrictive type in the expression
+      Least restrictive order: [long real, real, long, int, short, char]
+      With this we are able to do the appropriate operator overload
+    */
+    var types = Array(
+      vl.isInstanceOf[LongRealValue] || vr.isInstanceOf[LongRealValue],
+      vl.isInstanceOf[RealValue]     || vr.isInstanceOf[RealValue],
+      vl.isInstanceOf[LongValue]     || vr.isInstanceOf[LongValue],
+      vl.isInstanceOf[IntValue]      || vr.isInstanceOf[IntValue],
+      vl.isInstanceOf[ShortValue]    || vr.isInstanceOf[ShortValue]
+    )
+
+    op match {
+      case 1 => {
+        if (types(0) == true) LongRealValue((vl.toDouble + vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat + vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong + vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt + vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort + vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
+      }
+
+      case 2 => {
+        if (types(0) == true) LongRealValue((vl.toDouble - vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat - vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong - vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt - vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort - vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
+      }
+
+      case 3 => {
+        if (types(0) == true) LongRealValue((vl.toDouble * vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat * vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong * vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt * vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort * vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
+      }
+
+      case 4 => {
+        if (types(0) == true) LongRealValue((vl.toDouble / vr.toDouble).toDouble)
+        else if (types(1) == true) RealValue((vl.toFloat / vr.toFloat).toFloat)
+        else if (types(2) == true) LongValue((vl.toLong / vr.toLong).toLong)
+        else if (types(3) == true) IntValue((vl.toInt / vr.toInt).toInt)
+        else if (types(4) == true) ShortValue((vl.toShort / vr.toShort).toShort)
+        else CharValue((vl.toInt + vr.toInt).toChar)
+      }
+
+      case 5 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble == vr.toDouble)
+        else BoolValue(vl.toLong == vr.toLong)
+      }
+
+      case 6 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble != vr.toDouble)
+        else BoolValue(vl.toLong != vr.toLong)
+      }
+
+      case 7 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble > vr.toDouble)
+        else BoolValue(vl.toLong > vr.toLong)
+      }
+
+      case 8 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble < vr.toDouble)
+        else BoolValue(vl.toLong < vr.toLong)
+      }
+
+      case 9 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble >= vr.toDouble)
+        else BoolValue(vl.toLong >= vr.toLong)
+      }
+
+      case 10 => {
+        if (types(0) == true || types(1) == true) BoolValue(vl.toDouble <= vr.toDouble)
+        else BoolValue(vl.toLong <= vr.toLong)
+      }
+    }
+  }
+
   /**
    * Eval a binary expression.
    *
@@ -262,8 +364,11 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression): Expression = {
     val v1 = left.accept(this).asInstanceOf[Value[T]]
     val v2 = right.accept(this).asInstanceOf[Value[T]]
+
     fn(v1, v2)
   }
+
+  // def sum2 (v1: IntValue, v2: IntValue): Expression = IntValue(v1 + v2)
 
 }
 

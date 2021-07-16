@@ -1,0 +1,53 @@
+MODULE SimpleModule;
+
+VAR
+  a : REAL;
+  b : INTEGER;
+  c : SHORTINT;
+  d : LONGREAL;
+  e : LONGINT;
+
+  f : LONGINT;
+  g : REAL;
+  h : INTEGER;
+  i : LONGREAL;
+  j : SHORTINT;
+
+
+  k : SHORTINT;
+  l : REAL;
+  m : LONGINT;
+  n : INTEGER;
+  o : LONGREAL;
+
+  x : SHORTINT;
+  y : INTEGER;
+  z : LONGINT;
+  w : REAL;
+  t : LONGREAL;
+
+BEGIN
+    a := 1.5;
+    b := 2;
+    c := 3;
+    d := 4.5;
+    e := 5;
+    f := 6;
+    g := 7.5;
+    h := 8;
+    i := 9.5;
+    j := 10;
+    k := 11;
+    l := 12.5;
+    m := 13;
+    n := 14;
+    o := 15.5;
+
+    x := c + j + k;
+    y := b + h + n; 
+    z := e + f + m; 
+    w := a + g + l;
+    t := d + i + o 
+END
+
+END SimpleModule.

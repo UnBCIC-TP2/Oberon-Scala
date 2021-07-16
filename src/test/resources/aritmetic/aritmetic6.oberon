@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+VAR
+  x : LONGREAL;
+  
+BEGIN
+  x := 13.552647;
+  x := x + x
+END
+
+END SimpleModule.

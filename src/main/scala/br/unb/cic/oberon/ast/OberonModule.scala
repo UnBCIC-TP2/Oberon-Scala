@@ -46,8 +46,67 @@ trait Expression {
 
 abstract class Value[T](val value: T) extends Expression
 
+/*
+  Abstract class to define a primitive type, and also defines numeric conversion methods
+*/
+abstract class Primitive[T](val value: T) extends Expression
+{
+  def toInt(): Int
+  def toFloat(): Float
+  def toLong(): Long
+  def toShort(): Short
+  def toDouble(): Double
+}
+
+case class IntValue(v: Int) extends Primitive[Int](v){
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
+case class RealValue(v: Float) extends Primitive[Float](v) {
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
+case class ShortValue(v: Short) extends Primitive[Short](v) {
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
+case class LongValue(v: Long) extends Primitive[Long](v) {
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
+case class LongRealValue(v: Double) extends Primitive[Double](v) {
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
+case class CharValue(v: Char) extends Primitive[Char](v){
+  def toInt(): Int = v.toInt
+  def toFloat(): Float = v.toFloat
+  def toLong(): Long = v.toLong
+  def toShort(): Short = v.toShort
+  def toDouble(): Double = v.toDouble
+}
+
 case class Brackets(exp: Expression) extends Expression
-case class IntValue(v: Int) extends Value[Int](v)
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
 case class ArrayValue(v: List[Expression]) extends Value[List[Expression]](v)
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
@@ -76,7 +135,12 @@ trait Statement {
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
+case class ReadLongRealStmt(varName: String) extends Statement
+case class ReadRealStmt(varName: String) extends Statement
+case class ReadLongIntStmt(varName: String) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
+case class ReadShortIntStmt(varName: String) extends Statement
+case class ReadCharStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
@@ -109,7 +173,12 @@ trait Type {
 }
 
 case object IntegerType extends Type
+case object RealType extends Type
+case object ShortType extends Type
+case object LongType extends Type
+case object LongRealType extends Type
 case object BooleanType extends Type
+case object CharacterType extends Type
 case object UndefinedType extends Type
 case class ReferenceToUserDefinedType(name: String) extends Type
 

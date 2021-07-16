@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+VAR
+  v : CHAR;
+
+BEGIN
+  readChar(v); 
+  write(v)
+END
+
+END SimpleModule

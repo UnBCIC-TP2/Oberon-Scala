@@ -1,0 +1,14 @@
+MODULE SimpleModule;
+
+VAR
+  x : REAL;
+  y : REAL;
+BEGIN
+    x := 3.0;
+    y := 1.0;
+    IF (x > y) THEN
+        x := 2.0
+    END
+END
+
+END SimpleModule.

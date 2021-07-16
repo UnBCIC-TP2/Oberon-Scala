@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+VAR
+  x : LONGINT;
+  y : LONGINT;
+BEGIN
+    x := 2223372036854775807;
+    y := 2;
+    x := x * y
+END
+
+END SimpleModule. 
