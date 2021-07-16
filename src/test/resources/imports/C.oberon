@@ -1,0 +1,10 @@
+MODULE C;
+
+VAR
+    x : INTEGER;
+
+BEGIN
+    x := 2
+END
+
+END C.

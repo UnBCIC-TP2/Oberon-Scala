@@ -1,9 +1,21 @@
 grammar Oberon;
 
-
 compilationUnit
-  : 'MODULE' name = Id ';' declarations block? 'END' Id '.'
-  ;  
+  : 'MODULE' name = Id ';' imports? declarations block? 'END' Id '.'
+  ;
+
+imports
+  : 'IMPORT' imptList ';'
+  ;
+
+imptList
+  : (impt += imptAliased (',' impt += imptAliased)*)
+  ;
+
+imptAliased
+  : name = Id (':=' alias = Id)?
+  ;
+
 
 declarations
   : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
@@ -19,15 +31,15 @@ constant
   ;
 
 varDeclaration
-  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'    
-  ; 
+  : (vars += Id (',' vars += Id)*) ':' varType = oberonType ';'
+  ;
 
 procedure :
   'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
     declarations    // NOTE: This might support nested procedures
     block
    Id
-  ; 
+  ;
 
 formals
  : formalArg (',' formalArg)*
@@ -36,30 +48,34 @@ formals
 arguments
  : expression (',' expression)*
  ;
- 
-formalArg 
- : (args += Id (',' args += Id)*) ':' argType = oberonType 
+
+formalArg
+ : (args += Id (',' args += Id)*) ':' argType = oberonType
  ; // TODO: we should also support VarBased formal arguments.
- 
+
 block
  : 'BEGIN' statement 'END'
- ; 
-    
+ ;
+
 expression
  : '(' expression ')'                                                                     #Brackets
  | intValue                                                                               #IntegerValue
  | realValue                                                                              #FloatValue
- | boolValue                                                                              #BooleanValue 
- | charValue                                                                              #CharacterValue 
- | name = Id                                                                              #Variable
- | name = Id '(' arguments? ')'                                                           #FunctionCall
+ | boolValue                                                                              #BooleanValue
+ | charValue                                                                              #CharacterValue
+ | name = qualifiedName                                                                   #Variable
+ | name = qualifiedName '(' arguments? ')'                                                #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
- | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression 
- | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression  
+ | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
+ | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
-
  ;
+
+qualifiedName
+  : (module = Id '::')? name = Id
+  ;
+
 
 statement
  : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
@@ -94,11 +110,11 @@ statement
 caseAlternative
  : cond = expression ':' stmt = statement                       #SimpleCase
  | min = expression '..' max = expression ':' stmt = statement  #RangeCase
- ; 
+ ;
 
 elseIfStmt : cond = expression 'THEN' stmt = statement ;
 
-// TODO: NOT, MOD, Relational operators, 
+// TODO: NOT, MOD, Relational operators,
 // <assoc=right> expr '::' expr
 
 intValue : INT ;
@@ -151,4 +167,3 @@ COMMENT
 LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
     ;
-
