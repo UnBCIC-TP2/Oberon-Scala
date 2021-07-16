@@ -8,12 +8,7 @@ import br.unb.cic.oberon.ast._
 class ParserTestSuite extends AnyFunSuite {
 
   test("Testing the oberon simple01 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple01.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
@@ -21,12 +16,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple02 code. This module has one constants and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple02.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
@@ -37,12 +27,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple03 code. This module has three constants and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple03.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
@@ -56,13 +41,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
+    val module = ScalaParser.parseResource("simple/simple04.oberon")
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", IntValue(5)))
@@ -76,12 +55,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple05.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
@@ -95,12 +69,7 @@ class ParserTestSuite extends AnyFunSuite {
 
 
   test("Testing the oberon simple06 code. This module has one constants, complex expression, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple06.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
@@ -113,12 +82,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple07.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 2)
@@ -135,12 +99,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple08.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 3)
@@ -150,25 +109,15 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple09.oberon")
 
     assert(module.name == "SimpleModule")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
   }
 
-    test("Testing the oberon arrayIndex01 module. This module has a ArrayIndex") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/arrayIndex01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+  test("Testing the oberon arrayIndex01 module. This module has a ArrayIndex") {
+    val module = ScalaParser.parseResource("simple/arrayIndex01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -192,12 +141,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon arrayIndex02 code. This module has a ArrayIndex") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/arrayIndex02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/arrayIndex02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -221,12 +165,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt01 code. This module has a block of three statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -248,12 +187,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt02 code. This module has a block of four statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -276,12 +210,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -313,12 +242,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt04 code. This module has a While statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -348,17 +272,12 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt06 code. This module has a simple case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt06.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt06.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(!module.stmt.isEmpty)
-    
+
 
     module.stmt.getOrElse(false) match {
       case SequenceStmt(stmts) => assert(stmts.length == 3)
@@ -397,14 +316,9 @@ class ParserTestSuite extends AnyFunSuite {
     assert(sequenceStmts(2) == WriteStmt(VarExpression("xs")))
 
   }
-  
+
   test("Testing the oberon stmt07 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt07.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt07.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -437,12 +351,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt08 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt08.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt08.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -458,7 +367,7 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
 
     val stmts = sequence.stmts
-    
+
     val code = AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x")))
 
     assert(stmts.head == ReadIntStmt("y"))
@@ -470,19 +379,14 @@ class ParserTestSuite extends AnyFunSuite {
         assert(stmt == ForStmt(AssignmentStmt("z", IntValue(0)), LTExpression(VarExpression("z"),VarExpression("y")), code))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
- 
-    
+
+
     assert(stmts(2) == WriteStmt(VarExpression("k")))
 
   }
 
   test("Testing the oberon stmt09 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt09.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt09.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -511,14 +415,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(1) == WriteStmt(VarExpression("z")))
 
   }
-  
   test("Testing the oberon stmt10 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt10.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt10.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -545,20 +443,15 @@ class ParserTestSuite extends AnyFunSuite {
         assert(init == AssignmentStmt("y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
         assert(stmt == SequenceStmt(List(code, code2)))
-      case _ => fail("expecting an assigment stmt and if-then stmt") 
+      case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
     assert(stmts(2) == WriteStmt(VarExpression("z")))
 
   }
-  
+
   test("Testing the oberon stmt11 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt11.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt11.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -593,12 +486,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt12 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt12.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt12.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -632,7 +520,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(stmt == SequenceStmt(List(codee, code)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
-    
+
     assert(stmts(3) == AssignmentStmt("v", DivExpression(VarExpression("v"), VarExpression("x"))))
 
     stmts(4) match {
@@ -642,19 +530,14 @@ class ParserTestSuite extends AnyFunSuite {
         assert(stmt == SequenceStmt(List(codee, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
-    assert(stmts(5) == AssignmentStmt("u", DivExpression(VarExpression("u"), VarExpression("x")))) 
+    assert(stmts(5) == AssignmentStmt("u", DivExpression(VarExpression("u"), VarExpression("x"))))
 
     assert(stmts(6) == WriteStmt(VarExpression("v")))
     assert(stmts(7) == WriteStmt(VarExpression("u")))
   }
 
   test("Testing the oberon stmt13 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt13.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt13.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -678,7 +561,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(init == AssignmentStmt("y", VarExpression("x")))
         assert(cond == LTExpression(VarExpression("y"), IntValue(100)))
         assert(stmt == AssignmentStmt("y", MultExpression(VarExpression("y"), VarExpression("y"))))
-      case _ => fail("expecting an assigment stmt and if-then stmt") 
+      case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
     assert(stmts(2) == WriteStmt(VarExpression("y")))
@@ -686,12 +569,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt14 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt14.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt14.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -718,18 +596,13 @@ class ParserTestSuite extends AnyFunSuite {
         assert(init == AssignmentStmt("y", VarExpression("x")))
         assert(cond == GTExpression(VarExpression("y"), IntValue(0)))
         assert(stmt == SequenceStmt(List(code, code2)))
-      case _ => fail("expecting an assigment stmt and if-then stmt") 
+      case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
   }
 
    test("Testing the oberon stmt15 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt15.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt15.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -757,7 +630,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(init == AssignmentStmt("y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
         assert(stmt == SequenceStmt(List(code, code1)))
-      case _ => fail("expecting an assigment stmt and if-then stmt") 
+      case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
      assert(stmts(2) == WriteStmt(VarExpression("z")))
@@ -765,12 +638,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt16 code. This module has a For statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt16.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt16.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -797,7 +665,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(init == AssignmentStmt("y", VarExpression("x")))
         assert(cond == GTExpression(VarExpression("y"),IntValue(0)))
         assert(stmt == SequenceStmt(List(code, code1)))
-      case _ => fail("expecting an assigment stmt and if-then stmt") 
+      case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
      assert(stmts(2) == WriteStmt(VarExpression("z")))
@@ -805,12 +673,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt17 code. This module has a case statement with range cases, two variabels, read and write statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt17.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt17.oberon")
 
     assert(module.name == "RangeCaseModule")
 
@@ -851,16 +714,10 @@ class ParserTestSuite extends AnyFunSuite {
     // Verifying the last statement
     assert(sequenceStmts(3) == WriteStmt(VarExpression("y")))
 
-  } 
+  }
 
   test("Testing the oberon stmt18 code. this module has a simple case statement with range case, reading min and max") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt18.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
+    val module = ScalaParser.parseResource("stmts/stmt18.oberon")
     assert(module.name == "SimpleRangeCaseModule")
 
     // Verifying variables declarations
@@ -868,7 +725,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.head == VariableDeclaration("xs", IntegerType))
     assert(module.variables(1) == VariableDeclaration("min", IntegerType))
     assert(module.variables(2) == VariableDeclaration("max", IntegerType))
-    
+
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
@@ -887,7 +744,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     // Verifying the caseStmt properties
     assert(caseStmt.exp == VarExpression("xs"))
-    
+
     assert(caseStmt.cases.length == 3)
 
     // Verifying the caseAlternatives in the case
@@ -897,7 +754,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(caseAlts.head == SimpleCase(IntValue(1), AssignmentStmt("xs",IntValue(5))))
     assert(caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt("xs", IntValue(10))))
     assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
-      
+
     caseStmt.elseStmt.getOrElse(false) match {
       case AssignmentStmt(varName, exp) => {
         assert(varName == "xs")
@@ -906,17 +763,11 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("Expected an else on the case statement!")
     }
     assert(sequenceStmts(4) == WriteStmt(VarExpression("xs")))
-  
+
   }
 
   test("Testing the oberon stmt19 code. This module has three variabels, two case statements, an read and a write statements") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt19.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
+    val module = ScalaParser.parseResource("stmts/stmt19.oberon")
     assert(module.name == "CaseModule")
 
     // Verifying variables declarations
@@ -925,7 +776,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(1) == VariableDeclaration("y", IntegerType))
     assert(module.variables(2) == VariableDeclaration("z", IntegerType))
 
-    // Verifying statements 
+    // Verifying statements
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
@@ -946,10 +797,10 @@ class ParserTestSuite extends AnyFunSuite {
     var caseLabel = 5
     caseStmt1.cases.foreach(_miniCase => {
       val miniCase = _miniCase.asInstanceOf[SimpleCase]
-      
+
       assert(miniCase == SimpleCase(IntValue(caseLabel),
         AssignmentStmt("y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
-        
+
       caseSum += 5
       caseLabel *= 2
     })
@@ -959,7 +810,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(varName == "y")
         assert(exp == IntValue(41))
       }
-      case None => fail("Expected an else on the first case statement!") 
+      case None => fail("Expected an else on the first case statement!")
     }
 
     // Verifying the second case statement
@@ -983,7 +834,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(varName == "z")
         assert(exp == IntValue(1))
       }
-      case None => fail("Expected an else on the second case statement!") 
+      case None => fail("Expected an else on the second case statement!")
     }
 
     assert(sequenceStmts(4) == WriteStmt(VarExpression("z")))
@@ -991,12 +842,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt20 code. This module implements the factorial function with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt20.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt20.oberon")
 
     assert(module.name == "ProcedureCaseModule")
 
@@ -1017,10 +863,10 @@ class ParserTestSuite extends AnyFunSuite {
     // Verifying the case stmt in the factorial procedure
     assert(factorialCaseStmt.exp == VarExpression("n"))
     assert(factorialCaseStmt.cases.length == 2)
-    
+
     assert(factorialCaseStmt.cases.head == SimpleCase(IntValue(0), ReturnStmt(IntValue(1))))
     assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(IntValue(1))))
-    
+
     factorialCaseStmt.elseStmt.getOrElse(None) match {
       case ReturnStmt(MultExpression(left, right)) => {
         assert(left == VarExpression("n"))
@@ -1040,18 +886,13 @@ class ParserTestSuite extends AnyFunSuite {
 
     // Verifying the body module statements
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => succeed 
+      case SequenceStmt(stmts) => succeed
       case _ => fail("Expecting a sequence of statements!")
     }
   }
 
   test("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt21.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt21.oberon")
 
     assert(module.name == "SimpleRangeCaseModule")
 
@@ -1060,7 +901,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables.head == VariableDeclaration("x", IntegerType))
     assert(module.variables(1) == VariableDeclaration("aux", IntegerType))
 
-    
+
     assert(module.stmt.nonEmpty);
 
     module.stmt.getOrElse(None) match {
@@ -1068,8 +909,8 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("This module should have 5 statements!")
     }
 
-    // Verifying statements 
-    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts  
+    // Verifying statements
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
     assert(sequenceStmts.head == ReadIntStmt("x"))
     assert(sequenceStmts(1) == AssignmentStmt("aux", DivExpression(VarExpression("x"), IntValue(2))))
@@ -1088,7 +929,7 @@ class ParserTestSuite extends AnyFunSuite {
         assert(varName == "aux")
         assert(exp == IntValue(1))
       }
-      case None => fail("Expected an else on the case statement!") 
+      case None => fail("Expected an else on the case statement!")
     }
 
     // Verifying the write statement
@@ -1097,15 +938,10 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt22 code. This module implements a case statement inside a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt22.oberon").toURI)
-    
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt22.oberon")
 
     assert(module.name == "CaseCaseModule")
-    
+
     // Verifying variables declarations
     assert(module.variables.length == 1)
     assert(module.variables.head == VariableDeclaration("x", IntegerType))
@@ -1122,11 +958,11 @@ class ParserTestSuite extends AnyFunSuite {
     assert(sequenceStmts.head == ReadIntStmt("x"));
 
     val caseStmt1 = sequenceStmts(1).asInstanceOf[CaseStmt]
-    
+
 
     // Verifying the caseStmt properties
     assert(caseStmt1.exp == VarExpression("x"))
-    
+
     assert(caseStmt1.cases.length == 2)
 
     // Verifying the caseAlternatives in the case
@@ -1136,25 +972,20 @@ class ParserTestSuite extends AnyFunSuite {
     assert(caseStmt1.elseStmt.isEmpty)
 
     val innerCase = CaseStmt(VarExpression("x"), List(RangeCase(IntValue(1), IntValue(5),
-      AssignmentStmt("x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))), 
+      AssignmentStmt("x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))),
       None)
 
     assert(caseAlts(0) == RangeCase(IntValue(1), IntValue(10), innerCase))
-    
+
     assert(caseAlts(1) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("x",MultExpression(VarExpression("x"), IntValue(2)))))
-    
+
     // Verifying the write statement
     assert(sequenceStmts(2) == WriteStmt(VarExpression("x")))
 
   }
 
   test("Testing the oberon stmt23 code. This module has a while with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt23.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt23.oberon")
 
     assert(module.name == "WhileCaseModule")
 
@@ -1184,10 +1015,10 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
 
-    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum", 
+    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum",
       AddExpression(VarExpression("sum"), VarExpression("x")))))
 
-    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")), 
+    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")),
       AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
 
     assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
@@ -1195,7 +1026,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(innerCase.elseStmt == None)
 
-    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
+    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
       AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
 
     assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
@@ -1203,12 +1034,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt24 code. This module has a while with a case statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt24.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt24.oberon")
 
     assert(module.name == "WhileCaseModule")
 
@@ -1243,7 +1069,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(innerCase.elseStmt.getOrElse(None) == AssignmentStmt("sum", AddExpression(
       VarExpression("sum"), VarExpression("x"))))
 
-    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] == 
+    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
       AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
 
     assert(sequenceStmts(3) == WriteStmt(VarExpression("sum")))
@@ -1251,12 +1077,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt25 code. This module tests if a ForRange stmt is correctly converted to a For stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt25.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt25.oberon")
 
     assert("ForRangeModule" == module.name)
     assert(1 == module.variables.length)
@@ -1272,12 +1093,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt26.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt26.oberon")
 
     assert("ForRangeModule" == module.name)
     assert(3 == module.variables.length)
@@ -1299,7 +1115,7 @@ class ParserTestSuite extends AnyFunSuite {
       VarExpression("x"), IntValue(1))))
 
     val forStmts = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    
+
     assert(innerInit == forRangeStmt.init)
     assert(innerCondition == forRangeStmt.condition)
     assert(innerStmts(0) == forStmts(0))
@@ -1308,12 +1124,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt27 code. This module has a ForRange stmt nested with another ForRange stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt27.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt27.oberon")
 
     assert("ForRangeModule" == module.name)
     assert(2 == module.variables.length)
@@ -1344,12 +1155,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt28.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt28.oberon")
 
     assert("ForRangeModule" == module.name)
     assert(4 == module.variables.length)
@@ -1358,7 +1164,7 @@ class ParserTestSuite extends AnyFunSuite {
       case SequenceStmt(stmts) => assert(3 == stmts.length)
       case _ => fail("Expected a sequence of 3 statements!!!")
     }
-  
+
     val sequenceStmts = module.stmt.getOrElse(None).asInstanceOf[SequenceStmt].stmts
     assert(ReadIntStmt("min") == sequenceStmts.head)
     assert(ReadIntStmt("max") == sequenceStmts(1))
@@ -1387,12 +1193,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt29.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt29.oberon")
 
     assert("ForRangeModule" == module.name)
     assert(1 == module.variables.length)
@@ -1411,12 +1212,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt30.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt30.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1450,12 +1246,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt09.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt09.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1487,12 +1278,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt10.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/IfElseIfStmt10.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1542,12 +1328,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon procedure01 code. This module has a procedure") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/procedure01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1575,12 +1356,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon procedure02 code. This module resembles the code of the LDTA challenge") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/procedure02.oberon")
 
     assert(module.name == "Multiples")
 
@@ -1606,12 +1382,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon procedure03 code. This module implements a fatorial function") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("procedures/procedure03.oberon")
 
     assert(module.name == "Factorial")
 
@@ -1645,12 +1416,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon stmt31 module. This module has a RepeatUntil") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt31.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt31.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1665,14 +1431,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   // Parser doesn't create Bracket Expression objects.
   ignore("Testing simple10.oberon - Bracket Expression") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon")
-      .getFile
-      .replaceFirst("\\/(.:\\/)", "$1"))
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/simple10.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1685,12 +1444,7 @@ class ParserTestSuite extends AnyFunSuite {
 
 
   test("Testing the oberon ArrayAssignmentStmt01 code. This module has a simple array assignment") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1705,19 +1459,13 @@ class ParserTestSuite extends AnyFunSuite {
     // now we can assume that the main block contains a sequence of stmts
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-	
+
     assert(stmts.head == ReadIntStmt("x"))
     assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
 
   }
-  
   test("Testing the oberon ArrayAssignmentStmt02 code. This module has an array assignment in IF-THEN") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1747,14 +1495,9 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
-  
+
   test("Testing the oberon stmt32 code. This module has some user types declarations") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt32.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt32.oberon")
 
     assert(module.name == "UserTypeModule")
 
@@ -1764,12 +1507,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ArrayAssignmentStmt04 code. This module has two array assignments") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1791,27 +1529,15 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt05.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt05.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(module.userTypes.length == 1)
-
-    module.userTypes.length == ArrayType("arr", 1, IntegerType)
   }
 
   test("Testing the oberon stmt33 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt33.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/stmt33.oberon")
 
 
     assert(module.name == "UserTypeModule")
@@ -1819,12 +1545,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon recordAssignmentStmt01 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1844,25 +1565,15 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon recordAssignmentStmt02 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(module.userTypes.length == 1)
   }
 
-  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmt34.oberon").getFile)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+  ignore("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+    val module = ScalaParser.parseResource("stmts/stmt34.oberon")
 
 
     assert(module.name == "UserTypeModule")
@@ -1873,16 +1584,11 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
 
-    //TODO: add the new assets 
+    //TODO: add the new assets
   }
 
   test("Testing the oberon recordAssignmentStmt03 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt03.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1905,12 +1611,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon recordAssignmentStmt04 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1936,12 +1637,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon recordAssignmentStmt05 code") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt05.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt05.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -1974,13 +1670,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser1 code. This module tests if the parser can see expression name access"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser1.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
+    val module = ScalaParser.parseResource("stmts/ExpressionNameParser1.oberon")
     assert(module.name == "ExpressionNameModule")
     assert(module.stmt.isDefined)
 
@@ -1992,12 +1682,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser2.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ExpressionNameParser2.oberon")
 
     assert(module.name == "ExpressionNameModule")
 
@@ -2013,12 +1698,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words"){
-  	val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser3.oberon").toURI)
-
-  	assert(path != null)
-
-  	val content = String.join("\n", Files.readAllLines(path))
-  	val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ExpressionNameParser3.oberon")
 
   	assert(module.name == "ExpressionNameModule")
 
@@ -2032,12 +1712,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser4.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ExpressionNameParser4.oberon")
 
     assert(module.name == "ExpressionNameModule")
 
@@ -2052,12 +1727,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon ExpressionNameParser5 code. This module tests if the parser can translate different operations with type record declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ExpressionNameParser5.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("stmts/ExpressionNameParser5.oberon")
 
     assert(module.name == "ExpressionNameModule")
 
@@ -2075,37 +1745,27 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon userTypeSimple01 code module. This module has a record type declaration, with invalid declarations") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple01.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple01.oberon")
 
     assert(module.name == "UserTypeModule")
 
     assert(module.userTypes.length == 1)
 
-    val listDeclaration = List(VariableDeclaration("size", IntegerType), 
-      VariableDeclaration("variables", UndefinedType), VariableDeclaration("Varinho", 
+    val listDeclaration = List(VariableDeclaration("size", IntegerType),
+      VariableDeclaration("variables", UndefinedType), VariableDeclaration("Varinho",
       ReferenceToUserDefinedType("myType")))
 
     assert(module.userTypes(0) == RecordType("myType", listDeclaration))
-    
+
   }
 
   test("Testing the oberon userTypeSimple02 code module. This module has array and record type declarations") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple02.oberon").toURI)
-
-    assert(path != null)
-    
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple02.oberon")
     // val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
     assert(module.name == "test")
     assert(module.stmt.get.asInstanceOf[ReadIntStmt] == ReadIntStmt("x"))
-    
+
     assert(module.userTypes.length == 2)
 
     val typeList = module.userTypes
@@ -2127,12 +1787,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon userTypeSimple03 code module. This module has a record type declaration, with invalid declarations"){
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple03.oberon")
 
     assert(module.name == "test")
 
@@ -2141,11 +1796,11 @@ class ParserTestSuite extends AnyFunSuite {
     val typeList = module.userTypes
 
     val test_array = ArrayType("test_array", 5, BooleanType)
-    
+
     val tipo1 = RecordType("tipo1", List(
-      VariableDeclaration("num", IntegerType), 
+      VariableDeclaration("num", IntegerType),
       VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))))
-  
+
     val tipo2 =  RecordType("tipo2",
       List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
 
@@ -2157,49 +1812,39 @@ class ParserTestSuite extends AnyFunSuite {
       assert(t == typetoTest(it))
       it += 1
     })
-      
+
   }
 
   ignore("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple04.oberon")
 
     assert(module.name == "UserTypeModule")
 
     assert(module.userTypes.length == 3)
 
-    val listDeclaration = List(VariableDeclaration("size", IntegerType), 
-      VariableDeclaration("variables", ReferenceToUserDefinedType("cplusplus")), VariableDeclaration("Varinho", 
+    val listDeclaration = List(VariableDeclaration("size", IntegerType),
+      VariableDeclaration("variables", ReferenceToUserDefinedType("cplusplus")), VariableDeclaration("Varinho",
       ReferenceToUserDefinedType("myType")))
 
-    
+
     assert(module.userTypes(0) == ArrayType("cplusplus", 10, BooleanType))
     assert(module.userTypes(1) == RecordType("java", listDeclaration))
     assert(module.userTypes(2) == ArrayType("python", 5, ReferenceToUserDefinedType("java")))
   }
 
   test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"){
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple05.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple05.oberon")
 
     assert(module.name == "UserTypeModule")
 
     assert(module.userTypes.length == 2)
 
     assert(module.variables.length == 3)
-    
+
     val varList = List(VariableDeclaration("x", ReferenceToUserDefinedType("simple")),
-      VariableDeclaration("y", ReferenceToUserDefinedType("simple")), 
+      VariableDeclaration("y", ReferenceToUserDefinedType("simple")),
       VariableDeclaration("z", ReferenceToUserDefinedType("complicated")))
-       
+
     var it : Int = 0
     module.variables.foreach(v => {
       assert(v == varList(it))
@@ -2208,12 +1853,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Testing the oberon userTypeSimple06 code module. This module has a record and array type declaration"){
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple06.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple06.oberon")
 
     assert(module.name == "test_ando")
 
@@ -2222,11 +1862,11 @@ class ParserTestSuite extends AnyFunSuite {
     val typeList = module.userTypes
 
     val cheesewithbread = ArrayType("cheesewithbread", 10, IntegerType)
-    
+
     val cheesewithoutbread = RecordType("cheesewithoutbread", List(
-      VariableDeclaration("var1", IntegerType), 
+      VariableDeclaration("var1", IntegerType),
       VariableDeclaration("var2", ReferenceToUserDefinedType("cheesewithbread"))))
-  
+
     val cheesewithhalfabread =  ArrayType("cheesewithhalfabread", 100000, ReferenceToUserDefinedType("cheesewithoutbread"))
 
     val typetoTest = List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
@@ -2237,16 +1877,11 @@ class ParserTestSuite extends AnyFunSuite {
       assert(t == typetoTest(it))
       it += 1
     })
-      
+
   }
 
   test("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"){
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple07.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = ScalaParser.parseResource("simple/userTypeSimple07.oberon")
 
     assert(module.name == "UserTypeModule")
 
@@ -2261,6 +1896,34 @@ class ParserTestSuite extends AnyFunSuite {
     assert(userProcedure.returnType.get.asInstanceOf[ReferenceToUserDefinedType] == ReferenceToUserDefinedType("simple"))
     assert(userProcedure.variables.length == 1)
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
+  }
+
+  test("Testing module B oberon import module feature. Import one module") {
+    val moduleB = ScalaParser.parseResource("imports/B.oberon")
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleB.submodules)
+  }
+
+  test("Testing module D oberon import module feature. Import two modules") {
+    val moduleD = ScalaParser.parseResource("imports/D.oberon")
+
+    val expectedSet = Set("A","C")
+    assert(expectedSet == moduleD.submodules)
+  }
+
+  test("Testing module F oberon import module feature. Alias and module name") {
+    val moduleF = ScalaParser.parseResource("imports/F.oberon")
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleF.submodules)
+  }
+
+  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
+    val moduleH = ScalaParser.parseResource("imports/H.oberon")
+
+    val expectedSet = Set("A", "C", "D")
+    assert(expectedSet == moduleH.submodules)
   }
 
 

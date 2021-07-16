@@ -3,6 +3,7 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.ast.{AddExpression, AndExpression, ArrayType, AssignmentStmt, BoolValue, BooleanType, CharValue, CharacterType, Brackets, CaseStmt, Constant, DivExpression, EQExpression, ElseIfStmt, ExitStmt, Expression, FieldAccessExpression, ForStmt, FormalArg, GTEExpression, GTExpression, IfElseIfStmt, IfElseStmt, IntValue, RealValue, LongValue, ShortValue, LongRealValue, IntegerType, RealType, LongType, ShortType, LongRealType, LTEExpression, LTExpression, LoopStmt, MultExpression, NEQExpression, OberonModule, OrExpression, Procedure, ProcedureCallStmt, RangeCase, ReadLongRealStmt, ReadCharStmt, ReadRealStmt, ReadLongIntStmt, ReadIntStmt, ReadShortIntStmt, RecordType, ReferenceToUserDefinedType, RepeatUntilStmt, ReturnStmt, SequenceStmt, SimpleCase, Statement, SubExpression, Type, Undef, UndefinedType, VarExpression, VariableDeclaration, WhileStmt, WriteStmt}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.{OberonVisitor, OberonVisitorAdapter}
+import br.unb.cic.oberon.parser.ModuleLoader
 
 class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorAdapter {
   type T = Option[Type]
@@ -120,7 +121,7 @@ class TypeChecker extends OberonVisitorAdapter {
       }
       else List((stmt, s"Expression $condition does not have a boolean type"))
   }
-  
+
   private def visitIfElseIfStmt(stmt: Statement) = stmt match {
     case IfElseIfStmt(condition, thenStmt, elseIfStmt, elseStmt) =>
       if(condition.accept(expVisitor).contains(BooleanType)){

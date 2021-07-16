@@ -1,0 +1,11 @@
+MODULE interpreterModule1;
+    IMPORT A;
+
+VAR 
+    y : INTEGER;
+
+BEGIN
+    write(A::x);
+END
+
+END interpreterModule1.

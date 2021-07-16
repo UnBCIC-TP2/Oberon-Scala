@@ -4,8 +4,10 @@ import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import br.unb.cic.oberon.parser.ModuleLoader
 
 import scala.io.StdIn
 
@@ -26,6 +28,7 @@ class Interpreter extends OberonVisitorAdapter {
 
   var exit = false
   val env = new Environment[Expression]()
+
   var printStream : PrintStream = new PrintStream(System.out)
   var variaveis = List.empty[VariableDeclaration]
   override def visit(module: OberonModule): Unit = {

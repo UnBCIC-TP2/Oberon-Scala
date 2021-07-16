@@ -1,0 +1,9 @@
+MODULE D;
+    IMPORT A, C;
+
+BEGIN
+    write(A::x);
+    write(C::x)
+END
+
+END D.

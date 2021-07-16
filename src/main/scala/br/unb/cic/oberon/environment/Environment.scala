@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, RecordType, Type, UserDefinedType,Undef}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
  * or for type checking oberon programs.
  *
  * We have two kinds of memory: global and stack.
- * All global variables reside in the global are;
+ * All global variables reside in the global area;
  * while local variables reside in the stack.
  *
  * Whenever we call a procedure, we push a memory
@@ -31,7 +31,7 @@ class Environment[T] {
   def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
-    userDefinedTypes  += userDefinedTypeName(userType) -> userType
+    userDefinedTypes += userDefinedTypeName(userType) -> userType
     userType match {
       case ArrayType(name, length, variableType) => userArrayTypes += name -> ListBuffer.fill(length)(Undef())
       case _ => ???
@@ -39,14 +39,14 @@ class Environment[T] {
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
-    if(stack.size == 0) {
+    if(stack.isEmpty) {
       stack.push(Map.empty[String, T])
     }
     stack.top += name -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
-    if(!stack.isEmpty && stack.top.contains(name)) {
+    if(stack.nonEmpty && stack.top.contains(name)) {
       setLocalVariable(name, value)
     }
     else if(global.contains(name)) {
@@ -56,7 +56,7 @@ class Environment[T] {
   }
 
   def lookup(name: String) : Option[T] = {
-    if(!stack.isEmpty && stack.top.contains(name)) Some(stack.top(name))
+    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if(global.contains(name)) Some(global(name))
     else None
   }

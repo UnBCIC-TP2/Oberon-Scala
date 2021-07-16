@@ -1,9 +1,8 @@
 package br.unb.cic.oberon.parser
 
+import br.unb.cic.oberon.util.Resources
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.parser.OberonParser.StatementContext
-import scala.collection.mutable._
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -29,21 +28,28 @@ object ScalaParser {
     visitor.visitCompilationUnit(parser.compilationUnit())
     visitor.module
   }
+
+  def parseResource(resource: String): OberonModule = {
+    parse(Resources.getContent(resource))
+  }
 }
 
 class ParserVisitor {
   var module: OberonModule = _
   var variables : List[br.unb.cic.oberon.ast.VariableDeclaration] = List()
+  var imptAliases = scala.collection.mutable.Map.empty[String, String] // Map[Module Alias, Module Name]
+
 
   def visitCompilationUnit(ctx: OberonParser.CompilationUnitContext): Unit = {
     val name = ctx.name
+    val submodules = visitImport(ctx.imports())
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, userTypes, constants, variables, procedures, block)
+    module = OberonModule(name.getText, submodules, userTypes, constants, variables, procedures, block)
   }
 
   /**
@@ -62,6 +68,35 @@ class ParserVisitor {
     }
     else {
       None
+    }
+
+    def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
+      if (ctx != null) {
+        val imports = ctx.imptList.impt.asScala.toList
+
+        imports.map(visitImportAlias _)
+
+        val submodules = imports.map(_.name.getText)
+        Set.from(submodules)
+      } else {
+        Set.empty
+      }
+    }
+
+    def visitImportAlias(ctx: OberonParser.ImptAliasedContext) = {
+      if (ctx.alias != null)
+        imptAliases += ctx.alias.getText -> ctx.name.getText
+    }
+
+    /**
+     * @brief Qualify takes a qualified name and returns a string representation of it. For instance, if we are in a
+     * module A and try to qualify a variable x, this method would return "A::x" as that literal string.
+     */
+    def qualify(ctx: OberonParser.QualifiedNameContext): String = {
+      val module: String = ctx.module.getText
+      val name: String = ctx.name.getText
+
+      module + "::" + name
     }
 
   /**
@@ -224,7 +259,7 @@ class ParserVisitor {
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")
 
-    override def visitCharValue(ctx: OberonParser.CharValueContext): Unit = 
+    override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {

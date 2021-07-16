@@ -1,9 +1,11 @@
 package br.unb.cic.oberon.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
+import br.unb.cic.oberon.environment.Environment
 
 /* Abstract representation of an Oberon Module */
 case class OberonModule(name: String,
+                        submodules: Set[String],
                         userTypes: List[UserDefinedType],
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
@@ -28,6 +30,12 @@ case class Procedure(name: String,
 case class FormalArg(name: String, argumentType: Type) {
   def accept(v: OberonVisitor) = v.visit(this)
 }
+
+/* Imports */
+case class Import(name: String){
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+
 
 /* Constant definition */
 case class Constant(name: String, exp: Expression) {
@@ -132,6 +140,7 @@ trait Statement {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
+case class ScalaStmt(fn: Environment[Expression] => Unit) extends Statement
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
@@ -184,7 +193,7 @@ case class ReferenceToUserDefinedType(name: String) extends Type
 
 trait UserDefinedType{
   def accept(v: OberonVisitor) = v.visit(this)
-} 
+}
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType

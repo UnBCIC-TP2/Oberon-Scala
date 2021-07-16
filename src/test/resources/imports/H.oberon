@@ -1,0 +1,9 @@
+MODULE H;
+    IMPORT A := aliasA, C := aliasC, D;
+
+BEGIN
+    write(aliasA::x);
+    write(aliasC::x);
+END
+
+END H.
