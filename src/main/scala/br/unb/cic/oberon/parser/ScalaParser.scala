@@ -32,6 +32,19 @@ object ScalaParser {
   def parseResource(resource: String): OberonModule = {
     parse(Resources.getContent(resource))
   }
+
+  def parserREPL(input: String): REPL = {
+    val charStream = new ANTLRInputStream(input)
+    val lexer = new OberonLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new OberonParser(tokens)
+
+    val visitor = new ParserVisitor
+    val replVisitor = new visitor.REPLVisitor()
+
+    replVisitor.visit(parser.repl())
+    replVisitor.repl
+  }
 }
 
 class ParserVisitor {
@@ -200,6 +213,42 @@ class ParserVisitor {
     override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
       val nameType = ctx.name.getText
       baseType = ReferenceToUserDefinedType(nameType)
+    }
+  }
+
+  class REPLVisitor() extends OberonBaseVisitor[Unit] {
+    var repl: REPL = _
+
+    override def visitREPLVarDeclaration(ctx: OberonParser.REPLVarDeclarationContext): Unit = {
+      val v = ctx.varDeclaration()
+      val declarations = visitVariableDeclaration(v)
+      repl = REPLVarDeclaration(declarations)
+    }
+
+    override def visitREPLConstant(ctx: OberonParser.REPLConstantContext): Unit = {
+      val c = ctx.constant()
+      val constant = ParserVisitor.this.visitConstant(c)
+      repl = REPLConstant(constant)
+    }
+
+    override def visitREPLStatement(ctx: OberonParser.REPLStatementContext): Unit = {
+      val s = ctx.statement()
+      val stmtVisitor = new StatementVisitor
+      s.accept(stmtVisitor)
+      repl = REPLStatement(stmtVisitor.stmt)
+    }
+
+    override def visitREPLExpression(ctx: OberonParser.REPLExpressionContext): Unit = {
+      val e = ctx.expression()
+      val expVisitor = new ExpressionVisitor
+      e.accept(expVisitor)
+      repl = REPLExpression(expVisitor.exp)
+    }
+
+    override def visitREPLUserTypeDeclaration(ctx: OberonParser.REPLUserTypeDeclarationContext): Unit = {
+      val u = ctx.userTypeDeclaration()
+      val userDeclarations = visitUserDefinedType(u)
+      repl = REPLUserTypeDeclaration(userDeclarations)
     }
   }
 
