@@ -188,20 +188,6 @@ class ParserVisitor {
       baseType = RealType
     }
 
-    override def visitShortType(ctx: OberonParser.ShortTypeContext): Unit = {
-      baseType = ShortType
-
-    }
-
-    override def visitLongRealType(ctx: OberonParser.LongRealTypeContext): Unit = {
-      baseType = LongRealType
-    }
-
-    override def visitLongType(ctx: OberonParser.LongTypeContext): Unit = {
-      baseType = LongType
-
-    }
-
     override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = {
       baseType = BooleanType
     }
@@ -262,48 +248,10 @@ class ParserVisitor {
       'variables' contains all the variables in current program with its respective type.
     */
     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
-    {
-      var a = ctx.parent.parent.getText().split(":")(0)
+       exp = IntValue(ctx.getText.toInt)
 
-      for(v <- variables)
-      {
-        if(v.name == a)
-        {
-          if(v.variableType == IntegerType)
-            exp = IntValue(ctx.getText.toInt);
-          else if (v.variableType == ShortType)
-            exp = ShortValue(ctx.getText.toShort);
-          else exp = LongValue(ctx.getText.toLong)
-
-          return
-        }
-      }
-      exp = IntValue(ctx.getText.toInt);
-    }
-
-
-    /*
-      Same thing above, but with real types
-    */
     override def visitRealValue(ctx: OberonParser.RealValueContext): Unit =
-      {
-        var a = ctx.parent.parent.getText().split(":")(0)
-
-        for(v <- variables)
-        {
-          if(v.name == a)
-          {
-            if(v.variableType == RealType)
-              exp = RealValue(ctx.getText.toFloat);
-            else
-              exp = LongRealValue(ctx.getText.toDouble)
-
-            return
-          }
-        }
-
-        exp = RealValue(ctx.getText.toFloat);
-      }
+      exp = RealValue(ctx.getText.toFloat)
 
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")
@@ -432,29 +380,14 @@ class ParserVisitor {
       stmt = ReadCharStmt(varName)
     }
 
-    override def visitReadLongRealStmt(ctx: OberonParser.ReadLongRealStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadLongRealStmt(varName)
-    }
-
     override def visitReadRealStmt(ctx: OberonParser.ReadRealStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadRealStmt(varName)
     }
 
-    override def visitReadLongIntStmt(ctx: OberonParser.ReadLongIntStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadLongIntStmt(varName)
-    }
-
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadIntStmt(varName)
-    }
-
-    override def visitReadShortIntStmt(ctx: OberonParser.ReadShortIntStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadShortIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {

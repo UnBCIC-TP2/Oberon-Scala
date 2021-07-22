@@ -3,6 +3,20 @@ package br.unb.cic.oberon.stdlib
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.util.Values
 
+
+
+sealed trait Mode
+object Read extends Mode
+object Write extends Mode
+
+class FileHandler(val path: String, val mode: Mode) {
+//    var f: File = Paths.get(path).toFile
+//
+//    def open(): Int = {
+//
+//        return -1
+//    }
+}
 object Functions {
     def abs(x: Int): Int = Math.abs(x)
     def odd(x: Int): Boolean = x%2 == 1

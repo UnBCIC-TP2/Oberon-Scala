@@ -60,68 +60,41 @@ trait Expression {
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
-abstract class Value[T](val value: T) extends Expression
+sealed abstract class Value[T](val value: T) extends Expression
+sealed abstract class PrimitiveValue[T <% Ordering[T]](v: T) extends Value(v)
+sealed abstract class Number[T <% Numeric[T]](v: T) extends PrimitiveValue(v)
 
-/*
-  Abstract class to define a primitive type, and also defines numeric conversion methods
-*/
-abstract class Primitive[T](val value: T) extends Expression
-{
-  def toInt(): Int
-  def toFloat(): Float
-  def toLong(): Long
-  def toShort(): Short
-  def toDouble(): Double
+
+case class IntValue(v: Int) extends Number[Int](v)
+
+case class RealValue(v: Float) extends Value[Float](v) with Number {
+  def +(other: Number) =
+    other match {
+      case IntValue(o) => RealValue(value + o)
+      case RealValue(o) => RealValue(value + o)
+    }
+
+  def -(other: Number) =
+    other match {
+      case IntValue(o) => RealValue(value - o)
+      case RealValue(o) => RealValue(value - o)
+    }
+
+  def *(other: Number) =
+    other match {
+      case IntValue(o) => RealValue(value * o)
+      case RealValue(o) => RealValue(value * o)
+    }
+
+  def /(other: Number) =
+    other match {
+      case IntValue(o) => RealValue(value / o)
+      case RealValue(o) => RealValue(value / o)
+    }
 }
 
-case class IntValue(v: Int) extends Primitive[Int](v){
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
-case class RealValue(v: Float) extends Primitive[Float](v) {
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
-case class ShortValue(v: Short) extends Primitive[Short](v) {
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
-case class LongValue(v: Long) extends Primitive[Long](v) {
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
-case class LongRealValue(v: Double) extends Primitive[Double](v) {
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
-case class CharValue(v: Char) extends Primitive[Char](v){
-  def toInt(): Int = v.toInt
-  def toFloat(): Float = v.toFloat
-  def toLong(): Long = v.toLong
-  def toShort(): Short = v.toShort
-  def toDouble(): Double = v.toDouble
-}
-
+case class CharValue(v: Char) extends Value[Char](v)
+case class StringValue(v: String) extends Value[String](v)
 case class Brackets(exp: Expression) extends Expression
 case class BoolValue(v: Boolean) extends Value[Boolean](v)
 case class ArrayValue(v: List[Expression]) extends Value[List[Expression]](v)
@@ -184,25 +157,35 @@ case class VarAssignment(varName: String) extends AssignmentAlternative
 case class ArrayAssignment(array: Expression, elem: Expression) extends AssignmentAlternative
 case class RecordAssignment(record: Expression, atrib: String) extends AssignmentAlternative
 
-/* Types */
-trait Type {
-  def accept(v: OberonVisitor) = v.visit(this)
-}
 
-case object IntegerType extends Type
-case object RealType extends Type
-case object ShortType extends Type
-case object LongType extends Type
-case object LongRealType extends Type
-case object BooleanType extends Type
-case object CharacterType extends Type
-case object UndefinedType extends Type
-case class ReferenceToUserDefinedType(name: String) extends Type
-
-trait UserDefinedType{
+/**
+ * User defined types.
+ *
+ * Users can declare either records or
+ * array types.
+ */
+sealed trait UserDefinedType{
   def accept(v: OberonVisitor) = v.visit(this)
 }
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
 
+
+/** The hierarchy for the Oberon supported types */
+sealed trait Type {
+  def accept(v: OberonVisitor) = v.visit(this)
+}
+
+case object IntegerType extends Type
+case object RealType extends Type
+case object BooleanType extends Type
+case object CharacterType extends Type
+case object StringType extends Type
+case object UndefinedType extends Type
+case class ReferenceToUserDefinedType(name: String) extends Type
+
+object ValueConversion {
+  implicit def intValue2RealValue(intValue: IntValue) = RealValue(intValue.v)
+  implicit def charValue2IntValue(charValue: CharValue) = IntValue(charValue.v)
+}
