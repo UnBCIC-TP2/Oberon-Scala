@@ -3,7 +3,19 @@ package br.unb.cic.oberon.ast
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
 
-/* Abstract representation of an Oberon Module */
+
+/** Abstract representation of an Oberon Module
+ *
+ * Here we use an object-oriented decomposition to represent
+ * Oberon concepts as Scala classes and traits.
+ *
+ * The use of case classes here are handy, mostly because we
+ * can use case case classes in pattern matching, and they also
+ * provide useful methods (such as equality).
+ *
+ * Traits offers an interesting approach for software composition,
+ * besides OO inheritance.
+ */
 case class OberonModule(name: String,
                         submodules: Set[String],
                         userTypes: List[UserDefinedType],
@@ -12,16 +24,12 @@ case class OberonModule(name: String,
                         procedures: List[Procedure],
                         stmt: Option[Statement]
                        ) {
-  def accept(v: OberonVisitor): Unit = v.visit(this)
+  def accept(v: OberonVisitor): Unit =
+    v.visit(this)
 }
 
-trait REPL
-
-case class REPLExpression(exp: Expression) extends REPL
-case class REPLStatement(stmt: Statement) extends REPL
-case class REPLVarDeclaration(declarations: List[VariableDeclaration]) extends REPL
-case class REPLConstant(constants: Constant) extends REPL
-case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
+// SequenceStatement(List[Stmt]) extends Stmt
+// alternativa: SequenceStatement(stmt, stmt) extends Stmt
 
 /* procedure declaration definition */
 case class Procedure(name: String,
@@ -197,6 +205,7 @@ case object LongRealType extends Type
 case object BooleanType extends Type
 case object CharacterType extends Type
 case object UndefinedType extends Type
+
 case class ReferenceToUserDefinedType(name: String) extends Type
 
 trait UserDefinedType{
@@ -206,3 +215,11 @@ trait UserDefinedType{
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
 
+/* useful for implementing the REPL feature */
+trait REPL
+
+case class REPLExpression(exp: Expression) extends REPL
+case class REPLStatement(stmt: Statement) extends REPL
+case class REPLVarDeclaration(declarations: List[VariableDeclaration]) extends REPL
+case class REPLConstant(constants: Constant) extends REPL
+case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
