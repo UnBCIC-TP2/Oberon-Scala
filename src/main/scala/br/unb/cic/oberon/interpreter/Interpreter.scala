@@ -4,10 +4,8 @@ import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
-import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
-import br.unb.cic.oberon.parser.ModuleLoader
 
 import scala.io.StdIn
 
@@ -117,8 +115,10 @@ class Interpreter extends OberonVisitorAdapter {
           whileStmt.accept(this)
 
       case RepeatUntilStmt(condition, repeatUntilStmt) =>
-        do
+        do {
           repeatUntilStmt.accept(this)
+          val c = evalCondition(condition)
+        }
         while (!evalCondition(condition))
 
       case ForStmt(init, condition, block) =>
@@ -266,8 +266,8 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
     case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
-    case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.eq(v2)))
-    case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value != v2.value))
+    case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
+    case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
     case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
     case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
     case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))

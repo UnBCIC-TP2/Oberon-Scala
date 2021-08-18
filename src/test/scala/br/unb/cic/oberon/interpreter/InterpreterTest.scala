@@ -342,19 +342,18 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
-  // TODO: It is going to a forever loop
-  ignore("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
+  test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
     val module = ScalaParser.parseResource("stmts/RepeatUntilStmt07.oberon")
 
     assert(module.name == "RepeatUntilModule")
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(20)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(20)));
+    assert(interpreter.env.lookup("x") == Some(IntValue(3)));
+    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
   }
 
-  ignore("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
+  test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
     val module = ScalaParser.parseResource("stmts/RepeatUntilStmt08.oberon")
 
     assert(module.name == "RepeatUntilModule")
@@ -394,7 +393,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
   }
 
-  ignore("Testing LoopStmt stmt on loop_stmt03 program") {
+  test("Testing LoopStmt stmt on loop_stmt03 program") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
     assert(path != null)
