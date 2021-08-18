@@ -19,10 +19,7 @@ import scala.jdk.CollectionConverters._
  */
 object ScalaParser {
   def parse(input: String): OberonModule = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
+    val parser: OberonParser = createOberonParser(input)
 
     val visitor = new ParserVisitor
     visitor.visitCompilationUnit(parser.compilationUnit())
@@ -34,16 +31,33 @@ object ScalaParser {
   }
 
   def parserREPL(input: String): REPL = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
+    val parser = createOberonParser(input)
 
     val visitor = new ParserVisitor
     val replVisitor = new visitor.REPLVisitor()
 
     replVisitor.visit(parser.repl())
     replVisitor.repl
+  }
+
+  private def createOberonParser(input: String) = {
+    val lexer = new OberonLexer(new ANTLRInputStream(input))
+    lexer.removeErrorListeners
+    lexer.addErrorListener(OberonErrorListener)
+
+    val tokens = new CommonTokenStream(lexer)
+
+    val parser = new OberonParser(tokens)
+    parser.removeErrorListeners
+    parser.addErrorListener(OberonErrorListener)
+    parser
+  }
+
+  object OberonErrorListener extends BaseErrorListener {
+    override def syntaxError(recognizer: Recognizer[_, _], offendingSymbol: Any, line: Int, charPositionInLine: Int, msg: String, e: RecognitionException): Unit = {
+      import org.antlr.v4.runtime.misc.ParseCancellationException
+      throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg)
+    }
   }
 }
 
@@ -85,20 +99,20 @@ class ParserVisitor {
 
     def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
       if (ctx != null) {
-        val imports = ctx.imptList.impt.asScala.toList
+        val imports = ctx.importList.modules.asScala.toList
 
         imports.map(visitImportAlias _)
 
-        val submodules = imports.map(_.name.getText)
+        val submodules = imports.map(_.module.getText)
         Set.from(submodules)
       } else {
         Set.empty
       }
     }
 
-    def visitImportAlias(ctx: OberonParser.ImptAliasedContext) = {
+    def visitImportAlias(ctx: OberonParser.ImportModuleContext) = {
       if (ctx.alias != null)
-        imptAliases += ctx.alias.getText -> ctx.name.getText
+        imptAliases += ctx.alias.getText -> ctx.module.getText
     }
 
     /**
@@ -647,9 +661,11 @@ class ParserVisitor {
 
       val name = ctx.nameType.getText
       val length = ctx.length.getText.toInt
-      val baseType = typeVisitor.visitOberonType(ctx.vartype)
+      val baseType = typeVisitor.visitOberonType(ctx.baseType)
 
       uType = ArrayType(name, length, baseType)
     }
   }
+
+
 }

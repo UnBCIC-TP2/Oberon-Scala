@@ -5,15 +5,15 @@ compilationUnit
   ;
 
 imports
-  : 'IMPORT' imptList ';'
+  : 'IMPORT' importList ';'
   ;
 
-imptList
-  : (impt += imptAliased (',' impt += imptAliased)*)
+importList
+  : (modules += importModule (',' modules += importModule)*)
   ;
 
-imptAliased
-  : name = Id (':=' alias = Id)?
+importModule
+  : module = Id (':=' alias = Id)?
   ;
 
 
@@ -22,7 +22,7 @@ declarations
   ;
 
 userTypeDeclaration
-  : nameType = Id '=' ('ARRAY' length = INT 'OF' vartype = oberonType)      #ArrayTypeDeclaration
+  : nameType = Id '=' ('ARRAY' length = INT 'OF' baseType = oberonType)      #ArrayTypeDeclaration
   | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
   ;
 
