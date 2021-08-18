@@ -1975,7 +1975,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(9) == WriteStmt(VarExpression("z")))
   }
 
-  test("Reading new types") {
+  ignore("Reading new types") {
     val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").getFile)
 
     assert(path != null)

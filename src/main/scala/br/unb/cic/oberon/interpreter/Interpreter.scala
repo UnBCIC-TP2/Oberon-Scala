@@ -29,12 +29,11 @@ class Interpreter extends OberonVisitorAdapter {
   var exit = false
   val env = new Environment[Expression]()
 
-  var printStream : PrintStream = new PrintStream(System.out)
-  var variaveis = List.empty[VariableDeclaration]
+  var printStream: PrintStream = new PrintStream(System.out)
+
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
-    variaveis = module.variables
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
@@ -62,15 +61,17 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
-  // 	assert(stmts(1) == EAssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
-
-
   override def visit(stmt: Statement): Unit = {
     // we first check if we achieved a return stmt.
     // if so, we should not execute any other statement
     // of a sequence of stmts. Whenever we achieve a
-    // return stmt, we associate in the local variables
-    // the name "return" to the return value.
+    // return stmt, we associate a local variables
+    // "return" to the return value.
+    //
+    // we also check if exit is true. if this is the case
+    // we should also stop the execution of a block of
+    // statements within a any kind of repeat statement.
+
     if (exit || env.lookup(Values.ReturnKeyWord).isDefined) {
       return
     }
@@ -85,24 +86,61 @@ class Interpreter extends OberonVisitorAdapter {
           case _ => ???
         }
       }
-      case AssignmentStmt(name, exp) => env.setVariable(name, evalExpression(exp))
-      case SequenceStmt(stmts) => stmts.foreach(s => s.accept(this))
-      case ReadRealStmt(name) => env.setVariable(name, RealValue(StdIn.readLine().toFloat))
-      case ReadIntStmt(name) => env.setVariable(name, IntValue(StdIn.readLine().toInt))
-      case ReadCharStmt(name) => env.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
-      case WriteStmt(exp) => printStream.println(evalExpression(exp))
-      case IfElseStmt(condition, thenStmt, elseStmt) => if (evalCondition(condition)) thenStmt.accept(this) else if (elseStmt.isDefined) elseStmt.get.accept(this)
-      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) => checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
-      case WhileStmt(condition, whileStmt) => while (evalCondition(condition)) whileStmt.accept(this)
-      case RepeatUntilStmt(condition, repeatUntilStmt) => do (repeatUntilStmt.accept(this)) while (!evalCondition(condition))
-      case ForStmt(init, condition, block) => init.accept(this); while (evalCondition(condition)) block.accept(this)
-      case LoopStmt(stmt) => while(!exit) { stmt.accept(this) }; exit = false
-      case ExitStmt() => exit = true
-      case CaseStmt(exp, cases, elseStmt) => checkCaseStmt(exp, cases, elseStmt)
-      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp))
+
+      case AssignmentStmt(name, exp) =>
+        env.setVariable(name, evalExpression(exp))
+
+      case SequenceStmt(stmts) =>
+        stmts.foreach(s => s.accept(this))
+
+      case ReadRealStmt(name) =>
+        env.setVariable(name, RealValue(StdIn.readLine().toFloat))
+
+      case ReadIntStmt(name) =>
+        env.setVariable(name, IntValue(StdIn.readLine().toInt))
+
+      case ReadCharStmt(name) =>
+        env.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
+
+      case WriteStmt(exp) =>
+        printStream.println(evalExpression(exp))
+
+      case IfElseStmt(condition, thenStmt, elseStmt) =>
+        if (evalCondition(condition)) thenStmt.accept(this)
+        else if (elseStmt.isDefined) elseStmt.get.accept(this)
+
+      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) =>
+        checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
+
+      case WhileStmt(condition, whileStmt) =>
+        while (evalCondition(condition))
+          whileStmt.accept(this)
+
+      case RepeatUntilStmt(condition, repeatUntilStmt) =>
+        do
+          repeatUntilStmt.accept(this)
+        while (!evalCondition(condition))
+
+      case ForStmt(init, condition, block) =>
+        init.accept(this);
+        while (evalCondition(condition))
+          block.accept(this)
+
+      case LoopStmt(stmt) =>
+        while (!exit) {
+          stmt.accept(this)
+        };
+        exit = false
+      case ExitStmt() =>
+        exit = true
+
+      case CaseStmt(exp, cases, elseStmt) =>
+        checkCaseStmt(exp, cases, elseStmt)
+
+      case ReturnStmt(exp: Expression) =>
+        setReturnExpression(evalExpression(exp))
+
       case ProcedureCallStmt(name, args) =>
-        // we evaluate the "args" in the current
-        // environment.
         val actualArguments = args.map(a => evalExpression(a))
         env.push() // after that, we can "push", to indicate a procedure call.
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
@@ -115,10 +153,7 @@ class Interpreter extends OberonVisitorAdapter {
     var i = 0
 
     if (evalCondition(condition)) thenStmt.accept(this)
-
-
     else {
-
       while (i < listOfElseIf.size && !matched) {
         listOfElseIf(i) match {
           case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
@@ -128,13 +163,12 @@ class Interpreter extends OberonVisitorAdapter {
         }
         i += 1
       }
-
       if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
     }
   }
 
   private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Unit = {
-    var v = evalExpression(exp)
+    val v = evalExpression(exp)
     var matched = false
     var i = 0
     while (i < cases.size && !matched) {
@@ -195,11 +229,6 @@ class Interpreter extends OberonVisitorAdapter {
     val evalVisitor = new EvalExpressionVisitor(interpreter = this)
     expression.accept(evalVisitor).asInstanceOf[IntValue].value
   }
-  
-  // def evalCaseAlt(expression: Expression): Float = {
-  //   val evalVisitor = new EvalExpressionVisitor(interpreter = this)
-  //   expression.accept(evalVisitor).asInstanceOf[RealValue].value
-  // }
 
   /*
    * This method is mostly useful for testing purpose.
@@ -233,18 +262,18 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case BoolValue(v) => BoolValue(v)
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
-    case AddExpression(left, right) => arithmeticExpression(left, right, "+")
-    case SubExpression(left, right) => arithmeticExpression(left, right, "-")
-    case MultExpression(left, right) => arithmeticExpression(left, right, "*")
-    case DivExpression(left, right) => arithmeticExpression(left, right, "/")
-    case EQExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value == v2.value))
-    case NEQExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value != v2.value))
-    case GTExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value > v2.value))
-    case LTExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value < v2.value))
-    case GTEExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value >= v2.value))
-    case LTEExpression(left, right) => binExpression(left, right, (v1: Value[T], v2: Value[T]) => BoolValue(v1.value <= v2.value))
-    case AndExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value && v2.value))
-    case OrExpression(left, right) => binExpression(left, right, (v1: Value[Boolean], v2: Value[Boolean]) => BoolValue(v1.value || v2.value))
+    case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
+    case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
+    case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
+    case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
+    case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.eq(v2)))
+    case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value != v2.value))
+    case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
+    case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
+    case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
+    case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+    case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
+    case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => {
       val actualArguments = args.map(a => a.accept(this))
       interpreter.env.push()
@@ -264,47 +293,39 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   /**
    * Eval an arithmetic expression on Numbers
    *
-   * @param left the left expression
+   * @param left  the left expression
    * @param right the right expression
-   * @param op a function representing the operator
-   *
+   * @param op    a function representing the operator
    * @return the application of the operator after
    *         evaluating left and right to reduce them to
    *         numbers.
    */
-  def arithmeticExpression(left: Expression, right: Expression, op: String) : Expression = {
+  def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): Expression = {
     val vl = left.accept(this).asInstanceOf[Number]
     val vr = right.accept(this).asInstanceOf[Number]
 
-    op match {
-      case "+" => vl + vr
-      case "-" => vl - vr
-      case "*" => vl * vr
-      case "/" => vl / vr
-
-    }
+    fn(vl, vr)
   }
 
   /**
-   * Eval a binary expression.
+   * Eval a binary expression on values.
    *
    * @param left  the left expression
    * @param right the right expression
    * @param fn    a function that constructs an expression. Here we
-   *              are using again a high-order function. We assign to
+   *              are using a high-order function. We assign to
    *              the "result" visitor attribute the value we compute
    *              after applying this function.
-   * @tparam T a type parameter to set the function fn correctly.
    */
-  def binExpression[T](left: Expression, right: Expression, fn: (Value[T], Value[T]) => Expression): Expression = {
-    val v1 = left.accept(this).asInstanceOf[Value[T]]
-    val v2 = right.accept(this).asInstanceOf[Value[T]]
+  def binExpression(left: Expression, right: Expression, fn: (Value, Value) => Expression): Expression = {
+    val v1 = left.accept(this).asInstanceOf[Value]
+    val v2 = right.accept(this).asInstanceOf[Value]
 
     fn(v1, v2)
   }
 }
 
-class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) { }
+class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}
 
 class NullByteArrayOutputStream extends ByteArrayOutputStream {
   override def writeTo(o: OutputStream) {}
