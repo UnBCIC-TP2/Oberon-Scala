@@ -1,11 +1,15 @@
 MODULE SimpleModule;
 
+TYPE
+   date = RECORD
+      day: INTEGER;
+      month: INTEGER;
+   END
+
 VAR
-    record
-        day: INTEGER;
     d1 : record;
 BEGIN
-    d1.day := 5;
+    d1.day := 5
 END
 
 END SimpleModule.

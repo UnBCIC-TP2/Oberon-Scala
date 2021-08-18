@@ -2,10 +2,10 @@ MODULE ExpressionNameModule;
 
 TYPE
   type4 = RECORD
-    v1, v2: INTEGER
+    v1, v2: INTEGER;
   END
 
-  VAR
+VAR
   t4 : type4;
   result: INTEGER;
 

@@ -3,7 +3,7 @@ MODULE H;
 
 BEGIN
     write(aliasA::x);
-    write(aliasC::x);
+    write(aliasC::x)
 END
 
 END H.
