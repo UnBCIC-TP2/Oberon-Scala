@@ -19,10 +19,7 @@ import scala.jdk.CollectionConverters._
  */
 object ScalaParser {
   def parse(input: String): OberonModule = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
+    val parser: OberonParser = createOberonParser(input)
 
     val visitor = new ParserVisitor
     visitor.visitCompilationUnit(parser.compilationUnit())
@@ -34,16 +31,33 @@ object ScalaParser {
   }
 
   def parserREPL(input: String): REPL = {
-    val charStream = new ANTLRInputStream(input)
-    val lexer = new OberonLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new OberonParser(tokens)
+    val parser = createOberonParser(input)
 
     val visitor = new ParserVisitor
     val replVisitor = new visitor.REPLVisitor()
 
     replVisitor.visit(parser.repl())
     replVisitor.repl
+  }
+
+  private def createOberonParser(input: String) = {
+    val lexer = new OberonLexer(new ANTLRInputStream(input))
+    lexer.removeErrorListeners
+    lexer.addErrorListener(OberonErrorListener)
+
+    val tokens = new CommonTokenStream(lexer)
+
+    val parser = new OberonParser(tokens)
+    parser.removeErrorListeners
+    parser.addErrorListener(OberonErrorListener)
+    parser
+  }
+
+  object OberonErrorListener extends BaseErrorListener {
+    override def syntaxError(recognizer: Recognizer[_, _], offendingSymbol: Any, line: Int, charPositionInLine: Int, msg: String, e: RecognitionException): Unit = {
+      import org.antlr.v4.runtime.misc.ParseCancellationException
+      throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg)
+    }
   }
 }
 
@@ -85,20 +99,20 @@ class ParserVisitor {
 
     def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
       if (ctx != null) {
-        val imports = ctx.imptList.impt.asScala.toList
+        val imports = ctx.importList.modules.asScala.toList
 
         imports.map(visitImportAlias _)
 
-        val submodules = imports.map(_.name.getText)
+        val submodules = imports.map(_.module.getText)
         Set.from(submodules)
       } else {
         Set.empty
       }
     }
 
-    def visitImportAlias(ctx: OberonParser.ImptAliasedContext) = {
+    def visitImportAlias(ctx: OberonParser.ImportModuleContext) = {
       if (ctx.alias != null)
-        imptAliases += ctx.alias.getText -> ctx.name.getText
+        imptAliases += ctx.alias.getText -> ctx.module.getText
     }
 
     /**
@@ -188,20 +202,6 @@ class ParserVisitor {
       baseType = RealType
     }
 
-    override def visitShortType(ctx: OberonParser.ShortTypeContext): Unit = {
-      baseType = ShortType
-
-    }
-
-    override def visitLongRealType(ctx: OberonParser.LongRealTypeContext): Unit = {
-      baseType = LongRealType
-    }
-
-    override def visitLongType(ctx: OberonParser.LongTypeContext): Unit = {
-      baseType = LongType
-
-    }
-
     override def visitBooleanType(ctx: OberonParser.BooleanTypeContext): Unit = {
       baseType = BooleanType
     }
@@ -262,48 +262,10 @@ class ParserVisitor {
       'variables' contains all the variables in current program with its respective type.
     */
     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
-    {
-      var a = ctx.parent.parent.getText().split(":")(0)
+       exp = IntValue(ctx.getText.toInt)
 
-      for(v <- variables)
-      {
-        if(v.name == a)
-        {
-          if(v.variableType == IntegerType)
-            exp = IntValue(ctx.getText.toInt);
-          else if (v.variableType == ShortType)
-            exp = ShortValue(ctx.getText.toShort);
-          else exp = LongValue(ctx.getText.toLong)
-
-          return
-        }
-      }
-      exp = IntValue(ctx.getText.toInt);
-    }
-
-
-    /*
-      Same thing above, but with real types
-    */
     override def visitRealValue(ctx: OberonParser.RealValueContext): Unit =
-      {
-        var a = ctx.parent.parent.getText().split(":")(0)
-
-        for(v <- variables)
-        {
-          if(v.name == a)
-          {
-            if(v.variableType == RealType)
-              exp = RealValue(ctx.getText.toFloat);
-            else
-              exp = LongRealValue(ctx.getText.toDouble)
-
-            return
-          }
-        }
-
-        exp = RealValue(ctx.getText.toFloat);
-      }
+      exp = RealValue(ctx.getText.toFloat)
 
     override def visitBoolValue(ctx: OberonParser.BoolValueContext): Unit =
       exp = BoolValue(ctx.getText == "True")
@@ -432,29 +394,14 @@ class ParserVisitor {
       stmt = ReadCharStmt(varName)
     }
 
-    override def visitReadLongRealStmt(ctx: OberonParser.ReadLongRealStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadLongRealStmt(varName)
-    }
-
     override def visitReadRealStmt(ctx: OberonParser.ReadRealStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadRealStmt(varName)
     }
 
-    override def visitReadLongIntStmt(ctx: OberonParser.ReadLongIntStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadLongIntStmt(varName)
-    }
-
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadIntStmt(varName)
-    }
-
-    override def visitReadShortIntStmt(ctx: OberonParser.ReadShortIntStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = ReadShortIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {
@@ -714,9 +661,11 @@ class ParserVisitor {
 
       val name = ctx.nameType.getText
       val length = ctx.length.getText.toInt
-      val baseType = typeVisitor.visitOberonType(ctx.vartype)
+      val baseType = typeVisitor.visitOberonType(ctx.baseType)
 
       uType = ArrayType(name, length, baseType)
     }
   }
+
+
 }

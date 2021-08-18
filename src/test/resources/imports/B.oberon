@@ -1,8 +1,9 @@
 MODULE B;
-    IMPORT A;
+
+IMPORT A;
 
 BEGIN
-    write(A::x);
+    write(A::x)
 END
 
 END B.

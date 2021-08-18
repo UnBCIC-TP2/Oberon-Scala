@@ -1,4 +1,4 @@
-MODULE WhileCaseModule
+MODULE WhileCaseModule;
 
 VAR
   x, sum, lim : INTEGER;

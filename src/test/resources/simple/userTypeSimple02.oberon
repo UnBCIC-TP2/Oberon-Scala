@@ -4,7 +4,7 @@ TYPE
     
     HALLS = RECORD
         integrante : BOOLEAN;
-        matricula : INTEGER
+        matricula : INTEGER;
     END
     
     HALLS_array = ARRAY 9 OF HALLS

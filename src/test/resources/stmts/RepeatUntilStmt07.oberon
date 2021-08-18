@@ -5,7 +5,7 @@ VAR
 
 BEGIN
   x := 0;
-  y := 20;
+  y := 3;
 
   REPEAT
     x := x + 1
