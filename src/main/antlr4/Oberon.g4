@@ -95,12 +95,7 @@ statement
  | 'EXIT'                                                                                                                     #ExitStmt
  ;
 
-repl: varDeclaration #REPLVarDeclaration
-      | constant #REPLConstant
-      | expression #REPLExpression
-      | statement #REPLStatement
-      | userTypeDeclaration #REPLUserTypeDeclaration
-      ;
+
 
 designator
   : var = Id                                                          #VarAssignment
@@ -153,6 +148,14 @@ STRING
    ;
 
 Id : CharDef (CharDef | Digit | '_')* ;
+
+
+repl: varDeclaration #REPLVarDeclaration
+      | constant #REPLConstant
+      | expression #REPLExpression
+      | statement #REPLStatement
+      | userTypeDeclaration #REPLUserTypeDeclaration
+      ;
 
 fragment CharDef
   : ('a'..'z') | ('A' .. 'Z')

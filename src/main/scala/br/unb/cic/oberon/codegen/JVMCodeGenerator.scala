@@ -5,14 +5,9 @@ import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ast._
 
 import org.objectweb.asm._
-import org.objectweb.asm.util._
-import java.io.PrintWriter
 import org.objectweb.asm.Opcodes._
 
 import java.util.Base64
-
-//TODO: next steps:
-//      (b) generate methods from procedures (27/04).
 
 object JVMCodeGenerator extends CodeGenerator {
   override def generateCode(module: OberonModule): String = {
@@ -58,25 +53,5 @@ object JVMCodeGenerator extends CodeGenerator {
     }
   }
 
-  // def generateDeclarations(
-  //     variables: List[VariableDeclaration],
-  //     lineSpaces: Int = 2
-  // ): Doc = {
-
-    
-
-  //   val boolVariables = variables.filter(_.variableType == BooleanType).map {
-  //     case (boolVar) => Doc.text(boolVar.name)
-  //   }
-  //   val boolDeclaration =
-  //     if (boolVariables.nonEmpty)
-  //       formatLine(lineSpaces) + Doc.text("bool ") + Doc.intercalate(
-  //         Doc.comma + Doc.space,
-  //         boolVariables
-  //       ) + Doc.char(';') + Doc.line
-  //     else Doc.empty
-
-  //   intDeclaration + boolDeclaration
-  // }
 }
 
