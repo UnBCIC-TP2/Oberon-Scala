@@ -4,7 +4,7 @@ import br.unb.cic.oberon.ast.OberonModule
 
 /**
  * The base interface for code generation.
- * We can generate code for different target languages (e.g.: C, C++, LLVM, JIMPLE) and
+ * We can generate code for different target languages (e.g.: C, C++, LLVM, JIMPLE, JVM) and
  * using different technologies (String Interpolation, Pretty Printer Library, and so on).
  */
 trait CodeGenerator {

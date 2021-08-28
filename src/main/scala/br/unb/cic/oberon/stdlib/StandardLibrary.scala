@@ -3,8 +3,6 @@ package br.unb.cic.oberon.stdlib
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.util.Values
 
-
-
 sealed trait Mode
 object Read extends Mode
 object Write extends Mode
