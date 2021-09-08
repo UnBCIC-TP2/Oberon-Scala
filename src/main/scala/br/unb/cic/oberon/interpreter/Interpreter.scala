@@ -1,9 +1,9 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.stdlib.StandardLibrary
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -29,6 +29,10 @@ class Interpreter extends OberonVisitorAdapter {
 
   var printStream: PrintStream = new PrintStream(System.out)
 
+  def setupStandardLibraries(): Unit = {
+    StandardLibrary.stdlib.procedures.foreach(p => env.declareProcedure(p))
+  }
+
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
@@ -39,6 +43,7 @@ class Interpreter extends OberonVisitorAdapter {
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
+      setupStandardLibraries()
       module.stmt.get.accept(this)
     }
   }

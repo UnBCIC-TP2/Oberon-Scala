@@ -166,7 +166,6 @@ trait Statement {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-case class ScalaStmt(fn: Environment[Expression] => Unit) extends Statement
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
