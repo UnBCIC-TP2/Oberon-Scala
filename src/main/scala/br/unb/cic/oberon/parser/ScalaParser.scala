@@ -97,34 +97,34 @@ class ParserVisitor {
       None
     }
 
-    def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
-      if (ctx != null) {
-        val imports = ctx.importList.modules.asScala.toList
+  def visitImport(ctx: OberonParser.ImportsContext): Set[String] = {
+    if (ctx != null) {
+      val imports = ctx.importList.modules.asScala.toList
 
-        imports.map(visitImportAlias _)
+      imports.map(visitImportAlias _)
 
-        val submodules = imports.map(_.module.getText)
-        Set.from(submodules)
-      } else {
-        Set.empty
-      }
+      val submodules = imports.map(_.module.getText)
+      Set.from(submodules)
+    } else {
+      Set.empty
     }
+  }
 
-    def visitImportAlias(ctx: OberonParser.ImportModuleContext) = {
-      if (ctx.alias != null)
-        imptAliases += ctx.alias.getText -> ctx.module.getText
-    }
+  def visitImportAlias(ctx: OberonParser.ImportModuleContext) = {
+    if (ctx.alias != null)
+      imptAliases += ctx.alias.getText -> ctx.module.getText
+  }
 
-    /**
-     * @brief Qualify takes a qualified name and returns a string representation of it. For instance, if we are in a
-     * module A and try to qualify a variable x, this method would return "A::x" as that literal string.
-     */
-    def qualify(ctx: OberonParser.QualifiedNameContext): String = {
-      val module: String = ctx.module.getText
-      val name: String = ctx.name.getText
+  /**
+   * @brief Qualify takes a qualified name and returns a string representation of it. For instance, if we are in a
+   * module A and try to qualify a variable x, this method would return "A::x" as that literal string.
+   */
+  def qualify(ctx: OberonParser.QualifiedNameContext): String = {
+    val module: String = ctx.module.getText
+    val name: String = ctx.name.getText
 
-      module + "::" + name
-    }
+    module + "::" + name
+  }
 
   /**
    * Visit a constant declaration.
@@ -210,6 +210,10 @@ class ParserVisitor {
       baseType = CharacterType
     }
 
+    override def visitSetType(ctx: OberonParser.SetTypeContext): Unit = {
+      baseType = SetType
+    }
+
     override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
       val nameType = ctx.name.getText
       baseType = ReferenceToUserDefinedType(nameType)
@@ -261,8 +265,10 @@ class ParserVisitor {
       'a' is the name of the variable we are looking for and
       'variables' contains all the variables in current program with its respective type.
     */
+
+
     override def visitIntValue(ctx: OberonParser.IntValueContext): Unit =
-       exp = IntValue(ctx.getText.toInt)
+      exp = IntValue(ctx.getText.toInt)
 
     override def visitRealValue(ctx: OberonParser.RealValueContext): Unit =
       exp = RealValue(ctx.getText.toFloat)
@@ -272,6 +278,11 @@ class ParserVisitor {
 
     override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
+
+    /* CONSELHO PROFESSOR
+    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit =
+      exp = SetValue(ctx.getText.)
+    */
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
@@ -335,6 +346,7 @@ class ParserVisitor {
         case "/" => DivExpression
         case "&&" => AndExpression
         case "||" => OrExpression
+        case "IN" => InExpression
       }
 
     /*
@@ -402,6 +414,11 @@ class ParserVisitor {
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadIntStmt(varName)
+    }
+
+    override def visitReadSetStmt(ctx: OberonParser.ReadSetStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadSetStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {
