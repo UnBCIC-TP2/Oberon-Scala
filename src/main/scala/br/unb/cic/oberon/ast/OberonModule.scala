@@ -78,6 +78,7 @@ sealed abstract class Value extends Expression with Ordered[Value]{
     case (v1: RealValue, v2: RealValue) => v1.value.compareTo(v2.value)
     case (v1: CharValue, v2: CharValue) => v1.value.compareTo(v2.value)
     case (v1: StringValue, v2: StringValue) => v1.value.compareTo(v2.value)
+    case (v1: SetValue, v2: SetValue) => v1.value.compareTo(v2.value)
     case _ => throw new RuntimeException("Comparison is not defined for " + this.getClass + " and " + that.getClass)
   }
 }
@@ -89,7 +90,7 @@ sealed trait Number extends Expression {
   def /(that: Number): Number
 
 }
-case class IntValue(value: Int) extends Value with Number{
+case class IntValue(value: Int) extends Value with Number {
   type T = Int
   def +(that: Number): Number = that match {
     case other: IntValue => IntValue(value + other.value)
@@ -110,7 +111,6 @@ case class IntValue(value: Int) extends Value with Number{
     case other: IntValue => IntValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
   }
-
 }
 
 case class RealValue(value: Double) extends Value with Number {
@@ -137,6 +137,25 @@ case class RealValue(value: Double) extends Value with Number {
   }
 }
 
+case class SetValue(value: Set[Int]) extends Value with Number {
+  type T = Set[Int]
+  def +(that: Number): Number = that match {
+    case other: SetValue => SetValue(value union other.value)
+  }
+
+  def -(that: Number): Number = that match {
+    case other: SetValue => SetValue(value diff other.value)
+  }
+
+  def *(that: Number): Number = that match {
+    case other: SetValue => SetValue(value intersect other.value)
+  }
+
+  def /(that: Number): Number = that match {
+    case other: SetValue => SetValue(value diff other.value) + SetValue(other.value diff value)
+  }
+}
+
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
@@ -160,6 +179,7 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
+case class InExpression(left: Expression, right: Expression) extends Expression
 
 /* Statements */
 trait Statement {
@@ -174,6 +194,7 @@ case class ReadLongRealStmt(varName: String) extends Statement
 case class ReadRealStmt(varName: String) extends Statement
 case class ReadLongIntStmt(varName: String) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
+case class ReadSetStmt(varName: String) extends Statement
 case class ReadShortIntStmt(varName: String) extends Statement
 case class ReadCharStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
@@ -224,6 +245,7 @@ sealed trait Type {
 
 case object IntegerType extends Type
 case object RealType extends Type
+case object SetType extends Type
 case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type
