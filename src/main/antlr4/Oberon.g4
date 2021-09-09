@@ -16,7 +16,6 @@ importModule
   : module = Id (':=' alias = Id)?
   ;
 
-
 declarations
   : ('TYPE' userTypeDeclaration+) ? ('CONST' constant+)? ('VAR' varDeclaration+)? procedure*
   ;
@@ -58,15 +57,15 @@ block
  ;
 
 expression
- : '(' expression ')'                                                                     #Brackets
- | expValue                                                                               #Value
- | name = qualifiedName                                                                   #Variable
- | name = qualifiedName '(' arguments? ')'                                                #FunctionCall
- | exp = expression '.' name = Id                                                         #FieldAccess
- | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
- | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
- | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
- | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ : '(' expression ')'                                                                       #Brackets
+ | expValue                                                                                 #Value
+ | name = qualifiedName                                                                     #Variable
+ | name = qualifiedName '(' arguments? ')'                                                  #FunctionCall
+ | exp = expression '.' name = Id                                                           #FieldAccess
+ | arrayBase = expression '[' index = expression ']'                                        #ArraySubscript
+ | left = expression opr = ('IN' | '=' | '#' | '<' | '<=' | '>' | '>=')  right = expression #RelExpression
+ | left = expression opr = ('*' | '/' | '&&') right = expression                            #MultExpression
+ | left = expression opr = ('+' | '-' | '||') right = expression                            #AddExpression
  ;
 
 qualifiedName
@@ -81,6 +80,8 @@ statement
  | 'readReal'       '(' var = Id ')'                                                                                          #ReadRealStmt
  | 'readInt'        '(' var = Id ')'                                                                                          #ReadIntStmt
  | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
+ | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
+ | 'readSet'   '(' var = Id ')'                                                                                               #ReadSetStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt
@@ -119,6 +120,7 @@ expValue
   | charValue
   | stringValue
   | boolValue
+  | setValue
   ;
 
 intValue: INT ;
@@ -126,6 +128,7 @@ realValue: REAL ;
 charValue: CHAR ;
 stringValue: STRING ;
 boolValue: TRUE | FALSE ;
+setValue: SET;
 
 oberonType
  : 'INTEGER'         #IntegerType
@@ -133,12 +136,18 @@ oberonType
  | 'CHAR'            #CharacterType
  | 'BOOLEAN'         #BooleanType
  | 'STRING'          #StringType
+ | 'SET'             #SetType
  | name = Id         #ReferenceType        // Reference for user defined types
  ;
 
 INT : '-'? Digit+;
 REAL : '-'? Digit+ '.' Digit+;
 CHAR : '\'' CharDef '\'';
+SET: '{' '-'? Digit+ (',' '-'? Digit+)* '}';
+
+// fragment SetDef
+//   : ',' '-'? Digit+
+//   ;
 
 TRUE  : 'True' ;
 FALSE : 'False'  ;
