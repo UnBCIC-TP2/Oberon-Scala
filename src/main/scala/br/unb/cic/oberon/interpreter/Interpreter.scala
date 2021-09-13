@@ -30,7 +30,10 @@ class Interpreter extends OberonVisitorAdapter {
   var printStream: PrintStream = new PrintStream(System.out)
 
   def setupStandardLibraries(): Unit = {
-    StandardLibrary.stdlib.procedures.foreach(p => env.declareProcedure(p))
+    val lib = new StandardLibrary[Expression](env)
+    for(p <- lib.stdlib.procedures) {
+      env.declareProcedure(p)
+    }
   }
 
   override def visit(module: OberonModule): Unit = {
@@ -142,6 +145,8 @@ class Interpreter extends OberonVisitorAdapter {
 
       case ReturnStmt(exp: Expression) =>
         setReturnExpression(evalExpression(exp))
+
+      case MetaStmt(f) => f().accept(this)
 
       case ProcedureCallStmt(name, args) =>
         val actualArguments = args.map(a => evalExpression(a))

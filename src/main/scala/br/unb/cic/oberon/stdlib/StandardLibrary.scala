@@ -1,11 +1,12 @@
 package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.util.Values
+import br.unb.cic.oberon.environment.Environment
 
-object StandardLibrary {
 
-    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs), None)
+class StandardLibrary[T](env: Environment[T]) {
+
+    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd), None)
 
     def abs = Procedure(
         "ABS",                             // name
@@ -24,16 +25,15 @@ object StandardLibrary {
             Some(ReturnStmt(VarExpression("x"))))
     )
 
-//    def odd = Procedure(
-//        "ODD",
-//        List(FormalArg("x", IntegerType)),
-//        Some(BooleanType),
-//        List(),
-//        List(VariableDeclaration("temp", IntegerType)),
-//
-//        SequenceStmt(
-//            List(AssignmentStmt("temp", VarExpression("x")),
-//                ReturnStmt
-//        )
-//    )
+      def odd = Procedure(
+        "ODD",
+        List(FormalArg("x", IntegerType)),
+        Some(BooleanType),
+        List(),
+        List(),
+
+        SequenceStmt(
+            List(MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0))))
+        )
+    )
 }

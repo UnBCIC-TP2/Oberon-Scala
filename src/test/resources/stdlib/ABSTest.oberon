@@ -1,4 +1,4 @@
-MODULE STDLibTest;
+MODULE ABSTest;
 
 VAR
   x : INTEGER;
@@ -10,4 +10,4 @@ BEGIN
   y := ABS(x);
   z := ABS(y)
 END
-END STDLibTest.
+END ABSTest.

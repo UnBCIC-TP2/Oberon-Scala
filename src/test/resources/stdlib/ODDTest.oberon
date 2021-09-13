@@ -1,0 +1,15 @@
+MODULE ODDTest;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  z : BOOLEAN;
+  w : BOOLEAN;
+
+BEGIN
+  x := 10;
+  y := 11;
+  z := ODD(x);
+  w := ODD(y)
+END
+END ODDTest.
