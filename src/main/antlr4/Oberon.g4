@@ -128,7 +128,11 @@ realValue: REAL ;
 charValue: CHAR ;
 stringValue: STRING ;
 boolValue: TRUE | FALSE ;
-setValue: SET;
+setValue: '{' (element += element (',' element += element)*)? '}'
+
+element
+  : expression                                  # SingleBasedElement
+  | left = expression '..' right = expression   # RangeBasedElement
 
 oberonType
  : 'INTEGER'         #IntegerType
@@ -143,11 +147,6 @@ oberonType
 INT : '-'? Digit+;
 REAL : '-'? Digit+ '.' Digit+;
 CHAR : '\'' CharDef '\'';
-SET: '{' '-'? Digit+ (',' '-'? Digit+)* '}';
-
-// fragment SetDef
-//   : ',' '-'? Digit+
-//   ;
 
 TRUE  : 'True' ;
 FALSE : 'False'  ;
