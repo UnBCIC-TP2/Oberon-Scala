@@ -223,6 +223,13 @@ case class VarAssignment(varName: String) extends AssignmentAlternative
 case class ArrayAssignment(array: Expression, elem: Expression) extends AssignmentAlternative
 case class RecordAssignment(record: Expression, atrib: String) extends AssignmentAlternative
 
+trait Element {
+  def accept(v: OberonVisitor): v.T = v.visit(this)
+}
+
+case class SingleBasedElement(exp: Expression) extends Element
+case class RangeBasedElement(left: Expression, right: Expression) extends Element
+
 
 /**
  * User defined types.
@@ -236,7 +243,6 @@ sealed trait UserDefinedType{
 
 case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
 case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
-
 
 /** The hierarchy for the Oberon supported types */
 sealed trait Type {

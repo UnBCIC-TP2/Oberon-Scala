@@ -128,11 +128,12 @@ realValue: REAL ;
 charValue: CHAR ;
 stringValue: STRING ;
 boolValue: TRUE | FALSE ;
-setValue: '{' (element += element (',' element += element)*)? '}'
+setValue: '{' (elements += element (',' elements += element)*)? '}';
 
 element
   : expression                                  # SingleBasedElement
   | left = expression '..' right = expression   # RangeBasedElement
+  ;
 
 oberonType
  : 'INTEGER'         #IntegerType
