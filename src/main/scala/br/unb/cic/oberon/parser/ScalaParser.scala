@@ -279,7 +279,7 @@ class ParserVisitor {
     override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
 
-    /* CONSELHO PROFESSOR
+    /*
     override def visitSetValue(ctx: OberonParser.SetValueContext): Unit =
       exp = SetValue(ctx.getText.)
     */
