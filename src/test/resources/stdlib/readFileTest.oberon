@@ -1,0 +1,12 @@
+MODULE readFileTest;
+
+VAR
+  x : STRING;
+
+BEGIN
+  x := "./readFile.txt";
+
+  write(x)
+END
+
+END readFileTest.

@@ -3,6 +3,8 @@ package br.unb.cic.oberon.stdlib
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 
+import scala.io.Source
+
 
 class StandardLibrary[T](env: Environment[T]) {
 
@@ -35,5 +37,16 @@ class StandardLibrary[T](env: Environment[T]) {
         SequenceStmt(
             List(MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0))))
         )
+    )
+
+    def readFile = Procedure(
+      "readFile",                             // name
+      List(FormalArg("x", StringType)), // formal arguments
+      Some(StringType),                 // return type
+      List(),                            // local constants
+      List(),                            // local variables
+
+
+      MetaStmt(() => ReturnStmt(StringValue(Source.fromFile(env.lookup("x").get.asInstanceOf[StringValue].value).getLines.mkString)))
     )
 }
