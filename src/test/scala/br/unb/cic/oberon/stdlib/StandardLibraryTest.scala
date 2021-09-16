@@ -16,7 +16,6 @@ class StandardLibraryTest extends AnyFunSuite {
     interpreter.setTestEnvironment()
 
     module.accept(interpreter)
-
     assert(interpreter.env.lookup("x") == Some(IntValue(-10)))
     assert(interpreter.env.lookup("y") == Some(IntValue(10)))
     assert(interpreter.env.lookup("z") == Some(IntValue(10)))
