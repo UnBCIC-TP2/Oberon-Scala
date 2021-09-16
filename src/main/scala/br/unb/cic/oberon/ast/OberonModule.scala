@@ -137,7 +137,7 @@ case class RealValue(value: Double) extends Value with Number {
   }
 }
 
-/* Implementação 1 do SetValue, felippe
+/* Implementação 1 do SetValue
 case class SetValue(value: Set[Int]) extends Value with Number {
   type T = Set[Int]
   def +(that: Number): Number = that match {
@@ -157,12 +157,14 @@ case class SetValue(value: Set[Int]) extends Value with Number {
   }
 }
 
-Implementação 2 do SetValue, thiago
+Implementação 2 do SetValue
 case class SetValue(value: HashSet[Int]) extends Value { type T = HashSet }
 
-
-Implementação 3 do SetValue, thiago */
+Implementação 3 do SetValue
 case class SetValue(value: Set[Int]) extends Value { type T = Set[Int]}
+
+Implementação 4 do SetValue */
+case class SetValue(value: Set[Any]) extends Value { type T = Set[Any]}
 
 
 
