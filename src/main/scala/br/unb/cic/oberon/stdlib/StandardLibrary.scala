@@ -14,7 +14,7 @@ class StandardLibrary[T](env: Environment[T]) {
       bufferFile.close
       string
     }
-    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd), None)
+    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, readFile), None)
 
     def abs = Procedure(
         "ABS",                             // name
