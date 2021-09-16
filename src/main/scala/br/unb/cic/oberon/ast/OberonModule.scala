@@ -78,7 +78,7 @@ sealed abstract class Value extends Expression with Ordered[Value]{
     case (v1: RealValue, v2: RealValue) => v1.value.compareTo(v2.value)
     case (v1: CharValue, v2: CharValue) => v1.value.compareTo(v2.value)
     case (v1: StringValue, v2: StringValue) => v1.value.compareTo(v2.value)
-    case (v1: SetValue, v2: SetValue) => v1.value.compareTo(v2.value)
+    /* case (v1: SetValue, v2: SetValue) => v1.value.equals(v2.value) */
     case _ => throw new RuntimeException("Comparison is not defined for " + this.getClass + " and " + that.getClass)
   }
 }
@@ -137,6 +137,7 @@ case class RealValue(value: Double) extends Value with Number {
   }
 }
 
+/* Implementação 1 do SetValue, felippe
 case class SetValue(value: Set[Int]) extends Value with Number {
   type T = Set[Int]
   def +(that: Number): Number = that match {
@@ -155,6 +156,15 @@ case class SetValue(value: Set[Int]) extends Value with Number {
     case other: SetValue => SetValue(value diff other.value) + SetValue(other.value diff value)
   }
 }
+
+Implementação 2 do SetValue, thiago
+case class SetValue(value: HashSet[Int]) extends Value { type T = HashSet }
+
+
+Implementação 3 do SetValue, thiago */
+case class SetValue(value: Set[Int]) extends Value { type T = Set[Int]}
+
+
 
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
