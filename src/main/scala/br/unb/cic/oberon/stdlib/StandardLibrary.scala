@@ -7,9 +7,11 @@ import scala.io.Source
 class StandardLibrary[T](env: Environment[T]) {
     def readF (path:String) : String={
       var string = ""
-      for (line <- Source.fromFile(path).getLines()){
+      var bufferFile = Source.fromFile(path)
+      for (line <- bufferFile.getLines()){
         string = string.concat(line)
       }
+      bufferFile.close
       string
     }
     val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd), None)
