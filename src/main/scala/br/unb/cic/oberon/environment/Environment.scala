@@ -1,10 +1,8 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Undef, UserDefinedType}
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.Stack
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Map, Stack}
 
 /**
  * The environment represents a memory region, which
@@ -28,14 +26,14 @@ class Environment[T] {
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
+  def setGlobalVariable(name: String, value: T): Unit = global += name -> value
 
-  def addUserDefinedType(userType: UserDefinedType) : Unit = {
-    userDefinedTypes += userDefinedTypeName(userType) -> userType
-    userType match {
-      case ArrayType(name, length, variableType) => userArrayTypes += name -> ListBuffer.fill(length)(Undef())
-      case _ => ???
-    }
+    def addUserDefinedType(userType: UserDefinedType) : Unit = {
+      userDefinedTypes += userDefinedTypeName(userType) -> userType
+      userType.baseType match {
+        case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
+        case _ => ???
+      }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
@@ -85,8 +83,5 @@ class Environment[T] {
   def pop(): Unit = stack.pop()
 
   def userDefinedTypeName(userDefinedType: UserDefinedType) : String =
-     userDefinedType match {
-         case ArrayType(name, _, _) => name
-         case RecordType(name, _) => name
-     }
+    userDefinedType.name
 }

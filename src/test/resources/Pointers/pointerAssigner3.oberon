@@ -1,0 +1,13 @@
+MODULE pointerDecl;
+
+VAR
+    a : POINTER TO REAL;
+    b : POINTER TO a;
+    c : POINTER TO POINTER TO INTEGER;
+
+BEGIN
+    a^ := 10.5;
+    b^ := a;
+END
+
+END pointerDecl.
