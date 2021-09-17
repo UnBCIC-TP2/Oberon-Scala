@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.ast._
+import com.sun.jdi.IntegerValue
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.nio.file.{Files, Paths}
@@ -779,8 +780,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 5)
-      case _ => fail("This module should have 5 statements!")
+      case SequenceStmt(stmt) => assert(stmt.length == 4)
+      case _ => fail("This module should have 4 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
@@ -2150,7 +2151,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("pointerAssign1") {
     val module = ScalaParser.parseResource("Pointers/pointerAssign1.oberon")
 
-    //test if there are 5 statments in stmts list
+    //test if there are 5 statements in stmts list
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 5)
       case _ => fail("This module should have 5 statements!")
@@ -2164,4 +2165,81 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == EAssignmentStmt(PointerAssignment("d"), BoolValue(true)))
     assert(stmts(4) == EAssignmentStmt(PointerAssignment("e"), StringValue("Hello.")))
   }
+
+
+  test("pointerAssign2"){
+    val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
+
+    //oq é isso?
+    assert(module.userType() == "SimpleModule")
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    assert(module.variables.size == 2)
+    assert(module.variables(0) == VariableDeclaration("a", PointerType(RecordType)))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(ArrayType)))
+
+    //conferir a contagem de statement
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 4)
+      case _ => fail("This module should have 4 statements!")
+    }
+
+    // 2 ou 4 conferir. tentativa: 1 record, 1 array, 2 pointer
+    assert(module.userTypes.size == 4)
+
+
+    /* assert(module.userTypes.head.baseType == RecordType(List(VariableDeclaration("nome", StringType),
+      VariableDeclaration("idade",IntegerType))) )
+    assert(module.userTypes(1).baseType == ArrayType(3, RealType)) */
+
+    val typeList = module.userTypes
+    val aluno = RecordType(List(VariableDeclaration("nome", StringType), VariableDeclaration("idade", IntegerType)))
+    val notas = ArrayType(3, RealType)
+    val a = PointerType(RecordType)
+    val b = PointerType(ArrayType)
+    //inicialização para for each (verificação de tipo das variaveis definidas pelo user)
+    val typetoTest = List(aluno, notas, a, b)
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t.baseType == typetoTest(it))
+      it += 1
+    })
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head  == EAssignmentStmt(PointerType(RecordAssignment(VarExpression("a"), "nome")), StringValue("Manuela")))
+    assert(stmts(1) == EAssignmentStmt(PointerType(RecordAssignment(VarExpression("a"), "idade")), IntValue(23)))
+    assert(stmts(2) == EAssignmentStmt(PointerType(ArrayAssignment(VarExpression("b"), IntValue(0)),RealValue(9.5)) ) )
+    assert(stmts(3) == EAssignmentStmt(PointerType(ArrayAssignment(VarExpression("b"), IntValue(2)),RealValue(9.0)) ) )
+  }
+
+  test("pointerAssigner3"){
+    val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
+    assert(module.userType() == "SimpleModule")
+    assert(module.name == "pointerDecl")
+    assert(module.stmt.isDefined)
+
+    assert(module.variables.size == 3)
+    assert(module.variables(0) == VariableDeclaration("a", PointerType(RealType)))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(PointerType(RealType))))
+    assert(module.variables(2) == VariableDeclaration("c", PointerType(PointerType(IntegerType))))
+
+    //conferir a contagem de statement
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 2)
+      case _ => fail("This module should have 2 statements!")
+    }
+
+    //verificar com o grupo numeros
+    assert(module.userTypes.size == 2)
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    //opção IDE de convert to block expression - real value
+    assert(stmts.head  == EAssignmentStmt(PointerType(RealType), RealValue(10.5) ) )
+    assert(stmts.head  == EAssignmentStmt(PointerType(PointerType(RealType)), RealValue(10.5) ) )
+  }
 }
+
