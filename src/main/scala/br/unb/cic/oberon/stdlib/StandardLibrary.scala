@@ -51,8 +51,9 @@ class StandardLibrary[T](env: Environment[T]) {
         Some(StringType),
         List(),
         List(),
+
         SequenceStmt(
-          List(MetaStmt(()=>ReturnStmt(StringValue(this.readF((env.lookup("x").get.asInstanceOf[StringValue].value))))))
+          List(MetaStmt(()=>ReturnStmt(StringValue(this.readF(env.lookup("x").get.asInstanceOf[StringValue].value)))))
         )
       )
 }
