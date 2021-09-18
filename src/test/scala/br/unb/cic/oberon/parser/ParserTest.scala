@@ -2209,5 +2209,14 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts.head  == EAssignmentStmt(PointerAssignment("a"), RealValue(10.5)))
     assert(stmts(1)  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
   }
+
+  test(testName = "pointerOps1"){
+    val module = ScalaParser.parseResource("Pointers/pointerOps1.oberon")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(2) == AssignmentStmt("c",MultExpression(AddExpression(PointerAccessExpression("a"),PointerAccessExpression("b")),SubExpression(PointerAccessExpression("b"),PointerAccessExpression("a")))))
+  }
 }
 

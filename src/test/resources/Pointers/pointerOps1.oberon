@@ -1,0 +1,14 @@
+MODULE pointerOps;
+
+VAR
+  a : POINTER TO INTEGER;
+  b : POINTER TO INTEGER;
+  c : INTEGER;
+
+BEGIN
+    a^ := 7;
+    b^ := 12;
+    c := (a^ + b^)*(b^-a^)
+END
+
+END pointerOps.
