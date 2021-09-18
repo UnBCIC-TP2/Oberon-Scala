@@ -2137,14 +2137,25 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(4) == VariableDeclaration("e", PointerType(StringType)))
   }
 
-  test("Testing the oberon pointerDecl2 code") {
+  test("Testing_the_oberon_pointerDecl2_code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
 
-    assert(module.userType() == "SimpleModule")
+    val aluno = RecordType(
+      List(
+        VariableDeclaration("nome", StringType),
+        VariableDeclaration("idade",IntegerType)
+      )
+    )
+
+    val notas = ArrayType(3, RealType)
+
+    val a = PointerType(aluno)
+    val b = PointerType(notas)
+
     assert(module.variables.size == 2)
-    val halls = RecordType(List(VariableDeclaration("integrante", BooleanType),
-      VariableDeclaration("matricula",IntegerType)))
-    assert(module.variables(0) == VariableDeclaration("a", IntValue(5)))
+    assert(module.variables.head == VariableDeclaration("a",a))
+    assert(module.variables(1) == VariableDeclaration("b", b))
+
   }
 
   //Testing the oberon pointerAssign1 code
@@ -2170,15 +2181,6 @@ class ParserTestSuite extends AnyFunSuite {
   test("pointerAssign2"){
     val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
 
-    //oq é isso?
-    assert(module.userType() == "SimpleModule")
-    assert(module.name == "pointerAssign")
-    assert(module.stmt.isDefined)
-
-    assert(module.variables.size == 2)
-    assert(module.variables(0) == VariableDeclaration("a", PointerType(RecordType)))
-    assert(module.variables(1) == VariableDeclaration("b", PointerType(ArrayType)))
-
     //conferir a contagem de statement
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 4)
@@ -2186,43 +2188,21 @@ class ParserTestSuite extends AnyFunSuite {
     }
 
     // 2 ou 4 conferir. tentativa: 1 record, 1 array, 2 pointer
-    assert(module.userTypes.size == 4)
-
-
-    /* assert(module.userTypes.head.baseType == RecordType(List(VariableDeclaration("nome", StringType),
-      VariableDeclaration("idade",IntegerType))) )
-    assert(module.userTypes(1).baseType == ArrayType(3, RealType)) */
-
-    val typeList = module.userTypes
-    val aluno = RecordType(List(VariableDeclaration("nome", StringType), VariableDeclaration("idade", IntegerType)))
-    val notas = ArrayType(3, RealType)
-    val a = PointerType(RecordType)
-    val b = PointerType(ArrayType)
-    //inicialização para for each (verificação de tipo das variaveis definidas pelo user)
-    val typetoTest = List(aluno, notas, a, b)
-    var it: Int = 0
-
-    typeList.foreach(t => {
-      assert(t.baseType == typetoTest(it))
-      it += 1
-    })
+    assert(module.userTypes.size == 2)
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-    assert(stmts.head  == EAssignmentStmt(PointerType(RecordAssignment(VarExpression("a"), "nome")), StringValue("Manuela")))
-    assert(stmts(1) == EAssignmentStmt(PointerType(RecordAssignment(VarExpression("a"), "idade")), IntValue(23)))
-    assert(stmts(2) == EAssignmentStmt(PointerType(ArrayAssignment(VarExpression("b"), IntValue(0)),RealValue(9.5)) ) )
-    assert(stmts(3) == EAssignmentStmt(PointerType(ArrayAssignment(VarExpression("b"), IntValue(2)),RealValue(9.0)) ) )
+    assert(stmts.head  == EAssignmentStmt(RecordAssignment(VarExpression("a"), "nome"), StringValue("Manuela")))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("a"), "idade"), IntValue(23)))
+    assert(stmts(2) == EAssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(0)),RealValue(9.5)))
+    assert(stmts(3) == EAssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),RealValue(9.0)))
   }
 
   test("pointerAssigner3"){
     val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
-    assert(module.userType() == "SimpleModule")
-    assert(module.name == "pointerDecl")
-    assert(module.stmt.isDefined)
 
     assert(module.variables.size == 3)
-    assert(module.variables(0) == VariableDeclaration("a", PointerType(RealType)))
+    assert(module.variables.head == VariableDeclaration("a", PointerType(RealType)))
     assert(module.variables(1) == VariableDeclaration("b", PointerType(PointerType(RealType))))
     assert(module.variables(2) == VariableDeclaration("c", PointerType(PointerType(IntegerType))))
 
@@ -2238,8 +2218,8 @@ class ParserTestSuite extends AnyFunSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
     //opção IDE de convert to block expression - real value
-    assert(stmts.head  == EAssignmentStmt(PointerType(RealType), RealValue(10.5) ) )
-    assert(stmts.head  == EAssignmentStmt(PointerType(PointerType(RealType)), RealValue(10.5) ) )
+    assert(stmts.head  == EAssignmentStmt(PointerAssignment("a"), RealValue(10.5)))
+    assert(stmts.head  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
   }
 }
 
