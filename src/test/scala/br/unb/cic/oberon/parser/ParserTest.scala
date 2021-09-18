@@ -1,7 +1,6 @@
 package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.ast._
-import com.sun.jdi.IntegerValue
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.nio.file.{Files, Paths}
