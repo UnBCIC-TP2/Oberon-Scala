@@ -2130,7 +2130,7 @@ class ParserTestSuite extends AnyFunSuite {
     val module = ScalaParser.parseResource("Pointers/pointerDecl1.oberon")
 
     assert(module.variables.size == 5)
-    assert(module.variables(0) == VariableDeclaration("a", PointerType(IntegerType)))
+    assert(module.variables.head == VariableDeclaration("a", PointerType(IntegerType)))
     assert(module.variables(1) == VariableDeclaration("b", PointerType(RealType)))
     assert(module.variables(2) == VariableDeclaration("c", PointerType(CharacterType)))
     assert(module.variables(3) == VariableDeclaration("d", PointerType(BooleanType)))
@@ -2140,21 +2140,9 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing_the_oberon_pointerDecl2_code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
 
-    val aluno = RecordType(
-      List(
-        VariableDeclaration("nome", StringType),
-        VariableDeclaration("idade",IntegerType)
-      )
-    )
-
-    val notas = ArrayType(3, RealType)
-
-    val a = PointerType(aluno)
-    val b = PointerType(notas)
-
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration("a",a))
-    assert(module.variables(1) == VariableDeclaration("b", b))
+    assert(module.variables.head == VariableDeclaration("a", PointerType(ReferenceToUserDefinedType("aluno"))))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("notas"))))
 
   }
 
@@ -2203,7 +2191,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.variables.size == 3)
     assert(module.variables.head == VariableDeclaration("a", PointerType(RealType)))
-    assert(module.variables(1) == VariableDeclaration("b", PointerType(PointerType(RealType))))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("pointerA"))))
     assert(module.variables(2) == VariableDeclaration("c", PointerType(PointerType(IntegerType))))
 
     //conferir a contagem de statement
@@ -2213,13 +2201,13 @@ class ParserTestSuite extends AnyFunSuite {
     }
 
     //verificar com o grupo numeros
-    assert(module.userTypes.size == 2)
+    assert(module.userTypes.size == 1)
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
     //opção IDE de convert to block expression - real value
     assert(stmts.head  == EAssignmentStmt(PointerAssignment("a"), RealValue(10.5)))
-    assert(stmts.head  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
+    assert(stmts(1)  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
   }
 }
 
