@@ -780,8 +780,8 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.nonEmpty)
 
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 4)
-      case _ => fail("This module should have 4 statements!")
+      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case _ => fail("This module should have 5 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
@@ -1856,7 +1856,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.stmt.isDefined)
   }
 
-  test("Printing new types on console") {
+  ignore("Printing new types on console") {
     val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").getFile)
 
     assert(path != null)
