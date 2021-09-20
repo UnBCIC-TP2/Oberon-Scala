@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.stdlib
 
-import br.unb.cic.oberon.ast.{BoolValue, IntValue}
+import br.unb.cic.oberon.ast.{BoolValue, IntValue, RealValue}
 import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -36,6 +36,21 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(11)))
     assert(interpreter.env.lookup("z") == Some(BoolValue(false)))
     assert(interpreter.env.lookup("w") == Some(BoolValue(true)))
+  }
+
+  test("Test for the CEIL function") {
+    val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
+
+    assert(module.name == "CEILTest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    module.accept(interpreter)
+
+
+    assert(interpreter.env.lookup("z") == Some(RealValue(10.0)))
+    assert(interpreter.env.lookup("w") == Some(RealValue(12.0)))
   }
 
 }
