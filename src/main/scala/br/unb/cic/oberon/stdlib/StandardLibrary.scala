@@ -2,11 +2,12 @@ package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import com.sun.jdi.IntegerValue
 
 
 class StandardLibrary[T](env: Environment[T]) {
 
-    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd), None)
+    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot), None)
 
     def abs = Procedure(
         "ABS",                             // name
@@ -36,4 +37,46 @@ class StandardLibrary[T](env: Environment[T]) {
             List(MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0))))
         )
     )
+
+      def floor = Procedure(
+        "FLR",
+        List(FormalArg("x", RealType)),
+        Some(RealType),
+        List(),
+        List(),
+
+        SequenceStmt(
+          List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.floor)))))
+        )
+
+      def round = Procedure(
+        "RND",
+        List(FormalArg("x", RealType)),
+        Some(RealType),
+        List(),
+        List(),
+
+        SequenceStmt(
+          List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.round)))))
+        )
+      def power = Procedure(
+        "POW",
+        List(FormalArg("x", RealType), FormalArg("y", RealType)),
+        Some(RealType),
+        List(),
+        List(),
+
+        SequenceStmt(
+          List(MetaStmt(() => ReturnStmt(RealValue(scala.math.pow(env.lookup(name = "x").get.asInstanceOf[RealValue].value, env.lookup(name = "y").get.asInstanceOf[RealValue].value)))))
+  ))
+      def sqrroot = Procedure(
+        "SQR",
+        List(FormalArg("x", RealType)),
+        Some(RealType),
+        List(),
+        List(),
+
+        SequenceStmt(
+          List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value))))))
+  )
 }
