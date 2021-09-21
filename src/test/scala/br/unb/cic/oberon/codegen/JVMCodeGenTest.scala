@@ -9,11 +9,12 @@ import java.util.Base64
 
 import jdk.internal.org.objectweb.asm.Opcodes._
 import jdk.internal.org.objectweb.asm._
+import java.io.File
 
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
 
     assert(path != null)
 
@@ -46,7 +47,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code with fields of simple02.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
 
     assert(path != null)
 
@@ -79,7 +80,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
  test("Generate code with fields of simple03.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
 
     assert(path != null)
 
@@ -112,7 +113,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple04.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
 
     assert(path != null)
 
@@ -145,7 +146,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple05.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").toURI)
 
     assert(path != null)
 
@@ -178,7 +179,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple06.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").toURI)
 
     assert(path != null)
 
@@ -211,7 +212,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple07.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
 
     assert(path != null)
 
@@ -244,7 +245,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple08.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").toURI)
 
     assert(path != null)
 
@@ -277,7 +278,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple09.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").toURI)
 
     assert(path != null)
 
@@ -310,7 +311,7 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple10.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").toURI)
 
     assert(path != null)
 
@@ -348,9 +349,9 @@ class JVMCodeGenTest extends AnyFunSuite {
    * @return the relative Path to the class file.
    */
   def createOutputFile(name: String) = {
-    val base = Paths.get("target/out/")
+    val base = Paths.get("target" + File.pathSeparator + "out")
     Files.createDirectories(base)
-    val classFile = Paths.get("target/out/" + name + ".class")
+    val classFile = Paths.get("target" + File.pathSeparator +  "out" + File.pathSeparator + name + ".class")
     if(Files.exists(classFile)) {
       Files.delete(classFile)
     }
