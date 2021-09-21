@@ -2,7 +2,7 @@ package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.ast._
 import org.scalatest.funsuite.AnyFunSuite
-
+import org.scalactic.TolerantNumerics
 import java.nio.file.{Files, Paths}
 
 class ParserTestSuite extends AnyFunSuite {
@@ -2125,7 +2125,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(constant2 == REPLConstant(Constant("y",AddExpression(VarExpression("x"),IntValue(1)))))
   }
 //Testing the oberon pointerDecl1 code
-  test("pointerDecl1") {
+  test("Testing the oberon pointerDecl1 code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl1.oberon")
 
     assert(module.variables.size == 5)
@@ -2136,7 +2136,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(4) == VariableDeclaration("e", PointerType(StringType)))
   }
 
-  test("Testing_the_oberon_pointerDecl2_code") {
+  test("Testing the oberon pointerDecl2 code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
 
     assert(module.variables.size == 2)
@@ -2146,7 +2146,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   //Testing the oberon pointerAssign1 code
-  test("pointerAssign1") {
+  test("Testing the oberon pointerAssign1 code") {
     val module = ScalaParser.parseResource("Pointers/pointerAssign1.oberon")
 
     //test if there are 5 statements in stmts list
@@ -2155,17 +2155,20 @@ class ParserTestSuite extends AnyFunSuite {
       case _ => fail("This module should have 5 statements!")
     }
 
+    val epsilon = 1e-2f
+    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(epsilon)
+
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
     assert(stmts.head == EAssignmentStmt(PointerAssignment("a"), IntValue(1)))
-//    assert(stmts(1) == EAssignmentStmt(PointerAssignment("b"), RealValue(1.1)))
+    assert(stmts(1) === EAssignmentStmt(PointerAssignment("b"), RealValue(9.5)))
     assert(stmts(2) == EAssignmentStmt(PointerAssignment("c"), CharValue('c')))
     assert(stmts(3) == EAssignmentStmt(PointerAssignment("d"), BoolValue(true)))
     assert(stmts(4) == EAssignmentStmt(PointerAssignment("e"), StringValue("Hello.")))
   }
 
 
-  test("pointerAssign2"){
+  test("Testing the oberon pointerAssign2 code"){
     val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
 
     //conferir a contagem de statement
@@ -2185,7 +2188,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(3) == EAssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),RealValue(9.0)))
   }
 
-  test("pointerAssigner3"){
+  test("Testing the oberon pointerAssign3 code"){
     val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
 
     assert(module.variables.size == 3)
@@ -2209,7 +2212,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(1)  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
   }
 
-  test(testName = "pointerOps1"){
+  test(testName = "Testing the oberon pointerOps1 code"){
     val module = ScalaParser.parseResource("Pointers/pointerOps1.oberon")
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]

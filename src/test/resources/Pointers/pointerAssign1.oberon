@@ -9,7 +9,7 @@ VAR
 
 BEGIN
     a^ := 1;
-    b^ := 1.1;
+    b^ := 9.5;
     c^ := 'c';
     d^ := True;
     e^ := "Hello."
