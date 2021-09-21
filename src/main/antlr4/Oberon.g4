@@ -49,6 +49,7 @@ arguments
  : expression (',' expression)*
  ;
 
+// a, b, c: INTEGER
 formalArg
  : (args += Id (',' args += Id)*) ':' argType = oberonType
  ; // TODO: we should also support VarBased formal arguments.

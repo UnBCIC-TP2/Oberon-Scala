@@ -32,8 +32,7 @@ class StandardLibrary[T](env: Environment[T]) {
         List(),
         List(),
 
-        SequenceStmt(
-            List(MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0))))
-        )
+        MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0)))
+
     )
 }
