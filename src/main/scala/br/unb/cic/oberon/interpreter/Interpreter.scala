@@ -268,6 +268,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case RealValue(v) => RealValue(v)
     case CharValue(v) => CharValue(v)
     case BoolValue(v) => BoolValue(v)
+    case StringValue(v) => StringValue(v)
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
