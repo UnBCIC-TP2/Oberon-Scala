@@ -1,0 +1,10 @@
+MODULE pointerDecl;
+
+VAR
+  a : POINTER TO INTEGER;
+  b : POINTER TO REAL;
+  c : POINTER TO CHAR;
+  d : POINTER TO BOOLEAN;
+  e : POINTER TO STRING;
+
+END pointerDecl.

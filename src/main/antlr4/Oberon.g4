@@ -22,9 +22,14 @@ declarations
   ;
 
 userTypeDeclaration
-  : nameType = Id '=' ('ARRAY' length = INT 'OF' baseType = oberonType)      #ArrayTypeDeclaration
-  | nameType = Id '=' ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
+  : nameType = Id '=' baseType = userType
   ;
+
+userType
+: ('ARRAY' length = INT 'OF' baseType = oberonType)     #ArrayTypeDeclaration
+| ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
+| ('POINTER' 'TO' baseType = oberonType)                #PointerTypeDeclaration
+;
 
 constant
   : constName = Id '=' exp = expression ';'
@@ -65,6 +70,7 @@ expression
  | name = qualifiedName '(' arguments? ')'                                                #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
+ | name = Id '^'                                                                          #PointerAccess
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
@@ -102,6 +108,7 @@ designator
   : var = Id                                                          #VarAssignment
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
   | record = expression '.' name = Id                                 #RecordAssignment
+  | pointer = Id '^'                                                  #PointerAssignment
   ;
 
 caseAlternative
@@ -135,6 +142,7 @@ oberonType
  | 'BOOLEAN'         #BooleanType
  | 'STRING'          #StringType
  | name = Id         #ReferenceType        // Reference for user defined types
+ | userType          #ComplexType
  ;
 
 INT : '-'? Digit+;

@@ -146,6 +146,7 @@ case class ArrayValue(value: List[Expression]) extends Value { type T = List[Exp
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
+case class PointerAccessExpression(name: String) extends Expression
 case class VarExpression(name: String) extends Expression
 case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left:  Expression, right: Expression) extends Expression
@@ -201,6 +202,7 @@ trait AssignmentAlternative
 case class VarAssignment(varName: String) extends AssignmentAlternative
 case class ArrayAssignment(array: Expression, elem: Expression) extends AssignmentAlternative
 case class RecordAssignment(record: Expression, atrib: String) extends AssignmentAlternative
+case class PointerAssignment(pointerName: String) extends AssignmentAlternative
 
 
 /**
@@ -209,13 +211,9 @@ case class RecordAssignment(record: Expression, atrib: String) extends Assignmen
  * Users can declare either records or
  * array types.
  */
-sealed trait UserDefinedType{
+case class UserDefinedType(name: String, baseType: Type) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
-
-case class RecordType(name: String, variables: List[VariableDeclaration]) extends UserDefinedType
-case class ArrayType(name: String, length: Int, variableType: Type) extends UserDefinedType
-
 
 /** The hierarchy for the Oberon supported types */
 sealed trait Type {
@@ -228,6 +226,10 @@ case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type
 case object UndefinedType extends Type
+
+case class RecordType(variables: List[VariableDeclaration]) extends Type
+case class ArrayType(length: Int, variableType: Type) extends Type
+case class PointerType(variableType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type
 

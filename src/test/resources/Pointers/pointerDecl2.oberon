@@ -1,0 +1,15 @@
+MODULE pointerDecl;
+
+TYPE
+    aluno = RECORD
+                nome: STRING;
+                idade: INTEGER;
+            END
+
+    notas = ARRAY 3 OF REAL
+
+VAR
+  a : POINTER TO aluno;
+  b : POINTER TO notas;
+
+END pointerDecl.
