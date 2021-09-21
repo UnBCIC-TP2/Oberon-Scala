@@ -47,7 +47,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(StringValue("C:\\Users\\pelut\\README.txt")))
     assert(interpreter.env.lookup("y") == Some(StringValue("teste")))
   }
 

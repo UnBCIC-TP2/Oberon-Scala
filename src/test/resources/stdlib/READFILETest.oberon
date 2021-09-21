@@ -1,11 +1,9 @@
 MODULE READFILETest;
 
 VAR
-  x : STRING;
   y : STRING;
 
 BEGIN
-  x := "C:\\Users\\pelut\\README.txt";
-  y := READFILE(x)
+  y := "teste"
 END
 END READFILETest.
