@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.stdlib
 
-import br.unb.cic.oberon.ast.{BoolValue, IntValue, RealValue}
+import br.unb.cic.oberon.ast.{BoolValue, IntValue, RealValue, StringValue}
 import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -89,18 +89,32 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(interpreter.env.lookup("z") == Some(RealValue(14.0)))
     assert(interpreter.env.lookup("y") == Some(RealValue(3.1622776601683795)))
+  }
 
   test("Test for the CEIL function") {
-    
+
     val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
-    
+
     assert(module.name == "CEILTest")
-    
+
     val interpreter = new Interpreter
     interpreter.setTestEnvironment()
-    
+
     assert(interpreter.env.lookup("z") == Some(RealValue(10.0)))
     assert(interpreter.env.lookup("w") == Some(RealValue(12.0)))
+
+  }
+
+  test("Test for the writeFile function") {
+
+    val module = ScalaParser.parseResource("stdlib/WRITEFILETest.oberon")
+
+    assert(module.name == "WRITEFILETest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    assert(interpreter.env.lookup("z") == Some(StringValue("plainFile.txt")))
 
   }
 
