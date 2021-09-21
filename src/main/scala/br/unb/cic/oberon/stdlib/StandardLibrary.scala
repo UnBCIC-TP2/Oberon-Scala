@@ -2,6 +2,8 @@ package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
 import com.sun.jdi.IntegerValue
 
 
@@ -91,5 +93,16 @@ class StandardLibrary[T](env: Environment[T]) {
 
         SequenceStmt(
           List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value))))))
+  )
+
+  def writeFile = Procedure(
+    "writeFile",                       // name
+    List(FormalArg("FILENAME", StringType), FormalArg("CONTENT", StringType)), // arguments
+    Some(StringType),                  // return the File Path
+    List(),                            // local constants
+    List(),                            // local variables
+
+    MetaStmt(() => ReturnStmt(StringValue(Files.write(Paths.get(env.lookup(name = "FILENAME").get.asInstanceOf[StringValue].value),
+      env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value.getBytes(StandardCharsets.UTF_8)).toString)))
   )
 }
