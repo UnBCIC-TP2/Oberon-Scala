@@ -11,7 +11,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple01 code") {
     val module = ScalaParser.parseResource("simple/simple01.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule1")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("x", IntValue(5)))
   }
@@ -19,7 +19,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple02 code. This module has one constants and two variables") {
     val module = ScalaParser.parseResource("simple/simple02.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule2")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.variables.size == 2)
@@ -30,7 +30,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple03 code. This module has three constants and two variables") {
     val module = ScalaParser.parseResource("simple/simple03.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule3")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.constants(1) == Constant("y", IntValue(10)))
@@ -43,7 +43,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
     val module = ScalaParser.parseResource("simple/simple04.oberon")
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule4")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.constants(1) == Constant("y", IntValue(10)))
@@ -58,7 +58,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables") {
     val module = ScalaParser.parseResource("simple/simple05.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule5")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("z", MultExpression(IntValue(5), IntValue(10))))
 
@@ -72,7 +72,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple06 code. This module has one constants, complex expression, and two variables") {
     val module = ScalaParser.parseResource("simple/simple06.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule6")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("z", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
 
@@ -85,7 +85,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables") {
     val module = ScalaParser.parseResource("simple/simple07.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule7")
     assert(module.constants.size == 2)
     assert(module.constants.head == Constant("x", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
       assert(module.constants(1) == Constant("y",
@@ -102,7 +102,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables") {
     val module = ScalaParser.parseResource("simple/simple08.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule8")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", BoolValue(false)))
     assert(module.constants(1) == Constant("y", BoolValue(true)))
@@ -112,7 +112,7 @@ class ParserTestSuite extends AnyFunSuite {
   test("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
     val module = ScalaParser.parseResource("simple/simple09.oberon")
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule9")
     assert(module.constants.size == 1)
     assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
   }
@@ -1859,7 +1859,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   test("Printing new types on console") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").toURI)
 
     assert(path != null)
 
@@ -1878,7 +1878,7 @@ class ParserTestSuite extends AnyFunSuite {
   }
 
   ignore("Reading new types") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").toURI)
 
     assert(path != null)
 

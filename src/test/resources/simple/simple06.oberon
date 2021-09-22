@@ -1,4 +1,4 @@
-MODULE SimpleModule;
+MODULE SimpleModule6;
 
 CONST
   z = 5 + 10 * 3;
@@ -7,4 +7,4 @@ VAR
   abc : INTEGER;
   def : BOOLEAN;
 
-END SimpleModule.
+END SimpleModule6.

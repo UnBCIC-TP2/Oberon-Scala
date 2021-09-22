@@ -13,14 +13,14 @@ import jdk.internal.org.objectweb.asm._
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule1")
     assert(module.variables.size == 0)
     assert(module.constants.size == 1)
 
@@ -46,14 +46,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code with fields of simple02.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule2")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -79,14 +79,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
  test("Generate code with fields of simple03.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule3")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -112,14 +112,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple04.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule4")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -145,14 +145,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple05.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule5")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -178,14 +178,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple06.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule6")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -211,14 +211,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple07.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule7")
     assert(module.variables.size == 2)
     assert(module.constants.size == 2)
 
@@ -244,14 +244,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple08.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule8")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -277,14 +277,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple09.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule9")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -310,14 +310,14 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple10.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule10")
     assert(module.variables.size == 1)
     assert(module.constants.size == 0)
 

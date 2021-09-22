@@ -13,7 +13,7 @@ class NewTypesTest extends AnyFunSuite{
   interpreter.setTestEnvironment()
 
   test("Testing a lot of assignments") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic0.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic0.oberon").toURI)
 
     assert(path != null)
 
@@ -50,7 +50,7 @@ class NewTypesTest extends AnyFunSuite{
   }
 
   test("Testing LONG and SHORT operations") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic1.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic1.oberon").toURI)
 
     assert(path != null)
 
@@ -64,7 +64,7 @@ class NewTypesTest extends AnyFunSuite{
   }
 
   test("Testing LONGREAL and REAL +") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic2.oberon").getFile)
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic2.oberon").toURI)
 
     assert(path != null)
 
