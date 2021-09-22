@@ -127,6 +127,7 @@ expValue
   | charValue
   | stringValue
   | boolValue
+  | nullValue
   ;
 
 intValue: INT ;
@@ -134,6 +135,7 @@ realValue: REAL ;
 charValue: CHAR ;
 stringValue: STRING ;
 boolValue: TRUE | FALSE ;
+nullValue: NIL;
 
 oberonType
  : 'INTEGER'         #IntegerType
@@ -155,6 +157,8 @@ FALSE : 'False'  ;
 STRING
    : ('"' .*? '"')
    ;
+
+NIL : 'NIL' ;
 
 Id : CharDef (CharDef | Digit | '_')* ;
 

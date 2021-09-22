@@ -2220,5 +2220,19 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmts(2) == AssignmentStmt("c",MultExpression(AddExpression(PointerAccessExpression("a"),PointerAccessExpression("b")),SubExpression(PointerAccessExpression("b"),PointerAccessExpression("a")))))
   }
+
+
+  test(testName = "Testing the oberon LinkedList code"){
+    val module = ScalaParser.parseResource("Pointers/linkedList.oberon")
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(module.userTypes.size == 1)
+    assert(module.userTypes(0) == UserDefinedType("linkedList", RecordType(List(VariableDeclaration("value", IntegerType), VariableDeclaration("next", PointerType(ReferenceToUserDefinedType("linkedList")))))))
+    assert(module.variables(0) == VariableDeclaration("list", ReferenceToUserDefinedType("linkedList")))
+
+    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("list"), "value"), IntValue(10)))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue()))
+  }
 }
 
