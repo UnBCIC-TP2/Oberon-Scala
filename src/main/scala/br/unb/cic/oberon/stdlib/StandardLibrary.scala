@@ -47,7 +47,7 @@ class StandardLibrary[T](env: Environment[T]) {
       List(),                         // local variables
 
       SequenceStmt(
-        List(MetaStmt(() => ReturnStmt(RealValue((env.lookup("x").get.asInstanceOf[RealValue].value.ceil)))))
+        List(MetaStmt(() => ReturnStmt(RealValue(env.lookup("x").get.asInstanceOf[RealValue].value.ceil))))
       )
     )
 

@@ -93,14 +93,15 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(RealValue(3.1622776601683795)))
   }
   test("Test for the CEIL function") {
-    
     val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
     
     assert(module.name == "CEILTest")
     
     val interpreter = new Interpreter
     interpreter.setTestEnvironment()
-    
+
+    module.accept(interpreter)
+
     assert(interpreter.env.lookup("z") == Some(RealValue(10.0)))
     assert(interpreter.env.lookup("w") == Some(RealValue(12.0)))
 
