@@ -106,5 +106,19 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("w") == Some(RealValue(12.0)))
 
   }
+  test("Test for the READFILE function") {
+    val module = ScalaParser.parseResource("stdlib/READFILETest.oberon")
+
+    assert(module.name == "READFILETest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(StringValue("C:\\Users\\pelut\\README.txt")))
+    assert(interpreter.env.lookup("y") == Some(StringValue("teste")))
+
+  }
 
 }

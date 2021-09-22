@@ -2,13 +2,21 @@ package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
-import com.sun.jdi.IntegerValue
+import scala.io.Source
 
 
 class StandardLibrary[T](env: Environment[T]) {
+    def readf (path:String) : String = {
+      val buffer = Source.fromFile(path)
+      var string = ""
+      for (line <- buffer.getLines()){
+        string = string + line
+      }
+      buffer.close()
+      string
+    }
 
-
-    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot, ceil), None)
+    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot, ceil,readFile), None)
 
     def abs = Procedure(
         "ABS",                             // name
@@ -60,7 +68,7 @@ class StandardLibrary[T](env: Environment[T]) {
 
         SequenceStmt(
           List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.floor)))))
-        )
+      )
 
       def round = Procedure(
         "RND",
@@ -71,7 +79,7 @@ class StandardLibrary[T](env: Environment[T]) {
 
         SequenceStmt(
           List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.round)))))
-        )
+      )
       def power = Procedure(
         "POW",
         List(FormalArg("x", RealType), FormalArg("y", RealType)),
@@ -81,7 +89,7 @@ class StandardLibrary[T](env: Environment[T]) {
 
         SequenceStmt(
           List(MetaStmt(() => ReturnStmt(RealValue(scala.math.pow(env.lookup(name = "x").get.asInstanceOf[RealValue].value, env.lookup(name = "y").get.asInstanceOf[RealValue].value)))))
-  ))
+      ))
       def sqrroot = Procedure(
         "SQR",
         List(FormalArg("x", RealType)),
@@ -90,6 +98,17 @@ class StandardLibrary[T](env: Environment[T]) {
         List(),
 
         SequenceStmt(
-          List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value))))))
-  )
+          List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value)))))
+        )
+      )
+      def readFile = Procedure(
+        "READFILE",
+        List(FormalArg("x",StringType)),
+        Some(StringType),
+        List(),
+        List(),
+        SequenceStmt(
+          List(MetaStmt(() => ReturnStmt(StringValue(readf(env.lookup(name = "x").get.asInstanceOf[StringValue].value)))))
+        )
+      )
 }
