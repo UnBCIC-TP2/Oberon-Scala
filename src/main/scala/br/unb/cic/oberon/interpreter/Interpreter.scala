@@ -1,9 +1,9 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.stdlib.StandardLibrary
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -29,6 +29,13 @@ class Interpreter extends OberonVisitorAdapter {
 
   var printStream: PrintStream = new PrintStream(System.out)
 
+  def setupStandardLibraries(): Unit = {
+    val lib = new StandardLibrary[Expression](env)
+    for(p <- lib.stdlib.procedures) {
+      env.declareProcedure(p)
+    }
+  }
+
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
     module.constants.foreach(c => c.accept(this))
@@ -39,6 +46,7 @@ class Interpreter extends OberonVisitorAdapter {
     // execute the statement, if it is defined. remember,
     // module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
+      setupStandardLibraries()
       module.stmt.get.accept(this)
     }
   }
@@ -137,6 +145,8 @@ class Interpreter extends OberonVisitorAdapter {
 
       case ReturnStmt(exp: Expression) =>
         setReturnExpression(evalExpression(exp))
+
+      case MetaStmt(f) => f().accept(this)
 
       case ProcedureCallStmt(name, args) =>
         val actualArguments = args.map(a => evalExpression(a))
@@ -258,6 +268,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case RealValue(v) => RealValue(v)
     case CharValue(v) => CharValue(v)
     case BoolValue(v) => BoolValue(v)
+    case StringValue(v) => StringValue(v)
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)

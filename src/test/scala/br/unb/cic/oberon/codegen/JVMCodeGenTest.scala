@@ -9,6 +9,7 @@ import java.util.Base64
 
 import jdk.internal.org.objectweb.asm.Opcodes._
 import jdk.internal.org.objectweb.asm._
+import java.io.File
 
 class JVMCodeGenTest extends AnyFunSuite {
 
@@ -348,9 +349,9 @@ class JVMCodeGenTest extends AnyFunSuite {
    * @return the relative Path to the class file.
    */
   def createOutputFile(name: String) = {
-    val base = Paths.get("target/out/")
+    val base = Paths.get("target" + File.pathSeparator + "out")
     Files.createDirectories(base)
-    val classFile = Paths.get("target/out/" + name + ".class")
+    val classFile = Paths.get("target" + File.pathSeparator +  "out" + File.pathSeparator + name + ".class")
     if(Files.exists(classFile)) {
       Files.delete(classFile)
     }
