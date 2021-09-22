@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.stdlib
 
-import br.unb.cic.oberon.ast.{BoolValue, IntValue, StringValue}
+import br.unb.cic.oberon.ast.{BoolValue, IntValue, RealValue, StringValue}
 import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -37,19 +37,6 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("w") == Some(BoolValue(true)))
   }
 
-  test("Test for the READFILE function") {
-    val module = ScalaParser.parseResource("stdlib/READFILETest.oberon")
-
-    assert(module.name == "READFILETest")
-
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
-
-    module.accept(interpreter)
-
-    assert(interpreter.env.lookup("y") == Some(StringValue("teste")))
-  }
-  
   test(testName = "Test for the FLR function") {
     val module = ScalaParser.parseResource("stdlib/FLRTest.oberon")
 

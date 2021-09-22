@@ -1,9 +1,0 @@
-MODULE READFILETest;
-
-VAR
-  y : STRING;
-
-BEGIN
-  y := "teste"
-END
-END READFILETest.
