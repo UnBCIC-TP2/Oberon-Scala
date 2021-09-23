@@ -21,7 +21,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule1")
     assert(module.variables.size == 0)
     assert(module.constants.size == 1)
 
@@ -54,7 +54,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule2")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -87,7 +87,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule3")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -120,7 +120,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule4")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -153,7 +153,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule5")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -186,7 +186,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule6")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -219,7 +219,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule7")
     assert(module.variables.size == 2)
     assert(module.constants.size == 2)
 
@@ -252,7 +252,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule8")
     assert(module.variables.size == 2)
     assert(module.constants.size == 3)
 
@@ -285,7 +285,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule9")
     assert(module.variables.size == 2)
     assert(module.constants.size == 1)
 
@@ -318,7 +318,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule")
+    assert(module.name == "SimpleModule10")
     assert(module.variables.size == 1)
     assert(module.constants.size == 0)
 

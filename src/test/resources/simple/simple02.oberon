@@ -1,4 +1,4 @@
-MODULE SimpleModule;
+MODULE SimpleModule2;
 
 CONST
   x = 5;
@@ -7,4 +7,4 @@ VAR
   abc : INTEGER;
   def : BOOLEAN;
 
-END SimpleModule.
+END SimpleModule2.
