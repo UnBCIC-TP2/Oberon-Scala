@@ -210,6 +210,10 @@ class ParserVisitor {
       baseType = CharacterType
     }
 
+    override def visitStringType(ctx: OberonParser.StringTypeContext): Unit = {
+      baseType = StringType
+    }
+
     override def visitReferenceType(ctx: OberonParser.ReferenceTypeContext): Unit = {
       val nameType = ctx.name.getText
       baseType = ReferenceToUserDefinedType(nameType)
@@ -272,6 +276,9 @@ class ParserVisitor {
 
     override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
+
+    override def visitStringValue(ctx: OberonParser.StringValueContext): Unit =
+      exp = StringValue(ctx.getText.substring(1,ctx.getText.length()-1))
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
