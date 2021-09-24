@@ -4,6 +4,10 @@ import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import scala.io.Source
 
+import java.io.FileOutputStream
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
+
 
 class StandardLibrary[T](env: Environment[T]) {
     def readf (path:String) : String = {
@@ -16,7 +20,7 @@ class StandardLibrary[T](env: Environment[T]) {
       string
     }
 
-    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot, ceil,readFile), None)
+    val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot, ceil,readFile, writeFile), None)
 
     def abs = Procedure(
         "ABS",                             // name
@@ -101,6 +105,7 @@ class StandardLibrary[T](env: Environment[T]) {
           List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value)))))
         )
       )
+  
       def readFile = Procedure(
         "READFILE",
         List(FormalArg("x",StringType)),
@@ -111,4 +116,36 @@ class StandardLibrary[T](env: Environment[T]) {
           List(MetaStmt(() => ReturnStmt(StringValue(readf(env.lookup(name = "x").get.asInstanceOf[StringValue].value)))))
         )
       )
+
+  //  def writeFile = Procedure(
+  //    "WRITEFILE",                       // name
+  //    List(FormalArg("FILENAME", StringType), FormalArg("CONTENT", StringType)), // arguments
+  //    Some(StringType),                  // return the File Path
+  //    List(),                            // local constants
+  //    List(),                            // local variables
+  //
+  //    MetaStmt(() => ReturnStmt(StringValue(Files.write(Paths.get(env.lookup(name = "FILENAME").get.asInstanceOf[StringValue].value),
+  //      env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value.getBytes(StandardCharsets.UTF_8)).toString)))
+  //  )
+
+  def writeF (path:String, content:String) : String={
+
+    var file = new FileOutputStream(path)
+
+    if (file  != null) file.close()
+
+    Files.write(Paths.get(path),
+      content.getBytes(StandardCharsets.UTF_8)).toString
+  }
+
+  def writeFile = Procedure(
+    "WRITEFILE",                       // name
+    List(FormalArg("PATH", StringType), FormalArg("CONTENT", StringType)), // arguments
+    Some(StringType),                  // return the File Path
+    List(),                            // local constants
+    List(),                            // local variables
+
+    MetaStmt(() => ReturnStmt(StringValue(this.writeF(env.lookup(name = "PATH").get.asInstanceOf[StringValue].value, env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value))))
+  )
+
 }
