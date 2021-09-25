@@ -1,0 +1,11 @@
+MODULE READFILETest;
+
+VAR
+  x : STRING;
+  y : STRING;
+
+BEGIN
+  x := "C:\Users\pelut\README.txt";
+  y := READFILE(x)
+END
+END READFILETest.

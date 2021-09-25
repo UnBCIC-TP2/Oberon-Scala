@@ -94,9 +94,9 @@ class StandardLibraryTest extends AnyFunSuite {
   }
   test("Test for the CEIL function") {
     val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
-    
+
     assert(module.name == "CEILTest")
-    
+
     val interpreter = new Interpreter
     interpreter.setTestEnvironment()
 
@@ -104,6 +104,40 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(interpreter.env.lookup("z") == Some(RealValue(10.0)))
     assert(interpreter.env.lookup("w") == Some(RealValue(12.0)))
+
+  }
+  test("Test for the READFILE function") {
+    val module = ScalaParser.parseResource("stdlib/READFILETest.oberon")
+
+    assert(module.name == "READFILETest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(StringValue("C:\\Users\\pelut\\README.txt")))
+    assert(interpreter.env.lookup("y") == Some(StringValue("teste")))
+
+  }
+
+  test("Test for the WRITEFILE function") {
+    val module = ScalaParser.parseResource("stdlib/WRITEFILETest.oberon")
+
+    assert(module.name == "WRITEFILETest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+    assert(interpreter.env.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")))
+
+    if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
+      assert(interpreter.env.lookup("z") == Some(StringValue("src\\test\\resources\\stdlib\\plainFile.txt")))
+    else
+      assert(interpreter.env.lookup("z") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
 
   }
 
