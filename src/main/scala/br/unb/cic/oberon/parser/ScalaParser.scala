@@ -279,11 +279,16 @@ class ParserVisitor {
     override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
 
+    /*
+    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit = {
+      exp = SetValue(ctx.getText.toSet)
+    }*/
 
-    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit =
-      exp = SetValue(ctx.getText.toSet[Any])
-
-
+    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit = {
+      /*val elements = ctx.elements().toList(scala).map()*/
+      val elements = ctx.elements.asScala.toSet
+      exp = SetValue(elements)(expressao binaria)
+    }
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
 

@@ -137,36 +137,7 @@ case class RealValue(value: Double) extends Value with Number {
   }
 }
 
-/* Implementação 1 do SetValue
-case class SetValue(value: Set[Int]) extends Value with Number {
-  type T = Set[Int]
-  def +(that: Number): Number = that match {
-    case other: SetValue => SetValue(value union other.value)
-  }
-
-  def -(that: Number): Number = that match {
-    case other: SetValue => SetValue(value diff other.value)
-  }
-
-  def *(that: Number): Number = that match {
-    case other: SetValue => SetValue(value intersect other.value)
-  }
-
-  def /(that: Number): Number = that match {
-    case other: SetValue => SetValue(value diff other.value) + SetValue(other.value diff value)
-  }
-}
-
-Implementação 2 do SetValue
-case class SetValue(value: HashSet[Int]) extends Value { type T = HashSet }
-
-Implementação 3 do SetValue
-case class SetValue(value: Set[Int]) extends Value { type T = Set[Int]}
-
-Implementação 4 do SetValue */
-case class SetValue(value: Set[Any]) extends Value { type T = Set[Any]}
-
-
+case class SetValue(value: Set[Element]) extends Value { type T = Set[Element]}
 
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
