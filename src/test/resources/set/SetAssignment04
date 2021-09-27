@@ -1,0 +1,10 @@
+MODULE SimpleModule;
+
+BEGIN
+    readInt(x)
+    readInt(y)
+
+    t := { x..y };
+END
+
+END SimpleModule.

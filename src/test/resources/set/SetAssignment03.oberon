@@ -1,0 +1,12 @@
+MODULE SimpleModule;
+
+VAR
+    s, t : SET;
+BEGIN
+    s := { 1..5 };
+
+    readInt(x);
+    t := { 1..x };
+END
+
+END SimpleModule.

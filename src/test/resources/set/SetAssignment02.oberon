@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+VAR
+    n : INTEGER;
+    s : SET;
+BEGIN
+    n := 9;
+    s := { 1, 2, n };
+END
+
+END SimpleModule.

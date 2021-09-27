@@ -1,0 +1,10 @@
+MODULE SimpleModule;
+
+VAR
+    s, t : SET;
+BEGIN
+    s := { 5 };
+    t := { 1, 17, 23 };
+END
+
+END SimpleModule.
