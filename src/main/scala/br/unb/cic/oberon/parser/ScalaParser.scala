@@ -4,6 +4,7 @@ import br.unb.cic.oberon.util.Resources
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
 
+import javax.lang.model.element.ElementVisitor
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
@@ -279,10 +280,18 @@ class ParserVisitor {
     override def visitCharValue(ctx: OberonParser.CharValueContext): Unit =
       exp = CharValue(ctx.getText.charAt(1))
 
+    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit = {
+      val elements = new ListBuffer[Element]
 
-    override def visitSetValue(ctx: OberonParser.SetValueContext): Unit =
-      exp = SetValue(ctx.getText.toSet[Any])
+      val elementVisitor = new ElementVisitor()
 
+      ctx.elements.asScala.toList.foreach(e => {
+        e.accept(elementVisitor)
+        elements += elementVisitor.element
+      })
+
+      exp = SetValue(elements.toList.toSet)
+    }
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
@@ -592,6 +601,32 @@ class ParserVisitor {
     }
   }
 
+  class ElementVisitor extends OberonBaseVisitor[Unit] {
+    var element: Element = _
+
+    override def visitSingleBasedElement(ctx: OberonParser.SingleBasedElementContext): Unit = {
+      val expVisitor = new ExpressionVisitor()
+
+      ctx.expression().accept(expVisitor)
+      val exp = expVisitor.exp
+
+      element = SingleBasedElement(exp)
+    }
+
+    override def visitRangeBasedElement(ctx: OberonParser.RangeBasedElementContext): Unit = {
+      val leftExpVisitor = new ExpressionVisitor()
+      val rightExpVisitor = new ExpressionVisitor()
+
+      ctx.left.accept(leftExpVisitor)
+      ctx.right.accept(rightExpVisitor)
+
+      val left_exp = leftExpVisitor.exp
+      val right_exp = rightExpVisitor.exp
+
+      element = RangeBasedElement(left_exp, right_exp)
+    }
+  }
+
   class CaseAlternativeVisitor extends OberonBaseVisitor[Unit] {
     var caseAlt: CaseAlternative = _
 
@@ -683,6 +718,5 @@ class ParserVisitor {
       uType = ArrayType(name, length, baseType)
     }
   }
-
-
 }
+
