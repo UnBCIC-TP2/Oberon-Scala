@@ -141,4 +141,24 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
+  test("Test for the APPENDFILE function") {
+    val module = ScalaParser.parseResource("stdlib/APPENDFILETest.oberon")
+
+    assert(module.name == "APPENDFILETest")
+
+    val interpreter = new Interpreter
+    interpreter.setTestEnvironment()
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+    assert(interpreter.env.lookup("w") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
+
+    if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
+      assert(interpreter.env.lookup("m") == Some(StringValue("src\\test\\resources\\stdlib\\plainFile.txt")))
+    else
+      assert(interpreter.env.lookup("m") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+
+  }
+
 }
