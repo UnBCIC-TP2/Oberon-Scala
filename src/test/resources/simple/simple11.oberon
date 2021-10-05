@@ -1,4 +1,4 @@
-MODULE SimpleModule;
+MODULE SimpleModule11;
 
 VAR
   x : CHAR;
@@ -7,4 +7,4 @@ BEGIN
 	x := 'a'
 END
 
-END SimpleModule.
+END SimpleModule11.
