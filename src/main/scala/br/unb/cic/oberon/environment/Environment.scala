@@ -18,15 +18,29 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
-
-  private val global = Map.empty[String, T]
-  private val stack = Stack.empty[Map[String, T]]
+  type Location = Integer
+  private val locations = Map.empty[Location, T]
+  private val global = Map.empty[String, Location]
+  private val stack = Stack.empty[Map[String, Location]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: String, value: T): Unit = global += name -> value
+  def generateLocation(): Integer = {
+    val i = 0
+    while true:
+      if (!(locations.keySet contains i)){
+        return i
+      }
+      i += 1
+  }
+
+  def setGlobalVariable(name: String, value: T): Unit = {
+    val loc = generateLocation()
+    global += name -> loc
+    locations += loc -> value
+  }
 
     def addUserDefinedType(userType: UserDefinedType) : Unit = {
       userDefinedTypes += userDefinedTypeName(userType) -> userType
@@ -40,7 +54,9 @@ class Environment[T] {
     if(stack.isEmpty) {
       stack.push(Map.empty[String, T])
     }
-    stack.top += name -> value
+    val loc = generateLocation()
+    stack.top += name -> loc
+    locations += loc -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
