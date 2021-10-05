@@ -220,6 +220,11 @@ class ParserVisitor {
       baseType = ReferenceToUserDefinedType(nameType)
     }
 
+    override def visitNullType(ctx: OberonParser.NullTypeContext): Unit = {
+      baseType = NullType
+    }
+
+
     override def visitComplexType(ctx: OberonParser.ComplexTypeContext): Unit = {
       val userTypeVisitor = new UserTypeVisitor()
       ctx.accept(userTypeVisitor)
@@ -330,7 +335,7 @@ class ParserVisitor {
     }
 
     override def visitNullValue(ctx: OberonParser.NullValueContext): Unit =
-      exp = NullValue();
+      exp = NullValue(null)
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()

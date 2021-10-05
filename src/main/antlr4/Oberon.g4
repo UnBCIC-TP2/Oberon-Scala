@@ -143,6 +143,7 @@ oberonType
  | 'CHAR'            #CharacterType
  | 'BOOLEAN'         #BooleanType
  | 'STRING'          #StringType
+ | 'NIL'             #NullType
  | name = Id         #ReferenceType        // Reference for user defined types
  | userType          #ComplexType
  ;

@@ -2232,7 +2232,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.variables(0) == VariableDeclaration("list", ReferenceToUserDefinedType("linkedList")))
 
     assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("list"), "value"), IntValue(10)))
-    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue()))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue(null)))
   }
 }
 

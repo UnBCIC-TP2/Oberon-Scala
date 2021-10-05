@@ -140,8 +140,8 @@ case class RealValue(value: Double) extends Value with Number {
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
+case class NullValue(value: Null) extends Value { type T = Null }
 
-case class NullValue() extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: List[Expression]) extends Value { type T = List[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
@@ -227,6 +227,7 @@ case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type
 case object UndefinedType extends Type
+case object NullType extends Type
 
 case class RecordType(variables: List[VariableDeclaration]) extends Type
 case class ArrayType(length: Int, variableType: Type) extends Type
