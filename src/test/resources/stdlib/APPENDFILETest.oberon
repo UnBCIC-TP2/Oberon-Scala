@@ -1,0 +1,18 @@
+MODULE APPENDFILETest;
+
+VAR
+  x : STRING;
+  y : STRING;
+  z : STRING;
+  w : STRING;
+  m : STRING;
+
+BEGIN
+  x := "src/test/resources/stdlib/plainFile.txt";
+  y := "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  m := WRITEFILE(x, y);
+  y := "Testando append";
+  z := APPENDFILE(x, y);
+  w := READFILE(x)
+END
+END APPENDFILETest.
