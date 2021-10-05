@@ -335,7 +335,7 @@ class ParserVisitor {
     }
 
     override def visitNullValue(ctx: OberonParser.NullValueContext): Unit =
-      exp = NullValue(null)
+      exp = NullValue
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()
