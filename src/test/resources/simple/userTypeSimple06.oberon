@@ -5,7 +5,7 @@ TYPE
 
     cheesewithoutbread = RECORD
         var1 : INTEGER;
-        var2 : cheesewithbread
+        var2 : cheesewithbread;
     END
 
     cheesewithhalfabread =  ARRAY 100000 OF cheesewithoutbread 

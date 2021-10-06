@@ -1,14 +1,16 @@
 package br.unb.cic.oberon
 
 import br.unb.cic.oberon.ast.{REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration}
-import br.unb.cic.oberon.codegen.PaigesBasedGenerator
+import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
 
+import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
+import java.util.Base64
 
 
 /**
@@ -25,9 +27,11 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val tc = opt[String](name = "typeChecker", short = 't', descr = "Check if a oberon program is well typed", argName = "Oberon program path")
   val interpreter = opt[String](name = "interpreter", short = 'i', descr = "Interprets an Oberon program", argName = "Oberon program path" )
   val compile = opt[List[String]](name = "compile", short = 'c', descr = "Compiles an Oberon program to C", argName = "Oberon program path> <C program output path")
+  val jvmCompile = opt[List[String]](name = "compileJVM",  descr = "Compiles an Oberon program to JVM", argName = "Oberon program path> <JVM program output path")
+
   val repl = opt[Boolean](name = "REPL", short = 'R', descr = "Run Oberon REPL")
 
-  requireOne(tc, interpreter, compile, repl)
+  requireOne(tc, interpreter, compile, jvmCompile, repl)
 
   override def onError(e: Throwable): Unit = e match {
     case exceptions.Help("") => printHelp()
@@ -60,7 +64,9 @@ object Main extends App {
       interpret(conf)
     }
     else if (conf.compile.isSupplied) {
-      compile(conf)
+      compile(new PaigesBasedGenerator,  conf.compile.getOrElse(List()))
+    } else if (conf.jvmCompile.isSupplied) {
+      compile(JVMCodeGenerator, conf.jvmCompile.getOrElse(List()))
     }
     else if (conf.repl.isSupplied) {
       runREPL()
@@ -83,33 +89,57 @@ object Main extends App {
   /**
    * Executes the Oberon compiler.
    *
-   * @param conf the CLI configuration
+   * @param generator Either the CCodeGenerator or the JVMCodeGenerator
+   * @param config the paths to the Oberon input and output files
    */
-  private def compile(conf: Conf) = {
-    val oberonPath = Paths.get(conf.compile()(0))
+  private def compile(generator: CodeGenerator, config: List[String]) = {
+    if(config.size != 2) {
+      throw new RuntimeException("Wrong number of program arguments.")
+    }
+
+    val oberonPath = Paths.get(config(0))
 
     if (Files.exists(oberonPath)) {
       val oberonContent = String.join("\n", Files.readAllLines(oberonPath))
       val module = ScalaParser.parse(oberonContent)
 
-      val codeGen = PaigesBasedGenerator()
-      val generatedCCode = codeGen.generateCode(module)
+      val generatedCode = generator.generateCode(module)
 
-      var cPath = Paths.get("")
-      if (conf.compile().length == 1) {
-        cPath = Paths.get("compiled.c") // If path not provided, default path applied
-      } else cPath = Paths.get(conf.compile()(1))
 
-      val writer = Files.newBufferedWriter(cPath)
+      if(generator == JVMCodeGenerator) {
+        val out = new FileOutputStream(createOutputFile(config(1), module.name).toFile)
+        out.write(Base64.getDecoder.decode(generatedCode))
+      }
+      else {
+        val path = Paths.get(config(1))
 
-      writer.write(generatedCCode)
-      writer.flush()
-      writer.close()
+        val writer = Files.newBufferedWriter(path)
+
+        writer.write(generatedCode)
+        writer.flush()
+        writer.close()
+      }
     }
     else {
       println("The file '" + conf.compile() + "' does not exist")
     }
   }
+
+  /*
+  * Creates (or override) a class file
+  * @param name name of the class file
+  * @return the relative Path to the class file.
+  */
+  def createOutputFile(path: String, name: String) = {
+    val base = Paths.get(path)
+    Files.createDirectories(base)
+    val classFile = Paths.get(path + "/" + name + ".class")
+    if(Files.exists(classFile)) {
+      Files.delete(classFile)
+    }
+    Files.createFile(classFile)
+  }
+
 
   /**
    * Executes the Oberon interpreter.
@@ -203,5 +233,7 @@ object Repl {
       }
     }
   }
+
+
 
 }

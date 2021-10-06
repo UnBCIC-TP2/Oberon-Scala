@@ -24,7 +24,7 @@ BEGIN
     y := 9
   ELSIF(x < 23) THEN
     y := 10
-  ELSIF(x == 25) THEN
+  ELSIF(x = 25) THEN
     y := 11
   ELSE
     y := 12

@@ -10,7 +10,7 @@ PROCEDURE factorial(i: INTEGER) : INTEGER;
      RETURN 1
    END;
    RETURN i * factorial(i - 1)
- END factorial;
+ END factorial
  
 BEGIN
  res := factorial(5);

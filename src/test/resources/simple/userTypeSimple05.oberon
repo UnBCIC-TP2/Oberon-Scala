@@ -6,7 +6,7 @@ TYPE
     complicated = RECORD
         variable1 : INTEGER;
         variable2 : BOOLEAN;
-        variable3 : simple
+        variable3 : simple;
     END
 
 VAR

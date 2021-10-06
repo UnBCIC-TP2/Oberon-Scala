@@ -3,7 +3,7 @@ MODULE ExpressionNameModule;
 TYPE
   list = RECORD
     head: INTEGER;
-    tail: list
+    tail: list;
   END
 
 VAR

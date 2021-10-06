@@ -29,7 +29,5 @@ class InterpreterVisitorTest extends AnyFunSuite{
 
     assert(interpreter.env.lookup("res").isDefined)
     assert(interpreter.env.lookup("res") == Some(IntValue(120)))
-
-
   }
 }

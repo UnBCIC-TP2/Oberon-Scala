@@ -19,6 +19,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
+    module.accept(interpreter)
 
     assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
     assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
@@ -348,8 +349,8 @@ class InterpreterTest extends AnyFunSuite {
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(20)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(20)));
+    assert(interpreter.env.lookup("x") == Some(IntValue(3)));
+    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {

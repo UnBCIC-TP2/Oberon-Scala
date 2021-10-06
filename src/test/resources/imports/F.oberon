@@ -2,7 +2,7 @@ MODULE F;
     IMPORT A := alias;
 
 BEGIN
-    write(alias::x);
+    write(alias::x)
 END
 
 END F.

@@ -1,4 +1,4 @@
-MODULE SimpleModule;
+MODULE SimpleModule9;
 
 CONST
   z = True && False || False;
@@ -7,4 +7,4 @@ VAR
   abc : INTEGER;
   def : BOOLEAN;
 
-END SimpleModule.
+END SimpleModule9.

@@ -1,0 +1,13 @@
+MODULE ABSTest;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  z : INTEGER;
+
+BEGIN
+  x := -10;
+  y := ABS(x);
+  z := ABS(y)
+END
+END ABSTest.
