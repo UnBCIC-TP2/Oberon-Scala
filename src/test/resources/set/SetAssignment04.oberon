@@ -1,0 +1,10 @@
+MODULE SetModule4;
+
+BEGIN
+    readInt(x);
+    readInt(y);
+
+    t := { x..y }
+END
+
+END SetModule4.

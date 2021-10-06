@@ -1,11 +1,11 @@
-MODULE SimpleModule;
+MODULE SetModule2;
 
 VAR
     n : INTEGER;
     s : SET;
 BEGIN
     n := 9;
-    s := { 1, 2, n };
+    s := { 1, 2, n }
 END
 
-END SimpleModule.
+END SetModule2.

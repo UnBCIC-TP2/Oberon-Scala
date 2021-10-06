@@ -1,0 +1,13 @@
+MODULE SetModule6;
+
+VAR
+    s, t : SET;
+BEGIN
+    readInt(x);
+    readInt(y);
+
+    s := { 1, 2, x..10, 100 };
+    t := { y..100, 101, x }
+END
+
+END SetModule6.

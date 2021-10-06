@@ -1,4 +1,4 @@
-MODULE SimpleModule;
+MODULE SetModule3;
 
 VAR
     s, t : SET;
@@ -6,7 +6,7 @@ BEGIN
     s := { 1..5 };
 
     readInt(x);
-    t := { 1..x };
+    t := { 1..x }
 END
 
-END SimpleModule.
+END SetModule3.

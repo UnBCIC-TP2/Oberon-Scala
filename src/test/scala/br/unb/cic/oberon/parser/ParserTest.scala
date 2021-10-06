@@ -6,6 +6,7 @@ import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
 
+// @TODO: testar modulo que
 class ParserTestSuite extends AnyFunSuite {
 
   test("Testing the oberon simple01 code") {
@@ -1441,6 +1442,148 @@ class ParserTestSuite extends AnyFunSuite {
     val stmt = module.stmt.get.asInstanceOf[AssignmentStmt]
 
     assert(stmt.exp.isInstanceOf[Brackets])
+  }
+
+  test("Testing the oberon SetAssignment01 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment01.oberon")
+
+    assert(module.name == "SetModule1")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts.head === AssignmentStmt(("s"), SetValue(Set[Element]())))
+    assert(stmts(1) === AssignmentStmt(("n"), IntValue(9)))
+    assert(stmts(2) === AssignmentStmt(("s"), SetValue(Set(SingleBasedElement(VarExpression("n"))))))
+  }
+
+  test("Testing the oberon SetAssignment02 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment02.oberon")
+
+    assert(module.name == "SetModule2")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) === AssignmentStmt(("n"), IntValue(9)))
+    assert(stmts(1) === AssignmentStmt(("s"), SetValue(Set(
+      SingleBasedElement(IntValue(1)),
+      SingleBasedElement(IntValue(2)),
+      SingleBasedElement(VarExpression("n"))
+    ))))
+  }
+
+  test("Testing the oberon SetAssignment03 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment03.oberon")
+
+    assert(module.name == "SetModule3")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) === AssignmentStmt(("s"), SetValue(Set(
+      RangeBasedElement(IntValue(1), IntValue(5))
+    ))))
+    assert(stmts(1) == ReadIntStmt("x"))
+    assert(stmts(2) === AssignmentStmt(("t"), SetValue(Set(
+      RangeBasedElement(IntValue(1), VarExpression("x"))
+    ))))
+  }
+
+  test("Testing the oberon SetAssignment04 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment04.oberon")
+
+    assert(module.name == "SetModule4")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 3)
+      case _ => fail("we are expecting three stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
+    assert(stmts(2) === AssignmentStmt(("t"), SetValue(Set(
+      RangeBasedElement(VarExpression("x"), VarExpression("y"))
+    ))))
+  }
+
+  test("Testing the oberon SetAssignment05 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment05.oberon")
+
+    assert(module.name == "SetModule5")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("we are expecting two stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) === AssignmentStmt(("s"), SetValue(Set(SingleBasedElement(IntValue(5))))))
+    assert(stmts(1) === AssignmentStmt(("t"), SetValue(Set(
+      SingleBasedElement(IntValue(1)),
+      SingleBasedElement(IntValue(17)),
+      SingleBasedElement(IntValue(23))
+    ))))
+  }
+
+  test("Testing the oberon SetAssignment06 code. This module has a simple set assignment") {
+    val module = ScalaParser.parseResource("set/SetAssignment06.oberon")
+
+    assert(module.name == "SetModule6")
+
+    // assert that the main block contains a sequence of statements
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 4)
+      case _ => fail("we are expecting four stmts in the main block")
+    }
+
+    // now we can assume that the main block contains a sequence of stmts
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(0) == ReadIntStmt("x"))
+    assert(stmts(1) == ReadIntStmt("y"))
+    assert(stmts(2) === AssignmentStmt(("s"), SetValue(Set(
+      SingleBasedElement(IntValue(1)),
+      SingleBasedElement(IntValue(2)),
+      RangeBasedElement(VarExpression("x"), IntValue(10)),
+      SingleBasedElement(IntValue(100))
+    ))))
+    assert(stmts(3) === AssignmentStmt(("t"), SetValue(Set(
+      RangeBasedElement(VarExpression("y"), IntValue(100)),
+      SingleBasedElement(IntValue(101)),
+      SingleBasedElement(VarExpression("x"))
+    ))))
   }
 
 
