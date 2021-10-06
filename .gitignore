@@ -30,6 +30,7 @@ build
 .scala_dependencies
 .cache
 .cache-main
+**/.antlr/
 
 #general
 *.class
