@@ -1,0 +1,20 @@
+MODULE Multiples;
+CONST
+  limit = 10;
+VAR
+  base, count : INTEGER;
+  mult : INTEGER;
+PROCEDURE calcmult(i: INTEGER, base: INTEGER, VAR res: INTEGER) : INTEGER;
+ BEGIN
+   res := i * base
+ END calcmult
+
+BEGIN
+ readInt(base);
+ count := 1;
+ WHILE count < limit DO
+   calcmulti(count, base, mult);
+   write(mult)
+ END
+END
+END Multiples.
