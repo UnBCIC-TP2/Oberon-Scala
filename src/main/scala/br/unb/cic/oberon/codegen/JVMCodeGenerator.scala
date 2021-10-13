@@ -54,6 +54,50 @@ object JVMCodeGenerator extends CodeGenerator {
       case SubExpression(left, right) => generateBinExpression(left, right, mv, ISUB)
       case MultExpression(left, right) => generateBinExpression(left, right, mv, IMUL)
       case DivExpression(left, right) => generateBinExpression(left, right, mv, IDIV)
+      case AndExpression(left, right) => {
+        val falseLabel = new Label()
+        val endLabel = new Label()
+
+        /** coloca falso na pilha se a primeira expressão já for falsa */
+        generateExpression(left, mv)
+        mv.visitJumpInsn(IFEQ, falseLabel)
+
+        /** verifica a segunda expressão */
+        generateExpression(right, mv)
+        mv.visitJumpInsn(IFEQ, falseLabel)
+
+        /** coloca true na pilha se ambas passaram nos testes */
+        mv.visitInsn(ICONST_1)
+        mv.visitJumpInsn(GOTO, endLabel)
+
+        /** coloca false na pilha */
+        mv.visitLabel(falseLabel)
+        mv.visitInsn(ICONST_0)
+
+        mv.visitLabel(endLabel)
+      }
+      case OrExpression(left, right) => {
+        val trueLabel = new Label()
+        val endLabel = new Label()
+
+        /** coloca true na pilha se a primeira expressão já for verdadeira */
+        generateExpression(left, mv)
+        mv.visitJumpInsn(IFNE, trueLabel)
+
+        /** verifica a segunda expressão */
+        generateExpression(right, mv)
+        mv.visitJumpInsn(IFNE, trueLabel)
+
+        /** coloca true na pilha se ambas passaram nos testes */
+        mv.visitInsn(ICONST_0)
+        mv.visitJumpInsn(GOTO, endLabel)
+
+        /** coloca false na pilha */
+        mv.visitLabel(trueLabel)
+        mv.visitInsn(ICONST_1)
+
+        mv.visitLabel(endLabel)
+      }
   }
 
   def generateBinExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
@@ -63,26 +107,26 @@ object JVMCodeGenerator extends CodeGenerator {
   }
 
   def generateRelExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
+    val falseLabel = new Label()
+    val endLabel = new Label()
+
     generateExpression(left, mv)
     generateExpression(right, mv)
-
-    val falseLabel = new Label()
-    val trueLabel = new Label()
 
     /** se as expressões forem diferentes, pule para o 0 */
     mv.visitJumpInsn(opcode, falseLabel)
 
     /** se não, coloque 1 (true) na pilha */
     mv.visitInsn(ICONST_1)
-    mv.visitJumpInsn(GOTO, trueLabel)
+    mv.visitJumpInsn(GOTO, endLabel)
 
     /** coloca 0 na pilha */
     mv.visitLabel(falseLabel)
     mv.visitInsn(ICONST_0)
 
-    mv.visitLabel(trueLabel)
+    mv.visitLabel(endLabel)
   }
-  
+
   def generateVariables(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
     variables.foreach((v : VariableDeclaration) =>
       v.variableType match {
@@ -148,7 +192,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //
     // mv.visitLdcInsn("Hello world")
 
-    generateExpression(new DivExpression(new IntValue(4), new IntValue(5)), mv)
+    generateExpression(new AndExpression(new OrExpression(new BoolValue(false), new BoolValue(true)), new BoolValue(true)), mv)
 
     //
     // we make a call to the println method of the PrintStream
@@ -160,7 +204,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Int])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Boolean])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
