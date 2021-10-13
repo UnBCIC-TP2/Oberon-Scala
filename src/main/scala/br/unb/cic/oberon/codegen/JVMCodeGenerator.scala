@@ -44,28 +44,34 @@ object JVMCodeGenerator extends CodeGenerator {
       case BoolValue(v) => mv.visitLdcInsn(v)
       case StringValue(v) => mv.visitLdcInsn(v)
       case Brackets(exp) => { /* noop */}
-      case EQExpression(left, right) => {
-        generateExpression(left, mv)
-        generateExpression(right, mv)
-
-        val falseLabel = new Label()
-        val trueLabel = new Label()
-
-        /** se as expressões forem diferentes, pule para o 0 */
-        mv.visitJumpInsn(IF_ICMPNE, falseLabel)
-
-        /** se não, coloque 1 (true) na pilha */
-        mv.visitInsn(ICONST_1)
-        mv.visitJumpInsn(GOTO, trueLabel)
-
-        /** coloca 0 na pilha */
-        mv.visitLabel(falseLabel)
-        mv.visitInsn(ICONST_0)
-
-        mv.visitLabel(trueLabel)
-      }
+      case EQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPNE)
+      case NEQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPEQ)
+      case GTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLE)
+      case LTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGE)
+      case GTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLT)
+      case LTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGT)
     }
-  
+
+  def generateRelExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
+    generateExpression(left, mv)
+    generateExpression(right, mv)
+
+    val falseLabel = new Label()
+    val trueLabel = new Label()
+
+    /** se as expressões forem diferentes, pule para o 0 */
+    mv.visitJumpInsn(opcode, falseLabel)
+
+    /** se não, coloque 1 (true) na pilha */
+    mv.visitInsn(ICONST_1)
+    mv.visitJumpInsn(GOTO, trueLabel)
+
+    /** coloca 0 na pilha */
+    mv.visitLabel(falseLabel)
+    mv.visitInsn(ICONST_0)
+
+    mv.visitLabel(trueLabel)
+  }
   
   def generateVariables(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
     variables.foreach((v : VariableDeclaration) =>
@@ -132,7 +138,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //
     // mv.visitLdcInsn("Hello world")
 
-    val eq_expr = new EQExpression(new IntValue(5), new IntValue(5))
+    val eq_expr = new GTEExpression(new IntValue(4), new IntValue(5))
 
     generateExpression(eq_expr, mv)
 
