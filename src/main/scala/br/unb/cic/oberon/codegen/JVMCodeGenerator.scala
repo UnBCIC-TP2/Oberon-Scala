@@ -4,6 +4,7 @@ import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ast._
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
+import org.objectweb.asm.Label._ 
 
 import java.io.PrintStream
 import java.util.Base64
@@ -43,6 +44,26 @@ object JVMCodeGenerator extends CodeGenerator {
       case BoolValue(v) => mv.visitLdcInsn(v)
       case StringValue(v) => mv.visitLdcInsn(v)
       case Brackets(exp) => { /* noop */}
+      case EQExpression(left, right) => {
+        generateExpression(left, mv)
+        generateExpression(right, mv)
+
+        val falseLabel = new Label()
+        val trueLabel = new Label()
+
+        /** se as expressões forem diferentes, pule para o 0 */
+        mv.visitJumpInsn(IF_ICMPNE, falseLabel)
+
+        /** se não, coloque 1 (true) na pilha */
+        mv.visitInsn(ICONST_1)
+        mv.visitJumpInsn(GOTO, trueLabel)
+
+        /** coloca 0 na pilha */
+        mv.visitLabel(falseLabel)
+        mv.visitInsn(ICONST_0)
+
+        mv.visitLabel(trueLabel)
+      }
     }
   
   
@@ -109,7 +130,11 @@ object JVMCodeGenerator extends CodeGenerator {
     // loads the String constant "Hello world" and
     // pushes it into the stack.
     //
-    mv.visitLdcInsn("Hello world")
+    // mv.visitLdcInsn("Hello world")
+
+    val eq_expr = new EQExpression(new IntValue(5), new IntValue(5))
+
+    generateExpression(eq_expr, mv)
 
     //
     // we make a call to the println method of the PrintStream
@@ -121,7 +146,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[String])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Boolean])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
@@ -131,7 +156,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitInsn(RETURN)
 
     // please, read Section 3.2 of the ASM tutorial
-    mv.visitMaxs(0, 0) // it also closes the '}'
+    mv.visitMaxs(2, 0) // it also closes the '}'
 
     mv.visitEnd()
   }
