@@ -50,7 +50,17 @@ object JVMCodeGenerator extends CodeGenerator {
       case LTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGE)
       case GTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLT)
       case LTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGT)
-    }
+      case AddExpression(left, right) => generateBinExpression(left, right, mv, IADD)
+      case SubExpression(left, right) => generateBinExpression(left, right, mv, ISUB)
+      case MultExpression(left, right) => generateBinExpression(left, right, mv, IMUL)
+      case DivExpression(left, right) => generateBinExpression(left, right, mv, IDIV)
+  }
+
+  def generateBinExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
+    generateExpression(left, mv)
+    generateExpression(right, mv)
+    mv.visitInsn(opcode)
+  }
 
   def generateRelExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
     generateExpression(left, mv)
@@ -138,9 +148,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //
     // mv.visitLdcInsn("Hello world")
 
-    val eq_expr = new GTEExpression(new IntValue(4), new IntValue(5))
-
-    generateExpression(eq_expr, mv)
+    generateExpression(new DivExpression(new IntValue(4), new IntValue(5)), mv)
 
     //
     // we make a call to the println method of the PrintStream
@@ -152,7 +160,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Boolean])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Int])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
