@@ -35,7 +35,17 @@ object JVMCodeGenerator extends CodeGenerator {
     Base64.getEncoder().encodeToString(cw.toByteArray)
 
   }
-
+  
+  def generateExpression(expression: Expression, mv: MethodVisitor): Unit = expression match {
+      case IntValue(v) => mv.visitLdcInsn(v)
+      case RealValue(v) => mv.visitLdcInsn(v)
+      case CharValue(v) => mv.visitLdcInsn(v)
+      case BoolValue(v) => mv.visitLdcInsn(v)
+      case StringValue(v) => mv.visitLdcInsn(v)
+      case Brackets(exp) => { /* noop */}
+    }
+  
+  
   def generateVariables(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
     variables.foreach((v : VariableDeclaration) =>
       v.variableType match {
