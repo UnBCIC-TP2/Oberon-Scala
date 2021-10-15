@@ -162,9 +162,16 @@ class ParserVisitor {
     Procedure(name, args, returnType, constants, variables, block.get)
   }
 
-  def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
-    val argType = visitOberonType(ctx.argType)
-    ctx.args.asScala.toList.map(arg => FormalArg(arg.getText, argType))
+  class FormalArgVisitor extends OberonBaseVisitor[Unit] {
+    var arg: FormalArg = _
+
+    override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): Unit = {
+      FormaArg = ParameterByValue
+    }
+
+    override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): Unit = {
+      FormalArg = ParameterByReference
+    }
   }
 
   def visitUserDefinedType(ctx: OberonParser.UserTypeDeclarationContext): UserDefinedType = {
