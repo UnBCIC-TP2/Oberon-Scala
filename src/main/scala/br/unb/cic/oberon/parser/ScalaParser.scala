@@ -166,7 +166,7 @@ class ParserVisitor {
     var arg: FormalArg = _
 
     override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): Unit = {
-      FormaArg = ParameterByValue
+      FormalArg = ParameterByValue
     }
 
     override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): Unit = {
