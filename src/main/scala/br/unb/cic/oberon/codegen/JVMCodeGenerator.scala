@@ -1,8 +1,8 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.interpreter._
-import br.unb.cic.oberon.ast._
-import org.objectweb.asm._
+import br.unb.cic.oberon.ast.{Type, UserDefinedType, _}
+import org.objectweb.asm.{Type => ASMType, _}
 import org.objectweb.asm.Opcodes._
 
 import java.io.PrintStream
@@ -17,6 +17,7 @@ object JVMCodeGenerator extends CodeGenerator {
 
     generateConstants(module.constants, cw)
     generateVariables(module.variables, cw)
+    generateProcedures(module.procedures, module.userTypes, cw)
 
     // TODO: Ideally, we should only call the
     //  generateMainMethod if the module.stmt
@@ -51,7 +52,7 @@ object JVMCodeGenerator extends CodeGenerator {
     val visitor = new EvalExpressionVisitor(interpreter)
 
     constants.map {
-      case (constant) => 
+      case (constant) =>
         val v = constant.exp.accept(visitor)
 
         v match {
@@ -63,6 +64,48 @@ object JVMCodeGenerator extends CodeGenerator {
           }
         }
     }
+  }
+
+  def getUserDefinedTypeDescriptorValue(name: String, userTypes: List[UserDefinedType]): String = {
+    // TODO: refactor -> fold left
+    var descriptor = ""
+    userTypes.foreach((uType: UserDefinedType) => {
+      uType match {
+        case recordType: RecordType =>
+          if (recordType.name == name) descriptor += "Ljava/lang/" + name + ";"
+        case arrayType: ArrayType =>
+          if (arrayType.name == name) descriptor += "[" + getTypeDescriptorValue(arrayType.variableType, userTypes.filter(_ != uType))
+      }
+    })
+    descriptor
+  }
+
+  def getTypeDescriptorValue(t: Type, userTypes: List[UserDefinedType]): String = {
+    t match {
+      case IntegerType => ASMType.INT_TYPE.toString
+      case RealType => ASMType.DOUBLE_TYPE.toString
+      case BooleanType => ASMType.BOOLEAN_TYPE.toString
+      case CharacterType => ASMType.CHAR_TYPE.toString
+      case StringType => "Ljava/lang/String;"
+      case UndefinedType => ASMType.VOID_TYPE.toString
+      case t: ReferenceToUserDefinedType => getUserDefinedTypeDescriptorValue(t.name, userTypes)
+    }
+  }
+
+  def generateProcedures(procedures: List[Procedure], userTypes: List[UserDefinedType], cw: ClassWriter): Unit = {
+    procedures.foreach((p: Procedure) => {
+      var argumentTypes = ""
+
+      p.args.foreach((t: FormalArg) => {
+        val argumentType = getTypeDescriptorValue(t.argumentType, userTypes)
+        argumentTypes += argumentType;
+      })
+      val returnDescriptorArgumentType = getTypeDescriptorValue(p.returnType.get, userTypes)
+      val descriptor = "(" + argumentTypes + ")" + returnDescriptorArgumentType
+
+      cw.visitMethod(ACC_PUBLIC + ACC_ABSTRACT, p.name, descriptor, null, null)
+
+    })
   }
 
   /*
@@ -93,7 +136,7 @@ object JVMCodeGenerator extends CodeGenerator {
     // loads the static "out" field of java.lang.System and
     // pushes it into the stack.
     //
-    mv.visitFieldInsn(GETSTATIC, Type.getInternalName(classOf[System]), "out", Type.getDescriptor(classOf[PrintStream]))
+    mv.visitFieldInsn(GETSTATIC, ASMType.getInternalName(classOf[System]), "out", ASMType.getDescriptor(classOf[PrintStream]))
 
     //
     // loads the String constant "Hello world" and
@@ -109,9 +152,9 @@ object JVMCodeGenerator extends CodeGenerator {
     // popped out from the stack.
     //
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
-      Type.getInternalName(classOf[PrintStream]),    // the base class of the method
+      ASMType.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[String])), // the method descriptor
+      ASMType.getMethodDescriptor(ASMType.VOID_TYPE, ASMType.getType(classOf[String])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
@@ -128,4 +171,3 @@ object JVMCodeGenerator extends CodeGenerator {
 
 
 }
-
