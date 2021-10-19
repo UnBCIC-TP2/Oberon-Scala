@@ -1,0 +1,47 @@
+MODULE ComplexModule;
+
+TYPE
+    myType = RECORD
+        size : INTEGER;
+        variables : booleans;
+        Varinho : myType;
+    END
+    MEGA = ARRAY 10 OF myType
+    HALLS = ARRAY 1 OF MEGA
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+
+PROCEDURE sum(v1: CHAR) : CHAR;
+ BEGIN
+   RETURN 0
+ END sum
+
+PROCEDURE sum(v1: INTEGER) : BOOLEAN;
+ BEGIN
+   RETURN 0
+ END sum
+
+PROCEDURE sum(v1: myType) : myType;
+ BEGIN
+   RETURN 0
+ END sum
+
+PROCEDURE sum(v1: MEGA) : MEGA;
+ BEGIN
+   RETURN 0
+ END sum
+
+PROCEDURE sum(v1: HALLS) : HALLS;
+ BEGIN
+   RETURN 0
+ END sum
+
+BEGIN
+ readInt(x);
+ readInt(y);
+ write(sum(x,y))
+END
+
+END ComplexModule.

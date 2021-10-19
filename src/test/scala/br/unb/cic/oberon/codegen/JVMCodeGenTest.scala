@@ -1,360 +1,155 @@
 package br.unb.cic.oberon.codegen
 
+import br.unb.cic.oberon.ast.{Constant, OberonModule, Procedure, VariableDeclaration}
 import br.unb.cic.oberon.parser.ScalaParser
-import org.scalatest.funsuite.AnyFunSuite
 
 import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
 import java.util.Base64
-
 import jdk.internal.org.objectweb.asm.Opcodes._
 import jdk.internal.org.objectweb.asm._
 import java.io.File
 
-class JVMCodeGenTest extends AnyFunSuite {
 
-  test("Generate code with fields of simple01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
-
+/**
+ * The base class for code generation test.
+ * You should extend from this class to get base testing methods.
+ */
+class JVMCodeGenTest extends CodeGenTest {
+  /**
+   * Gets Oberon module from given oberon file.
+   *
+   * @param filePath oberon file target path of the current test.
+   *
+   * @return the resulting module for the given target oberon file.
+   */
+  def getOberonModuleFromFile(filePath: String): OberonModule = {
+    val path = Paths.get(getClass.getClassLoader.getResource(filePath).toURI)
     assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule1")
-    assert(module.variables.size == 0)
-    assert(module.constants.size == 1)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(1 == v.numberOfTotalFields);
-    assert(1 == v.numberOfIntegerConstants);
-    assert(0 == v.numberOfIntegerVariables);
-    assert(0 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
+    ScalaParser.parse(String.join("\n", Files.readAllLines(path)))
   }
 
-  test("Generate code with fields of simple02.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule2")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 1)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(3 == v.numberOfTotalFields);
-    assert(1 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
- test("Generate code with fields of simple03.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule3")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 3)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(5 == v.numberOfTotalFields);
-    assert(2 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(1 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple04.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule4")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 3)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(5 == v.numberOfTotalFields);
-    assert(3 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple05.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule5")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 1)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(3 == v.numberOfTotalFields);
-    assert(1 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple06.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule6")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 1)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(3 == v.numberOfTotalFields);
-    assert(1 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple07.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule7")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 2)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(4 == v.numberOfTotalFields);
-    assert(2 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple08.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule8")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 3)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(5 == v.numberOfTotalFields);
-    assert(0 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(3 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple09.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule9")
-    assert(module.variables.size == 2)
-    assert(module.constants.size == 1)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(3 == v.numberOfTotalFields);
-    assert(0 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(1 == v.numberOfBooleanVariables);
-    assert(1 == v.numberOfBooleanConstants);
-  }
-
-  test("Generate code of simple10.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule10")
-    assert(module.variables.size == 1)
-    assert(module.constants.size == 0)
-
-    val codeGen = JVMCodeGenerator
-
-    val byteCodeAsString = codeGen.generateCode(module)
-
-    val out = new FileOutputStream(createOutputFile(module.name).toFile)
-
-    out.write(Base64.getDecoder.decode(byteCodeAsString))
-
-    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
-
-    val v = new ClassVisitorTest(ASM4);
-
-    cr.accept(v, 0);
-
-    assert(1 == v.numberOfTotalFields);
-    assert(0 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
-    assert(0 == v.numberOfBooleanVariables);
-    assert(0 == v.numberOfBooleanConstants);
-  }
-
-  /*
+  /**
    * Creates (or override) a class file
    * @param name name of the class file
    * @return the relative Path to the class file.
    */
   def createOutputFile(name: String) = {
-    val base = Paths.get("target" + File.pathSeparator + "out")
-    Files.createDirectories(base)
+    Files.createDirectories(Paths.get("target" + File.pathSeparator + "out"))
     val classFile = Paths.get("target" + File.pathSeparator +  "out" + File.pathSeparator + name + ".class")
-    if(Files.exists(classFile)) {
-      Files.delete(classFile)
-    }
+    if(Files.exists(classFile)) Files.delete(classFile)
     Files.createFile(classFile)
   }
+
+  def getVisitModule(module: OberonModule): ClassVisitorTest = {
+    val byteCodeAsString = JVMCodeGenerator.generateCode(module)
+
+    val out = new FileOutputStream(createOutputFile(module.name).toFile)
+    out.write(Base64.getDecoder.decode(byteCodeAsString))
+
+    val cr = new ClassReader(Base64.getDecoder.decode(byteCodeAsString));
+    val v = new ClassVisitorTest(ASM4)
+//    val s = new String(Base64.getDecoder.decode(byteCodeAsString), StandardCharsets.UTF_8)
+    cr.accept(v, 0)
+    v
+  }
+
+  override def assertWithJVMCodeGenerated(codeTest: ModuleTest): Unit = {
+    
+		val module = codeTest.module
+    
+		val visitor = getVisitModule(codeTest.module)
+
+    assert(module.name == codeTest.moduleName)
+
+    assert(module.constants.size == visitor.constants.size)
+    assert(module.variables.size == visitor.variables.size)
+    assert(module.procedures.size == visitor.procedures.size)
+
+    module.constants.foreach((c: Constant) => assert(visitor.constants.contains(c.name)))
+    module.variables.foreach((v: VariableDeclaration) => assert(visitor.variables.contains(v.name)))
+    module.procedures.foreach((p: Procedure) => assert(visitor.procedures.contains(p.name)))
+  }
+
+  override def testGenerator(testName: String, codeTest: ModuleTest): Unit = {
+    codeTest.module = getOberonModuleFromFile(codeTest.filePath)
+
+    test(testName) {
+      assertWithJVMCodeGenerated(codeTest)
+    }
+
+  }
 }
+
+
+class SimpleModule01CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple01.oberon", "SimpleModule1")
+
+  testGenerator("Generate code with fields of simple01.oberon", codeTest)
+}
+
+
+class SimpleModule02CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple02.oberon", "SimpleModule2")
+
+  testGenerator("Generate code with fields of simple02.oberon", codeTest)
+}
+
+
+class SimpleModule03CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple03.oberon", "SimpleModule3")
+
+  testGenerator("Generate code with fields of simple03.oberon", codeTest)
+}
+
+
+class SimpleModule04CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple04.oberon", "SimpleModule4")
+
+  testGenerator("Generate code of simple04.oberon", codeTest)
+}
+
+
+class SimpleModule05CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple05.oberon", "SimpleModule5")
+
+  testGenerator("Generate code of simple05.oberon", codeTest)
+}
+
+
+class SimpleModule06CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple06.oberon", "SimpleModule6")
+
+  testGenerator("Generate code of simple06.oberon", codeTest)
+}
+
+class SimpleModule07CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple07.oberon", "SimpleModule7")
+
+  testGenerator("Generate code of simple07.oberon", codeTest)
+}
+
+class SimpleModule08CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple08.oberon", "SimpleModule8")
+
+  testGenerator("Generate code of simple08.oberon", codeTest)
+}
+
+class SimpleModule09CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple09.oberon", "SimpleModule9")
+
+  testGenerator("Generate code of simple09.oberon", codeTest)
+}
+
+class SimpleModule10CodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("simple/simple10.oberon", "SimpleModule10")
+
+  testGenerator("Generate code of simple10.oberon", codeTest)
+}
+
+class ComplexModuleCodeGenTest extends JVMCodeGenTest {
+  val codeTest = new ModuleTest("procedures/procedure05.oberon", "ComplexModule")
+
+  testGenerator("Generate code of procedure05.oberon", codeTest)
+}
+

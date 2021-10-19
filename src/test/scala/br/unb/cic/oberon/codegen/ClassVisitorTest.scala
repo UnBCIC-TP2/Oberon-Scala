@@ -1,44 +1,36 @@
 package br.unb.cic.oberon.codegen
 
-import jdk.internal.org.objectweb.asm.{ClassVisitor, FieldVisitor}
-import jdk.internal.org.objectweb.asm.Opcodes._;
+import jdk.internal.org.objectweb.asm.{ClassVisitor, FieldVisitor, MethodVisitor}
+import jdk.internal.org.objectweb.asm.Opcodes._
 
-class ClassVisitorTest(version: Integer) extends ClassVisitor(version) {
-  var numberOfTotalFields: Integer = 0;
-  var numberOfIntegerVariables: Integer = 0;
-  var numberOfBooleanVariables: Integer = 0;
-  var numberOfIntegerConstants: Integer = 0;
-  var numberOfBooleanConstants: Integer = 0;
+import scala.collection.mutable.ListBuffer
 
-  val VAR: Int = ACC_PUBLIC;
-  val CONST: Int = ACC_PUBLIC + ACC_FINAL;
+class ClassVisitorTest(version: Int) extends ClassVisitor(version) {
+  var constants = new ListBuffer[String]()
+  var variables = new ListBuffer[String]()
+  var procedures = new ListBuffer[String]()
 
-  override def visitField(access: Int, name: String, desc: String, signature: String, value: Any): FieldVisitor = {
-    numberOfTotalFields += 1;
+  def registerByOpcodes(access: Int, name: String): Unit = {
+    val VAR: Int = ACC_PUBLIC
+    val CONST: Int = ACC_PUBLIC + ACC_FINAL
+    val PROC: Int = ACC_PUBLIC + ACC_ABSTRACT
 
     access match {
-      case VAR => {
-        desc match {
-          case "I" => {
-            numberOfIntegerVariables += 1;
-          }
-          case "Z" => {
-            numberOfBooleanVariables += 1;
-          }
-        }
-      }
-      case CONST => {
-        desc match {
-          case "I" => {
-            numberOfIntegerConstants += 1;
-          }
-          case "Z" => {
-            numberOfBooleanConstants += 1;
-          }
-        }
-      }
+      case CONST => constants += name
+      case VAR => variables += name
+      case PROC => procedures += name
+      case _ =>
     }
+  }
 
+  override def visitField(access: Int, name: String, desc: String, signature: String, value: Any): FieldVisitor = {
+    registerByOpcodes(access, name)
     super.visitField(access, name, desc, signature, value)
+  }
+
+  override def visitMethod(access: Int, name: String, desc: String, signature: String,
+                           exceptions: Array[String]): MethodVisitor = {
+    registerByOpcodes(access, name)
+    super.visitMethod(access, name, desc, signature, exceptions)
   }
 }
