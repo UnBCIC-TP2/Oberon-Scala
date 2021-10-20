@@ -3,6 +3,7 @@ package br.unb.cic.oberon.parser
 import br.unb.cic.oberon.util.Resources
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
+import org.antlr.stringtemplate.language.FormalArgument
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -152,7 +153,7 @@ class ParserVisitor {
 
   def visitProcedureDeclaration(ctx: OberonParser.ProcedureContext): Procedure = {
     val name = ctx.name.getText
-    val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal)).flatten
+    val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal))
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val block = visitModuleBlock(ctx.block())
@@ -162,15 +163,25 @@ class ParserVisitor {
     Procedure(name, args, returnType, constants, variables, block.get)
   }
 
+  def visitFormalArg(ctx: OberonParser.FormalArgContext): FormalArg = {
+    val parameterTypeVisitor = new FormalArgVisitor()
+    ctx.accept(parameterTypeVisitor)
+    parameterTypeVisitor.arg
+  }
+
   class FormalArgVisitor extends OberonBaseVisitor[Unit] {
     var arg: FormalArg = _
 
     override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): Unit = {
-      FormalArg = ParameterByValue
+      val varName = ctx.getText
+      val argType = visitOberonType(ctx.argType)
+      ctx.args.asScala.toList.map(arg => parameterByValue(varName, argType))
     }
 
     override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): Unit = {
-      FormalArg = ParameterByReference
+      val varName = ctx.getText
+      val argType = visitOberonType(ctx.argType)
+      ctx.args.asScala.toList.map(arg => parameterByReference(varName, argType))
     }
   }
 
