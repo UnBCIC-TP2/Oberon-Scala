@@ -2,6 +2,9 @@ package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ast
+
+import org.objectweb.asm
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.Label._ 
@@ -36,6 +39,40 @@ object JVMCodeGenerator extends CodeGenerator {
     Base64.getEncoder().encodeToString(cw.toByteArray)
 
   }
+
+  def getExpressionType(expression: Expression): asm.Type = expression match {
+    case IntValue(v) => Type.INT_TYPE
+    case RealValue(v) => Type.FLOAT_TYPE
+    case CharValue(v) => Type.CHAR_TYPE
+    case BoolValue(v) => Type.BOOLEAN_TYPE
+    case StringValue(v) => Type.getType(classOf[String])
+    case EQExpression(left, right) => Type.BOOLEAN_TYPE
+    case NEQExpression(left, right) => Type.BOOLEAN_TYPE
+    case GTExpression(left, right) => Type.BOOLEAN_TYPE
+    case LTExpression(left, right) => Type.BOOLEAN_TYPE
+    case GTEExpression(left, right) => Type.BOOLEAN_TYPE
+    case LTEExpression(left, right) => Type.BOOLEAN_TYPE
+    case AddExpression(left, right) => getNumberExpressionType(left, right)
+    case SubExpression(left, right) => getNumberExpressionType(left, right)
+    case MultExpression(left, right) => getNumberExpressionType(left, right)
+    case DivExpression(left, right) => getNumberExpressionType(left, right)
+  }
+
+  def getNumberExpressionType(left: Expression, right: Expression): asm.Type = {
+    val leftType = getExpressionType(left)
+    val rightType = getExpressionType(right)
+    if (leftType == Type.FLOAT_TYPE || rightType == Type.FLOAT_TYPE) return Type.FLOAT_TYPE
+    else return Type.INT_TYPE
+  }
+
+  def oberonTypeToAsmType(t: ast.Type) = t match {
+    case IntegerType => Type.INT_TYPE
+    case RealType => Type.FLOAT_TYPE
+    case BooleanType => Type.BOOLEAN_TYPE
+    case CharacterType => Type.CHAR_TYPE
+    case StringType => Type.getType(classOf[String])
+    // TODO: Undefined, UserDefined
+  }
   
   def generateExpression(expression: Expression, mv: MethodVisitor, module: OberonModule): Unit = expression match {
       case IntValue(v) => mv.visitLdcInsn(v)
@@ -45,15 +82,14 @@ object JVMCodeGenerator extends CodeGenerator {
       case StringValue(v) => mv.visitLdcInsn(v)
       case Brackets(exp) => { /* noop */}
       case VarExpression(name) => {
-        // if the variable is in the module constantes
+        // if the variable is in the module constants
         if (module.constants.map(c => c.name).contains(name)) {
-          // TODO: figure how to get correct descriptor
-          // val value = module.constants.find(c => c.name == name).get
-          // getType(value.exp)
-          mv.visitFieldInsn(GETSTATIC, module.name, name, "I")
+          val value = module.constants.find(c => c.name == name).get
+          mv.visitFieldInsn(GETSTATIC, module.name, name, getExpressionType(value.exp).getDescriptor())
         // if the variable is in the module variables
         } else if (module.variables.map(c => c.name).contains(name)) {
-          mv.visitFieldInsn(GETSTATIC, module.name, name, "I")
+          val value = module.variables.find(c => c.name == name).get
+          mv.visitFieldInsn(GETSTATIC, module.name, name, oberonTypeToAsmType(value.variableType).getDescriptor())
         } else {
           // TODO: see how procedures/methods are beign generated then
           // mv.visitVarInsn(_LOAD, getIndex(name))
