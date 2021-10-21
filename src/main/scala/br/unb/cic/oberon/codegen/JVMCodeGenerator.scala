@@ -52,17 +52,10 @@ object JVMCodeGenerator extends CodeGenerator {
     case LTExpression(left, right) => Type.BOOLEAN_TYPE
     case GTEExpression(left, right) => Type.BOOLEAN_TYPE
     case LTEExpression(left, right) => Type.BOOLEAN_TYPE
-    case AddExpression(left, right) => getNumberExpressionType(left, right)
-    case SubExpression(left, right) => getNumberExpressionType(left, right)
-    case MultExpression(left, right) => getNumberExpressionType(left, right)
-    case DivExpression(left, right) => getNumberExpressionType(left, right)
-  }
-
-  def getNumberExpressionType(left: Expression, right: Expression): asm.Type = {
-    val leftType = getExpressionType(left)
-    val rightType = getExpressionType(right)
-    if (leftType == Type.FLOAT_TYPE || rightType == Type.FLOAT_TYPE) return Type.FLOAT_TYPE
-    else return Type.INT_TYPE
+    case AddExpression(left, right) => Type.INT_TYPE
+    case SubExpression(left, right) => Type.INT_TYPE
+    case MultExpression(left, right) => Type.INT_TYPE
+    case DivExpression(left, right) => Type.INT_TYPE
   }
 
   def oberonTypeToAsmType(t: ast.Type) = t match {
