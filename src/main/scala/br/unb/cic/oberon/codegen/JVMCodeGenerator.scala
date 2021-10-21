@@ -23,7 +23,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //  generateMainMethod if the module.stmt
     //  is defined.
 
-    generateMainMethod(cw)
+    generateMainMethod(cw, module)
 
     //  TODO: this is code bellow is safer.
     //    if(module.stmt.isDefined) {
@@ -37,33 +37,48 @@ object JVMCodeGenerator extends CodeGenerator {
 
   }
   
-  def generateExpression(expression: Expression, mv: MethodVisitor): Unit = expression match {
+  def generateExpression(expression: Expression, mv: MethodVisitor, module: OberonModule): Unit = expression match {
       case IntValue(v) => mv.visitLdcInsn(v)
       case RealValue(v) => mv.visitLdcInsn(v)
       case CharValue(v) => mv.visitLdcInsn(v)
       case BoolValue(v) => mv.visitLdcInsn(v)
       case StringValue(v) => mv.visitLdcInsn(v)
       case Brackets(exp) => { /* noop */}
-      case EQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPNE)
-      case NEQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPEQ)
-      case GTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLE)
-      case LTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGE)
-      case GTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLT)
-      case LTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGT)
-      case AddExpression(left, right) => generateBinExpression(left, right, mv, IADD)
-      case SubExpression(left, right) => generateBinExpression(left, right, mv, ISUB)
-      case MultExpression(left, right) => generateBinExpression(left, right, mv, IMUL)
-      case DivExpression(left, right) => generateBinExpression(left, right, mv, IDIV)
+      case VarExpression(name) => {
+        // if the variable is in the module constantes
+        if (module.constants.map(c => c.name).contains(name)) {
+          // TODO: figure how to get correct descriptor
+          // val value = module.constants.find(c => c.name == name).get
+          // getType(value.exp)
+          mv.visitFieldInsn(GETSTATIC, module.name, name, "I")
+        // if the variable is in the module variables
+        } else if (module.variables.map(c => c.name).contains(name)) {
+          mv.visitFieldInsn(GETSTATIC, module.name, name, "I")
+        } else {
+          // TODO: see how procedures/methods are beign generated then
+          // mv.visitVarInsn(_LOAD, getIndex(name))
+        }
+      }
+      case EQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPNE, module)
+      case NEQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPEQ, module)
+      case GTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLE, module)
+      case LTExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGE, module)
+      case GTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPLT, module)
+      case LTEExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPGT, module)
+      case AddExpression(left, right) => generateBinExpression(left, right, mv, IADD, module)
+      case SubExpression(left, right) => generateBinExpression(left, right, mv, ISUB, module)
+      case MultExpression(left, right) => generateBinExpression(left, right, mv, IMUL, module)
+      case DivExpression(left, right) => generateBinExpression(left, right, mv, IDIV, module)
       case AndExpression(left, right) => {
         val falseLabel = new Label()
         val endLabel = new Label()
 
         /** coloca falso na pilha se a primeira expressão já for falsa */
-        generateExpression(left, mv)
+        generateExpression(left, mv, module)
         mv.visitJumpInsn(IFEQ, falseLabel)
 
         /** verifica a segunda expressão */
-        generateExpression(right, mv)
+        generateExpression(right, mv, module)
         mv.visitJumpInsn(IFEQ, falseLabel)
 
         /** coloca true na pilha se ambas passaram nos testes */
@@ -81,11 +96,11 @@ object JVMCodeGenerator extends CodeGenerator {
         val endLabel = new Label()
 
         /** coloca true na pilha se a primeira expressão já for verdadeira */
-        generateExpression(left, mv)
+        generateExpression(left, mv, module)
         mv.visitJumpInsn(IFNE, trueLabel)
 
         /** verifica a segunda expressão */
-        generateExpression(right, mv)
+        generateExpression(right, mv, module)
         mv.visitJumpInsn(IFNE, trueLabel)
 
         /** coloca true na pilha se ambas passaram nos testes */
@@ -100,18 +115,18 @@ object JVMCodeGenerator extends CodeGenerator {
       }
   }
 
-  def generateBinExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
-    generateExpression(left, mv)
-    generateExpression(right, mv)
+  def generateBinExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int, module: OberonModule): Unit = {
+    generateExpression(left, mv, module)
+    generateExpression(right, mv, module)
     mv.visitInsn(opcode)
   }
 
-  def generateRelExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int): Unit = {
+  def generateRelExpression(left: Expression, right: Expression, mv: MethodVisitor, opcode: Int, module: OberonModule): Unit = {
     val falseLabel = new Label()
     val endLabel = new Label()
 
-    generateExpression(left, mv)
-    generateExpression(right, mv)
+    generateExpression(left, mv, module)
+    generateExpression(right, mv, module)
 
     /** se as expressões forem diferentes, pule para o 0 */
     mv.visitJumpInsn(opcode, falseLabel)
@@ -130,8 +145,8 @@ object JVMCodeGenerator extends CodeGenerator {
   def generateVariables(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
     variables.foreach((v : VariableDeclaration) =>
       v.variableType match {
-        case IntegerType =>  cw.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
-        case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
+        case IntegerType =>  cw.visitField(ACC_PUBLIC + ACC_STATIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
+        case BooleanType => cw.visitField(ACC_PUBLIC + ACC_STATIC, v.name, "Z", null, false).visitEnd()
       }
     )
   }
@@ -147,10 +162,10 @@ object JVMCodeGenerator extends CodeGenerator {
 
         v match {
           case IntValue (value) => {
-            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, value).visitEnd();
+            cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, constant.name, "I", null, value).visitEnd();
           }
           case BoolValue (value) => {
-            cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
+            cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, constant.name, "Z", null, value).visitEnd();
           }
         }
     }
@@ -171,7 +186,7 @@ object JVMCodeGenerator extends CodeGenerator {
    *  ASM library. It is still too low level. A fluent
    *  API might be an interesting choice.
    */
-  def generateMainMethod(cw: ClassWriter): Unit = {
+  def generateMainMethod(cw: ClassWriter, module: OberonModule): Unit = {
     //
     // method declaration:
     //  public static void main(String[])
@@ -192,7 +207,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //
     // mv.visitLdcInsn("Hello world")
 
-    generateExpression(new AndExpression(new OrExpression(new BoolValue(false), new BoolValue(true)), new BoolValue(true)), mv)
+    generateExpression(new VarExpression("x"), mv, module)
 
     //
     // we make a call to the println method of the PrintStream
@@ -204,7 +219,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Boolean])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Int])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
