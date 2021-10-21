@@ -17,6 +17,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case RealValue(_) => Some(RealType)
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
+    case SetValue(_) => Some(SetType)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
     case EQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
