@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
-import br.unb.cic.oberon.visitor.{OberonVisitorAdapter}
+import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
 class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorAdapter {
   type T = Option[Type]
@@ -15,7 +15,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case Brackets(exp) => exp.accept(this)
     case IntValue(_) => Some(IntegerType)
     case RealValue(_) => Some(RealType)
-     case CharValue(_) => Some(CharacterType)
+    case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
@@ -95,6 +95,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case ReadIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadShortIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadCharStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
+    case ReadSetStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared"))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
   }
 
