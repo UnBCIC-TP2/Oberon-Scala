@@ -18,6 +18,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
     case StringValue(_) => Some(StringType)
+    case NullValue => Some(NullType)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
     case EQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
@@ -47,8 +48,22 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
             if(attribute.isDefined) Some(attribute.get.variableType) else None
           } else None
         }
+        case RecordType(variables) => {
+          val attribute = variables.find(v => v.name.equals(attributeName))
+          if(attribute.isDefined) Some(attribute.get.variableType) else None
+        }
         case _ => None
       }
+    }
+
+    case PointerAccessExpression(name) => {
+      //verifica se p está definido. busca o tipo de p e aceita o visitor de expressão. o tipo de p
+      //é PointerType(baseType)
+      if(typeChecker.env.lookup(name).isDefined) {
+        val pointerType = typeChecker.env.lookup(name).get
+        Some(pointerType.variableType)
+      }
+      else None
     }
   }
 
@@ -79,6 +94,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
+    case EAssignmentStmt(_, _) => visitEAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
@@ -107,6 +123,29 @@ class TypeChecker extends OberonVisitorAdapter {
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
+  }
+
+  private def visitEAssignment(stmt: Statement) = stmt match {
+    case EAssignmentStmt(designator, exp) => {
+      designator.get match {
+        case VarAssignment(varName) => 
+              if (env.lookup(varName).isDefined) {
+                if (exp.accept(expVisitor).isDefined)
+                  List()
+                else List((stmt, s"Expression $exp is ill typed"))
+              }
+        //TODO
+        // case ArrayAssignment(array, elem) => 
+        // case RecordAssignment(record, atrib) => 
+        case PointerAssignment(pointerName) =>
+              if (env.lookup(pointerName).isDefined) {
+                if (exp.accept(expVisitor).isDefined)
+                  List()
+                else List((stmt, s"Expression $exp is ill typed"))
+              }
+              else List((stmt, s"Variable $v not declared"))
+        } 
+      }
   }
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {

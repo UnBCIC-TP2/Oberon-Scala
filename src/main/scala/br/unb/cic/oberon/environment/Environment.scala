@@ -19,6 +19,7 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  */
 class Environment[T] {
   type Location = Integer
+  private val top_location = 0
   private val locations = Map.empty[Location, T]
   private val global = Map.empty[String, Location]
   private val stack = Stack.empty[Map[String, Location]]
@@ -27,51 +28,46 @@ class Environment[T] {
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def generateLocation(): Integer = {
-    val i = 0
-    while true:
-      if (!(locations.keySet contains i)){
-        return i
-      }
-      i += 1
-  }
+  def incmtLocation(): Unit = { top_location += 1 }
 
   def setGlobalVariable(name: String, value: T): Unit = {
-    val loc = generateLocation()
-    global += name -> loc
-    locations += loc -> value
+    incmtLocation()
+    global += name -> top_location
+    locations += top_location -> value
   }
 
-    def addUserDefinedType(userType: UserDefinedType) : Unit = {
-      userDefinedTypes += userDefinedTypeName(userType) -> userType
-      userType.baseType match {
-        case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
-        case _ => ???
-      }
+  def addUserDefinedType(userType: UserDefinedType) : Unit = {
+    userDefinedTypes += userDefinedTypeName(userType) -> userType
+    userType.baseType match {
+      case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
+      case _ => ???
+    }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
     if(stack.isEmpty) {
       stack.push(Map.empty[String, T])
     }
-    val loc = generateLocation()
-    stack.top += name -> loc
-    locations += loc -> value
+    incmtLocation()
+    stack.top += name -> top_location
+    locations += top_location -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
     if(stack.nonEmpty && stack.top.contains(name)) {
-      setLocalVariable(name, value)
+      // setLocalVariable(name, value)
+      locations(stack.top(name)) = value
     }
     else if(global.contains(name)) {
-      setGlobalVariable(name, value)
+      // setGlobalVariable(name, value)
+      locations(global(name)) = value
     }
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
   def lookup(name: String) : Option[T] = {
-    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
-    else if(global.contains(name)) Some(global(name))
+    if(stack.nonEmpty && stack.top.contains(name)) Some(locations(stack.top(name)))
+    else if(global.contains(name)) Some(locations(global(name)))
     else None
   }
 
