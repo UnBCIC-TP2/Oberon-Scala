@@ -17,7 +17,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case RealValue(_) => Some(RealType)
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
-    case SetValue(_) => Some(SetType)
+    case SetValue(value) => computeSetElementType(value)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
     case EQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
@@ -52,6 +52,24 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     }
   }
 
+  def computeSetElementType(value: Set[Element]) : Option[Type] = {
+    value.foreach(element => element match {
+      case SingleBasedElement(exp) =>
+        if(exp.accept(this).contains(IntegerType)) {
+        } else {
+          None
+        }
+      case RangeBasedElement(left, right) =>
+        if(computeBinExpressionType(left, right, IntegerType, IntegerType).contains(IntegerType)){
+        } else {
+          None
+        }
+    })
+
+    // If gets here then theres only integertype elements
+    Some(SetType)
+  }
+
   def computeBinExpressionType(left: Expression, right: Expression, expected: Type, result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
@@ -75,6 +93,11 @@ class TypeChecker extends OberonVisitorAdapter {
 
     if(module.stmt.isDefined) module.stmt.get.accept(this)
     else List()
+  }
+
+  override def visit(element: Element) = element match {
+    case SingleBasedElement(exp) => if(exp.accept(expVisitor).isDefined) List() else List((element, s"Element $element is ill typed"))
+
   }
 
   override def visit(stmt: Statement) = stmt match {
