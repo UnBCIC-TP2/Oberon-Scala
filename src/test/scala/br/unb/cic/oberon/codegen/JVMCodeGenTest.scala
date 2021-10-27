@@ -15,12 +15,6 @@ import br.unb.cic.oberon.ast._
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.util._
 
-class StubClassLoader extends ClassLoader {
-  def getClass(name: String, b: Array[Byte]): Class[_] = {
-    return defineClass(name, b, 0, b.length);
-  }
-}
-
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
