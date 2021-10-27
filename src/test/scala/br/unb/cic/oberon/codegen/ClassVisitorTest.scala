@@ -10,8 +10,8 @@ class ClassVisitorTest(version: Integer) extends ClassVisitor(version) {
   var numberOfIntegerConstants: Integer = 0;
   var numberOfBooleanConstants: Integer = 0;
 
-  val VAR: Int = ACC_PUBLIC;
-  val CONST: Int = ACC_PUBLIC + ACC_FINAL;
+  val VAR: Int = ACC_PUBLIC + ACC_STATIC;
+  val CONST: Int = ACC_PUBLIC + ACC_FINAL + ACC_STATIC;
 
   override def visitField(access: Int, name: String, desc: String, signature: String, value: Any): FieldVisitor = {
     numberOfTotalFields += 1;

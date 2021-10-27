@@ -360,7 +360,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     val p = new Textifier()
     val cv = new TraceMethodVisitor(mv, p)
 
-    codeGen.generateExpression(expr, cv)
+    codeGen.generateExpression(expr, cv, null)
 
     mv.visitInsn(RETURN)
     mv.visitMaxs(2, 0) 
