@@ -18,25 +18,6 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Type._
 
 class JVMCodeGenTest extends AnyFunSuite {
-  def visitExpressionMethod(expression: Expression, cw: ClassWriter, name: String, returnType: asm.Type): Unit = {
-    val codeGen = JVMCodeGenerator
-
-    val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, name, "()" + returnType.getDescriptor(), null, null)
-    mv.visitCode()
-    codeGen.generateExpression(expression, mv, null)
-
-    mv.visitInsn(returnType match {
-      case BOOLEAN_TYPE => IRETURN
-      case CHAR_TYPE => IRETURN
-      case INT_TYPE => IRETURN
-      case FLOAT_TYPE => FRETURN
-      case VOID_TYPE => RETURN
-    })
-
-    mv.visitMaxs(0, 0) 
-    mv.visitEnd()
-  }
-
   test("Generate code with fields of simple01.oberon") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
 
@@ -371,7 +352,9 @@ class JVMCodeGenTest extends AnyFunSuite {
     val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
 
-    visitExpressionMethod(IntValue(1), cw, "one", INT_TYPE)
+    visitExpressionMethod(IntValue(-1), cw, "int1", INT_TYPE)
+    visitExpressionMethod(IntValue(1), cw, "int2", INT_TYPE)
+    visitExpressionMethod(IntValue(10), cw, "int3", INT_TYPE)
 
     cw.visitEnd()
 
@@ -380,15 +363,318 @@ class JVMCodeGenTest extends AnyFunSuite {
     val stubClassLoader = new StubClassLoader()
     val c = stubClassLoader.getClass("test", b)
 
-    assert(1 == c.getDeclaredMethod("one").invoke(null))
+    assert(-1 == c.getDeclaredMethod("int1").invoke(null))
+    assert(1 == c.getDeclaredMethod("int2").invoke(null))
+    assert(10 == c.getDeclaredMethod("int3").invoke(null))
+  }
+
+  test("Generate real expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(RealValue(0.0), cw, "real1", DOUBLE_TYPE)
+    visitExpressionMethod(RealValue(1.0), cw, "real2", DOUBLE_TYPE)
+    visitExpressionMethod(RealValue(1.5), cw, "real3", DOUBLE_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(0.0 == c.getDeclaredMethod("real1").invoke(null))
+    assert(1.0 == c.getDeclaredMethod("real2").invoke(null))
+    assert(1.5 == c.getDeclaredMethod("real3").invoke(null))
+  }
+
+  test("Generate char expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(CharValue('a'), cw, "charExpression", CHAR_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert('a' == c.getDeclaredMethod("charExpression").invoke(null))
+  }
+
+  test("Generate boolean expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(BoolValue(true), cw, "trueExpression", returnType = BOOLEAN_TYPE)
+    visitExpressionMethod(BoolValue(false), cw, "falseExpression", returnType = BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(true == c.getDeclaredMethod("trueExpression").invoke(null))
+    assert(false == c.getDeclaredMethod("falseExpression").invoke(null))
+  }
+
+  test("Generate string expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(StringValue("Lorem ipsum"), cw, "stringExpression", asm.Type.getType(classOf[String]))
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert("Lorem ipsum" == c.getDeclaredMethod("stringExpression").invoke(null))
+  }
+
+  test("Generate constant var expression") {
+    val constant = Constant("x", IntValue(5))
+    val module = OberonModule("test", null, null, List(constant), List(), List(), None)
+    val codeGen = JVMCodeGenerator
+
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+    codeGen.generateConstants(module.constants, cw)
+
+    val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "varExpression", "()I", null, null)
+
+    mv.visitCode()
+
+    codeGen.generateExpression(VarExpression("x"), mv, module)
+
+    mv.visitInsn(IRETURN)
+
+    mv.visitMaxs(0, 0) 
+    mv.visitEnd()
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(5 == c.getDeclaredMethod("varExpression").invoke(null))
   }
 
   test("Generate EQ expression") {
     val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
 
-    visitExpressionMethod(EQExpression(IntValue(10), IntValue(10)), cw, "trueMethod", BOOLEAN_TYPE)
-    visitExpressionMethod(EQExpression(IntValue(10), IntValue(9)), cw, "falseMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(LTExpression(IntValue(10), IntValue(5)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(EQExpression(IntValue(10), IntValue(10)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(EQExpression(IntValue(5), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(false == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+
+  test("Generate NEQ expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(NEQExpression(IntValue(10), IntValue(9)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(NEQExpression(IntValue(10), IntValue(10)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(NEQExpression(IntValue(9), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(true == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+
+   test("Generate GT expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(GTExpression(IntValue(10), IntValue(9)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(GTExpression(IntValue(10), IntValue(10)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(GTExpression(IntValue(9), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(true == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+
+  test("Generate LT expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(LTExpression(IntValue(10), IntValue(5)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(LTExpression(IntValue(5), IntValue(5)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(LTExpression(IntValue(5), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(false == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+
+  test("Generate GTE expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(GTEExpression(IntValue(10), IntValue(9)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(GTEExpression(IntValue(10), IntValue(10)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(GTEExpression(IntValue(9), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(true == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(false == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+
+  test("Generate LTE expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(LTEExpression(IntValue(10), IntValue(9)), cw, "greaterMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(LTEExpression(IntValue(10), IntValue(10)), cw, "equalMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(LTEExpression(IntValue(9), IntValue(10)), cw, "lessMethod", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(false == c.getDeclaredMethod("greaterMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("equalMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("lessMethod").invoke(null))
+  }
+  
+
+  test("Generate Add expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(AddExpression(IntValue(4), IntValue(5)), cw, "add1", INT_TYPE)
+    visitExpressionMethod(AddExpression(IntValue(3), IntValue(-1)), cw, "add2", INT_TYPE)
+    visitExpressionMethod(AddExpression(IntValue(-1), IntValue(-2)), cw, "add3", INT_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(9 == c.getDeclaredMethod("add1").invoke(null))
+    assert(2 == c.getDeclaredMethod("add2").invoke(null))
+    assert(-3 == c.getDeclaredMethod("add3").invoke(null))
+  }
+
+   test("Generate Sub expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(SubExpression(IntValue(4), IntValue(2)), cw, "sub1", INT_TYPE)
+    visitExpressionMethod(SubExpression(IntValue(3), IntValue(-1)), cw, "sub2", INT_TYPE)
+    visitExpressionMethod(SubExpression(IntValue(-1), IntValue(-2)), cw, "sub3", INT_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(2 == c.getDeclaredMethod("sub1").invoke(null))
+    assert(4 == c.getDeclaredMethod("sub2").invoke(null))
+    assert(1 == c.getDeclaredMethod("sub3").invoke(null))
+  }
+
+   test("Generate Mult expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(MultExpression(IntValue(4), IntValue(5)), cw, "mult1", INT_TYPE)
+    visitExpressionMethod(MultExpression(IntValue(2), IntValue(10)), cw, "mult2", INT_TYPE)
+    visitExpressionMethod(MultExpression(IntValue(3), IntValue(7)), cw, "mult3", INT_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(20 == c.getDeclaredMethod("mult1").invoke(null))
+    assert(20 == c.getDeclaredMethod("mult2").invoke(null))
+    assert(21 == c.getDeclaredMethod("mult3").invoke(null))
+  }
+
+  test("Generate Div expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(DivExpression(IntValue(1), IntValue(2)), cw, "div1", INT_TYPE)
+    visitExpressionMethod(DivExpression(IntValue(4), IntValue(2)), cw, "div2", INT_TYPE)
+    visitExpressionMethod(DivExpression(IntValue(9), IntValue(3)), cw, "div3", INT_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(0 == c.getDeclaredMethod("div1").invoke(null))
+    assert(2 == c.getDeclaredMethod("div2").invoke(null))
+    assert(3 == c.getDeclaredMethod("div3").invoke(null))
+  }
+
+  test("Generate And expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(true)), cw, "trueMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(false)), cw, "falseMethod", BOOLEAN_TYPE)
 
     cw.visitEnd()
 
@@ -400,23 +686,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(true == c.getDeclaredMethod("trueMethod").invoke(null))
     assert(false == c.getDeclaredMethod("falseMethod").invoke(null))
   }
-
-  test("Generate add expression") {
-    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
-
-    visitExpressionMethod(AddExpression(IntValue(1), IntValue(2)), cw, "add", INT_TYPE)
-
-    cw.visitEnd()
-
-    val b = cw.toByteArray()
-
-    val stubClassLoader = new StubClassLoader()
-    val c = stubClassLoader.getClass("test", b)
-
-    assert(3 == c.getDeclaredMethod("add").invoke(null))
-  }
-
+  
   /*
    * Creates (or override) a class file
    * @param name name of the class file
@@ -430,5 +700,30 @@ class JVMCodeGenTest extends AnyFunSuite {
       Files.delete(classFile)
     }
     Files.createFile(classFile)
+  }
+
+  /**
+   * Create a method with an expression that returns it's result
+   */
+  def visitExpressionMethod(expression: Expression, cw: ClassWriter, name: String, returnType: asm.Type): Unit = {
+    val codeGen = JVMCodeGenerator
+
+    val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, name, "()" + returnType.getDescriptor(), null, null)
+    mv.visitCode()
+    codeGen.generateExpression(expression, mv, null)
+
+    mv.visitInsn(returnType match {
+      case BOOLEAN_TYPE => IRETURN
+      case CHAR_TYPE => IRETURN
+      case INT_TYPE => IRETURN
+      case DOUBLE_TYPE => DRETURN
+      case FLOAT_TYPE => FRETURN
+      case VOID_TYPE => RETURN
+      // FIXME: change _ to a matcher for OBJECT_TYPE
+      case _ => ARETURN
+    })
+
+    mv.visitMaxs(0, 0) 
+    mv.visitEnd()
   }
 }
