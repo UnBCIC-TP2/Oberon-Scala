@@ -26,7 +26,7 @@ object JVMCodeGenerator extends CodeGenerator {
     //  generateMainMethod if the module.stmt
     //  is defined.
 
-    generateMainMethod(cw, module)
+    generateMainMethod(cw)
 
     //  TODO: this is code bellow is safer.
     //    if(module.stmt.isDefined) {
@@ -224,7 +224,7 @@ object JVMCodeGenerator extends CodeGenerator {
    *  ASM library. It is still too low level. A fluent
    *  API might be an interesting choice.
    */
-  def generateMainMethod(cw: ClassWriter, module: OberonModule): Unit = {
+  def generateMainMethod(cw: ClassWriter): Unit = {
     //
     // method declaration:
     //  public static void main(String[])
@@ -265,7 +265,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitInsn(RETURN)
 
     // please, read Section 3.2 of the ASM tutorial
-    mv.visitMaxs(2, 0) // it also closes the '}'
+    mv.visitMaxs(0, 0) // it also closes the '}'
 
     mv.visitEnd()
   }
