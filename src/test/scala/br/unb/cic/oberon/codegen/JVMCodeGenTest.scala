@@ -673,8 +673,10 @@ class JVMCodeGenTest extends AnyFunSuite {
     val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
 
-    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(true)), cw, "trueMethod", BOOLEAN_TYPE)
-    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(false)), cw, "falseMethod", BOOLEAN_TYPE)
+    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(true)), cw, "and1", BOOLEAN_TYPE)
+    visitExpressionMethod(AndExpression(BoolValue(true), BoolValue(false)), cw, "and2", BOOLEAN_TYPE)
+    visitExpressionMethod(AndExpression(BoolValue(false), BoolValue(true)), cw, "and3", BOOLEAN_TYPE)
+    visitExpressionMethod(AndExpression(BoolValue(false), BoolValue(false)), cw, "and4", BOOLEAN_TYPE)
 
     cw.visitEnd()
 
@@ -683,8 +685,32 @@ class JVMCodeGenTest extends AnyFunSuite {
     val stubClassLoader = new StubClassLoader()
     val c = stubClassLoader.getClass("test", b)
 
-    assert(true == c.getDeclaredMethod("trueMethod").invoke(null))
-    assert(false == c.getDeclaredMethod("falseMethod").invoke(null))
+    assert(true == c.getDeclaredMethod("and1").invoke(null))
+    assert(false == c.getDeclaredMethod("and2").invoke(null))
+    assert(false == c.getDeclaredMethod("and3").invoke(null))
+    assert(false == c.getDeclaredMethod("and4").invoke(null))
+  }
+
+  test("Generate Or expression") {
+    val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
+
+    visitExpressionMethod(OrExpression(BoolValue(true), BoolValue(true)), cw, "or1", BOOLEAN_TYPE)
+    visitExpressionMethod(OrExpression(BoolValue(true), BoolValue(false)), cw, "or2", BOOLEAN_TYPE)
+    visitExpressionMethod(OrExpression(BoolValue(false), BoolValue(true)), cw, "or3", BOOLEAN_TYPE)
+    visitExpressionMethod(OrExpression(BoolValue(false), BoolValue(false)), cw, "or4", BOOLEAN_TYPE)
+
+    cw.visitEnd()
+
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(true == c.getDeclaredMethod("or1").invoke(null))
+    assert(true == c.getDeclaredMethod("or2").invoke(null))
+    assert(true == c.getDeclaredMethod("or3").invoke(null))
+    assert(false == c.getDeclaredMethod("or4").invoke(null))
   }
   
   /*
