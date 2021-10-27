@@ -255,7 +255,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Float])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[String])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
