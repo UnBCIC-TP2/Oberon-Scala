@@ -15,6 +15,12 @@ import br.unb.cic.oberon.ast._
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.util._
 
+class StubClassLoader extends ClassLoader {
+  def getClass(name: String, b: Array[Byte]): Class[_] = {
+    return defineClass(name, b, 0, b.length);
+  }
+}
+
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
@@ -352,23 +358,23 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     cw.visit(V1_5, ACC_PUBLIC, "test", null, "java/lang/Object", null);
-    val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null)
+    val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "()I", null, null)
     mv.visitCode()  
 
-    val expr = IntValue(1)
+    codeGen.generateExpression(IntValue(1), mv, null)
 
-    val p = new Textifier()
-    val cv = new TraceMethodVisitor(mv, p)
-
-    codeGen.generateExpression(expr, cv, null)
-
-    mv.visitInsn(RETURN)
+    mv.visitInsn(IRETURN)
     mv.visitMaxs(2, 0) 
     mv.visitEnd()
 
     cw.visitEnd()
 
-    assert(p.getText().get(0).toString().matches(".*LDC 1.*\n"))
+    val b = cw.toByteArray()
+
+    val stubClassLoader = new StubClassLoader()
+    val c = stubClassLoader.getClass("test", b)
+
+    assert(1 == c.getDeclaredMethod("main").invoke(null))
   }
 
   /*
