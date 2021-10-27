@@ -11,6 +11,10 @@ import jdk.internal.org.objectweb.asm.Opcodes._
 import jdk.internal.org.objectweb.asm._
 import java.io.File
 
+import br.unb.cic.oberon.interpreter._
+import br.unb.cic.oberon.ast._
+import java.io.PrintStream
+
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
@@ -336,22 +340,72 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     cr.accept(v, 0);
 
-    assert(1 == v.numberOfTotalFields);
+    assert(2 == v.numberOfTotalFields);
     assert(0 == v.numberOfIntegerConstants);
-    assert(1 == v.numberOfIntegerVariables);
+    assert(0 == v.numberOfIntegerVariables);
     assert(0 == v.numberOfBooleanVariables);
     assert(0 == v.numberOfBooleanConstants);
   }
 
+  test("Generate bytecode from records"){
+
+    val path = Paths.get(getClass.getClassLoader.getResource("records/record_1_simples.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "simple_record")
+    assert(module.variables.size == 2)
+    assert(module.constants.size == 0)
+    assert(module.userTypes.size == 2)
+
+    val codeGen = GenerateClassFromRecord
+    // var recordClassString = new String;
+
+    // val record_name_and_bytecode
+    // usa pattern matching para obter um record 
+    //  (o único record do arquivo oberon, ou o último, caso tenha mais de um record)
+    // module.userTypes.foreach((userDefinedTypes : UserDefinedType) =>
+    //   userDefinedTypes match {
+    //     case r: RecordType => val record_name_and_bytecode = codeGen.generateCode(r);
+    //     case a: ArrayType => null;
+    //   }
+    // )
+
+    var record_name_and_bytecode = codeGen.generateCode(module.userTypes.head.asInstanceOf[RecordType])
+
+    val bytecode = record_name_and_bytecode._2
+
+    val out = new FileOutputStream(createOutputFile(record_name_and_bytecode._1).toFile)
+
+    out.write(bytecode)
+
+    val cr = new ClassReader(bytecode);
+
+    val v = new ClassVisitorTest(ASM4);
+
+    // record dentro de record
+    // fazer mais testes (checar differentes atributos)
+    // resolver target;out -> done
+
+    cr.accept(v, 0);
+
+    assert(3 == v.numberOfTotalFields);
+    assert(2 == v.numberOfIntegerVariables);
+    assert(1 == v.numberOfBooleanVariables);
+
+  }
   /*
    * Creates (or override) a class file
    * @param name name of the class file
    * @return the relative Path to the class file.
    */
   def createOutputFile(name: String) = {
-    val base = Paths.get("target" + File.pathSeparator + "out")
+    val base = Paths.get("target" + File.separator + "out")
     Files.createDirectories(base)
-    val classFile = Paths.get("target" + File.pathSeparator +  "out" + File.pathSeparator + name + ".class")
+    val classFile = Paths.get("target" + File.separator +  "out" + File.separator + name + ".class")
     if(Files.exists(classFile)) {
       Files.delete(classFile)
     }
