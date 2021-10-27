@@ -68,24 +68,33 @@ object JVMCodeGenerator extends CodeGenerator {
   }
   
   def generateExpression(expression: Expression, mv: MethodVisitor, module: OberonModule): Unit = expression match {
-      case IntValue(v) => mv.visitLdcInsn(v)
-      case RealValue(v) => mv.visitLdcInsn(v)
+      case IntValue(v) => {
+        if (v >= -1 && v <= 5) mv.visitInsn(ICONST_0 + v) // Instructions ICONST_M1, ICONST_0, ..., ICONST_5
+        else mv.visitLdcInsn(v)
+      }
+      case RealValue(v) => v match {
+        case 0.0 => mv.visitInsn(DCONST_0)
+        case 1.0 => mv.visitInsn(DCONST_1)
+        case other => mv.visitLdcInsn(other)
+      }
       case CharValue(v) => mv.visitLdcInsn(v)
-      case BoolValue(v) => mv.visitLdcInsn(v)
+      case BoolValue(v) => v match {
+        case true => mv.visitInsn(ICONST_1)
+        case false => mv.visitInsn(ICONST_0)
+      }
       case StringValue(v) => mv.visitLdcInsn(v)
       case Brackets(exp) => { /* noop */}
-      case VarExpression(name) => {
-        // if the variable is in the module constants
-        if (module.constants.map(c => c.name).contains(name)) {
-          val value = module.constants.find(c => c.name == name).get
-          mv.visitFieldInsn(GETSTATIC, module.name, name, getExpressionType(value.exp).getDescriptor())
-        // if the variable is in the module variables
-        } else if (module.variables.map(c => c.name).contains(name)) {
-          val value = module.variables.find(c => c.name == name).get
-          mv.visitFieldInsn(GETSTATIC, module.name, name, oberonTypeToAsmType(value.variableType).getDescriptor())
-        } else {
-          // TODO: see how procedures/methods are beign generated then
-          // mv.visitVarInsn(_LOAD, getIndex(name))
+      case VarExpression(name) => module.constants.find(c => c.name == name) match {
+        // if variable is in the module constants
+        case Some(value) => mv.visitFieldInsn(GETSTATIC, module.name, name, getExpressionType(value.exp).getDescriptor())
+        case None => module.variables.find(c => c.name == name) match {
+          // if variable is in the module variables 
+          case Some(value) => mv.visitFieldInsn(GETSTATIC, module.name, name, oberonTypeToAsmType(value.variableType).getDescriptor())
+          // else is in the local variable array (procedure variables)
+          case None => {
+            // TODO: see how procedures/methods are beign generated then
+            // mv.visitVarInsn(_LOAD, getIndex(name))
+          }
         }
       }
       case EQExpression(left, right) => generateRelExpression(left, right, mv, IF_ICMPNE, module)
@@ -234,9 +243,7 @@ object JVMCodeGenerator extends CodeGenerator {
     // loads the String constant "Hello world" and
     // pushes it into the stack.
     //
-    // mv.visitLdcInsn("Hello world")
-
-    generateExpression(new VarExpression("x"), mv, module)
+    mv.visitLdcInsn("Hello world")
 
     //
     // we make a call to the println method of the PrintStream
@@ -248,7 +255,7 @@ object JVMCodeGenerator extends CodeGenerator {
     mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
       Type.getInternalName(classOf[PrintStream]),    // the base class of the method
       "println",                              // the name of the method.
-      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Int])), // the method descriptor
+      Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[Float])), // the method descriptor
       false)                               // if this method comes from an interface
 
     //
