@@ -18,22 +18,20 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
-  type Location = Integer
-  private val top_location = 0
-  private val locations = Map.empty[Location, T]
-  private val global = Map.empty[String, Location]
-  private val stack = Stack.empty[Map[String, Location]]
+  private var loc = 0
+  private var top_loc = new(T)
+  private val locations = Map.empty[T, T]
+  private val global = Map.empty[String, T]
+  private val stack = Stack.empty[Map[String, T]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def incmtLocation(): Unit = { top_location += 1 }
-
   def setGlobalVariable(name: String, value: T): Unit = {
-    incmtLocation()
-    global += name -> top_location
-    locations += top_location -> value
+    loc += 1
+    global += name -> top_loc
+    locations += top_loc -> value
   }
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
@@ -48,18 +46,16 @@ class Environment[T] {
     if(stack.isEmpty) {
       stack.push(Map.empty[String, T])
     }
-    incmtLocation()
-    stack.top += name -> top_location
-    locations += top_location -> value
+    loc += 1
+    stack.top += name -> top_loc
+    locations += top_loc -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
     if(stack.nonEmpty && stack.top.contains(name)) {
-      // setLocalVariable(name, value)
       locations(stack.top(name)) = value
     }
     else if(global.contains(name)) {
-      // setGlobalVariable(name, value)
       locations(global(name)) = value
     }
     else throw new RuntimeException("Variable " + name + " is not defined")

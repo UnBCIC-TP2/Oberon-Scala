@@ -139,11 +139,15 @@ class TypeChecker extends OberonVisitorAdapter {
         // case RecordAssignment(record, atrib) => 
         case PointerAssignment(pointerName) =>
               if (env.lookup(pointerName).isDefined) {
-                if (exp.accept(expVisitor).isDefined)
-                  List()
+                if (exp.accept(expVisitor).isDefined){
+                  if (env.lookup(pointerName).variableType == exp.accept(expVisitor)){
+                    List()
+                  }
+                  else List((stmt, s"Expression $exp doesn't match variable type."))
+                }
                 else List((stmt, s"Expression $exp is ill typed"))
               }
-              else List((stmt, s"Variable $v not declared"))
+              else List((stmt, s"Variable $pointerName not declared"))
         } 
       }
   }

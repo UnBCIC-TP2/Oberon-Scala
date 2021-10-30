@@ -722,4 +722,16 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(errors.size == 0)
   }
 
+
+  test("Test_pointer") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerAccessStmt.oberon")
+
+    visitor = new TypeChecker()
+
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+
+  }
+
 }
