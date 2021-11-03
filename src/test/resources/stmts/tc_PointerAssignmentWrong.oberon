@@ -5,7 +5,11 @@ VAR
   x : INTEGER;
 
 BEGIN
-    p^ := 10
+    x := 10;
+    p^ := 20;
+    x := p;
+    p := x
+    
 END
 
 END pointer.

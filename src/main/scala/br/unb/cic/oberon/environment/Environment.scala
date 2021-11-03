@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Undef, UserDefinedType}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Undef, UserDefinedType, Location}
 
 import scala.collection.mutable.{ListBuffer, Map, Stack}
 
@@ -18,20 +18,19 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
-  private var loc = 0
-  private var top_loc = new(T)
-  private val locations = Map.empty[T, T]
-  private val global = Map.empty[String, T]
-  private val stack = Stack.empty[Map[String, T]]
+  private var top_loc = 0
+  private val locations = Map.empty[Location, T]
+  private val global = Map.empty[String, Location]
+  private val stack = Stack.empty[Map[String, Location]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
   def setGlobalVariable(name: String, value: T): Unit = {
-    loc += 1
-    global += name -> top_loc
-    locations += top_loc -> value
+    top_loc += 1
+    global += name -> Location(top_loc)
+    locations += Location(top_loc) -> value
   }
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
@@ -43,12 +42,12 @@ class Environment[T] {
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
+    top_loc += 1
     if(stack.isEmpty) {
-      stack.push(Map.empty[String, T])
+      stack.push(Map.empty[String, Location])
     }
-    loc += 1
-    stack.top += name -> top_loc
-    locations += top_loc -> value
+    stack.top += name -> Location(top_loc)
+    locations += Location(top_loc) -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
@@ -86,7 +85,7 @@ class Environment[T] {
 
   def findProcedure(name: String): Procedure = procedures(name)
 
-  def push(): Unit = stack.push(Map.empty[String, T])
+  def push(): Unit = stack.push(Map.empty[String, Location])
 
   def pop(): Unit = stack.pop()
 

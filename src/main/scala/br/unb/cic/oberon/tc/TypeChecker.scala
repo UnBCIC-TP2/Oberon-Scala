@@ -57,11 +57,10 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     }
 
     case PointerAccessExpression(name) => {
-      //verifica se p está definido. busca o tipo de p e aceita o visitor de expressão. o tipo de p
-      //é PointerType(baseType)
       if(typeChecker.env.lookup(name).isDefined) {
-        val pointerType = typeChecker.env.lookup(name).get
-        Some(pointerType.variableType)
+        val pointerType = typeChecker.env.lookup(name).get.accept(this).get
+        val PointerType(varType) = pointerType
+        Some(varType)
       }
       else None
     }
@@ -118,39 +117,58 @@ class TypeChecker extends OberonVisitorAdapter {
   private def visitAssignment(stmt: Statement) = stmt match {
     case AssignmentStmt(v, exp) =>
       if (env.lookup(v).isDefined) {
-        if (exp.accept(expVisitor).isDefined)
-          List()
+        if (exp.accept(expVisitor).isDefined){
+          if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get)
+            List((stmt, s"Assignment between different types: $v, $exp"))
+          else List()
+        }
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
   }
 
   private def visitEAssignment(stmt: Statement) = stmt match {
-    case EAssignmentStmt(designator, exp) => {
-      designator.get match {
-        case VarAssignment(varName) => 
-              if (env.lookup(varName).isDefined) {
-                if (exp.accept(expVisitor).isDefined)
-                  List()
-                else List((stmt, s"Expression $exp is ill typed"))
-              }
-        //TODO
-        // case ArrayAssignment(array, elem) => 
-        // case RecordAssignment(record, atrib) => 
-        case PointerAssignment(pointerName) =>
-              if (env.lookup(pointerName).isDefined) {
-                if (exp.accept(expVisitor).isDefined){
-                  if (env.lookup(pointerName).variableType == exp.accept(expVisitor)){
-                    List()
-                  }
-                  else List((stmt, s"Expression $exp doesn't match variable type."))
-                }
-                else List((stmt, s"Expression $exp is ill typed"))
-              }
-              else List((stmt, s"Variable $pointerName not declared"))
-        } 
+    case EAssignmentStmt(designator, exp) => 
+      val varType = visitAssignmentAlternative(designator)
+      if (varType == exp.accept(expVisitor).get){
+        List()
       }
+      else List((stmt, s"Expression $exp doesn't match variable type."))
   }
+
+  private def visitAssignmentAlternative(assignment: AssignmentAlternative) = assignment match {
+    case PointerAssignment(pointerName) => 
+      val pointer = env.lookup(pointerName).get.accept(expVisitor).get
+      val PointerType(varType) = pointer
+      varType
+    case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
+  }
+
+
+
+  //     if (designator == VarAssignment(varName)){
+  //       if (env.lookup(varName).isDefined) {
+  //         if (exp.accept(expVisitor).isDefined)
+  //           List((stmt, s"Sem erro"))
+  //         else List((stmt, s"Expression $exp is ill typed"))
+  //       }
+  //     }
+  //     if (designator == PointerAssignment(pointerName)){
+  //       if (env.lookup(pointerName).isDefined) {
+  //         if (exp.accept(expVisitor).isDefined){
+  //           if (env.lookup(pointerName).get.accept(expVisitor) == exp.accept(expVisitor)){
+  //             List()
+  //           }
+  //           else List((stmt, s"Expression $exp doesn't match variable type."))
+  //         }
+  //         else List((stmt, s"Expression $exp is ill typed"))
+  //       }
+  //       else List((stmt, s"Variable $pointerName not declared"))
+  //     }
+  //       // TODO
+  //       // case ArrayAssignment(array, elem) => 
+  //       // case RecordAssignment(record, atrib) => 
+  // }
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {
     case IfElseStmt(condition, thenStmt, elseStmt) =>
