@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast.{AddExpression, BoolValue, BooleanType, DivExpression, EQExpression, IntValue, IntegerType, SubExpression}
+import br.unb.cic.oberon.ast.{AddExpression, BoolValue, BooleanType, SetType, SetValue, SingleBasedElement, RangeBasedElement, DivExpression, EQExpression, IntValue, IntegerType, SubExpression}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -11,12 +11,19 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
       val val10 = IntValue(10)
       val bTrue = BoolValue(true)
       val bFalse = BoolValue(false)
+      val set = SetValue(Set(
+        SingleBasedElement(IntValue(1)),
+        SingleBasedElement(IntValue(2)),
+        RangeBasedElement(IntValue(5), IntValue(10))
+      ))
 
       assert(val10.accept(visitor) == Some(IntegerType))
 
       assert(bTrue.accept(visitor) == Some(BooleanType))
 
       assert(bFalse.accept(visitor) == Some(BooleanType))
+
+      assert(set.accept(visitor) == Some(SetType))
     }
 
   test("Test expression type on add expressions") {

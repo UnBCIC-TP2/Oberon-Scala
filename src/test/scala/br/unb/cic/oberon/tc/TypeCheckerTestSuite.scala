@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, CharValue, RealValue, BoolValue, BooleanType, ForStmt, IfElseStmt, SetValue, SetType, Element, SingleBasedElement, RangeBasedElement, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
 import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
@@ -720,6 +720,71 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val errors = visitor.visit(module)
 
     assert(errors.size == 0)
+  }
+
+  test("Test an invalid set with char elements") {
+    val visitor = new TypeChecker()
+
+    val stmt01 = AssignmentStmt("x", SetValue(Set(SingleBasedElement(CharValue('c')))))
+    val stmt02 = AssignmentStmt("y", SetValue(Set(RangeBasedElement(CharValue('c'), IntValue(10)))))
+    val stmt03 = AssignmentStmt("z", SetValue(Set(RangeBasedElement(CharValue('c'), CharValue('z')))))
+
+    visitor.env.setGlobalVariable("x", SetType)
+    visitor.env.setGlobalVariable("y", SetType)
+    visitor.env.setGlobalVariable("z", SetType)
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test an invalid set with boolean elements") {
+    val visitor = new TypeChecker()
+
+    val stmt01 = AssignmentStmt("x", SetValue(Set(SingleBasedElement(BoolValue(true)))))
+    val stmt02 = AssignmentStmt("y", SetValue(Set(RangeBasedElement(BoolValue(true), BoolValue(false)))))
+    val stmt03 = AssignmentStmt("z", SetValue(Set(RangeBasedElement(BoolValue(true), IntValue(10)))))
+
+    visitor.env.setGlobalVariable("x", SetType)
+    visitor.env.setGlobalVariable("y", SetType)
+    visitor.env.setGlobalVariable("z", SetType)
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test an invalid set with real elements") {
+    val visitor = new TypeChecker()
+
+    val stmt01 = AssignmentStmt("x", SetValue(Set(SingleBasedElement(RealValue(1.2)))))
+    val stmt02 = AssignmentStmt("y", SetValue(Set(RangeBasedElement(RealValue(1.0), RealValue(6.6)))))
+    val stmt03 = AssignmentStmt("z", SetValue(Set(RangeBasedElement(RealValue(9.22), RealValue(10.0)))))
+
+    visitor.env.setGlobalVariable("x", SetType)
+    visitor.env.setGlobalVariable("y", SetType)
+    visitor.env.setGlobalVariable("z", SetType)
+
+    assert(stmt01.accept(visitor).size == 1)
+    assert(stmt02.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
+  }
+
+  test("Test a valid set") {
+    val visitor = new TypeChecker()
+
+    val stmt02 = AssignmentStmt("x", SetValue(Set(SingleBasedElement(IntValue(10)))))
+    val stmt01 = AssignmentStmt("y", SetValue(Set(RangeBasedElement(IntValue(1), VarExpression("x")))))
+    val stmt03 = AssignmentStmt("z", SetValue(Set(SingleBasedElement(IntValue(10))))) // invalid stmt
+    val stmt04 = AssignmentStmt("x", AddExpression(IntValue(5), SetValue(Set(RangeBasedElement(IntValue(1), IntValue(10)))))) // invalid stmt
+
+    visitor.env.setGlobalVariable("x", SetType)
+    visitor.env.setGlobalVariable("y", SetType)
+
+    assert(stmt01.accept(visitor) == List())
+    assert(stmt02.accept(visitor) == List())
+    assert(stmt03.accept(visitor).size == 1)
+    assert(stmt03.accept(visitor).size == 1)
   }
 
 }
