@@ -1441,21 +1441,20 @@ class ParserTestSuite extends AnyFunSuite {
     val procedure = module.procedures.head
 
     assert(procedure.name == "mult")
-    assert(procedure.args.size == 2)
-    assert(procedure.returnType == Some(IntegerType))
+    assert(procedure.args.size == 3)
+      assert(procedure.returnType == None)
 
     procedure.stmt match {
-      case ReturnStmt(MultExpression(VarExpression("i"), VarExpression("a"))) => succeed
-      case _ => fail("expecting a return i * a stmt")
+      case AssignmentStmt("res", MultExpression(VarExpression("i"), VarExpression("a"))) => succeed
+      case _ => fail("expecting a res = i * a stmt")
     }
 
     assert(module.stmt.get.isInstanceOf[SequenceStmt])
 
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
-    assert(stmt.stmts.head == ReadIntStmt("i"))
-    assert(stmt.stmts(1) == ReadIntStmt("a"))
-    assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("mult", List(VarExpression("i"), VarExpression("a")))))
+    assert(stmt.stmts.head == ReadIntStmt("a"))
+    assert(stmt.stmts(1) == ReadIntStmt("b"))
   }
 
 

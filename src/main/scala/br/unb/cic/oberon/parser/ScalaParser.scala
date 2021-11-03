@@ -153,7 +153,7 @@ class ParserVisitor {
 
   def visitProcedureDeclaration(ctx: OberonParser.ProcedureContext): Procedure = {
     val name = ctx.name.getText
-    val args = ctx.formals().formalArg().asScala.toList.map(formal => visitFormalArg(formal))
+    val args = ctx.formals().formalArg().asScala.toList.flatMap(formal => visitFormalArg(formal))
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
     val variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
     val block = visitModuleBlock(ctx.block())
@@ -163,25 +163,20 @@ class ParserVisitor {
     Procedure(name, args, returnType, constants, variables, block.get)
   }
 
-  def visitFormalArg(ctx: OberonParser.FormalArgContext): FormalArg = {
+  def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
     val parameterTypeVisitor = new FormalArgVisitor()
     ctx.accept(parameterTypeVisitor)
-    parameterTypeVisitor.arg
   }
 
-  class FormalArgVisitor extends OberonBaseVisitor[Unit] {
-    var arg: FormalArg = _
-
-    override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): Unit = {
-      val varName = ctx.getText
+  class FormalArgVisitor extends OberonBaseVisitor[List[FormalArg]] {
+    override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): List[FormalArg] = {
       val argType = visitOberonType(ctx.argType)
-      ctx.args.asScala.toList.map(arg => parameterByValue(varName, argType))
+      ctx.Id().asScala.toList.map(arg => parameterByValue(arg.getText, argType))
     }
 
-    override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): Unit = {
-      val varName = ctx.getText
+    override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): List[FormalArg] = {
       val argType = visitOberonType(ctx.argType)
-      ctx.args.asScala.toList.map(arg => parameterByReference(varName, argType))
+      ctx.Id().asScala.toList.map(arg => parameterByReference(arg.getText, argType))
     }
   }
 

@@ -35,7 +35,7 @@ varDeclaration
   ;
 
 procedure :
-  'PROCEDURE' name = Id '(' formals?  ')' (':' procedureType = oberonType)? ';'
+  'PROCEDURE' name = Id '(' formals? ')' (':' procedureType = oberonType)? ';'
     declarations    // NOTE: This might support nested procedures
     block
    Id
@@ -45,14 +45,13 @@ formals
  : formalArg (',' formalArg)*
  ;
 
-arguments
- : expression (',' expression)*
- ;
-
-// a, b, c: INTEGER
 formalArg
  : args += Id (',' args += Id)* ':' argType = oberonType              #ParameterByValue
- | 'VAR' args += Id (', VAR' args += Id)* ':' argType = oberonType    #ParameterByReference
+ | args += 'VAR' Id (',' args += 'VAR' Id)* ':' argType = oberonType  #ParameterByReference
+ ;
+
+arguments
+ : expression (',' expression)*
  ;
 
 block
