@@ -95,11 +95,6 @@ class TypeChecker extends OberonVisitorAdapter {
     else List()
   }
 
-  override def visit(element: Element) = element match {
-    case SingleBasedElement(exp) => if(exp.accept(expVisitor).isDefined) List() else List((element, s"Element $element is ill typed"))
-
-  }
-
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
