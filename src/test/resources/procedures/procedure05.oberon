@@ -1,0 +1,20 @@
+MODULE Multiply_Ref;
+
+VAR
+  a, b : INTEGER;
+  c : INTEGER;
+
+PROCEDURE mult(i: INTEGER, a: INTEGER, VAR res: INTEGER);
+BEGIN
+  res := i * a
+END mult
+ 
+BEGIN
+  readInt(a);
+  readInt(b);
+
+  mult(b, a, c);
+  write(c)
+END
+
+END Multiply_ref.

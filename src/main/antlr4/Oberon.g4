@@ -51,8 +51,9 @@ arguments
 
 // a, b, c: INTEGER
 formalArg
- : (args += Id (',' args += Id)*) ':' argType = oberonType
- ; // TODO: we should also support VarBased formal arguments.
+ : args += Id (',' args += Id)* ':' argType = oberonType              #ParameterByValue
+ | 'VAR' args += Id (', VAR' args += Id)* ':' argType = oberonType    #ParameterByReference
+ ;
 
 block
  : 'BEGIN' statement 'END'

@@ -1328,6 +1328,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
+
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val module = ScalaParser.parseResource("procedures/procedure01.oberon")
 
@@ -1429,18 +1430,32 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(stmt.stmts(2).isInstanceOf[RepeatUntilStmt])
   }
+  test("Testing the oberon procedure05 code. This module resembles the code of multiples to test parameters.") {
+    val module = ScalaParser.parseResource("procedures/procedure05.oberon")
 
-  // Parser doesn't create Bracket Expression objects.
-  ignore("Testing simple10.oberon - Bracket Expression") {
-    val module = ScalaParser.parseResource("simple/simple10.oberon")
+    assert(module.name == "Multiply_Ref")
 
-    assert(module.name == "SimpleModule")
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
 
-    assert(module.stmt.isDefined && module.stmt.get.isInstanceOf[AssignmentStmt])
+    val procedure = module.procedures.head
 
-    val stmt = module.stmt.get.asInstanceOf[AssignmentStmt]
+    assert(procedure.name == "mult")
+    assert(procedure.args.size == 2)
+    assert(procedure.returnType == Some(IntegerType))
 
-    assert(stmt.exp.isInstanceOf[Brackets])
+    procedure.stmt match {
+      case ReturnStmt(MultExpression(VarExpression("i"), VarExpression("a"))) => succeed
+      case _ => fail("expecting a return i * a stmt")
+    }
+
+    assert(module.stmt.get.isInstanceOf[SequenceStmt])
+
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
+
+    assert(stmt.stmts.head == ReadIntStmt("i"))
+    assert(stmt.stmts(1) == ReadIntStmt("a"))
+    assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("mult", List(VarExpression("i"), VarExpression("a")))))
   }
 
 
