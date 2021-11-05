@@ -11,6 +11,7 @@ BEGIN
     x := 25;
     p^ := y;
     q^ := x;
+    p := x + y;
     p^ := q^ + p^
 
 END
