@@ -757,7 +757,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
-    val erro1 = (AssignmentStmt("p",AddExpression("x","y")), "Assignment between different types: p, AddExpression("x","y")")
+    val erro1 = (AssignmentStmt("p",AddExpression(VarExpression("x"),VarExpression("y"))), "Assignment between different types: p, AddExpression('x','y')")
 
     assert(errors.size == 1)
     assert(errors == List(erro1))
