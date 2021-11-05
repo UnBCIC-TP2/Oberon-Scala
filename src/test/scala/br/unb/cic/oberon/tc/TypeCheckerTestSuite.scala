@@ -752,4 +752,17 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   }
 
+  test("Test_pointer4") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerOperationWrong.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    val erro1 = (AddExpression(VarExpression("x + y"),VarExpression("p")), "Assignment between different types: x + y, VarExpression(p)")
+    val erro2 = (AssignmentStmt("p",VarExpression("x + y")), "Assignment between different types: p, VarExpression(x + y)")
+
+    assert(errors.size == 2)
+    assert(errors == List(erro1, erro2))
+
+  }
+
 }
