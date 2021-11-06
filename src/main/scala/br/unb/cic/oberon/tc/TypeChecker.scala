@@ -18,6 +18,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
     case StringValue(_) => Some(StringType)
+    case NullValue => Some(NullType)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
     case EQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
@@ -39,16 +40,31 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       if (expType.isEmpty) None
       expType.get match {
         case ReferenceToUserDefinedType(userTypeName) => {
-          val baseType = typeChecker.env.lookupUserDefinedType(userTypeName)
-          if (baseType.isEmpty) None
-          if (baseType.get.isInstanceOf[RecordType]) {
-            val recordType = baseType.get.asInstanceOf[RecordType]
+          val userType = typeChecker.env.lookupUserDefinedType(userTypeName)
+          println(userType)
+          if (userType.isEmpty) None
+          val UserDefinedType(name, baseType) = userType.get
+          if (baseType.isInstanceOf[RecordType]) {
+            val recordType = baseType.asInstanceOf[RecordType]
             val attribute = recordType.variables.find(v => v.name.equals(attributeName))
             if(attribute.isDefined) Some(attribute.get.variableType) else None
           } else None
         }
+        case RecordType(variables) => {
+          val attribute = variables.find(v => v.name.equals(attributeName))
+          if(attribute.isDefined) Some(attribute.get.variableType) else None
+        }
         case _ => None
       }
+    }
+
+    case PointerAccessExpression(name) => {
+      if(typeChecker.env.lookup(name).isDefined) {
+        val pointerType = typeChecker.env.lookup(name).get.accept(this).get
+        val PointerType(varType) = pointerType
+        Some(varType)
+      }
+      else None
     }
   }
 
@@ -79,6 +95,7 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
+    case EAssignmentStmt(_, _) => visitEAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
@@ -102,11 +119,49 @@ class TypeChecker extends OberonVisitorAdapter {
   private def visitAssignment(stmt: Statement) = stmt match {
     case AssignmentStmt(v, exp) =>
       if (env.lookup(v).isDefined) {
-        if (exp.accept(expVisitor).isDefined)
-          List()
+        if (exp.accept(expVisitor).isDefined){
+          if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get){
+              if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[PointerType]) &&
+                    (exp.accept(expVisitor).get == NullType)){
+                    List()
+              }
+              else if ((env.lookup(v).get.accept(expVisitor).get == IntegerType) &&
+                    (exp.accept(expVisitor).get == BooleanType)){
+                    List()
+              }
+              else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
+                    (exp.accept(expVisitor).get == IntegerType)){
+                    List()
+              }              
+              else{
+                 List((stmt, s"Assignment between different types: $v, $exp"))
+              }
+          }
+          else List()
+        }
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
+  }
+
+  private def visitEAssignment(stmt: Statement) = stmt match {
+    case EAssignmentStmt(designator, exp) => 
+      val varType = visitAssignmentAlternative(designator)
+      if (varType == exp.accept(expVisitor).get){
+        List()
+      }
+      else List((stmt, s"Expression $exp doesn't match variable type."))
+  }
+
+  private def visitAssignmentAlternative(designator: AssignmentAlternative) = designator match {
+    case PointerAssignment(pointerName) => 
+      val pointer = env.lookup(pointerName).get.accept(expVisitor).get
+      val PointerType(varType) = pointer
+      varType
+    case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
+    //TODO
+    // case ArrayAssignment
+    // case RecordAssignment
   }
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {

@@ -87,7 +87,10 @@ class Interpreter extends OberonVisitorAdapter {
         indexDesignator match {
           case ArrayAssignment(arrayExpression, indexExpression) =>
             env.reassignArray(arrayExpression.asInstanceOf[VarExpression].name, evalExpression(indexExpression).asInstanceOf[IntValue].value, evalExpression(exp))
+          
+          //TODO:
           case RecordAssignment(_, _) => ???
+          case PointerAssignment(_) => ???
           case _ => ???
         }
 
@@ -269,6 +272,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case CharValue(v) => CharValue(v)
     case BoolValue(v) => BoolValue(v)
     case StringValue(v) => StringValue(v)
+    case NullValue => NullValue
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
@@ -290,6 +294,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
       interpreter.env.pop()
       exp
     }
+
+    //TODO FieldAccessExpression
+    //TODO ArraySubscriptExpression
+    //TODO PointerAccessExpression
   }
 
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {

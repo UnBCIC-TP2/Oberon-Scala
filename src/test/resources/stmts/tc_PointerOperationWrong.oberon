@@ -1,0 +1,19 @@
+MODULE pointer;
+
+VAR
+  p : POINTER TO INTEGER;
+  q : POINTER TO INTEGER;
+  y : INTEGER;
+  x : INTEGER;
+
+BEGIN
+    y := 30;
+    x := 25;
+    p^ := y;
+    q^ := x;
+    p := x + y;
+    p^ := q^ + p^
+
+END
+
+END pointer.

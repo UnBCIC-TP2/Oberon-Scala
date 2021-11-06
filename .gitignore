@@ -4,9 +4,11 @@ bin/
 project/project
 project/target
 target/
+target:out/
 build/
 null/
 out/
+.bsp/
 
 # eclipse
 build
@@ -21,6 +23,9 @@ build
 *.ipr
 *.iws
 .idea
+
+# vscode
+*.vscode
 
 # mac
 .DS_Store
