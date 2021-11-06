@@ -723,7 +723,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
 
-  test("Test_pointer") {
+  test("Test assignment to pointer value") {
     val module = ScalaParser.parseResource("stmts/tc_PointerAccessStmt.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -731,7 +731,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(errors.size == 0)
   }
 
-  test("Test_pointer2") {
+  test("Test arithmetic operation with pointers") {
     val module = ScalaParser.parseResource("stmts/tc_PointerOperation.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -739,7 +739,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(errors.size == 0)
   }
 
-   test("Test_pointer3") {
+   test("Test incorrect assignment between pointer and simple type variable") {
     val module = ScalaParser.parseResource("stmts/tc_PointerAssignmentWrong.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -752,7 +752,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   }
 
-  test("Test_pointer4") {
+  test("Test incorrect assignment between pointer and arithmetic operation") {
     val module = ScalaParser.parseResource("stmts/tc_PointerOperationWrong.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -761,6 +761,15 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     assert(errors.size == 1)
     assert(errors == List(erro1))
+
+  }
+
+    test("Test assignment of NullValue to pointer") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
 
   }
 

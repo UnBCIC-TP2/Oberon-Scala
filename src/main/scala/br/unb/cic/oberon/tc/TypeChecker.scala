@@ -40,10 +40,12 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       if (expType.isEmpty) None
       expType.get match {
         case ReferenceToUserDefinedType(userTypeName) => {
-          val baseType = typeChecker.env.lookupUserDefinedType(userTypeName)
-          if (baseType.isEmpty) None
-          if (baseType.get.isInstanceOf[RecordType]) {
-            val recordType = baseType.get.asInstanceOf[RecordType]
+          val userType = typeChecker.env.lookupUserDefinedType(userTypeName)
+          println(userType)
+          if (userType.isEmpty) None
+          val UserDefinedType(name, baseType) = userType.get
+          if (baseType.isInstanceOf[RecordType]) {
+            val recordType = baseType.asInstanceOf[RecordType]
             val attribute = recordType.variables.find(v => v.name.equals(attributeName))
             if(attribute.isDefined) Some(attribute.get.variableType) else None
           } else None
@@ -118,8 +120,23 @@ class TypeChecker extends OberonVisitorAdapter {
     case AssignmentStmt(v, exp) =>
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined){
-          if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get)
-            List((stmt, s"Assignment between different types: $v, $exp"))
+          if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get){
+              if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[PointerType]) &&
+                    (exp.accept(expVisitor).get == NullType)){
+                    List()
+              }
+              else if ((env.lookup(v).get.accept(expVisitor).get == IntegerType) &&
+                    (exp.accept(expVisitor).get == BooleanType)){
+                    List()
+              }
+              else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
+                    (exp.accept(expVisitor).get == IntegerType)){
+                    List()
+              }              
+              else{
+                 List((stmt, s"Assignment between different types: $v, $exp"))
+              }
+          }
           else List()
         }
         else List((stmt, s"Expression $exp is ill typed"))

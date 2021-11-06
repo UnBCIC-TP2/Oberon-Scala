@@ -4,9 +4,11 @@ bin/
 project/project
 project/target
 target/
+target:out/
 build/
 null/
 out/
+.bsp/
 
 # eclipse
 build
