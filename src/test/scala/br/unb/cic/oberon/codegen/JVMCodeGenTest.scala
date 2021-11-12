@@ -361,18 +361,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(module.constants.size == 0)
     assert(module.userTypes.size == 2)
 
-    val codeGen = GenerateClassFromRecord
-    // var recordClassString = new String;
-
-    // val record_name_and_bytecode
-    // usa pattern matching para obter um record 
-    //  (o único record do arquivo oberon, ou o último, caso tenha mais de um record)
-    // module.userTypes.foreach((userDefinedTypes : UserDefinedType) =>
-    //   userDefinedTypes match {
-    //     case r: RecordType => val record_name_and_bytecode = codeGen.generateCode(r);
-    //     case a: ArrayType => null;
-    //   }
-    // )
+    val codeGen = GenerateClassFromRecords
 
     var record_name_and_bytecode = codeGen.generateCode(module.userTypes.head.asInstanceOf[RecordType])
 
