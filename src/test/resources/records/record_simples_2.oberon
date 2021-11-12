@@ -1,0 +1,13 @@
+MODULE simple_record_2;
+
+TYPE
+    floresta = RECORD
+        nr_arvores : INTEGER;
+        foi_desmatada : BOOLEAN;
+        propriedade_privada : BOOLEAN;
+    END
+
+CONST
+    nr_florestas = 3;
+
+END simple_record_2.

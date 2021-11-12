@@ -1,4 +1,4 @@
-MODULE simple_record;
+MODULE simple_record_1;
 
 TYPE
     pessoa = RECORD
@@ -13,4 +13,4 @@ VAR
     mateus : pessoa;
     matematica : notas;
 
-END simple_record.
+END simple_record_1.
