@@ -340,9 +340,9 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     cr.accept(v, 0);
 
-    assert(2 == v.numberOfTotalFields);
+    assert(1 == v.numberOfTotalFields);
     assert(0 == v.numberOfIntegerConstants);
-    assert(0 == v.numberOfIntegerVariables);
+    assert(1 == v.numberOfIntegerVariables);
     assert(0 == v.numberOfBooleanVariables);
     assert(0 == v.numberOfBooleanConstants);
   }
@@ -361,7 +361,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(module.constants.size == 0)
     assert(module.userTypes.size == 2)
 
-    val codeGen = GenerateClassFromRecords
+    val codeGen = GenerateClassFromRecord
 
     var record_name_and_bytecode = codeGen.generateCode(module.userTypes.head.asInstanceOf[RecordType])
 
