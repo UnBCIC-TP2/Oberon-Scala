@@ -28,8 +28,7 @@ object GenerateClassFromRecord{
           case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, null).visitEnd()
           case CharacterType => cw.visitField(ACC_PUBLIC, v.name, "C", null, null).visitEnd()
           case StringType => cw.visitField(ACC_PUBLIC, v.name, "Ljava/lang/String;", null, null).visitEnd()
-          // checar linha abaixo e ver como resolver o tipo array ccom o grupo array
-          case ReferenceToUserDefinedType(_) => cw.visitField(ACC_PUBLIC, v.name, "L" + v.name + ";", null, null).visitEnd()
+          case ReferenceToUserDefinedType(_) => cw.visitField(ACC_PUBLIC, v.name, null, null, null).visitEnd()
           case UndefinedType => cw.visitField(ACC_PUBLIC, v.name, "Ljava/lang/Object;", null, null).visitEnd()
         }
       )
