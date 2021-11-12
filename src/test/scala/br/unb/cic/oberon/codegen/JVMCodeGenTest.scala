@@ -347,16 +347,16 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(0 == v.numberOfBooleanConstants);
   }
 
-  test("Generate bytecode from records"){
+  test("Generate bytecode from record, teste 1"){
 
-    val path = Paths.get(getClass.getClassLoader.getResource("records/record_1_simples.oberon").toURI)
+    val path = Paths.get(getClass.getClassLoader.getResource("records/record_simples_1.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "simple_record")
+    assert(module.name == "simple_record_1")
     assert(module.variables.size == 2)
     assert(module.constants.size == 0)
     assert(module.userTypes.size == 2)
@@ -386,14 +386,81 @@ class JVMCodeGenTest extends AnyFunSuite {
 
     val v = new ClassVisitorTest(ASM4);
 
-    // record dentro de record
-    // fazer mais testes (checar differentes atributos)
-    // resolver target;out -> done
-
     cr.accept(v, 0);
 
     assert(3 == v.numberOfTotalFields);
     assert(2 == v.numberOfIntegerVariables);
+    assert(1 == v.numberOfBooleanVariables);
+
+  }
+  test("Generate bytecode from record, teste 2"){
+
+    val path = Paths.get(getClass.getClassLoader.getResource("records/record_simples_2.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "simple_record_2")
+    assert(module.variables.size == 0)
+    assert(module.constants.size == 1)
+    assert(module.userTypes.size == 1)
+
+    val codeGen = GenerateClassFromRecord
+
+    var record_name_and_bytecode = codeGen.generateCode(module.userTypes.head.asInstanceOf[RecordType])
+
+    val bytecode = record_name_and_bytecode._2
+
+    val out = new FileOutputStream(createOutputFile(record_name_and_bytecode._1).toFile)
+
+    out.write(bytecode)
+
+    val cr = new ClassReader(bytecode);
+
+    val v = new ClassVisitorTest(ASM4);
+    
+    cr.accept(v, 0);
+
+    assert(3 == v.numberOfTotalFields);
+    assert(1 == v.numberOfIntegerVariables);
+    assert(2 == v.numberOfBooleanVariables);
+
+  }
+
+  ignore("Generate bytecode from record, teste 3"){
+
+    val path = Paths.get(getClass.getClassLoader.getResource("records/record_dentro_de_record.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "record_inside_record")
+    assert(module.variables.size == 0)
+    assert(module.constants.size == 0)
+    assert(module.userTypes.size == 2)
+
+    val codeGen = GenerateClassFromRecord
+
+    var record_name_and_bytecode = codeGen.generateCode(module.userTypes(1).asInstanceOf[RecordType])
+
+    val bytecode = record_name_and_bytecode._2
+
+    val out = new FileOutputStream(createOutputFile(record_name_and_bytecode._1).toFile)
+
+    out.write(bytecode)
+
+    val cr = new ClassReader(bytecode);
+
+    val v = new ClassVisitorTest(ASM4);
+
+    cr.accept(v, 0);
+
+    assert(2 == v.numberOfTotalFields);
+    assert(0 == v.numberOfIntegerVariables);
     assert(1 == v.numberOfBooleanVariables);
 
   }
