@@ -1,0 +1,12 @@
+MODULE pointer;
+
+VAR
+    p : POINTER TO INTEGER;
+
+
+BEGIN
+    p := NIL
+
+END
+
+END pointer.

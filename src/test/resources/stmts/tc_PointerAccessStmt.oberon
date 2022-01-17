@@ -1,0 +1,11 @@
+MODULE pointer;
+
+VAR
+  p : POINTER TO INTEGER;
+  x : INTEGER;
+
+BEGIN
+    p^ := 10
+END
+
+END pointer.

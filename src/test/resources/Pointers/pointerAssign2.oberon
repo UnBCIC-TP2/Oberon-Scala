@@ -1,0 +1,23 @@
+MODULE pointerAssign;
+
+TYPE
+    aluno = RECORD
+        nome: STRING;
+        idade: INTEGER;
+    END
+
+    notas = ARRAY 3 OF REAL
+
+VAR
+    a : POINTER TO aluno;
+    b : POINTER TO notas;
+
+BEGIN
+    a.nome := "Manuela";
+    a.idade := 23;
+
+    b^[0] := 9.5;
+    b^[2] := 9.0
+END
+
+END pointerAssign.

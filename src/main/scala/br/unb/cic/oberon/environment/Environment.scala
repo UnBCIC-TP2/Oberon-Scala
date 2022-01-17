@@ -1,10 +1,8 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, OberonModule, Procedure, RecordType, Type, Undef, UserDefinedType}
+import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Undef, UserDefinedType, Location}
 
-import scala.collection.mutable.Map
-import scala.collection.mutable.Stack
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Map, Stack}
 
 /**
  * The environment represents a memory region, which
@@ -20,44 +18,51 @@ import scala.collection.mutable.ListBuffer
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
-
-  private val global = Map.empty[String, T]
-  private val stack = Stack.empty[Map[String, T]]
+  private var top_loc = 0
+  private val locations = Map.empty[Location, T]
+  private val global = Map.empty[String, Location]
+  private val stack = Stack.empty[Map[String, Location]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
   private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
 
-  def setGlobalVariable(name: String, value: T) : Unit = global += name -> value
+  def setGlobalVariable(name: String, value: T): Unit = {
+    top_loc += 1
+    global += name -> Location(top_loc)
+    locations += Location(top_loc) -> value
+  }
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes += userDefinedTypeName(userType) -> userType
-    userType match {
-      case ArrayType(name, length, variableType) => userArrayTypes += name -> ListBuffer.fill(length)(Undef())
+    userType.baseType match {
+      case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
       case _ => ???
     }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
+    top_loc += 1
     if(stack.isEmpty) {
-      stack.push(Map.empty[String, T])
+      stack.push(Map.empty[String, Location])
     }
-    stack.top += name -> value
+    stack.top += name -> Location(top_loc)
+    locations += Location(top_loc) -> value
   }
 
   def setVariable(name: String, value: T) : Unit = {
     if(stack.nonEmpty && stack.top.contains(name)) {
-      setLocalVariable(name, value)
+      locations(stack.top(name)) = value
     }
     else if(global.contains(name)) {
-      setGlobalVariable(name, value)
+      locations(global(name)) = value
     }
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
   def lookup(name: String) : Option[T] = {
-    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
-    else if(global.contains(name)) Some(global(name))
+    if(stack.nonEmpty && stack.top.contains(name)) Some(locations(stack.top(name)))
+    else if(global.contains(name)) Some(locations(global(name)))
     else None
   }
 
@@ -80,13 +85,10 @@ class Environment[T] {
 
   def findProcedure(name: String): Procedure = procedures(name)
 
-  def push(): Unit = stack.push(Map.empty[String, T])
+  def push(): Unit = stack.push(Map.empty[String, Location])
 
   def pop(): Unit = stack.pop()
 
   def userDefinedTypeName(userDefinedType: UserDefinedType) : String =
-     userDefinedType match {
-         case ArrayType(name, _, _) => name
-         case RecordType(name, _) => name
-     }
+    userDefinedType.name
 }

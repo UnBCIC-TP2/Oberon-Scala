@@ -4,9 +4,11 @@ bin/
 project/project
 project/target
 target/
+target:out/
 build/
 null/
 out/
+.bsp/
 
 # eclipse
 build
@@ -22,6 +24,9 @@ build
 *.iws
 .idea
 
+# vscode
+*.vscode
+
 # mac
 .DS_Store
 
@@ -30,7 +35,11 @@ build
 .scala_dependencies
 .cache
 .cache-main
+
 **/.antlr/
+
+src/main/antlr4/.antlr
+
 
 #general
 *.class

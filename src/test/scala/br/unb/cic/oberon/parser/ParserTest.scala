@@ -1,13 +1,11 @@
 package br.unb.cic.oberon.parser
 
-import br.unb.cic.oberon.ast
-
-import java.nio.file.{Files, Paths}
-import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalactic.TolerantNumerics
+import java.nio.file.{Files, Paths}
 
 class ParserTestSuite extends AnyFunSuite {
-
   test("Testing the oberon simple01 code") {
     val module = ScalaParser.parseResource("simple/simple01.oberon")
 
@@ -1587,7 +1585,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.userTypes.size == 5)
 
-    assert(module.userTypes(0) == ArrayType("m_id", 15, IntegerType))
+    assert(module.userTypes(0).baseType == ArrayType(15, IntegerType))
 
   }
 
@@ -1687,17 +1685,17 @@ class ParserTestSuite extends AnyFunSuite {
 
     val typeList = module.userTypes
 
-    val halls = RecordType("HALLS", List(VariableDeclaration("integrante", BooleanType),
+    val halls = RecordType(List(VariableDeclaration("integrante", BooleanType),
       VariableDeclaration("matricula",IntegerType)))
 
-    val halls_array = ArrayType("HALLS_array", 9, ReferenceToUserDefinedType("HALLS"))
+    val halls_array = ArrayType(9, ReferenceToUserDefinedType("HALLS"))
 
     val typetoTest = List(halls, halls_array)
 
     var it: Int = 0
 
     typeList.foreach(t => {
-      assert(t == typetoTest(it))
+      assert(t.baseType == typetoTest(it))
       it += 1
     })
 
@@ -1712,21 +1710,20 @@ class ParserTestSuite extends AnyFunSuite {
 
     val typeList = module.userTypes
 
-    val test_array = ArrayType("test_array", 5, BooleanType)
+    val test_array = ArrayType(5, BooleanType)
 
-    val tipo1 = RecordType("tipo1", List(
+    val tipo1 = RecordType(List(
       VariableDeclaration("num", IntegerType),
       VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))))
 
-    val tipo2 =  RecordType("tipo2",
-      List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
+    val tipo2 =  RecordType(List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
 
     val typetoTest = List(test_array, tipo1, tipo2)
 
     var it: Int = 0
 
     typeList.foreach(t => {
-      assert(t == typetoTest(it))
+      assert(t.baseType == typetoTest(it))
       it += 1
     })
 
@@ -1744,9 +1741,9 @@ class ParserTestSuite extends AnyFunSuite {
       ReferenceToUserDefinedType("myType")))
 
 
-    assert(module.userTypes(0) == ArrayType("cplusplus", 10, BooleanType))
-    assert(module.userTypes(1) == RecordType("java", listDeclaration))
-    assert(module.userTypes(2) == ArrayType("python", 5, ReferenceToUserDefinedType("java")))
+    assert(module.userTypes(0).baseType == ArrayType(10, BooleanType))
+    assert(module.userTypes(1).baseType == RecordType(listDeclaration))
+    assert(module.userTypes(2).baseType == ArrayType(5, ReferenceToUserDefinedType("java")))
   }
 
   test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"){
@@ -1778,20 +1775,20 @@ class ParserTestSuite extends AnyFunSuite {
 
     val typeList = module.userTypes
 
-    val cheesewithbread = ArrayType("cheesewithbread", 10, IntegerType)
+    val cheesewithbread = ArrayType(10, IntegerType)
 
-    val cheesewithoutbread = RecordType("cheesewithoutbread", List(
+    val cheesewithoutbread = RecordType(List(
       VariableDeclaration("var1", IntegerType),
       VariableDeclaration("var2", ReferenceToUserDefinedType("cheesewithbread"))))
 
-    val cheesewithhalfabread =  ArrayType("cheesewithhalfabread", 100000, ReferenceToUserDefinedType("cheesewithoutbread"))
+    val cheesewithhalfabread =  ArrayType(100000, ReferenceToUserDefinedType("cheesewithoutbread"))
 
     val typetoTest = List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
 
     var it: Int = 0
 
     typeList.foreach(t => {
-      assert(t == typetoTest(it))
+      assert(t.baseType == typetoTest(it))
       it += 1
     })
 
@@ -2141,4 +2138,115 @@ class ParserTestSuite extends AnyFunSuite {
     val constant2 = ScalaParser.parserREPL(const2)
     assert(constant2 == REPLConstant(Constant("y",AddExpression(VarExpression("x"),IntValue(1)))))
   }
+//Testing the oberon pointerDecl1 code
+  test("Testing the oberon pointerDecl1 code") {
+    val module = ScalaParser.parseResource("Pointers/pointerDecl1.oberon")
+
+    assert(module.variables.size == 5)
+    assert(module.variables.head == VariableDeclaration("a", PointerType(IntegerType)))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(RealType)))
+    assert(module.variables(2) == VariableDeclaration("c", PointerType(CharacterType)))
+    assert(module.variables(3) == VariableDeclaration("d", PointerType(BooleanType)))
+    assert(module.variables(4) == VariableDeclaration("e", PointerType(StringType)))
+  }
+
+  test("Testing the oberon pointerDecl2 code") {
+    val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("a", PointerType(ReferenceToUserDefinedType("aluno"))))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("notas"))))
+
+  }
+
+  //Testing the oberon pointerAssign1 code
+  test("Testing the oberon pointerAssign1 code") {
+    val module = ScalaParser.parseResource("Pointers/pointerAssign1.oberon")
+
+    //test if there are 5 statements in stmts list
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 5)
+      case _ => fail("This module should have 5 statements!")
+    }
+
+    val epsilon = 1e-2f
+    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(epsilon)
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head == EAssignmentStmt(PointerAssignment("a"), IntValue(1)))
+    assert(stmts(1) === EAssignmentStmt(PointerAssignment("b"), RealValue(9.5)))
+    assert(stmts(2) == EAssignmentStmt(PointerAssignment("c"), CharValue('c')))
+    assert(stmts(3) == EAssignmentStmt(PointerAssignment("d"), BoolValue(true)))
+    assert(stmts(4) == EAssignmentStmt(PointerAssignment("e"), StringValue("Hello.")))
+  }
+
+
+  test("Testing the oberon pointerAssign2 code"){
+    val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
+
+    //conferir a contagem de statement
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 4)
+      case _ => fail("This module should have 4 statements!")
+    }
+
+    // 2 ou 4 conferir. tentativa: 1 record, 1 array, 2 pointer
+    assert(module.userTypes.size == 2)
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head  == EAssignmentStmt(RecordAssignment(VarExpression("a"), "nome"), StringValue("Manuela")))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("a"), "idade"), IntValue(23)))
+    assert(stmts(2) == EAssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(0)),RealValue(9.5)))
+    assert(stmts(3) == EAssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),RealValue(9.0)))
+  }
+
+  test("Testing the oberon pointerAssign3 code"){
+    val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
+
+    assert(module.variables.size == 3)
+    assert(module.variables.head == VariableDeclaration("a", PointerType(RealType)))
+    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("pointerA"))))
+    assert(module.variables(2) == VariableDeclaration("c", PointerType(PointerType(IntegerType))))
+
+    //conferir a contagem de statement
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 2)
+      case _ => fail("This module should have 2 statements!")
+    }
+
+    //verificar com o grupo numeros
+    assert(module.userTypes.size == 1)
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    //opção IDE de convert to block expression - real value
+    assert(stmts.head  == EAssignmentStmt(PointerAssignment("a"), RealValue(10.5)))
+    assert(stmts(1)  == EAssignmentStmt(PointerAssignment("b"), VarExpression("a")))
+  }
+
+  test(testName = "Testing the oberon pointerOps1 code"){
+    val module = ScalaParser.parseResource("Pointers/pointerOps1.oberon")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(stmts(2) == AssignmentStmt("c",MultExpression(AddExpression(PointerAccessExpression("a"),PointerAccessExpression("b")),SubExpression(PointerAccessExpression("b"),PointerAccessExpression("a")))))
+  }
+
+
+  test(testName = "Testing the oberon LinkedList code"){
+    val module = ScalaParser.parseResource("Pointers/linkedList.oberon")
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    assert(module.userTypes.size == 1)
+    assert(module.userTypes(0) == UserDefinedType("linkedList", RecordType(List(VariableDeclaration("value", IntegerType), VariableDeclaration("next", PointerType(ReferenceToUserDefinedType("linkedList")))))))
+    assert(module.variables(0) == VariableDeclaration("list", ReferenceToUserDefinedType("linkedList")))
+
+    assert(stmts.head == EAssignmentStmt(RecordAssignment(VarExpression("list"), "value"), IntValue(10)))
+    assert(stmts(1) == EAssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue))
+  }
 }
+

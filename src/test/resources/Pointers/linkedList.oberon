@@ -1,0 +1,18 @@
+MODULE dataStructrs;
+
+TYPE
+
+    linkedList = RECORD 
+                    value: INTEGER;
+                    next: POINTER TO linkedList;
+                 END
+
+VAR 
+    list : linkedList;
+
+BEGIN
+    list.value := 10;
+    list.next := NIL
+END
+
+END dataStructrs.
