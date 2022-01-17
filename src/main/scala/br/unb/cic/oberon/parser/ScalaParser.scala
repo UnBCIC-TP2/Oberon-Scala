@@ -278,7 +278,7 @@ class ParserVisitor {
       exp = CharValue(ctx.getText.charAt(1))
 
     override def visitStringValue(ctx: OberonParser.StringValueContext): Unit =
-      exp = StringValue(ctx.getText)
+      exp = StringValue(ctx.getText.substring(1,ctx.getText.length()-1))
 
     override def visitFieldAccess(ctx: OberonParser.FieldAccessContext): Unit = {
       val visitor = new ExpressionVisitor()

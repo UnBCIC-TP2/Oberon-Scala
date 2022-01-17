@@ -1,0 +1,15 @@
+MODULE FLRTest;
+
+VAR
+  x : REAL;
+  y : REAL;
+  z : REAL;
+  w : REAL;
+
+BEGIN
+  w := 50.1;
+  x := 10.8;
+  y := FLR(x);
+  z := FLR(w)
+END
+END FLRTest.

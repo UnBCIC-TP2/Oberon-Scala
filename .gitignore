@@ -40,3 +40,4 @@ project/metals.sbt
 .vscode/
 .bloop/
 .scalafmt.conf
+.bsp

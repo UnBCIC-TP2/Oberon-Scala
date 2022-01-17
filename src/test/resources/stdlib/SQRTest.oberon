@@ -1,0 +1,15 @@
+MODULE SQRTest;
+
+VAR
+  x : REAL;
+  y : REAL;
+  z : REAL;
+  w : REAL;
+
+BEGIN
+  w := 196.0;
+  x := 10.0;
+  y := SQR(x);
+  z := SQR(w)
+END
+END SQRTest.

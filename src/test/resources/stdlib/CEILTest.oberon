@@ -1,0 +1,15 @@
+MODULE CEILTest;
+
+VAR
+    x : REAL;
+    y : REAL;
+    z : REAL;
+    w : REAL;
+
+BEGIN
+    x := 10.0;
+    y := 11.6;
+    z := CEIL(x);
+    w := CEIL(y)
+END
+END CEILTest.
