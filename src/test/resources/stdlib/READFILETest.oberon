@@ -1,0 +1,11 @@
+MODULE READFILETest;
+
+VAR
+  x : STRING;
+  y : STRING;
+
+BEGIN
+  x := "src/test/resources/stdlib/plainFile.txt";
+  y := READFILE(x)
+END
+END READFILETest.

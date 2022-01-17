@@ -1,0 +1,15 @@
+MODULE RNDTest;
+
+VAR
+  x : REAL;
+  y : REAL;
+  z : REAL;
+  w : REAL;
+
+BEGIN
+  w := -0.9;
+  x := 10.4;
+  y := RND(x);
+  z := RND(w)
+END
+END RNDTest.

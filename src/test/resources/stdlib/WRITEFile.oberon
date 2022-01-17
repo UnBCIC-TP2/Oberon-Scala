@@ -1,0 +1,13 @@
+MODULE WRITEFILETest;
+
+VAR
+  x : STRING;
+  y : STRING;
+  z : STRING;
+
+BEGIN
+  x := "src/test/resources/stdlib/plainFile.txt";
+  y := "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  z := WRITEFILE(x, y)
+END
+END WRITEFILETest.

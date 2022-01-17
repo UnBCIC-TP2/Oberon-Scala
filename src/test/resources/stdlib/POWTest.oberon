@@ -1,0 +1,21 @@
+MODULE POWTest;
+
+VAR
+  x : REAL;
+  y : REAL;
+  z : REAL;
+  w : REAL;
+  a : REAL;
+  b : REAL;
+
+
+BEGIN
+  x := 2.5;
+  y := -1.5;
+  a := -9.0;
+  b := 3.0;
+  z := POW(x, y);
+  w := POW(a, b)
+END
+
+END POWTest.

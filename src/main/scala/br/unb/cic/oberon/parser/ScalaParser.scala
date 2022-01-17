@@ -171,12 +171,12 @@ class ParserVisitor {
   class FormalArgVisitor extends OberonBaseVisitor[List[FormalArg]] {
     override def visitParameterByValue(ctx: OberonParser.ParameterByValueContext): List[FormalArg] = {
       val argType = visitOberonType(ctx.argType)
-      ctx.Id().asScala.toList.map(arg => parameterByValue(arg.getText, argType))
+      ctx.Id().asScala.toList.map(arg => ParameterByValue(arg.getText, argType))
     }
 
     override def visitParameterByReference(ctx: OberonParser.ParameterByReferenceContext): List[FormalArg] = {
       val argType = visitOberonType(ctx.argType)
-      ctx.Id().asScala.toList.map(arg => parameterByReference(arg.getText, argType))
+      ctx.Id().asScala.toList.map(arg => ParameterByReference(arg.getText, argType))
     }
   }
 

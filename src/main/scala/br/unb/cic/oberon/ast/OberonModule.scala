@@ -47,8 +47,8 @@ trait FormalArg{
   def argumentType: Type
   def name: String
 }
-case class parameterByValue(name: String, argumentType: Type) extends FormalArg
-case class parameterByReference(name: String, argumentType: Type) extends FormalArg
+case class ParameterByValue(name: String, argumentType: Type) extends FormalArg
+case class ParameterByReference(name: String, argumentType: Type) extends FormalArg
 
 
   /* Imports */
