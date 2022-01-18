@@ -6,9 +6,9 @@ version := "0.1.1"
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
 
-githubOwner := "UnBCIC-TP2"
-githubRepository := "Oberon-Scala"
-githubTokenSource := TokenSource.GitConfig("github.token")
+// githubOwner := "UnBCIC-TP2"
+// githubRepository := "Oberon-Scala"
+//  githubTokenSource := TokenSource.GitConfig("github.token")
 
 enablePlugins(Antlr4Plugin)
 
