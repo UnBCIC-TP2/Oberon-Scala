@@ -1,0 +1,16 @@
+MODULE simple_record_1;
+
+TYPE
+    pessoa = RECORD
+        idade : INTEGER;
+        renda : INTEGER;
+        tem_gato : BOOLEAN;
+    END
+
+    notas = ARRAY 9 OF REAL
+
+VAR
+    mateus : pessoa;
+    matematica : notas;
+
+END simple_record_1.

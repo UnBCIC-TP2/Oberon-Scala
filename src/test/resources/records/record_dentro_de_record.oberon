@@ -1,0 +1,16 @@
+MODULE record_inside_record;
+
+TYPE
+
+    pessoa = RECORD
+        idade : INTEGER;
+        renda : INTEGER;
+        tem_gato : BOOLEAN;
+    END
+
+    familia = RECORD
+        Kleber : pessoa;
+        mora_junto : BOOLEAN;
+    END
+
+END record_inside_record.
