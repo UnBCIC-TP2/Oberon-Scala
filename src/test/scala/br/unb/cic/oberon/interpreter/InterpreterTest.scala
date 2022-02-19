@@ -440,7 +440,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
-  ignore("Module A has no imports"){
+  test("Module A has no imports"){
     val module = ScalaParser.parseResource("imports/A.oberon")
 
     assert(module.name == "A")
