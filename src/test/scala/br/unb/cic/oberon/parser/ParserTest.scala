@@ -1575,7 +1575,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(module.userTypes.length == 1)
   }
 
-  ignore("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
     val module = ScalaParser.parseResource("stmts/stmt34.oberon")
 
 

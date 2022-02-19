@@ -7,7 +7,7 @@ import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
 
 class CoreTransformerTest extends AnyFunSuite {
-  
+
   test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
