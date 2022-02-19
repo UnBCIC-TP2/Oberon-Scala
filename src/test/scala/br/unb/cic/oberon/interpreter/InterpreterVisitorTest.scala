@@ -13,6 +13,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
     val interpreter = new Interpreter()
     assert(module.name == "SimpleModule")
 
+    interpreter.setTestEnvironment()
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("x") == Some(IntValue(625)))
@@ -25,6 +26,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
     val interpreter = new Interpreter()
     assert(module.name == "Factorial")
 
+    interpreter.setTestEnvironment()
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("res").isDefined)
