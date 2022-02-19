@@ -42,7 +42,7 @@ class CoreTransformerTest extends AnyFunSuite {
     ))))
   }
 
-  ignore("Testing the loop_stmt02 evaluation after conversion to OberonCore") {
+  test("Testing the loop_stmt02 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI)
 
     assert(path != null)
@@ -54,6 +54,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(6)))
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
@@ -95,7 +96,7 @@ class CoreTransformerTest extends AnyFunSuite {
     ))))
   }
 
-  ignore("Testing the loop_stmt03 evaluation after conversion to OberonCore") {
+  test("Testing the loop_stmt03 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
     assert(path != null)
@@ -107,6 +108,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment
     coreModule.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(10)))
     assert(interpreter.env.lookup("i") == Some(IntValue(10)))
@@ -158,7 +160,7 @@ class CoreTransformerTest extends AnyFunSuite {
   /** ###### Loop Tests end here ###### */
 
   /** ###### RepeatUntil Tests begin here ###### */
-  ignore("Testing the RepeatUntilStmt01 evaluation after conversion to OberonCore") {
+  test("Testing the RepeatUntilStmt01 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").toURI)
 
     assert(path != null)
@@ -170,6 +172,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
@@ -215,7 +218,7 @@ class CoreTransformerTest extends AnyFunSuite {
   }
 
   // TODO
-  ignore("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
+  test("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
     assert(path != null)
@@ -227,6 +230,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
@@ -271,8 +275,8 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("y")))
   }
 
-  /**RepeatUntil Test 07*/
-  ignore("Testing the RepeatUntilStmt07 evaluation after conversion to OberonCore") {
+  /**RepeatUntil test 07*/
+  test("Testing the RepeatUntilStmt07 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").toURI)
 
     assert(path != null)
@@ -284,14 +288,15 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
-    assert(interpreter.env.lookup("x").contains(IntValue(20)));
-    assert(interpreter.env.lookup("y").contains(IntValue(20)));
+    assert(interpreter.env.lookup("x").contains(IntValue(3)));
+    assert(interpreter.env.lookup("y").contains(IntValue(3)));
   }
 
-  ignore("Testing the RepeatUntilStmt07 expressions after conversion to While") {
+  test("Testing the RepeatUntilStmt07 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").toURI)
 
     assert(path != null)
@@ -314,7 +319,7 @@ class CoreTransformerTest extends AnyFunSuite {
     val stmts = sequence.stmts
 
     assert(stmts.head == AssignmentStmt("x",IntValue(0)))
-    assert(stmts(1) == AssignmentStmt("y",IntValue(20)))
+    assert(stmts(1) == AssignmentStmt("y",IntValue(3)))
     assert(stmts(2) == WhileStmt(BoolValue(true), SequenceStmt(List(
       AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))),
       IfElseStmt(EQExpression(VarExpression("x"), VarExpression("y")),
@@ -324,7 +329,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
-  ignore("Testing the repeatuntil02 evaluation after conversion to OberonCore") {
+  test("Testing the repeatuntil02 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil02.oberon").toURI)
 
     assert(path != null)
@@ -336,12 +341,10 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
-
-    println(interpreter.env.lookup("x"))
-    println(interpreter.env.lookup("y"))
 
     assert(interpreter.env.lookup("x").contains(IntValue(10)));
     assert(interpreter.env.lookup("y").contains(IntValue(19)));
@@ -389,7 +392,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(stmts(4) == WriteStmt(VarExpression("y")))
   }
 
-  ignore("Testing the repeatuntil04 evaluation after conversion to OberonCore") {
+  test("Testing the repeatuntil04 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil04.oberon").toURI)
 
     assert(path != null)
@@ -401,12 +404,10 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
-
-    println(interpreter.env.lookup("x"))
-    println(interpreter.env.lookup("y"))
 
     assert(interpreter.env.lookup("x").contains(IntValue(2)));
     assert(interpreter.env.lookup("y").contains(IntValue(2)));
@@ -442,7 +443,7 @@ class CoreTransformerTest extends AnyFunSuite {
   /** ###### RepeatUntil Tests end here ###### */
 
   /** ###### For Tests begin here ###### */
-  ignore("Testing the interpreter_stmt01 evaluation after conversion to OberonCore") {
+  test("Testing the interpreter_stmt01 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").toURI)
 
     assert(path != null)
@@ -454,6 +455,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -496,7 +498,7 @@ class CoreTransformerTest extends AnyFunSuite {
   }
 
 
-  ignore("Testing the stmtForCore01 evaluation after conversion to OberonCore") {
+  test("Testing the stmtForCore01 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
 
     assert(path != null)
@@ -508,6 +510,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -516,7 +519,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("k") == Some(IntValue(18))) // k = result
   }
 
-  ignore("Testing the stmtForCore01 expressions after conversion to While") {
+  test("Testing the stmtForCore01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtForCore01.oberon").toURI)
 
     assert(path != null)
@@ -528,9 +531,9 @@ class CoreTransformerTest extends AnyFunSuite {
     val coreModule = coreVisitor.transformModule(module)
 
     assert(coreModule.name == "SimpleModule")
-    assert (coreModule.stmt.isDefined)
+    assert(coreModule.stmt.isDefined)
     // assert that the main block contains a sequence of statements
-    module.stmt.get match {
+    coreModule.stmt.get match {
       case SequenceStmt(stmts) => assert(stmts.length == 2)
       case _ => fail("we are expecting two stmts in the main block")
     }
@@ -539,10 +542,10 @@ class CoreTransformerTest extends AnyFunSuite {
     val stmts = sequence.stmts
 
     assert(stmts.head == AssignmentStmt("x", IntValue(0)))
-    assert(stmts(1) == WhileStmt(LTExpression(VarExpression("x"), VarExpression(("y"))), SequenceStmt(List(
+    assert(stmts(1) == WhileStmt(LTExpression(VarExpression("x"), IntValue(10)), SequenceStmt(List(
       WriteStmt(VarExpression("x")),
       AssignmentStmt("z", IntValue(0)),
-      WhileStmt(LTExpression(VarExpression("z"), VarExpression("y")), SequenceStmt(List(
+      WhileStmt(LTExpression(VarExpression("z"), IntValue(10)), SequenceStmt(List(
         AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x"))),
         AssignmentStmt("z", AddExpression(VarExpression("z"), IntValue(1))),
         WriteStmt(VarExpression("k"))
@@ -555,7 +558,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
 
   /** ###### IfElseIf Tests begin here ###### */
-  ignore("Testing the IfElseIfStmt01 evaluation after conversion to OberonCore") {
+  test("Testing the IfElseIfStmt01 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
 
     assert(path != null)
@@ -567,6 +570,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -608,7 +612,7 @@ class CoreTransformerTest extends AnyFunSuite {
   }
 
 
-  ignore("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
+  test("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
 
     assert(path != null)
@@ -620,6 +624,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -660,7 +665,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert((stmts(2) == WriteStmt(VarExpression("y"))))
   }
 
-  ignore("Testing the IfElseIfStmt05 evaluation after conversion to OberonCore") {
+  test("Testing the IfElseIfStmt05 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
 
     assert(path != null)
@@ -672,6 +677,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -716,7 +722,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert((stmts(2) == WriteStmt(VarExpression("y"))))
   }
 
-  ignore("Testing the IfElseIfStmt08 evaluation after conversion to OberonCore") {
+  test("Testing the IfElseIfStmt08 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").toURI)
 
     assert(path != null)
@@ -728,6 +734,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -771,8 +778,8 @@ class CoreTransformerTest extends AnyFunSuite {
 
 
   /** ###### Case Tests begin here ###### */
-  ignore("Testing the StmtCaseCore01 evaluation after conversion to OberonCore") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore01.oberon").toURI)
+  test("Testing the StmtCaseCore01 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore01.oberon").toURI)
 
     assert(path != null)
 
@@ -783,14 +790,15 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleModule")
 
     assert(interpreter.env.lookup("xs") == Some(IntValue(0)));
   }
 
-  ignore("Testing the StmtCaseCore01 expressions after conversion to IfElse") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore01.oberon").toURI)
+  test("Testing the StmtCaseCore01 expressions after conversion to IfElse") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore01.oberon").toURI)
 
     assert(path != null)
 
@@ -825,8 +833,8 @@ class CoreTransformerTest extends AnyFunSuite {
     assert((stmts(2) == WriteStmt(VarExpression("xs"))))
   }
 
-  ignore("Testing the StmtCaseCore02 evaluation after conversion to OberonCore") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore02.oberon").toURI)
+  test("Testing the StmtCaseCore02 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore02.oberon").toURI)
 
     assert(path != null)
 
@@ -837,14 +845,15 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleModule")
 
     assert(interpreter.env.lookup("xs") == Some(IntValue(10)));
   }
 
-  ignore("Testing the StmtCaseCore02 expressions after conversion to IfElse") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore02.oberon").toURI)
+  test("Testing the StmtCaseCore02 expressions after conversion to IfElse") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore02.oberon").toURI)
 
     assert(path != null)
 
@@ -880,8 +889,8 @@ class CoreTransformerTest extends AnyFunSuite {
   }
 
 
-  ignore("Testing the StmtCaseCore03 evaluation after conversion to OberoCore") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
+  test("Testing the StmtCaseCore03 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore03.oberon").toURI)
 
     assert(path != null)
 
@@ -892,14 +901,15 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleRangeCaseModule")
 
     assert(interpreter.env.lookup("xs") == Some(IntValue(5)));
   }
 
-  ignore("Testing the StmtCaseCore03 expressions after conversion to IfElse") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore03.oberon").toURI)
+  test("Testing the StmtCaseCore03 expressions after conversion to IfElse") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore03.oberon").toURI)
 
     assert(path != null)
 
@@ -934,8 +944,8 @@ class CoreTransformerTest extends AnyFunSuite {
     assert((stmts(4) == WriteStmt(VarExpression("xs"))))
   }
 
-  ignore("Testing the StmtCaseCore04 evaluation after conversion to OberonCore") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+  test("Testing the StmtCaseCore04 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore04.oberon").toURI)
 
     assert(path != null)
 
@@ -946,14 +956,15 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleRangeCaseModule")
 
     assert(interpreter.env.lookup("xs") == Some(IntValue(20)));
   }
 
-  ignore("Testing the StmtCaseCore04 expressions after conversion to IfElse") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+  test("Testing the StmtCaseCore04 expressions after conversion to IfElse") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore04.oberon").toURI)
 
     assert(path != null)
 
@@ -990,8 +1001,8 @@ class CoreTransformerTest extends AnyFunSuite {
   /** ###### Case Tests end here ###### */
 
   /** ###### Case Tests for CoreChecker ###### */
-  ignore("Testing if Core for valid Core for StmtCaseCore04") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/StmtCaseCore04.oberon").toURI)
+  test("Testing if Core for valid Core for StmtCaseCore04") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/stmtCaseCore04.oberon").toURI)
 
     assert(path != null)
 

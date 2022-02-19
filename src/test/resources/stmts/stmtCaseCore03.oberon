@@ -1,0 +1,21 @@
+MODULE SimpleRangeCaseModule;
+
+VAR
+  xs, min, max : INTEGER;
+
+BEGIN
+  xs := 1;
+  min := 10;
+  max := 20;
+
+  CASE xs OF
+    1: xs := 5
+  | 2: xs := 10
+  | min .. max: xs := 20
+  ELSE xs := 0
+  END;
+
+  write(xs)
+END
+
+END SimpleRangeCaseModule.
