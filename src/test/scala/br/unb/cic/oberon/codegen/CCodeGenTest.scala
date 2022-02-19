@@ -150,7 +150,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  ignore("Testing C generator for stmt32") {
+  test("Testing C generator for stmt32") {
     val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt32.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
@@ -159,7 +159,7 @@ class CCodeGenTest extends AnyFunSuite {
     assert(generatedCCode == cCode)
   }
 
-  ignore("Testing C generator for stmt33") {
+  test("Testing C generator for stmt33") {
     val module = ScalaParser.parseResource(s"stmts/ifelseif_stmt33.oberon")
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
