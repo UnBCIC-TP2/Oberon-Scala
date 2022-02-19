@@ -142,7 +142,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
-  ignore("Test for the APPENDFILE function") {
+  test("Test for the APPENDFILE function") {
     val module = ScalaParser.parseResource("stdlib/APPENDFILETest.oberon")
 
     assert(module.name == "APPENDFILETest")

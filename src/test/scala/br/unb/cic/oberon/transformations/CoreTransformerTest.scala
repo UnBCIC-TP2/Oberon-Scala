@@ -8,7 +8,7 @@ import java.nio.file.{Files, Paths}
 
 class CoreTransformerTest extends AnyFunSuite {
 
-  ignore("Testing the loop_stmt01 expressions after conversion to While") {
+  test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
     assert(path != null)
@@ -59,7 +59,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
   }
 
-  ignore("Testing the loop_stmt02 expressions after conversion to While") {
+  test("Testing the loop_stmt02 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI)
 
     assert(path != null)
@@ -113,7 +113,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(100)))
   }
 
-  ignore("Testing the loop_stmt03 expressions after conversion to While") {
+  test("Testing the loop_stmt03 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
     assert(path != null)
@@ -177,7 +177,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("sum").contains(IntValue(55)));
   }
 
-  ignore("Testing the RepeatUntilStmt01 expressions after conversion to While") {
+  test("Testing the RepeatUntilStmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt01.oberon").toURI)
 
     assert(path != null)
@@ -234,7 +234,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y").contains(IntValue(40)))
   }
 
-  ignore("Testing the RepeatUntilStmt06 expressions after conversion to While") {
+  test("Testing the RepeatUntilStmt06 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
     assert(path != null)
@@ -347,7 +347,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y").contains(IntValue(19)));
   }
 
-  ignore("Testing the repeatuntil02 expressions after conversion to While") {
+  test("Testing the repeatuntil02 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil02.oberon").toURI)
 
     assert(path != null)
@@ -412,7 +412,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y").contains(IntValue(2)));
   }
 
-  ignore("Testing the repeatuntil04 expressions after conversion to While") {
+  test("Testing the repeatuntil04 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil04.oberon").toURI)
 
     assert(path != null)
@@ -463,7 +463,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
   }
 
-  ignore("Testing the interpreter_stmt01 expressions after conversion to While") {
+  test("Testing the interpreter_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/interpreter_stmt01.oberon").toURI)
 
     assert(path != null)
@@ -575,7 +575,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(1)));
   }
 
-  ignore("Testing the IfElseIfStmt01 expressions after conversion to IfElse") {
+  test("Testing the IfElseIfStmt01 expressions after conversion to IfElse") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt01.oberon").toURI)
 
     assert(path != null)
@@ -628,7 +628,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(3)));
   }
 
-  ignore("Testing the IfElseIfStmt03 expressions after conversion to IfElse") {
+  test("Testing the IfElseIfStmt03 expressions after conversion to IfElse") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
 
     assert(path != null)
@@ -680,7 +680,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(5)));
   }
 
-  ignore("Testing the IfElseIfStmt05 expressions after conversion to IfElse") {
+  test("Testing the IfElseIfStmt05 expressions after conversion to IfElse") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt05.oberon").toURI)
 
     assert(path != null)
@@ -736,7 +736,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(interpreter.env.lookup("x") == Some(IntValue(0)));
   }
 
-  ignore("Testing the IfElseIfStmt08 expressions after conversion to IfElse") {
+  test("Testing the IfElseIfStmt08 expressions after conversion to IfElse") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt08.oberon").toURI)
 
     assert(path != null)
@@ -1008,7 +1008,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(isCore2)
   }
 
-  ignore("Testing if Core for valid Core for loop_stmt01") {
+  test("Testing if Core for valid Core for loop_stmt01") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
     assert(path != null)
@@ -1026,7 +1026,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(isCore2)
   }
 
-  ignore("Testing if Core for valid Core for RepeatUntilStmt06") {
+  test("Testing if Core for valid Core for RepeatUntilStmt06") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
 
     assert(path != null)
@@ -1044,7 +1044,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(isCore2)
   }
 
-  ignore("Testing if Core for valid Core for RepeatUntil04") {
+  test("Testing if Core for valid Core for RepeatUntil04") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/repeatuntil04.oberon").toURI)
 
     assert(path != null)
