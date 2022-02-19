@@ -7,7 +7,7 @@ import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
 
 class CoreTransformerTest extends AnyFunSuite {
-
+  
   test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
@@ -54,6 +54,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(6)))
     assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
@@ -107,6 +108,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment
     coreModule.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(10)))
     assert(interpreter.env.lookup("i") == Some(IntValue(10)))
@@ -170,6 +172,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
@@ -227,6 +230,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
@@ -271,7 +275,7 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("y")))
   }
 
-  /**RepeatUntil Test 07*/
+  /**RepeatUntil test 07*/
   test("Testing the RepeatUntilStmt07 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt07.oberon").toURI)
 
@@ -284,6 +288,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
@@ -336,12 +341,10 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
-
-    println(interpreter.env.lookup("x"))
-    println(interpreter.env.lookup("y"))
 
     assert(interpreter.env.lookup("x").contains(IntValue(10)));
     assert(interpreter.env.lookup("y").contains(IntValue(19)));
@@ -401,12 +404,10 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "RepeatUntilModule");
-
-    println(interpreter.env.lookup("x"))
-    println(interpreter.env.lookup("y"))
 
     assert(interpreter.env.lookup("x").contains(IntValue(2)));
     assert(interpreter.env.lookup("y").contains(IntValue(2)));
@@ -454,6 +455,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -508,6 +510,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -567,6 +570,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -620,6 +624,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -672,6 +677,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -728,6 +734,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment
     coreModule.accept(interpreter)
 
     assert(module.name == "SimpleModule")
@@ -783,6 +790,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleModule")
 
@@ -837,6 +845,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleModule")
 
@@ -892,6 +901,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleRangeCaseModule")
 
@@ -946,6 +956,7 @@ class CoreTransformerTest extends AnyFunSuite {
 
     val coreModule = coreVisitor.transformModule(module)
 
+    interpreter.setTestEnvironment()
     coreModule.accept(interpreter)
     assert(module.name == "SimpleRangeCaseModule")
 
