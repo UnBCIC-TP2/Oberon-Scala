@@ -8,7 +8,7 @@ import java.nio.file.{Files, Paths}
 
 class CoreTransformerTest extends AnyFunSuite {
 
-  ignore("Testing the loop_stmt01 expressions after conversion to While") {
+  test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
 
     assert(path != null)
