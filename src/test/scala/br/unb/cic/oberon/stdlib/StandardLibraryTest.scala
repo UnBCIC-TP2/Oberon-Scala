@@ -5,6 +5,8 @@ import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.io.Source
+
 class StandardLibraryTest extends AnyFunSuite {
 
   test("Test for the ABS function") {
@@ -122,7 +124,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
-  ignore("Test for the WRITEFILE function") {
+  test("Test for the WRITEFILE function") {
     val module = ScalaParser.parseResource("stdlib/WRITEFILETest.oberon")
 
     assert(module.name == "WRITEFILETest")
@@ -132,13 +134,21 @@ class StandardLibraryTest extends AnyFunSuite {
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+    val fileName = "writtenByWRITEFILE.txt"
+    val pathToWrite = if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
+                          "src\\test\\resources\\stdlib\\"
+                      else
+                          "src/test/resources/stdlib/"
+
+    val toWriteFullPath = pathToWrite + fileName
+    assert(interpreter.env.lookup("x") == Some(StringValue(toWriteFullPath)))
     assert(interpreter.env.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")))
 
-    if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
-      assert(interpreter.env.lookup("z") == Some(StringValue("src\\test\\resources\\stdlib\\plainFile.txt")))
-    else
-      assert(interpreter.env.lookup("z") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+    val bufferedSource = Source.fromFile(toWriteFullPath)
+    val fileContent = bufferedSource.getLines().mkString
+    bufferedSource.close
+
+    assert(interpreter.env.lookup("y") == Some(StringValue(fileContent)))
 
   }
 
