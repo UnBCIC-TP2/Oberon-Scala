@@ -108,7 +108,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
-  ignore("Test for the READFILE function") {
+  test("Test for the READFILE function") {
     val module = ScalaParser.parseResource("stdlib/READFILETest.oberon")
 
     assert(module.name == "READFILETest")
@@ -118,7 +118,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("y") == Some(StringValue(_)))
+    assert(interpreter.env.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
 
   }
 
