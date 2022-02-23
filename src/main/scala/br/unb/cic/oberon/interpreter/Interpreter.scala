@@ -120,8 +120,9 @@ class Interpreter extends OberonVisitorAdapter {
         checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
 
       case WhileStmt(condition, whileStmt) =>
-        while (evalCondition(condition))
+        while (evalCondition(condition) && exit == false )
           whileStmt.accept(this)
+        exit = false
 
       case RepeatUntilStmt(condition, repeatUntilStmt) =>
         do {
