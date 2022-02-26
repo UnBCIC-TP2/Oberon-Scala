@@ -11,11 +11,11 @@ PROCEDURE initialize_array(pogArray : simple) : simple;
     i := 0;
 
     REPEAT
-      pogArray[i] = i*5;
+      pogArray[i] := i*5;
       i := i + 1
-    UNTIL i < 10;
+    UNTIL i = 10;
 
     RETURN pogArray
-  END
+  END initialize_array
 
 END UserTypeModule.

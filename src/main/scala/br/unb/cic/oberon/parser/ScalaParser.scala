@@ -476,14 +476,29 @@ class ParserVisitor {
       stmt = ReadCharStmt(varName)
     }
 
+    override def visitReadLongRealStmt(ctx: OberonParser.ReadLongRealStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadLongRealStmt(varName)
+    }
+
     override def visitReadRealStmt(ctx: OberonParser.ReadRealStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadRealStmt(varName)
     }
 
+    override def visitReadLongIntStmt(ctx: OberonParser.ReadLongIntStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadLongIntStmt(varName)
+    }
+
     override def visitReadIntStmt(ctx: OberonParser.ReadIntStmtContext): Unit = {
       val varName = ctx.`var`.getText
       stmt = ReadIntStmt(varName)
+    }
+
+    override def visitReadShortIntStmt(ctx: OberonParser.ReadShortIntStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = ReadShortIntStmt(varName)
     }
 
     override def visitWriteStmt(ctx: OberonParser.WriteStmtContext): Unit = {
