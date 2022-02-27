@@ -100,7 +100,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)
   }
   /** Whilestmt test */
-  ignore("Test control flow graph for stmt04.oberon") {
+  test("Test control flow graph for stmt04.oberon") {
     val s3_1 = AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x")))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("y")
@@ -256,7 +256,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
 
-  ignore("Test control flow graph for stmt13.oberon") {
+  test("Test control flow graph for stmt13.oberon") {
 
 
     /**
@@ -300,7 +300,7 @@ test("Test control flow graph for stmt01.oberon") {
     val g = builder.createControlFlowGraph(SequenceStmt(stmts))
 
     assert( 7 == g.nodes.size)
-    assert( 6 == g.edges.size)
+    assert( 7 == g.edges.size)
 
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
