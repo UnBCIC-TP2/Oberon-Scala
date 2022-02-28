@@ -1729,7 +1729,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  ignore("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
+  test("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
     val module = ScalaParser.parseResource("simple/userTypeSimple04.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1743,7 +1743,7 @@ class ParserTestSuite extends AnyFunSuite {
 
     assert(module.userTypes(0).baseType == ArrayType(10, BooleanType))
     assert(module.userTypes(1).baseType == RecordType(listDeclaration))
-    assert(module.userTypes(2).baseType == ArrayType(5, ReferenceToUserDefinedType("java")))
+    assert(module.userTypes(2).baseType == ArrayType(-5, ReferenceToUserDefinedType("java")))
   }
 
   test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"){
