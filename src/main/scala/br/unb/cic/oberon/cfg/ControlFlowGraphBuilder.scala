@@ -39,7 +39,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
           case _ =>
             g += StartNode() ~> SimpleNode(stmts.head)
         }
-        createControlFlowGraph(stmts, g)
+        createControlFlowGraph(stmts, None, g)
 
       case ForStmt(init, _ , forStmt) =>
         g += StartNode() ~> SimpleNode(init)
@@ -59,7 +59,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
    * @param g a graph used as accumulator
    * @return a new version of the graph
    */
-  def createControlFlowGraph(stmts: List[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
+  def createControlFlowGraph(stmts: List[Statement], end: Option[Statement], g: Graph[GraphNode, GraphEdge.DiEdge]): Graph[GraphNode, GraphEdge.DiEdge] = {
     stmts match {
     case s1 :: s2 :: rest => // case the list has at least two elements. this is the recursive case
       s1 match {
@@ -70,7 +70,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
             case _ =>
               processStmtNode(s1, Some(s2), g)
           }
-          createControlFlowGraph(s2 :: rest, g)
+          createControlFlowGraph(s2 :: rest, end, g)
         case CaseStmt(_, _, Some(_)) =>
           s2 match {
             case ForStmt(init,_ ,_) =>
@@ -78,7 +78,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
             case _ =>
               processStmtNode(s1, Some(s2), g)
           }
-          createControlFlowGraph(s2 :: rest, g)
+          createControlFlowGraph(s2 :: rest, end, g)
         case IfElseIfStmt(_, _, _, Some(_)) =>
           s2 match {
             case ForStmt(init,_ ,_) =>
@@ -86,12 +86,12 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
             case _ =>
               processStmtNode(s1, Some(s2), g)
           }
-          createControlFlowGraph(s2 :: rest, g)
+          createControlFlowGraph(s2 :: rest, end, g)
         case ForStmt(init, _ , forStmt) =>
           g += SimpleNode(init) ~> SimpleNode(s1)
           g += SimpleNode(s1) ~> SimpleNode(s2)
           processStmtNode(s1, Some(forStmt), g)
-          createControlFlowGraph(s2 :: rest, g)
+          createControlFlowGraph(s2 :: rest, end, g)
         case _ =>
           s2 match {
             case ForStmt(init,_ , _) =>
@@ -100,7 +100,7 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
               g += SimpleNode(s1) ~> SimpleNode(s2)
               processStmtNode(s1, Some(s2), g)
           }
-          createControlFlowGraph(s2 :: rest, g)
+          createControlFlowGraph(s2 :: rest, end, g)
       }
     case s1 :: List() => // case the list has just one element. this is the base case
       s1 match {
@@ -111,9 +111,11 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
 
       }
 
-      g += SimpleNode(s1) ~> EndNode()
-      processStmtNode(s1, None, g) // process the singleton node of the stmts list of statements
-      g
+      if (!end.isDefined) {
+        g += SimpleNode(s1) ~> EndNode()
+        processStmtNode(s1, None, g) // process the singleton node of the stmts list of statements
+      }
+        g
   }
   }
 
@@ -182,8 +184,11 @@ class IntraProceduralGraphBuilder extends ControlFlowGraphBuilder {
         g += SimpleNode(from) ~> SimpleNode(stmts.head) // create an edge from "from" to the first elements of the list stmts
         if(end.isDefined) {
           g += SimpleNode(stmts.last) ~> SimpleNode(end.get)
+          createControlFlowGraph(stmts, end, g)
         }
-        createControlFlowGraph(stmts, g)
+        else {
+          createControlFlowGraph(stmts, None, g)
+        }
       case _ =>
         g += SimpleNode(from) ~> SimpleNode(target)
         if(end.isDefined) {
