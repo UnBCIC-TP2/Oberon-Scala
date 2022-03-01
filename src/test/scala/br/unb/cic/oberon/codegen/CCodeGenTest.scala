@@ -173,7 +173,7 @@ class CCodeGenTest extends AnyFunSuite {
     val codeGen = PaigesBasedGenerator()
     val generatedCCode = codeGen.generateCode(module)
 
-    val cCode = Resources.getContent(s"cCode/stmts/stmt21.c")
+    val cCode = Resources.getContent(s"cCode/stmts/stmt21.c") // The C file used for the test does not exist
     assert(generatedCCode == cCode)
   }
 }
