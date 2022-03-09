@@ -23,33 +23,46 @@ class CoreVisitor extends OberonVisitorAdapter {
       SequenceStmt(List(initStmt.accept(this), WhileStmt(condition, block.accept(this))))
 
     case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) =>
-      IfElseStmt (condition, thenStmt.accept(this), Some(ifAux(elsifStmt, elseStmt)))
+      IfElseStmt (condition, thenStmt.accept(this), Some(transformElsif(elsifStmt, elseStmt)))
 
-    case CaseStmt(exp, cases, elseStmt) => caseAux(exp, cases, elseStmt)
+    case CaseStmt(exp, cases, elseStmt) => transformCase(exp, cases, elseStmt)
 
     case _ => stmt
   }
 
-  private def caseAux(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
+  private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
+    val coreElseStmt = if (elseStmt.isEmpty) None else Some(elseStmt.get.accept(this))
 
-    if (cases.nonEmpty){
-      if (cases.head.isInstanceOf[SimpleCase]){
-        return IfElseStmt(EQExpression(exp, cases.head.asInstanceOf[SimpleCase].condition), cases.head.asInstanceOf[SimpleCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
-      }
-      else{
-        return IfElseStmt(AndExpression(LTEExpression(cases.head.asInstanceOf[RangeCase].min, exp), LTEExpression(exp, cases.head.asInstanceOf[RangeCase].max)), cases.head.asInstanceOf[RangeCase].stmt.accept(this), Some(caseAux(exp, cases.tail, Some(elseStmt.get.accept(this)))))
-      }
-    }else{
-      return elseStmt.get.accept(this)
+    cases.head match {
+      case SimpleCase(condition, stmt) if cases.tail.nonEmpty =>
+        val newCondition = EQExpression(exp, condition)
+        val newElse = Some(transformCase(exp, cases.tail, coreElseStmt))
+        IfElseStmt(newCondition, stmt.accept(this), newElse)
+      
+      case SimpleCase(condition, stmt) =>
+        val newCondition = EQExpression(exp, condition)
+        IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+        
+      case RangeCase(min, max, stmt) if cases.tail.nonEmpty =>
+        val newCondition = AndExpression(LTEExpression(min, exp), LTEExpression(exp, max))
+        val newElse = Some(transformCase(exp, cases.tail, coreElseStmt))
+        IfElseStmt(newCondition, stmt.accept(this), newElse)
+
+      case RangeCase(min, max, stmt) =>
+        val newCondition = AndExpression(LTEExpression(min, exp), LTEExpression(exp, max))
+        IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
     }
   }
 
-  private def ifAux (elsifStmt: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = { // falta arruamr a entrada da função com os tipos
-    if (elsifStmt.tail.isEmpty){ // termina a recursividade
-      return IfElseStmt(elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt.accept(this), Some(elseStmt.get.accept((this))))
-    }
-    else{
-      return IfElseStmt (elsifStmt.head.condition, elsifStmt.head.asInstanceOf[ElseIfStmt].thenStmt.accept(this), Some(ifAux(elsifStmt.tail, Some(elseStmt.get.accept(this)))))
+  private def transformElsif (elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = {
+    val coreElseStmt = if (elseStmt.isEmpty) None else Some(elseStmt.get.accept(this))
+    val currentElsif = elsifStmts.head
+
+    if (elsifStmts.tail.isEmpty) {
+      IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), coreElseStmt)
+    } else {
+      val nextElsif = Some(transformElsif(elsifStmts.tail, coreElseStmt))
+      IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), nextElsif)
     }
   }
 
