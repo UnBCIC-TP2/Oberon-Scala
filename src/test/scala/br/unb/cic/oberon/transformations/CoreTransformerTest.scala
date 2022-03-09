@@ -217,6 +217,27 @@ class CoreTransformerTest extends AnyFunSuite {
     assert(stmts(3) == WriteStmt(VarExpression("sum")))
   }
 
+  test("Testing the RepeatUntilStmt02 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt02.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt02.oberon")
+    val interpreter = new Interpreter()
+    val coreVisitor = new CoreVisitor()
+
+    val coreModule = coreVisitor.transformModule(module)
+
+    interpreter.setTestEnvironment()
+    coreModule.accept(interpreter)
+
+    assert(coreModule.name == "RepeatUntilModule")
+    assert(interpreter.env.lookup("sum") == Some(IntValue(330)));
+    assert(interpreter.env.lookup("x") == Some(IntValue(21)));
+
+  }
+
   // TODO
   test("Testing the RepeatUntilStmt06 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/RepeatUntilStmt06.oberon").toURI)
@@ -611,6 +632,25 @@ class CoreTransformerTest extends AnyFunSuite {
     assert((stmts(2) == WriteStmt(VarExpression("y"))))
   }
 
+  test("Testing the IfElseIfStmt02 evaluation after conversion to OberonCore") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt02.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+    val interpreter = new Interpreter()
+    val coreVisitor = new CoreVisitor()
+
+    val coreModule = coreVisitor.transformModule(module)
+
+    interpreter.setTestEnvironment()
+    coreModule.accept(interpreter)
+
+    assert(module.name == "SimpleModule")
+
+    assert(interpreter.env.lookup("y") == Some(IntValue(2)));
+  }
 
   test("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/IfElseIfStmt03.oberon").toURI)
