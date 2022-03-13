@@ -1,0 +1,17 @@
+MODULE Aritmetic37;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  z : INTEGER;
+  w : INTEGER;
+
+BEGIN
+  x := 5;
+  y := 3;
+  z := x MOD y;
+  w := (-1)* x MOD y
+END
+
+
+END Aritmetic37.

@@ -112,6 +112,12 @@ class Interpreter extends OberonVisitorAdapter {
       case WriteStmt(exp) =>
         printStream.println(evalExpression(exp))
 
+      case IncStmt(name) =>
+        env.setLocalVariable(name, evalExpression(AddExpression(env.lookup(name).get, IntValue(1))))
+
+      case DecStmt(name) =>
+        env.setLocalVariable(name, evalExpression(AddExpression(env.lookup(name).get, IntValue(-1))))
+
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (evalCondition(condition)) thenStmt.accept(this)
         else if (elseStmt.isDefined) elseStmt.get.accept(this)
@@ -280,12 +286,14 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
     case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
+    case ModExpression(left, right) => modularExpression(left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
     case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
     case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
     case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
     case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
     case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
     case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+    case NotExpression(exp) => BoolValue(!exp.accept(this).asInstanceOf[Value].value.asInstanceOf[Boolean])
     case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => {
@@ -321,6 +329,23 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): Expression = {
     val vl = left.accept(this).asInstanceOf[Number]
     val vr = right.accept(this).asInstanceOf[Number]
+
+    fn(vl, vr)
+  }
+
+  /**
+   * Eval an modular expression on Numbers
+   *
+   * @param left  the left expression
+   * @param right the right expression
+   * @param op    a function representing the operator
+   * @return the application of the operator after
+   *         evaluating left and right to reduce them to
+   *         numbers.
+   */
+  def modularExpression(left: Expression, right: Expression, fn: (Modular, Modular) => Modular): Expression = {
+    val vl = left.accept(this).asInstanceOf[Modular]
+    val vr = right.accept(this).asInstanceOf[Modular]
 
     fn(vl, vr)
   }

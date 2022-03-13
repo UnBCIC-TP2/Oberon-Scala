@@ -1,0 +1,15 @@
+MODULE FLTTest;
+
+VAR
+  x : INTEGER;
+  y : REAL;
+  z : REAL;
+  w : INTEGER;
+
+BEGIN
+  w := 2;
+  x := -8;
+  y := FLT(x);
+  z := FLT(w)
+END
+END FLTTest.

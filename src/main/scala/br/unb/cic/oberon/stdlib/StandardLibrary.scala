@@ -21,7 +21,8 @@ class StandardLibrary[T](env: Environment[T]) {
     string
   }
 
-  val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(), List(abs, odd, floor, round, power, sqrroot, ceil, readFile, writeFile, appendFile), None)
+  val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(),
+    List(abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile), None)
 
   def abs = Procedure(
     "ABS",                             // name
@@ -55,35 +56,46 @@ class StandardLibrary[T](env: Environment[T]) {
   def ceil = Procedure(
     "CEIL",                         // name
     List(ParameterByValue("x", RealType)), // formal arguments
-    Some(RealType),                 // return type
+    Some(IntegerType),                 // return type
     List(),                         // local constants
     List(),                         // local variables
 
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup("x").get.asInstanceOf[RealValue].value.ceil))))
+      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup("x").get.asInstanceOf[RealValue].value.ceil.toInt))))
     )
   )
 
   def floor = Procedure(
-    "FLR",
+    "FLOOR",
     List(ParameterByValue("x", RealType)),
-    Some(RealType),
+    Some(IntegerType),
     List(),
     List(),
 
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.floor)))))
+      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.floor.toInt)))))
   )
 
   def round = Procedure(
     "RND",
     List(ParameterByValue("x", RealType)),
+    Some(IntegerType),
+    List(),
+    List(),
+
+    SequenceStmt(
+      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.round.toInt)))))
+  )
+
+  def intToFloat = Procedure(
+    "FLT",
+    List(ParameterByValue("x", IntegerType)),
     Some(RealType),
     List(),
     List(),
 
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.round)))))
+      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[IntValue].value.toFloat)))))
   )
   def power = Procedure(
     "POW",

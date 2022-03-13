@@ -481,4 +481,69 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
     //assert(interpreter.env.lookup("x") == Some(IntValue(2)))
   }
+
+  ignore("Testing ArrayAssignmentStmt03"){
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt03.oberon")
+
+    assert(module.name == "ArrayAssignmentStmt03")
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("array").isDefined)
+    assert(interpreter.env.lookup("outroarray").isDefined)
+
+
+    assert(interpreter.env.lookupArrayIndex("outoarray", 0) == Some(IntValue(1)))
+    assert(interpreter.env.lookupArrayIndex("outoarray", 1) == Some(IntValue(5)))
+
+    for (i <- 0 to 2){
+      assert(interpreter.env.lookupArrayIndex("array", i) == Some(IntValue(10*(i+1))))
+    }
+  }
+
+  test("Testing aritmetic37"){
+    val module = ScalaParser.parseResource("aritmetic/aritmetic37.oberon")
+
+    assert(module.name == "Aritmetic37")
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(5)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(3)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(2)))
+    assert(interpreter.env.lookup("w") == Some(IntValue(1)))
+
+  }
+
+  test(testName = "Test for the INC function"){
+    val module = ScalaParser.parseResource("stmts/INCTest.oberon")
+
+    assert(module.name == "INCTest")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(RealValue(10.0)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(-7)))
+
+  }
+
+  test(testName = "Test for the DEC function"){
+    val module = ScalaParser.parseResource("stmts/DECTest.oberon")
+
+    assert(module.name == "DECTest")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(8)))
+    assert(interpreter.env.lookup("y") == Some(RealValue(-9.0)))
+  }
+
+  test(testName = "Testing boolean32"){
+    val module = ScalaParser.parseResource("boolean/boolean32.oberon")
+
+    assert(module.name == "Boolean32")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(BoolValue(true)))
+    assert(interpreter.env.lookup("a") == Some(BoolValue(false)))
+    assert(interpreter.env.lookup("b") == Some(BoolValue(true)))
+  }
 }

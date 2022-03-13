@@ -403,6 +403,11 @@ class ParserVisitor {
       exp = FunctionCallExpression(name, args.toList)
     }
 
+    override def visitNotExpression(ctx: OberonParser.NotExpressionContext): Unit = {
+      ctx.exp.accept(this)
+      exp = NotExpression(exp)
+    }
+
     private def expression(opr: String): (Expression, Expression) => Expression =
       opr match {
         case "=" => EQExpression
@@ -417,6 +422,7 @@ class ParserVisitor {
         case "/" => DivExpression
         case "&&" => AndExpression
         case "||" => OrExpression
+        case "MOD" => ModExpression
       }
 
     /*
@@ -505,6 +511,16 @@ class ParserVisitor {
       val visitor = new ExpressionVisitor()
       ctx.expression().accept(visitor)
       stmt = WriteStmt(visitor.exp)
+    }
+
+    override def visitIncStmt(ctx: OberonParser.IncStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = IncStmt(varName)
+    }
+
+    override def visitDecStmt(ctx: OberonParser.DecStmtContext): Unit = {
+      val varName = ctx.`var`.getText
+      stmt = DecStmt(varName)
     }
 
     override def visitProcedureCall(ctx: OberonParser.ProcedureCallContext): Unit = {

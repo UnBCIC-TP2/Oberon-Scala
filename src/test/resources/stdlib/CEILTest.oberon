@@ -3,8 +3,8 @@ MODULE CEILTest;
 VAR
     x : REAL;
     y : REAL;
-    z : REAL;
-    w : REAL;
+    z : INTEGER;
+    w : INTEGER;
 
 BEGIN
     x := 10.0;
