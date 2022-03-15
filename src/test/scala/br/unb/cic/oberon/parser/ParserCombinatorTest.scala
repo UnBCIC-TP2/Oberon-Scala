@@ -10,11 +10,11 @@ class ParserCombinatorTestSuite extends AnyFunSuite{
 
     test("Testing Int Parser") {
         val assign = IntValue(123)
-        val a = ParserInt.parse(ParserInt.int, "123") match {
+        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.int, "123") match {
 
-            case ParserInt.Success(matched,_) => matched 
-            case ParserInt.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserInt.Error(msg,_) => fail("ERROR: " + msg)
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
 
         assert(assign ==a ) 
@@ -22,10 +22,10 @@ class ParserCombinatorTestSuite extends AnyFunSuite{
 
     test("Testing Real Parser") {
         val assign = RealValue(1.02)
-        val a = ParserReal.parse(ParserReal.real, "1.02") match {
-            case ParserReal.Success(matched,_) => matched 
-            case ParserReal.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserReal.Error(msg,_) => fail("ERROR: " + msg)
+        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.real, "1.02") match {
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
 
         assert(assign == a)
@@ -36,17 +36,17 @@ class ParserCombinatorTestSuite extends AnyFunSuite{
         val assign1 = BoolValue(true)
         val assign2 = BoolValue(false)
 
-        val a = ParserBool.parse(ParserBool.bool, "TRUE") match {
-            case ParserBool.Success(matched,_) => matched 
-            case ParserBool.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserBool.Error(msg,_) => fail("ERROR: " + msg)
+        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.bool, "TRUE") match {
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
 
 
-        val b = ParserBool.parse(ParserBool.bool, "FALSE") match {
-            case ParserBool.Success(matched,_) => matched 
-            case ParserBool.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserBool.Error(msg,_) => fail("ERROR: " + msg)
+        val b = Oberon2ScalaParser.parse(Oberon2ScalaParser.bool, "FALSE") match {
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
 
         assert(assign1 == a)
@@ -57,16 +57,16 @@ class ParserCombinatorTestSuite extends AnyFunSuite{
 
         val assign = StringValue("teste")
 
-        val a = ParserString.parse(ParserString.string, "\"teste\"") match {
-            case ParserString.Success(matched,_) => matched 
-            case ParserString.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserString.Error(msg,_) => fail("ERROR: " + msg)
+        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.string, "\"teste\"") match {
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
         
-        val b = ParserString.parse(ParserString.string, "\'teste\'") match {
-            case ParserString.Success(matched,_) => matched 
-            case ParserString.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case ParserString.Error(msg,_) => fail("ERROR: " + msg)
+        val b = Oberon2ScalaParser.parse(Oberon2ScalaParser.string, "\'teste\'") match {
+            case Oberon2ScalaParser.Success(matched,_) => matched 
+            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
+            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
         }
 
         assert (a == assign)
