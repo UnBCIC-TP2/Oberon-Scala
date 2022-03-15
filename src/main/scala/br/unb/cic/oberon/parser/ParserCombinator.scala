@@ -12,4 +12,12 @@ object Oberon2ScalaParser extends JavaTokenParsers {
     def number: String = digit + "+"
     def alpha: String = "[A-z]"
     def identifier: Parser[String] = (alpha +"(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
+
+    def parseAbs[T](result: ParseResult[T]): Any = { //ToDO: tirar esse Any
+        return result match {
+            case Success(matched,_) => matched
+            case Failure(msg,_)  => "FAILURE: " + msg
+            case Error(msg,_) => "ERROR: " + msg
+        }
+    }
 }

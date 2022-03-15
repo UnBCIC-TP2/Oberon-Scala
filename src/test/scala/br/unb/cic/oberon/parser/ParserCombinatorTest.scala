@@ -1,23 +1,36 @@
 package br.unb.cic.oberon.parser
 
+import scala.util.parsing.combinator._
 import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalactic.TolerantNumerics
 
 
+
+
 class ParserCombinatorTestSuite extends AnyFunSuite{
-
+    
     test("Testing Int Parser") {
-        val assign = IntValue(123)
-        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.int, "123") match {
+        val len = 4
+        var input = new Array[String](len)
+        var output = new Array[Any](len)
 
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
+        //positive number
+        input(0) = "123"
+        output(0) = IntValue(123)
+        //negative number
+        input(1) = "-321"
+        output(1) = IntValue(-321)
+        //string before
+        input(2) = "abc 123"
+        output(2) = "FAILURE: string matching regex '-?[0-9]+' expected but 'a' found"
+        //string after
+        input(3) = "123 abc"
+        output(3) = IntValue(123)
 
-        assert(assign ==a ) 
+        for( i <- 0 to len-1) 
+            assert(output(i) == Oberon2ScalaParser.parseAbs(Oberon2ScalaParser.parse(Oberon2ScalaParser.int, input(i))))
     }
 
     test("Testing Real Parser") {
