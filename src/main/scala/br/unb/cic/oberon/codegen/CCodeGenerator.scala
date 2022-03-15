@@ -1,6 +1,8 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.transformations.CoreChecker
+
 import scala.annotation.tailrec
 import org.typelevel.paiges._
 
@@ -8,6 +10,11 @@ abstract class CCodeGenerator extends CodeGenerator {}
 
 case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
+
+    if (!CoreChecker.isModuleCore(module))
+      throw new Exception("Não podemos compilar módulo C que não seja OberonCore")
+
+
     val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.text(
       "#include <stdbool.h>"
     ) + Doc.line + Doc.line
