@@ -34,75 +34,69 @@ class ParserCombinatorTestSuite extends AnyFunSuite{
     }
 
     test("Testing Real Parser") {
-        val positiveReal = RealValue(1.02)
-        val negativeReal = RealValue(-3.14)
+        val len = 2
+        var input = new Array[String](len)
+        var output = new Array[Any](len)
 
-        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.real, "1.02") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
-        val b = Oberon2ScalaParser.parse(Oberon2ScalaParser.real, "-3.14") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
+        //positive number
+        input(0) = "12.3"
+        output(0) = RealValue(12.3)
+        //negative number
+        input(1) = "-32.1"
+        output(1) = RealValue(-32.1)
 
-        assert(positiveReal == a)
-        assert(negativeReal == b)
+        for( i <- 0 to len-1) 
+            assert(output(i) == Oberon2ScalaParser.parseAbs(Oberon2ScalaParser.parse(Oberon2ScalaParser.real, input(i))))
+
     }
 
     test("Testing Bool Parser") {
 
-        val assign1 = BoolValue(true)
-        val assign2 = BoolValue(false)
+        val len = 2
+        var input = new Array[String](len)
+        var output = new Array[Any](len)
 
-        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.bool, "TRUE") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
+        //True
+        input(0) = "TRUE"
+        output(0) = BoolValue(true)
+        //False
+        input(1) = "FALSE"
+        output(1) = BoolValue(false)
 
-
-        val b = Oberon2ScalaParser.parse(Oberon2ScalaParser.bool, "FALSE") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
-
-        assert(assign1 == a)
-        assert(assign2 == b)
+        for( i <- 0 to len-1) 
+            assert(output(i) == Oberon2ScalaParser.parseAbs(Oberon2ScalaParser.parse(Oberon2ScalaParser.bool, input(i))))
     }
 
     test("Testing String Parser") {
 
-        val assign = StringValue("teste")
+        val len = 2
+        var input = new Array[String](len)
+        var output = new Array[Any](len)
 
-        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.string, "\"teste\"") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
-        
-        val b = Oberon2ScalaParser.parse(Oberon2ScalaParser.string, "\'teste\'") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
+        //Double quotes
+        input(0) = "\"teste\""
+        output(0) = StringValue("teste")
+        //Single quotes
+        input(1) = "\'teste\'"
+        output(1) = StringValue("teste")
 
-        assert (a == assign)
-        assert (b == assign)
+        for( i <- 0 to len-1) 
+            assert(output(i) == Oberon2ScalaParser.parseAbs(Oberon2ScalaParser.parse(Oberon2ScalaParser.string, input(i))))
+
     }
 
     test("Testing identifier parser") {
-        val assign = "teste"
+        val len = 1
+        var input = new Array[String](len)
+        var output = new Array[Any](len)
 
-        val a = Oberon2ScalaParser.parse(Oberon2ScalaParser.identifier, "teste") match {
-            case Oberon2ScalaParser.Success(matched,_) => matched 
-            case Oberon2ScalaParser.Failure(msg,_)  => fail("FAILURE: " + msg)
-            case Oberon2ScalaParser.Error(msg,_) => fail("ERROR: " + msg)
-        }
+        //Testing Simple id
+        input(0) = "teste"
+        output(0) = "teste"
 
-        assert (a == assign)
+        for( i <- 0 to len-1) 
+            assert(output(i) == Oberon2ScalaParser.parseAbs(Oberon2ScalaParser.parse(Oberon2ScalaParser.identifier, input(i))))
+
+
     }
 }
