@@ -97,14 +97,14 @@ class TypeChecker extends OberonVisitorAdapter {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case EAssignmentStmt(_, _) => visitEAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
-    case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
+    //case IfElseIfStmt(_, _, _, _) => visitIfElseIfStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
-    case RepeatUntilStmt(_, _) => visitRepeatUntilStmt(stmt)
-    case ForStmt(_, _, _) => visitForStmt(stmt)
-    case LoopStmt(_) => visitLoopStmt(stmt)
+    //case RepeatUntilStmt(_, _) => visitRepeatUntilStmt(stmt)
+    //case ForStmt(_, _, _) => visitForStmt(stmt)
+    //case LoopStmt(_) => visitLoopStmt(stmt)
     case ExitStmt() => visitExitStmt()
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
-    case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
+    //case CaseStmt(_, _, _) => visitSwitchStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
     case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
     case ReadLongRealStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
@@ -114,6 +114,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case ReadShortIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadCharStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case _ => throw new RuntimeException("Statement not part of Oberon-Core")
   }
 
   private def visitAssignment(stmt: Statement) = stmt match {
