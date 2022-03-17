@@ -7,6 +7,7 @@ import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpr
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.transformations.CoreVisitor
 
 class TypeCheckerTestSuite  extends AnyFunSuite {
 
@@ -111,7 +112,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test if-else-if statment type checker (invalid condition 'if')"){
+  test ("Test if-else-if statment type checker (invalid condition 'if')"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(20))
     val stmt02 = AssignmentStmt("z", IntValue(30))
@@ -122,7 +124,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(IntValue(34), stmt01, list1, None);
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(IntValue(34), stmt01, list1, None));
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -130,7 +132,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test else-if statment type checker (invalid condition 'else-if')"){
+  test ("Test else-if statment type checker (invalid condition 'else-if')"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
@@ -141,7 +144,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt03 = ElseIfStmt(IntValue(70), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None));
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -149,7 +152,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test else-if statment type checker (invalid condition list 'else-if')"){
+  test ("Test else-if statment type checker (invalid condition list 'else-if')"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
@@ -171,7 +175,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test else-if statment type checker (invalid then-stmt 'else-if')"){
+  test ("Test else-if statment type checker (invalid then-stmt 'else-if')"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
@@ -181,7 +186,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None)
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 1)
@@ -189,7 +194,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test if-else-if statment type checker (invalid else-stmt)"){
+  test ("Test if-else-if statment type checker (invalid else-stmt)"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
@@ -201,7 +207,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt04 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt04)
 
-    val stmt05 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
+    val stmt05 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -210,7 +216,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"){
+  test ("Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
@@ -221,7 +228,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt06 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt04, stmt05, stmt06)
 
-    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
+    val stmt07 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
@@ -230,7 +237,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test if-else-if statment type checker"){
+  test ("Test if-else-if statment type checker"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(15))
     val stmt02 = AssignmentStmt("y", IntValue(5))
@@ -241,7 +249,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None));
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -281,21 +289,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test for statement type checker (with invalid init)") {
+  test ("Test for statement type checker (with invalid init)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(10))
 
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 1)
   }
 
   // Transform to core
-  ignore ("Test for statement type checker (with invalid condition)") {
+  test ("Test for statement type checker (with invalid condition)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(10))
@@ -303,28 +313,30 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01,IntValue(10), stmt02)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01,IntValue(10), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 1)
   }
 
   // Transform to core
-  ignore ("Test for statement type checker (with invalid stmt)") {
+  test ("Test for statement type checker (with invalid stmt)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(100))
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt03.accept(visitor).size == 1)
   }
 
   // Transform to core
-  ignore ("Test for statement type checker") {
+  test ("Test for statement type checker") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(0))
     val stmt02 = AssignmentStmt("y", IntValue(10))
@@ -332,14 +344,15 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 0)
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker RangeCase (invalid case01 min expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case01 min expression) ") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -355,7 +368,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(IntValue(11), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -364,7 +377,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker RangeCase (invalid case02 min expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case02 min expression) ") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -380,7 +394,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(IntValue(11), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -389,7 +403,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -405,7 +420,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(IntValue(11), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -414,7 +429,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -430,7 +446,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(IntValue(11), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -439,7 +455,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
+  test("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -455,7 +472,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(Undef(), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(Undef(), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -464,7 +481,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker SimpleCase (invalid CaseStmt condition)") {
+  test ("Test switch-case statement type checker SimpleCase (invalid CaseStmt condition)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -477,7 +495,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(BoolValue(false), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(BoolValue(true), cases, Some(caseElse))
+    val stmt02 = coreTransformer.visit(CaseStmt(BoolValue(true), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
@@ -485,7 +503,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker SimpleCase (invalid case02 condition)") {
+  test ("Test switch-case statement type checker SimpleCase (invalid case02 condition)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -498,7 +517,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(BoolValue(false), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+    val stmt02 = coreTransformer.visit(CaseStmt(IntValue(10), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
@@ -506,7 +525,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
+  test ("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -519,7 +539,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(Undef(), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+    val stmt02 = coreTransformer.visit(CaseStmt(IntValue(10), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
@@ -527,7 +547,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker RangeCase") {
+  test ("Test switch-case statement type checker RangeCase") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -543,7 +564,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+    val stmt03 = coreTransformer.visit(CaseStmt(IntValue(11), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
@@ -552,7 +573,8 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test switch-case statement type checker SimpleCase") {
+  test ("Test switch-case statement type checker SimpleCase") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -565,7 +587,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(IntValue(20), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+    val stmt02 = coreTransformer.visit(CaseStmt(IntValue(10), cases, Some(caseElse)))
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
@@ -587,12 +609,13 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore("Test the type checker of a valid Repeat statement") {
+  test("Test the type checker of a valid Repeat statement") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val condition  = LTExpression(VarExpression("x"), IntValue(10))
     val stmt01     = ReadIntStmt("x")
-    val repeatStmt = RepeatUntilStmt(condition, stmt01)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -602,12 +625,13 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
 
   // Transform to core
-  ignore ("Test the type checker of a valid Repeat statement 2"){
+  test ("Test the type checker of a valid Repeat statement 2"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val condition  = EQExpression(VarExpression("x"), IntValue(0))
     val stmt01     = ReadIntStmt("x")
-    val repeatStmt = RepeatUntilStmt(condition, stmt01)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -617,18 +641,20 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test the type checker of a valid Repeat statement 3"){
+  test ("Test the type checker of a valid Repeat statement 3"){
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
     val stmt01  =  AssignmentStmt("x", IntValue(10))
 
-    val stmt02  = RepeatUntilStmt(BoolValue(true), stmt01)
+    val stmt02  = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
   }
 
   // Transform to core
-  ignore ("Test a invalid Repeat statement in the type checker") {
+  test ("Test a invalid Repeat statement in the type checker") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
@@ -636,7 +662,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt03 = IfElseStmt(BoolValue(false), stmt01, Some(stmt02))
     val stmt04 = AssignmentStmt("x", IntValue(20))
     val stmt05 = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
-    val stmt06 = RepeatUntilStmt(BoolValue(true), stmt05)
+    val stmt06 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt05))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
@@ -648,13 +674,14 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
 
   // Transform to core
-  ignore ("Test the type checker of a valid Repeat statement 4"){
+  test ("Test the type checker of a valid Repeat statement 4"){
+    val coreTransformer = new CoreVisitor
   val visitor = new TypeChecker()
 
   val condition  = AndExpression(GTEExpression(VarExpression("x"), IntValue(1)),
     LTEExpression(VarExpression("x"), IntValue(10)))
   val stmt01     = ReadIntStmt("x")
-  val repeatStmt = RepeatUntilStmt(condition, stmt01)
+  val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
   visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -664,14 +691,15 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test a valid Repeat statement, with nested Repeat statements") {
+  test ("Test a valid Repeat statement, with nested Repeat statements") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
-    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
-    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
-    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
+    val repeatStmt01 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
+    val repeatStmt02 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt01))
+    val repeatStmt03 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt02))
+    val repeatStmt04 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt03))
 
     visitor.env.setGlobalVariable("x", IntegerType)
     val allStmts = List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
@@ -682,14 +710,15 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test a invalid Repeat statement, with nested Repeat statements") {
+  test ("Test a invalid Repeat statement, with nested Repeat statements") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01       = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01)
-    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01)
-    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02)
-    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03)
+    val repeatStmt01 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
+    val repeatStmt02 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt01))
+    val repeatStmt03 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt02))
+    val repeatStmt04 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt03))
 
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
@@ -699,12 +728,13 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test a valid Repeat statement, with a boolean variable") {
+  test ("Test a valid Repeat statement, with a boolean variable") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val boolVar    = VarExpression("flag")
     val stmt01     = AssignmentStmt(boolVar.name, BoolValue(true))
-    val repeatStmt = RepeatUntilStmt(boolVar, stmt01)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(boolVar, stmt01))
 
     visitor.env.setGlobalVariable("flag", BooleanType)
 
@@ -713,11 +743,12 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test a valid Repeat statement, with a sequence of statements") {
+  test ("Test a valid Repeat statement, with a sequence of statements") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01     = AssignmentStmt("x", BoolValue(false))
-    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     visitor.env.setGlobalVariable("x", IntegerType)
@@ -726,18 +757,20 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   }
 
   // Transform to core
-  ignore ("Test a invalid Repeat statement, with a sequence of statements") {
+  test ("Test a invalid Repeat statement, with a sequence of statements") {
+    val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
     val stmt01     = AssignmentStmt("x", BoolValue(false))
-    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     assert(stmt02.accept(visitor).size == 4)
   }
 
   // Transform to core
-  ignore ("Test a loop statement, from loop_stmt03") {
+  test ("Test a loop statement, from loop_stmt03") {
+    val coreTransformer = new CoreVisitor
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
     assert(path != null)
