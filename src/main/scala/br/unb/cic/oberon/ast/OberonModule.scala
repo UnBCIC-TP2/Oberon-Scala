@@ -172,6 +172,18 @@ case class AndExpression(left: Expression, right: Expression) extends Expression
 /* Statements */
 trait Statement {
   def accept(v: OberonVisitor): v.T = v.visit(this)
+
+  val _id: Int = Statement.getNextId()
+  override def hashCode(): Int = _id
+}
+
+object Statement {
+  private var nextId = 0
+  def getNextId() = {
+    val returnId = nextId;
+    nextId += 1;
+    returnId
+  }
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement

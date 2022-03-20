@@ -308,7 +308,7 @@ test("Test control flow graph for stmt01.oberon") {
 
 
 
-  ignore("Simple control flow graph with repeated statements") {
+  test("Simple control flow graph with repeated statements") {
 
     val stmt0 = ReadIntStmt("x")
     val stmt1 = ReadIntStmt("y")
