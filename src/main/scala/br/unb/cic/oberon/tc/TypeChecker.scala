@@ -21,18 +21,30 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case NullValue => Some(NullType)
     case Undef() => None
     case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
-    case EQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case NEQExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case GTExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case LTExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case GTEExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case LTEExpression(left, right) => computeBinExpressionType(left, right, IntegerType, BooleanType)
-    case AddExpression(left, right) => computeBinExpressionType(left, right, IntegerType, IntegerType) // todo passar array de tipos (sugestao)
-    case SubExpression(left, right) => computeBinExpressionType(left, right, IntegerType, IntegerType)
-    case MultExpression(left, right) => computeBinExpressionType(left, right, IntegerType, IntegerType)
-    case DivExpression(left, right) => computeBinExpressionType(left, right, IntegerType, IntegerType)
-    case AndExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
-    case OrExpression(left, right) => computeBinExpressionType(left, right, BooleanType, BooleanType)
+    case EQExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType, RealType, BooleanType), BooleanType)
+    case NEQExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType, RealType, BooleanType), BooleanType)
+    case GTExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+    case LTExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+    case GTEExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+    case LTEExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+    case AddExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+    case SubExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+    case MultExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+    case DivExpression(left, right) =>
+      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+    case AndExpression(left, right) =>
+      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+    case OrExpression(left, right) =>
+      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     // TODO: function call ...
 
     case FieldAccessExpression(exp, attributeName) => {
@@ -68,10 +80,10 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     }
   }
 
-  def computeBinExpressionType(left: Expression, right: Expression, expected: Type, result: Type) : Option[Type] = {
+  def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
-    if(t1 == t2 && t1.contains(expected)) Some(result) else None
+    if(t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result) else None
   }
 }
 
@@ -160,22 +172,26 @@ class TypeChecker extends OberonVisitorAdapter {
     // case RecordAssignment
   }
 
-  private def visitIfElseStmt(stmt: Statement) = stmt match {
-    case IfElseStmt(condition, thenStmt, elseStmt) =>
-      if(condition.accept(expVisitor).contains(BooleanType)) {
-        val list1 = thenStmt.accept(this)
-        val list2 = if(elseStmt.isDefined) elseStmt.get.accept(this) else List()
-        list1 ++ list2
-      }
-      else List((stmt, s"Expression $condition does not have a boolean type"))
-  }
+private def visitIfElseStmt(stmt: Statement) = stmt match {
+  case IfElseStmt(condition, thenStmt, elseStmt) =>
+    var errorList = thenStmt.accept(this)
+
+    if(!condition.accept(expVisitor).contains(BooleanType)) {
+      errorList = (stmt, s"Expression $condition does not have a boolean type") :: errorList
+    }
+    
+    errorList ++ elseStmt.map(_.accept(this)).getOrElse(List())
+}
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
     case WhileStmt(condition, stmt) =>
+      val errorList = stmt.accept(this)
+
       if(condition.accept(expVisitor).contains(BooleanType)) {
-        stmt.accept(this)
+        errorList
+      } else {
+        (stmt, s"Expression $condition do not have a boolean type") :: errorList
       }
-      else List((stmt, s"Expression $condition do not have a boolean type"))
   }
 
   private def visitExitStmt() = List[(br.unb.cic.oberon.ast.Statement, String)]()
