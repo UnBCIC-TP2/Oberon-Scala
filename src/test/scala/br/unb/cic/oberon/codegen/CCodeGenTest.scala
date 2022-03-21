@@ -1,20 +1,15 @@
 package br.unb.cic.oberon.codegen
 
-import java.nio.file.{Files, Paths}
-import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.util.Resources
 import br.unb.cic.oberon.parser.ScalaParser
-import br.unb.cic.oberon.transformations.{CoreChecker, CoreVisitor}
+import br.unb.cic.oberon.transformations.CoreChecker
+import br.unb.cic.oberon.util.Resources
 import org.scalatest.funsuite.AnyFunSuite
 
 class CCodeGenTest extends AnyFunSuite {
 
-  // Tests for C code generator for stmt01.oberon - stmt16.oberon
-  val successfulTests = (1 to 16).toList
-  for (i <- successfulTests) {
+  for (i <- (1 to 16).toList) {
     val stmtNumber = "%02d".format(i)
     test(s"Testing C generator for stmt$stmtNumber") {
-      val stmtNumber = "%02d".format(i)
       testGenerator(s"stmts/stmt$stmtNumber.oberon", s"cCode/stmts/stmt$stmtNumber.c")
     }
   }
@@ -25,14 +20,14 @@ class CCodeGenTest extends AnyFunSuite {
     val module = ScalaParser.parseResource(oberonFile)
     val codeGen = PaigesBasedGenerator(lineSpaces)
 
-    if (CoreChecker.isModuleCore(module)) { //sucess
+    if (CoreChecker.isModuleCore(module)) { //success
       val generatedCCode = codeGen.generateCode(module)
       val cCode = Resources.getContent(CFile)
       assert(generatedCCode == cCode)
     }
     else { //fail
-      intercept[Exception] {
-        val generatedCCode = codeGen.generateCode(module)
+      intercept[NotOberonCoreException] {
+        codeGen.generateCode(module)
       }
     }
   }
@@ -61,7 +56,6 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator(s"stmts/stmt01.oberon", s"cCode/stmts/stmt01_4spaces.c", 4)
   }
 
-
   test("First RepeatUntil Test") {
     testGenerator(s"stmts/repeatuntil.oberon", s"cCode/stmts/repeatuntil.c")
   }
@@ -82,24 +76,19 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator(s"stmts/repeatuntil04.oberon", s"cCode/stmts/repeatuntil04.c")
   }
 
-  //Tests for IfElseIf
-  test("Testing C generator for stmt30") {
-    testGenerator(s"stmts/stmt30.oberon", s"cCode/stmts/stmt17.c")
+  test("Testing C generator for stmt30 (if-else-if)") {
+    testGenerator(s"stmts/stmt30.oberon", s"cCode/stmts/stmt30.c")
   }
 
   test("Testing C generator for ifelseif_stmt31") {
-    testGenerator(s"stmts/ifelseif_stmt31.oberon", s"cCode/stmts/stmt18.c")
+    testGenerator(s"stmts/ifelseif_stmt31.oberon", s"cCode/stmts/ifelseif_stmt31.c")
   }
 
-  test("Testing C generator for stmt32") {
-    testGenerator(s"stmts/ifelseif_stmt32.oberon", s"cCode/stmts/stmt19.c")
+  test("Testing C generator for ifelseif_stmt32") {
+    testGenerator(s"stmts/ifelseif_stmt32.oberon", s"cCode/stmts/ifelseif_stmt32.c")
   }
 
-  test("Testing C generator for stmt33") {
-    testGenerator(s"stmts/ifelseif_stmt33.oberon", s"cCode/stmts/stmt20.c")
+  test("Testing C generator for ifelseif_stmt33") {
+    testGenerator(s"stmts/ifelseif_stmt33.oberon", s"cCode/stmts/ifelseif_stmt33.c")
   }
-
-  /*test("Testing C generator for stmt34") {
-    testGenerator(s"stmts/stmt34.oberon", s"cCode/stmts/stmt21.c")
-  }*/
 }
