@@ -149,7 +149,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt04.accept(visitor).size == 1)
   }
 
-  ignore ("Test else-if statment type checker (invalid condition list 'else-if')"){
+  test ("Test else-if statment type checker (invalid condition list 'else-if')"){
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
@@ -164,7 +164,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val stmt06 = ElseIfStmt(BoolValue(false), stmt01)
     val list1 = List(stmt03, stmt04, stmt05, stmt06)
 
-    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, None);
+    val stmt07 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None));
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -210,7 +210,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt05.accept(visitor).size == 1)
   }
   
-  ignore ("Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"){
+  test ("Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"){
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker
     val stmt01 = AssignmentStmt("x", IntValue(40))
@@ -227,7 +227,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt03.accept(visitor).size == 1)
-    assert(stmt07.accept(visitor).size == 5)
+    assert(stmt07.accept(visitor).size == 7)
   }
 
   test ("Test if-else-if statment type checker"){
@@ -389,7 +389,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
   }
 
-  ignore ("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -414,7 +414,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 2)
   }
 
-  ignore ("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -424,7 +424,6 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
-
 
     val case01 = RangeCase(IntValue(20),BoolValue(false), stmt01)
     val case02 = RangeCase(IntValue(30),BoolValue(false), stmt02)
@@ -439,7 +438,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 2)
   }
 
-  test("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
+  ignore ("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -464,7 +463,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt03.accept(visitor).size == 1)
   }
 
-  test ("Test switch-case statement type checker SimpleCase (invalid CaseStmt condition)") {
+  test ("Test switch-case statement type checker SimpleCase (Boolean cases)") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -482,7 +481,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size ==  1)
+    assert(stmt02.accept(visitor) == List())
   }
 
   test ("Test switch-case statement type checker SimpleCase (invalid case02 condition)") {
@@ -506,7 +505,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size ==  1)
   }
 
-  ignore ("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
+  test ("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -737,7 +736,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     assert(stmt02.accept(visitor).size == 4)
   }
 
-  ignore ("Test a loop statement, from loop_stmt03") {
+  test ("Test a loop statement, from loop_stmt03") {
     val coreTransformer = new CoreVisitor
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt03.oberon").toURI)
 
@@ -750,7 +749,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val visitor = new TypeChecker()
 
-    val errors = visitor.visit(module)
+    val errors = visitor.visit(coreTransformer.transformModule(module))
 
     assert(errors.size == 0)
   }
