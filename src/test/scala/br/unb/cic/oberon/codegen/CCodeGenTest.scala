@@ -7,21 +7,14 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class CCodeGenTest extends AnyFunSuite {
 
-  for (i <- (1 to 16).toList) {
-    val stmtNumber = "%02d".format(i)
-    test(s"Testing C generator for stmt$stmtNumber") {
-      testGenerator(s"stmts/stmt$stmtNumber.oberon", s"cCode/stmts/stmt$stmtNumber.c")
-    }
-  }
+  private def testGenerator(oberonFile :String, lineSpaces :Int = 2) = {
 
-  // Tests for C code generator for procedure01.oberon - procedure04.oberon
-
-  private def testGenerator(oberonFile :String, CFile :String, lineSpaces :Int = 2) = {
     val module = ScalaParser.parseResource(oberonFile)
     val codeGen = PaigesBasedGenerator(lineSpaces)
 
     if (CoreChecker.isModuleCore(module)) { //success
       val generatedCCode = codeGen.generateCode(module)
+      val CFile :String = s"cCode/$oberonFile".replace(".oberon", ".c")
       val cCode = Resources.getContent(CFile)
       assert(generatedCCode == cCode)
     }
@@ -32,63 +25,65 @@ class CCodeGenTest extends AnyFunSuite {
     }
   }
 
+  for (i <- (1 to 16).toList) {
+    val stmtNumber = "%02d".format(i)
+    test(s"Testing C generator for stmt$stmtNumber") {
+      testGenerator(s"stmts/stmt$stmtNumber.oberon")
+    }
+  }
+
   for (i <- 1 to 4) {
     val procedureNumber = "%02d".format(i)
     test(s"Testing C generator for procedure$procedureNumber") {
-      testGenerator(s"procedures/procedure$procedureNumber.oberon", s"cCode/procedures/procedure$procedureNumber.c")
+      testGenerator(s"procedures/procedure$procedureNumber.oberon")
     }
   }
 
-  // Tests for C code generator for interpreter_factorial01.oberon - interpreter_factorial03.oberon
   for (i <- 1 to 3) {
     val procedureNumber = "%02d".format(i)
     test(s"Testing C generator for interpreter_factorial$procedureNumber") {
-      testGenerator(s"procedures/interpreter_factorial$procedureNumber.oberon", s"cCode/procedures/interpreter_factorial$procedureNumber.c")
+      testGenerator(s"procedures/interpreter_factorial$procedureNumber.oberon")
     }
   }
 
-  // Test for C code generator for interpreter_fibonacci01.oberon
-  test(s"Testing C generator for interpreter_fibonacci01") {
-    testGenerator(s"procedures/interpreter_fibonacci01.oberon", s"cCode/procedures/interpreter_fibonacci01.c")
+  test("Testing C generator for interpreter_fibonacci01") {
+    testGenerator("procedures/interpreter_fibonacci01.oberon")
   }
 
-  test("Testing C generator for stmt01 with 4 spaces indent ") {
-    testGenerator(s"stmts/stmt01.oberon", s"cCode/stmts/stmt01_4spaces.c", 4)
-  }
 
   test("First RepeatUntil Test") {
-    testGenerator(s"stmts/repeatuntil.oberon", s"cCode/stmts/repeatuntil.c")
+    testGenerator("stmts/repeatuntil.oberon")
   }
 
   test("RepeatUntil Test with just one loop") {
-    testGenerator(s"stmts/repeatuntil01.oberon", s"cCode/stmts/repeatuntil01.c")
+    testGenerator("stmts/repeatuntil01.oberon")
   }
 
   test("RepeatUntil Nested") {
-    testGenerator(s"stmts/repeatuntil02.oberon", s"cCode/stmts/repeatuntil02.c")
+    testGenerator("stmts/repeatuntil02.oberon")
   }
 
   test("RepeatUntil Compound Exit Condition") {
-    testGenerator(s"stmts/repeatuntil03.oberon", s"cCode/stmts/repeatuntil03.c")
+    testGenerator("stmts/repeatuntil03.oberon")
   }
 
   test("RepeatUntil In Procedure") {
-    testGenerator(s"stmts/repeatuntil04.oberon", s"cCode/stmts/repeatuntil04.c")
+    testGenerator("stmts/repeatuntil04.oberon")
   }
 
   test("Testing C generator for stmt30 (if-else-if)") {
-    testGenerator(s"stmts/stmt30.oberon", s"cCode/stmts/stmt30.c")
+    testGenerator("stmts/stmt30.oberon")
   }
 
   test("Testing C generator for ifelseif_stmt31") {
-    testGenerator(s"stmts/ifelseif_stmt31.oberon", s"cCode/stmts/ifelseif_stmt31.c")
+    testGenerator("stmts/ifelseif_stmt31.oberon")
   }
 
   test("Testing C generator for ifelseif_stmt32") {
-    testGenerator(s"stmts/ifelseif_stmt32.oberon", s"cCode/stmts/ifelseif_stmt32.c")
+    testGenerator("stmts/ifelseif_stmt32.oberon")
   }
 
   test("Testing C generator for ifelseif_stmt33") {
-    testGenerator(s"stmts/ifelseif_stmt33.oberon", s"cCode/stmts/ifelseif_stmt33.c")
+    testGenerator("stmts/ifelseif_stmt33.oberon" )
   }
 }
