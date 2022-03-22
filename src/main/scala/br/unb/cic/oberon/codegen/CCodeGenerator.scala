@@ -8,7 +8,7 @@ class NotOberonCoreException(s:String) extends Exception(s){}
 
 abstract class CCodeGenerator extends CodeGenerator {}
 
-case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
+case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
 
     if (!CoreChecker.isModuleCore(module))
@@ -29,14 +29,14 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
     val mainDeclarations = generateDeclarations(module.variables, lineSpaces)
     val mainBody = module.stmt match {
       case Some(stmt) =>
-        Doc.text("void main() ") + Doc.char(
+        Doc.text("int main() ") + Doc.char(
           '{'
         ) + Doc.line + mainDeclarations + Doc.line + generateStatement(
           stmt,
           lineSpaces,
           lineSpaces
         ) + Doc.char('}')
-      case None => Doc.text("void main() {}")
+      case None => Doc.text("int main() {}")
     }
     val main = mainHeader + mainDefines + mainProcedures + mainBody
     main.render(60)
@@ -153,16 +153,15 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
             thenStmt,
             startSpaces + padSpaces,
             padSpaces
-          ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+          ) + formatLine(startSpaces) + Doc.char('}')
         val elseCond = elseStmt match {
           case Some(stmt) =>
-            formatLine(startSpaces) + Doc.text("else") +
-              Doc.text(" {") + Doc.line + generateStatement(
+             Doc.text(" else {") + Doc.line + generateStatement(
               stmt,
               startSpaces + padSpaces,
               padSpaces
-            ) + Doc.char('}') + Doc.line
-          case None => Doc.empty
+            ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+          case None => Doc.line
         }
         ifCond + elseCond
       case WhileStmt(condition, stmt) =>
@@ -179,6 +178,9 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           exp
         ) + Doc
           .char(';') + Doc.line
+
+      case ExitStmt() =>
+        formatLine(startSpaces) + Doc.text("break; ") + Doc.line
 
       case _ => Doc.empty
     }
