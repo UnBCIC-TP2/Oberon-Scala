@@ -1,28 +1,38 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.parser.ScalaParser
-import br.unb.cic.oberon.transformations.CoreChecker
+import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.util.Resources
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.io.{BufferedWriter, File, FileWriter}
+
 class CCodeGenTest extends AnyFunSuite {
 
-  private def testGenerator(oberonFile :String, lineSpaces :Int = 2) = {
+  private def testGenerator(oberonFile :String, lineSpaces :Int = 4) = {
+
 
     val module = ScalaParser.parseResource(oberonFile)
-    val codeGen = PaigesBasedGenerator(lineSpaces)
+    val coreModule = new CoreVisitor().transformModule(module)
+    val generatedCCode = PaigesBasedGenerator(lineSpaces).generateCode(coreModule)
+    val CFile :String = s"cCode/$oberonFile".replace(".oberon", ".c")
+    val cCode = Resources.getContent(CFile)
 
-    if (CoreChecker.isModuleCore(module)) { //success
-      val generatedCCode = codeGen.generateCode(module)
-      val CFile :String = s"cCode/$oberonFile".replace(".oberon", ".c")
-      val cCode = Resources.getContent(CFile)
-      assert(generatedCCode == cCode)
+
+    //saveStringToFile(generatedCCode, s"c:/$CFile")
+    assert(generatedCCode == cCode)
+  }
+
+  private def saveStringToFile(content: String, path: String): Unit ={
+
+    val file = new File(path)
+    val directory:File = file.getParentFile
+    if (!directory.exists) {
+      directory.mkdirs()
     }
-    else { //fail
-      intercept[NotOberonCoreException] {
-        codeGen.generateCode(module)
-      }
-    }
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(content)
+    bw.close()
   }
 
   for (i <- (1 to 16).toList) {
