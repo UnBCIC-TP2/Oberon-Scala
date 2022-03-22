@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
+int main() {
     int x, y;
 
     scanf("%d", &x);

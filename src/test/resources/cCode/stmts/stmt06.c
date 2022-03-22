@@ -1,26 +1,26 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
-  int xs;
+int main() {
+    int xs;
 
-  scanf("%d", &xs);
-  switch (xs) {
-  case 1:
-    xs = 5;
-    break;
-  case 2:
-    xs = 10;
-    break;
-  case 3:
-    xs = 20;
-    break;
-  case 4:
-    xs = 40;
-    break;
-  default:
-    xs = 0;
-    break;
-  }
-  printf("%d\n", xs);
+    scanf("%d", &xs);
+    if (xs == 1) {
+        xs = 5;
+    } else {
+        if (xs == 2) {
+            xs = 10;
+        } else {
+            if (xs == 3) {
+                xs = 20;
+            } else {
+                if (xs == 4) {
+                    xs = 40;
+                } else {
+                    xs = 0;
+                }
+            }
+        }
+    }
+    printf("%d\n", xs);
 }

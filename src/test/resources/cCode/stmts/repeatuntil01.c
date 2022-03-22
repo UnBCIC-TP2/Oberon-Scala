@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
-  int x;
+int main() {
+    int x;
 
-  x = 20;
-  do {
-    x = x + 1;
-  } while (!(x >= 10));
-  printf("%d\n", x);
+    x = 20;
+    while (true) {
+        x = x + 1;
+        if (x >= 10) {
+            break; 
+        }
+    }
+    printf("%d\n", x);
 }
