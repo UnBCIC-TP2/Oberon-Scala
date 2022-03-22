@@ -171,7 +171,17 @@ case class AndExpression(left: Expression, right: Expression) extends Expression
 
 /* Statements */
 trait Statement {
+  val label = Statement.getLabel()
   def accept(v: OberonVisitor): v.T = v.visit(this)
+}
+
+object Statement{
+  var label = 0
+
+  def getLabel() : Int = {
+    label += 1
+    label
+  }
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
