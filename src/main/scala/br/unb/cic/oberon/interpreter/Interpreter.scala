@@ -135,43 +135,7 @@ class Interpreter extends OberonVisitorAdapter {
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
         env.pop() // and we pop to indicate that a procedure finished its execution.
 
-      // The following cases are to phased out as the interpreter is changed
-      // to only support OberonCore statements.
-
-      case CaseStmt(exp, cases, elseStmt) =>
-        throw new Exception("Modules should be converted to OberonCore before calling the interpreter; CaseStmt no longer supported.")
-        // old body:
-        // checkCaseStmt(exp, cases, elseStmt)
-
-      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) =>
-        throw new Exception("Modules should be converted to OberonCore before calling the interpreter; IfElseIfStmt no longer supported.")
-        // old body:
-        // checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
-
-      case RepeatUntilStmt(condition, repeatUntilStmt) =>
-        throw new Exception("Modules should be converted to OberonCore before calling the interpreter; RepeatUntilStmt no longer supported.")
-        // old body:
-        // do {
-        //   repeatUntilStmt.accept(this)
-        //   val c = evalCondition(condition)
-        // }
-        // while (!evalCondition(condition))
-
-      case ForStmt(init, condition, block) =>
-        throw new Exception("Modules should be converted to OberonCore before calling the interpreter; ForStmt no longer supported.")
-        // old body:
-        // init.accept(this)
-        // while (evalCondition(condition))
-        //   block.accept(this)
-
-      case LoopStmt(stmt) =>
-        throw new Exception("Modules should be converted to OberonCore before calling the interpreter; LoopStmt no longer supported.")
-        // old body:
-        // while (!exit) {
-        //   stmt.accept(this)
-        // }
-        // exit = false
-      
+      //default: throw exception if stmt doesn't match with previous cases as the interpreter only supports OberonCore statements
       case _ => throw new Exception("Module contains statement type unsupported by the interpreter.")
     }
   }
