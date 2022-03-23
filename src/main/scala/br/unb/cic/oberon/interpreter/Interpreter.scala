@@ -140,54 +140,6 @@ class Interpreter extends OberonVisitorAdapter {
     }
   }
 
-  // Moving forward, only modules converted to OberonCore should be accepted.
-  // The following two functions are meant to be used in interpreting
-  // IfElseIfStmt and CaseStmt, respectively. Since these types are
-  // no longer to be supported, they are currently disabled.
-
-  // private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {
-  //   var matched = false
-  //   var i = 0
-  // 
-  //   if (evalCondition(condition)) thenStmt.accept(this)
-  //   else {
-  //     while (i < listOfElseIf.size && !matched) {
-  //       listOfElseIf(i) match {
-  //         case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
-  //           stmt.accept(this)
-  //           matched = true
-  //         }
-  //       }
-  //       i += 1
-  //     }
-  //     if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
-  //   }
-  // }
-
-  // private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Unit = {
-  //   val v = evalExpression(exp)
-  //   var matched = false
-  //   var i = 0
-  //   while (i < cases.size && !matched) {
-  //     cases(i) match {
-  //       case RangeCase(min, max, stmt) =>
-  //         if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
-  //           stmt.accept(this)
-  //           matched = true
-  //         }
-  //       case SimpleCase(condition, stmt) =>
-  //         if (v == evalExpression(condition)) {
-  //           stmt.accept(this)
-  //           matched = true
-  //         }
-  //     }
-  //     i += 1
-  //   }
-  //   if (!matched && elseStmt.isDefined) {
-  //     elseStmt.get.accept(this)
-  //   }
-  // }
-
   /*
    * process the ReturnStmt(exp) statement.
    * In this case, we just create a new entry
@@ -221,11 +173,6 @@ class Interpreter extends OberonVisitorAdapter {
     val evalVisitor = new EvalExpressionVisitor(this)
     expression.accept(evalVisitor)
   }
-
-  // def evalCaseAlt(expression: Expression): Integer = {
-  //   val evalVisitor = new EvalExpressionVisitor(interpreter = this)
-  //   expression.accept(evalVisitor).asInstanceOf[IntValue].value
-  // }
 
   /*
    * This method is mostly useful for testing purposes.
