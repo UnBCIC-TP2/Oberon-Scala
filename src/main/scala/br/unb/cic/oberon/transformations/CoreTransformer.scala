@@ -5,7 +5,7 @@ import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import br.unb.cic.oberon.ast.Procedure
 
-class CoreVisitor extends OberonVisitorAdapter {
+class CoreVisitor(var addedVariables: List[VariableDeclaration] = Nil) extends OberonVisitorAdapter {
 
   override type T = Statement
 
@@ -33,27 +33,61 @@ class CoreVisitor extends OberonVisitorAdapter {
     case _ => stmt
   }
 
+  private var nextCaseId = 0
+
+  private def getNextCaseId(): Int = {
+    val returnId = nextCaseId
+    nextCaseId += 1
+    returnId
+  }
+
   private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
     val coreElseStmt = if (elseStmt.isEmpty) None else Some(elseStmt.get.accept(this))
 
-    cases.head match {
-      case SimpleCase(condition, stmt) if cases.tail.nonEmpty =>
-        val newCondition = EQExpression(exp, condition)
-        val newElse = Some(transformCase(exp, cases.tail, coreElseStmt))
-        IfElseStmt(newCondition, stmt.accept(this), newElse)
-      
-      case SimpleCase(condition, stmt) =>
-        val newCondition = EQExpression(exp, condition)
-        IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
-        
-      case RangeCase(min, max, stmt) if cases.tail.nonEmpty =>
-        val newCondition = AndExpression(LTEExpression(min, exp), LTEExpression(exp, max))
-        val newElse = Some(transformCase(exp, cases.tail, coreElseStmt))
-        IfElseStmt(newCondition, stmt.accept(this), newElse)
+    // TODO corrigir comportamento para outras expressões
 
-      case RangeCase(min, max, stmt) =>
-        val newCondition = AndExpression(LTEExpression(min, exp), LTEExpression(exp, max))
-        IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+    val caseExpressionId = exp match {
+      case VarExpression(name) => name
+      case _ => f"case_exp#${getNextCaseId}"
+    }
+    val caseExpressionEvaluation = AssignmentStmt(caseExpressionId, exp)
+
+    def casesToIfElseStmt(cases: List[CaseAlternative]): IfElseStmt =
+      cases match {
+        case SimpleCase(condition, stmt) :: Nil =>
+          val newCondition =
+            EQExpression(VarExpression(caseExpressionId), condition)
+          IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+
+        case SimpleCase(condition, stmt) :: tailCases =>
+          val newCondition =
+            EQExpression(VarExpression(caseExpressionId), condition)
+          val newElse = Some(casesToIfElseStmt(tailCases))
+          IfElseStmt(newCondition, stmt.accept(this), newElse)
+
+        case RangeCase(min, max, stmt) :: Nil =>
+          val newCondition = AndExpression(
+            LTEExpression(min, VarExpression(caseExpressionId)),
+            LTEExpression(VarExpression(caseExpressionId), max)
+          )
+          IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+
+        case RangeCase(min, max, stmt) :: tailCases =>
+          val newCondition = AndExpression(
+            LTEExpression(min, VarExpression(caseExpressionId)),
+            LTEExpression(VarExpression(caseExpressionId), max)
+          )
+          val newElse = Some(casesToIfElseStmt(tailCases))
+          IfElseStmt(newCondition, stmt.accept(this), newElse)
+
+        case _ => throw new RuntimeException("Invalid CaseStmt without cases")
+      }
+    
+    exp match {
+      case VarExpression(_) => casesToIfElseStmt(cases)
+      case _ =>
+        addedVariables = VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables
+        SequenceStmt(List(caseExpressionEvaluation, casesToIfElseStmt(cases)))
     }
   }
 
@@ -87,12 +121,14 @@ class CoreVisitor extends OberonVisitorAdapter {
     var listProceduresCore = ListBuffer[Procedure]()
 
     for (procedure <- listProcedures){
+      addedVariables = Nil
+      val coreStmt = procedure.stmt.accept(this)
       listProceduresCore += Procedure(name = procedure.name,
         args = procedure.args,
         returnType = procedure.returnType,
         constants = procedure.constants,
-        variables = procedure.variables,
-        stmt = procedure.stmt.accept(this))
+        variables = procedure.variables ++ addedVariables,
+        stmt = coreStmt)
     }
     listProceduresCore.toList
   }
@@ -105,16 +141,16 @@ class CoreVisitor extends OberonVisitorAdapter {
     }
 
   def transformModule(module: OberonModule): OberonModule = {
-
-    val stmtcore = module.stmt.get.accept(this)
+    
     val stmtprocedureList = transformProcedureListStatement(module.procedures)
+    val stmtcore = module.stmt.get.accept(this)
 
      val coreModule = OberonModule(
       name = module.name,
       submodules = module.submodules,
       userTypes = module.userTypes,
       constants = module.constants,
-      variables = module.variables,
+      variables = module.variables ++ addedVariables,
       procedures = stmtprocedureList,
       stmt = Some(stmtcore)
     )
