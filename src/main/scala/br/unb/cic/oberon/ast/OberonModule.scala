@@ -182,6 +182,10 @@ object Statement{
     label += 1
     label
   }
+
+  def reset() : Unit = {
+    label = 0
+  }
 }
 
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
