@@ -9,9 +9,9 @@ trait BasicParsers extends JavaTokenParsers {
     def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
     def string: Parser[StringValue] = ("\"[^\"]+\"".r | "\'[^\']+\'".r)  ^^ (i =>  StringValue(i.substring(1, i.length()-1)))
     
-    def alpha: String = "[A-z]"
+    def char: String = "[A-z]"
     def digit: Parser[String] = "[0-9]".r ^^ (i => i)
-    def identifier: Parser[String] = (alpha +"(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
+    def identifier: Parser[String] = (char +"(" + char + "|" + digit + "|_)*").r ^^ (i => i)
 
     def typeParser: Parser[Type] = (
         "INTEGER" ^^ (i => IntegerType)
@@ -42,12 +42,13 @@ trait ExpressionParser extends BasicParsers {
     )
     def qualifiedNameParser: Parser[Expression]
     def argumentsParser: Parser[List[Expression]]
-    def expValueParser: Parser[Value] = (
+    def expValueParser: Parser[Expression] = (
         int
     |   real
-    |   bool
+    |   char.r ^^ (i => CharValue(i.toCharArray.head))
     |   string
-    // other options
+    |   bool
+    |   "NIL" ^^ (i => NullValue)
     )
 }
 
