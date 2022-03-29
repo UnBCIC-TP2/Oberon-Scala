@@ -5,9 +5,10 @@ import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import br.unb.cic.oberon.ast.Procedure
 
-class CoreVisitor(var addedVariables: List[VariableDeclaration] = Nil) extends OberonVisitorAdapter {
-
+class CoreVisitor() extends OberonVisitorAdapter {
   override type T = Statement
+  
+  var addedVariables: List[VariableDeclaration] = Nil
 
   override def visit(stmt: Statement): Statement = stmt match {
     case SequenceStmt(stmts) =>
