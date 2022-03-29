@@ -24,15 +24,13 @@ trait BasicParsers extends JavaTokenParsers {
     )
 }
 
-trait Oberon2ScalaParser extends BasicParsers{
-    //parser principal
-
+trait Oberon2ScalaParser extends BasicParsers {
 
     def parseAbs[T](result: ParseResult[T]): T = {
         return result match {
-            case Success(matched,_) => matched
-            case Failure(msg,_)  => throw new Exception(msg)
-            case Error(msg,_) => throw new Exception(msg)
+            case Success(matched, _) => matched
+            case Failure(msg, _)  => throw new Exception(msg)
+            case Error(msg, _) => throw new Exception(msg)
         }
     }
 }

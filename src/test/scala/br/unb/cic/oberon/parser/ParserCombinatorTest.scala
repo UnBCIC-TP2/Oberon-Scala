@@ -8,112 +8,42 @@ import org.scalactic.TolerantNumerics
 
 
 class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
-    
     test("Testing Int Parser") {
-        //toDo comentar
-        assert(IntValue(123) == parseAbs(parse(int, "123")))
-        assert(IntValue(-321) == parseAbs(parse(int, "-321")))
+        assert(IntValue(123) == parseAbs(parse(int, "123"))) // positive number
+        assert(IntValue(-321) == parseAbs(parse(int, "-321"))) // negative number
         val thrown = intercept[Exception] {
-            parseAbs(parse(int, "abc 123"))
+            parseAbs(parse(int, "abc 123")) // not accepted chars in the beginning
         }
-        assert(thrown.getMessage.length>0) //não verifica o tipo de erro
-        assert(IntValue(123) == parseAbs(parse(int, "123 abc")))
+        assert(thrown.getMessage.length>0)
+        assert(IntValue(123) == parseAbs(parse(int, "123 abc"))) // accepted chars in the end
     }
 
     test("Testing Real Parser") {
-        val len = 2
-        var input = new Array[String](len)
-        var output = new Array[Any](len)
-
-        //positive number
-        input(0) = "12.3"
-        output(0) = RealValue(12.3)
-        //negative number
-        input(1) = "-32.1"
-        output(1) = RealValue(-32.1)
-
-        for( i <- 0 to len-1) 
-            assert(output(i) == parseAbs(parse(real, input(i))))
-
+        assert(RealValue(12.3) == parseAbs(parse(real, "12.3"))) // positive number
+        assert(RealValue(-32.1) == parseAbs(parse(real, "-32.1"))) // negative number
     }
 
     test("Testing Bool Parser") {
-
-        val len = 2
-        var input = new Array[String](len)
-        var output = new Array[Any](len)
-
-        //True
-        input(0) = "TRUE"
-        output(0) = BoolValue(true)
-        //False
-        input(1) = "FALSE"
-        output(1) = BoolValue(false)
-
-        for( i <- 0 to len-1) 
-            assert(output(i) == parseAbs(parse(bool, input(i))))
+        assert(BoolValue(true) == parseAbs(parse(bool, "TRUE")))
+        assert(BoolValue(false) == parseAbs(parse(bool, "FALSE")))
     }
 
     test("Testing String Parser") {
-
-        val len = 2
-        var input = new Array[String](len)
-        var output = new Array[Any](len)
-
-        //Double quotes
-        input(0) = "\"teste\""
-        output(0) = StringValue("teste")
-        //Single quotes
-        input(1) = "\'teste\'"
-        output(1) = StringValue("teste")
-
-        for( i <- 0 to len-1) 
-            assert(output(i) == parseAbs(parse(string, input(i))))
-
+        assert(StringValue("teste") == parseAbs(parse(string, "\"teste\""))) // double quotes
+        assert(StringValue("teste") == parseAbs(parse(string, "\'teste\'"))) // single quotes
     }
 
     test("Testing identifier parser") {
-        val len = 1
-        var input = new Array[String](len)
-        var output = new Array[Any](len)
-
-        //Testing Simple id
-        input(0) = "teste"
-        output(0) = "teste"
-
-        for( i <- 0 to len-1) 
-            assert(output(i) == parseAbs(parse(identifier, input(i))))
+        assert("teste" == parseAbs(parse(identifier, "teste")))
     }
 
     test("Testing type parser"){
-        val len = 7
-        var input = new Array[String](len)
-        var output = new Array[Any](len)
-
-        //Testing 
-        input(0) = "INTEGER"
-        output(0) = IntegerType
-        //
-        input(1) = "REAL"
-        output(1) = RealType
-
-        input(2) = "CHAR"
-        output(2) = CharacterType
-        //
-        input(3) = "BOOLEAN"
-        output(3) = BooleanType
-        //
-        input(4) = "STRING"
-        output(4) = StringType
-        //
-        input(5) = "NIL"
-        output(5) = NullType
-        //
-        input(6) = "bolo"
-        output(6) = ReferenceToUserDefinedType("bolo")
-        //
-
-        for( i <- 0 to len-1) 
-            assert(output(i) == parseAbs(parse(typeParser, input(i))))
+        assert(IntegerType == parseAbs(parse(typeParser, "INTEGER"))) 
+        assert(RealType == parseAbs(parse(typeParser, "REAL")))
+        assert(CharacterType == parseAbs(parse(typeParser, "CHAR")))
+        assert(BooleanType == parseAbs(parse(typeParser, "BOOL")))
+        assert(StringType == parseAbs(parse(typeParser, "STRING")))
+        assert(NullType == parseAbs(parse(typeParser, "NIL")))
+        assert(ReferenceToUserDefinedType("bolo") == parseAbs(parse(typeParser, "bolo")))
     }
 }
