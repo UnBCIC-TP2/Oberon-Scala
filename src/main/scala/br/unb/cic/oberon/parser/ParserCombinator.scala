@@ -24,7 +24,34 @@ trait BasicParsers extends JavaTokenParsers {
     )
 }
 
-trait Oberon2ScalaParser extends BasicParsers {
+trait ExpressionParser extends BasicParsers {
+    def expressionParser: Parser[Expression] = (
+        "(" ~ expressionParser ~ ")" ^^ {case _ ~ a ~ _ => Brackets(a)}
+        |   expValueParser
+    // |   qualifiedNameParser ^^ (a => VarExpression())
+    // |   qualifiedNameParser ~ "(" ~ opt(argumentsParser) ~ ")" ^^ {
+    //         case a ~ _ ~ Some(b) ~ _ => FunctionCallExpression()
+    //         case a ~ _ ~ None ~ _ => FunctionCallExpression()
+    //         }
+    // |   expressionParser ~ "." ~ identifier ^^ {case a ~ _ ~ b => FieldAccessExpression()]
+    // |   expressionParser ~ "[" ~ expressionParser ~ "]" ^^ {case a ~ _ ~ b ~ _ => ArraySubscript()}
+    // |   identifier ~ "^" ^^ PointerAccessExpression()
+    // |   expressionParser ~ "(=|#|<|<=|>|>=)".r ~ expression ^^ {case a ~ "=" ~ b => } 
+    // |   expressionParser ~ "(\*|/|&&)".r ~ expression
+    // |   expressionParser ~ "(\+|-|\|\|)".r ~ expression
+    )
+    def qualifiedNameParser: Parser[Expression]
+    def argumentsParser: Parser[List[Expression]]
+    def expValueParser: Parser[Value] = (
+        int
+    |   real
+    |   bool
+    |   string
+    // other options
+    )
+}
+
+trait Oberon2ScalaParser extends ExpressionParser {
 
     def parseAbs[T](result: ParseResult[T]): T = {
         return result match {
