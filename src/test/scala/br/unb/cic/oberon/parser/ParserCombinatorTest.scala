@@ -19,6 +19,7 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(thrown.getMessage.length>0) //não verifica o tipo de erro
         assert(IntValue(123) == parseAbs(parse(int, "123 abc")))
     }
+
     test("Testing Real Parser") {
         val len = 2
         var input = new Array[String](len)
@@ -111,24 +112,8 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         input(6) = "bolo"
         output(6) = ReferenceToUserDefinedType("bolo")
         //
-        /*input(7) = "123"
-        output(7) = "FAILURE: string matching regex '[A-z]([A-z]|[0-9]|_)*' expected but '1' found"
-*/
+
         for( i <- 0 to len-1) 
             assert(output(i) == parseAbs(parse(typeParser, input(i))))
     }
-
-    
-    //val input = "2 * (3 + 7)"
-   // println(Arith.parseAll(Arith.expr, input))
-
-/*
-    test("tesando 123"){
-        val result = BasicParsers.parse(BasicParsers.digit, "123") match {
-            case Success(matched,_) => matched
-            case Failure(msg,_)  => throw new Exception(msg)
-            case Error(msg,_) => throw new Exception(msg)
-        }
-        assert("1" === result)
-    }*/
 }

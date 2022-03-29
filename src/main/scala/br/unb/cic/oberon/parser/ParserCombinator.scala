@@ -4,30 +4,15 @@ import scala.util.parsing.combinator._
 import br.unb.cic.oberon.ast._
 
 trait BasicParsers extends JavaTokenParsers {
-    // unity parsers
-    def digit: Parser[String] = "[0-9]".r ^^ (i => i)
-    def number: Parser[String] = "[0-9]+".r ^^ (i => i)
-    def alpha: String = "[A-z]"
-    /*def number: Parser[String] = digit ~ opt(rep(digit)) ^^ {
-        case r ~ None => r
-        case r ~ Some(rs) => r + rs.mkString
-    }*/ // number parser using combinators
-
-    // TypeValues
-    def int: Parser[IntValue] = opt("-")~number ^^ {
-        case None ~ a => IntValue(a.toInt)
-        case Some("-") ~ a => IntValue(-(a.toInt))
-    }
-    def real: Parser[RealValue] =  opt("-") ~ number ~ opt("." ~ number) ^^ {
-        case None ~ a ~ None => RealValue(a.toDouble)
-        case None ~ a ~ Some("." ~ b) => RealValue((a + "." + b).toDouble)
-        case Some("-") ~ a ~ None => RealValue(- a.toDouble)
-        case Some("-") ~ a ~ Some("." ~ b) => RealValue(-(a + "." + b).toDouble)
-    }
+    def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
+    def real: Parser[RealValue] = ("-?[0-9]+\\.[0-9]+".r | "-?[0-9]+".r) ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
     def string: Parser[StringValue] = ("\"[^\"]+\"".r | "\'[^\']+\'".r)  ^^ (i =>  StringValue(i.substring(1, i.length()-1)))
+    
+    def alpha: String = "[A-z]"
+    def digit: Parser[String] = "[0-9]".r ^^ (i => i)
     def identifier: Parser[String] = (alpha +"(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
-    //
+
     def typeParser: Parser[Type] = (
         "INTEGER" ^^ (i => IntegerType)
     |   "REAL" ^^ (i => RealType)
