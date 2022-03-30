@@ -30,20 +30,29 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
 
     test("Testing String Parser") {
         assert(StringValue("teste") == parseAbs(parse(string, "\"teste\""))) // double quotes
-        assert(StringValue("teste") == parseAbs(parse(string, "\'teste\'"))) // single quotes
     }
 
     test("Testing identifier parser") {
         assert("teste" == parseAbs(parse(identifier, "teste")))
     }
 
-    test("Testing type parser"){
+    test("Testing type parser") {
         assert(IntegerType == parseAbs(parse(typeParser, "INTEGER"))) 
         assert(RealType == parseAbs(parse(typeParser, "REAL")))
         assert(CharacterType == parseAbs(parse(typeParser, "CHAR")))
-        assert(BooleanType == parseAbs(parse(typeParser, "BOOL")))
+        assert(BooleanType == parseAbs(parse(typeParser, "BOOLEAN")))
         assert(StringType == parseAbs(parse(typeParser, "STRING")))
         assert(NullType == parseAbs(parse(typeParser, "NIL")))
         assert(ReferenceToUserDefinedType("bolo") == parseAbs(parse(typeParser, "bolo")))
+    }
+
+    test("Testing expValueParser Expression") {
+        assert(IntValue(16) == parseAbs(parse(expValueParser, "16")))
+        assert(RealValue(-35.2) == parseAbs(parse(expValueParser, "-35.2")))
+        assert(CharValue('a') == parseAbs(parse(expValueParser, "'a'")))
+        assert(StringValue("teste") == parseAbs(parse(expValueParser, "\"teste\"")))
+        assert(BoolValue(true) == parseAbs(parse(expValueParser, "TRUE")))
+        assert(BoolValue(false) == parseAbs(parse(expValueParser, "FALSE")))
+        assert(NullValue == parseAbs(parse(expValueParser, "NIL")))
     }
 }
