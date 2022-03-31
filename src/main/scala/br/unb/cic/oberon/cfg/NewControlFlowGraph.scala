@@ -21,16 +21,16 @@ trait NewControlFlowGraphBuilder {
 }
 
 class NewControlFlowGraph {
-  def init(stmet : Statement) : Statement = {
-    stmet match {
+  def init(stmtFG : Statement) : Statement = {
+    stmtFG match {
       case SequenceStmt(stmts) =>  init(stmts.head)
-      case _ => stmet
+      case _ => stmtFG
     }
   }
 
-  def finalFG(stmet: Statement) : List[Statement] = {
-    stmet match {
-      case AssignmentStmt(name, exp) => List(AssignmentStmt(name, exp))
+  def finalFG(stmtFG: Statement) : Set[Statement] = {
+    stmtFG match {
+      case AssignmentStmt(name, exp) => Set(AssignmentStmt(name, exp))
       case SequenceStmt(stmts) => finalFG(stmts.last)
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (elseStmt.isDefined){
@@ -40,34 +40,72 @@ class NewControlFlowGraph {
           finalFG(thenStmt)
         }
       case IfElseIfStmt(condition, thenStmt, elseifStmt, elseStmt) =>
-        var result = finalFG(thenStmt)
+        var stmtsIfElseIf = finalFG(thenStmt)
 
         for(elseIf <- elseifStmt){
-          result = result concat finalFG(elseIf)
+          stmtsIfElseIf = stmtsIfElseIf concat finalFG(elseIf)
         }
 
         if(elseStmt.isDefined)
-          result concat finalFG(elseStmt.get)
-        else
-          result
+          stmtsIfElseIf concat finalFG(elseStmt.get)
+
+        stmtsIfElseIf
       case ElseIfStmt(condition, thenStmt) => finalFG(thenStmt)
       case CaseStmt(exp, cases, elseStmt) =>
-        var result : List[Statement] = List()
-        for (caso <- cases){
-          var teste = caso  match {
+        var stmtsCase : Set[Statement] = Set()
+        for (caseItem <- cases){
+          var caseType = caseItem  match {
             case SimpleCase(condition, stmt) => finalFG(stmt)
             case RangeCase(min, max, stmt) => finalFG(stmt)
           }
-          result = result concat teste
+          stmtsCase = stmtsCase concat caseType
         }
 
         if (elseStmt.isDefined){
-          result = result concat finalFG(elseStmt.get)
+          stmtsCase = stmtsCase concat finalFG(elseStmt.get)
+        }
+
+        stmtsCase
+
+      case _ => Set(stmtFG)
+    }
+  }
+
+  def flow(stmtFG : Statement) : Set[Object] = {
+    stmtFG match {
+      case AssignmentStmt(varName, exp) => Set()
+      case IfElseStmt(condition, thenStmt, elseStmt) =>
+        if (elseStmt.isDefined)
+          flow(thenStmt) concat flow(elseStmt.get) concat Set((stmtFG, init(thenStmt)),
+            (stmtFG, init(elseStmt.get)))
+        else
+          flow(thenStmt) concat Set((stmtFG, init(thenStmt)))
+      case WhileStmt(condition, stmt) =>
+        var result = flow(stmt) concat Set((stmtFG, init(stmt)))
+        val finalWhile = finalFG(stmt)
+        for (s <- finalWhile){
+          result = result concat Set((s, stmtFG))
+        }
+
+        result
+      case SequenceStmt(stmts) =>
+        var result : Set[Object] = Set()
+        for (stmt <- stmts){
+          result = result concat flow(stmt)
+        }
+
+        for (i <- 0 until stmts.length - 1 ){
+          var stmtAtual = stmts(i)
+          var stmtProximo = stmts(i + 1)
+          for (stmtFinal <- finalFG(stmtAtual)){
+            result = result concat Set((stmtFinal, init(stmtProximo)))
+          }
         }
 
         result
 
-      case _ => List(stmet)
+
     }
+
   }
 }
