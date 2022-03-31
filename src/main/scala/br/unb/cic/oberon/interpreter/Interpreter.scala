@@ -43,8 +43,8 @@ class Interpreter extends OberonVisitorAdapter {
     module.procedures.foreach(p => p.accept(this))
     module.userTypes.foreach(userType => userType.accept(this))
 
-    // execute the statement, if it is defined. remember,
-    // module.stmt is an Option[Statement].
+    // execute the statement if it is defined.
+    // remember, module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
       setupStandardLibraries()
       module.stmt.get.accept(this)
@@ -68,11 +68,11 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   override def visit(stmt: Statement): Unit = {
-    // we first check if we achieved a return stmt.
+    // we first check if we have encountered a return stmt.
     // if so, we should not execute any other statement
-    // of a sequence of stmts. Whenever we achieve a
-    // return stmt, we associate a local variables
-    // "return" to the return value.
+    // of a sequence of stmts. Whenever we encounter a
+    // return stmt, we assign a new local variable
+    // "return" as the return value.
     //
     // we also check if exit is true. if this is the case
     // we should also stop the execution of a block of
@@ -116,36 +116,13 @@ class Interpreter extends OberonVisitorAdapter {
         if (evalCondition(condition)) thenStmt.accept(this)
         else if (elseStmt.isDefined) elseStmt.get.accept(this)
 
-      case IfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt) =>
-        checkIfElseIfStmt(condition, thenStmt, listOfElseIf, elseStmt)
-
       case WhileStmt(condition, whileStmt) =>
         while (evalCondition(condition) && exit == false )
           whileStmt.accept(this)
         exit = false
 
-      case RepeatUntilStmt(condition, repeatUntilStmt) =>
-        do {
-          repeatUntilStmt.accept(this)
-          val c = evalCondition(condition)
-        }
-        while (!evalCondition(condition))
-
-      case ForStmt(init, condition, block) =>
-        init.accept(this)
-        while (evalCondition(condition))
-          block.accept(this)
-
-      case LoopStmt(stmt) =>
-        while (!exit) {
-          stmt.accept(this)
-        }
-        exit = false
       case ExitStmt() =>
         exit = true
-
-      case CaseStmt(exp, cases, elseStmt) =>
-        checkCaseStmt(exp, cases, elseStmt)
 
       case ReturnStmt(exp: Expression) =>
         setReturnExpression(evalExpression(exp))
@@ -154,52 +131,12 @@ class Interpreter extends OberonVisitorAdapter {
 
       case ProcedureCallStmt(name, args) =>
         val actualArguments = args.map(a => evalExpression(a))
-        env.push() // after that, we can "push", to indicate a procedure call.
+        env.push() // after that, we can "push" to indicate a procedure call.
         visitProcedureCall(name, actualArguments) // then we execute the procedure.
-        env.pop() // and we pop, to indicate that a procedure finished its execution.
-    }
-  }
+        env.pop() // and we pop to indicate that a procedure finished its execution.
 
-  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {
-    var matched = false
-    var i = 0
-
-    if (evalCondition(condition)) thenStmt.accept(this)
-    else {
-      while (i < listOfElseIf.size && !matched) {
-        listOfElseIf(i) match {
-          case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
-            stmt.accept(this)
-            matched = true
-          }
-        }
-        i += 1
-      }
-      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
-    }
-  }
-
-  private def checkCaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Unit = {
-    val v = evalExpression(exp)
-    var matched = false
-    var i = 0
-    while (i < cases.size && !matched) {
-      cases(i) match {
-        case RangeCase(min, max, stmt) =>
-          if ((evalCaseAlt(v) >= evalCaseAlt(min)) && (evalCaseAlt(v) <= evalCaseAlt(max))) {
-            stmt.accept(this)
-            matched = true
-          }
-        case SimpleCase(condition, stmt) =>
-          if (v == evalExpression(condition)) {
-            stmt.accept(this)
-            matched = true
-          }
-      }
-      i += 1
-    }
-    if (!matched && elseStmt.isDefined) {
-      elseStmt.get.accept(this)
+      //default: throw exception if stmt doesn't match with previous cases as the interpreter only supports OberonCore statements
+      case _ => throw new Exception("Module contains statement type unsupported by the interpreter.")
     }
   }
 
@@ -237,14 +174,9 @@ class Interpreter extends OberonVisitorAdapter {
     expression.accept(evalVisitor)
   }
 
-  def evalCaseAlt(expression: Expression): Integer = {
-    val evalVisitor = new EvalExpressionVisitor(interpreter = this)
-    expression.accept(evalVisitor).asInstanceOf[IntValue].value
-  }
-
   /*
-   * This method is mostly useful for testing purpose.
-   * That is, here we are considering testability as a
+   * This method is mostly useful for testing purposes.
+   * That is, here we are considering testability a
    * design concern.
    */
   def setGlobalVariable(name: String, exp: Expression): Unit = {

@@ -27,6 +27,9 @@ class CoreVisitor extends OberonVisitorAdapter {
 
     case CaseStmt(exp, cases, elseStmt) => transformCase(exp, cases, elseStmt)
 
+    case WhileStmt(condition, stmt) =>
+      WhileStmt(condition, stmt.accept(this))
+
     case _ => stmt
   }
 
