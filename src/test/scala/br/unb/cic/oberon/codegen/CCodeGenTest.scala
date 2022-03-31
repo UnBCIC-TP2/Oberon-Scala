@@ -11,15 +11,16 @@ class CCodeGenTest extends AnyFunSuite {
 
   private def testGenerator(oberonFile :String, lineSpaces :Int = 4) = {
 
-
     val module = ScalaParser.parseResource(oberonFile)
-    val coreModule = new CoreVisitor().transformModule(module)
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
     val generatedCCode = PaigesBasedGenerator(lineSpaces).generateCode(coreModule)
     val CFile :String = s"cCode/$oberonFile".replace(".oberon", ".c")
+
+    saveStringToFile(generatedCCode, s"c:/$CFile")
     val cCode = Resources.getContent(CFile)
 
 
-    //saveStringToFile(generatedCCode, s"c:/$CFile")
     assert(generatedCCode == cCode)
   }
 
@@ -96,4 +97,17 @@ class CCodeGenTest extends AnyFunSuite {
   test("Testing C generator for ifelseif_stmt33") {
     testGenerator("stmts/ifelseif_stmt33.oberon" )
   }
+
+  test("Testing C generator for stmt35 (Array Declaration)") {
+    testGenerator("stmts/stmt35.oberon" )
+  }
+
+  test("Testing C generator for recordAssignmentStmt01 (Record Declaration)") {
+    testGenerator("stmts/recordAssignmentStmt01.oberon" )
+  }
+  test("Testing C generator for userTypeSimple02 (User Type Declaration)") {
+    testGenerator("simple/userTypeSimple02.oberon" )
+  }
+
+
 }

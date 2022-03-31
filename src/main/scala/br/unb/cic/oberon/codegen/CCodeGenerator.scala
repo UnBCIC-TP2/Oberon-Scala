@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ast.{UserDefinedType, _}
 import br.unb.cic.oberon.transformations.CoreChecker
 import org.typelevel.paiges._
 
@@ -9,6 +9,8 @@ class NotOberonCoreException(s:String) extends Exception(s){}
 abstract class CCodeGenerator extends CodeGenerator {}
 
 case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
+
+
   override def generateCode(module: OberonModule): String = {
 
     if (!CoreChecker.isModuleCore(module))
@@ -27,6 +29,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
       else Doc.empty
     val mainDefines = generateConstants(module.constants)
     val mainDeclarations = generateDeclarations(module.variables, lineSpaces)
+    val userDefinedTypes = generateUserDefinedTypes(module.userTypes, lineSpaces)
     val mainBody = module.stmt match {
       case Some(stmt) =>
         Doc.text("int main() ") + Doc.char(
@@ -38,7 +41,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
         ) + Doc.char('}')
       case None => Doc.text("int main() {}")
     }
-    val main = mainHeader + mainDefines + mainProcedures + mainBody
+    val main = mainHeader + userDefinedTypes + mainDefines + mainProcedures + mainBody
     main.render(60)
   }
 
@@ -94,6 +97,35 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
       else Doc.empty
 
     intDeclaration + boolDeclaration
+  }
+
+
+  def generateUserDefinedTypes(userTypes: List[UserDefinedType], lineSpaces:Int): Doc = {
+
+    def generate(userType: UserDefinedType): Doc = {
+      userType.baseType match {
+      case ArrayType(length, vType) =>
+        val variableType: String = getCType(vType)
+        Doc.text(s"$variableType ${userType.name}[$length];") + Doc.line
+      case RecordType(variables) =>
+        Doc.text(s"struct ${userType.name} {") + Doc.line + generateDeclarations(variables, lineSpaces) + Doc.text("};") + Doc.line
+      }
+    }
+    var text:Doc = Doc.empty
+    for (userType <- userTypes) {
+      text += generate(userType)
+    }
+    text
+  }
+  def getCType(variableType:Type):String= {
+    variableType match {
+      case IntegerType => "int"
+      case BooleanType => "bool"
+      case CharacterType => "char"
+      case RealType => "float"
+      case ReferenceToUserDefinedType(name) => name
+      //struct
+    }
   }
 
   def generateConstants(constants: List[Constant]): Doc = {
