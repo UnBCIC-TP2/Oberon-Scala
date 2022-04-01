@@ -7,7 +7,7 @@ import scala.io.Source
 import java.io.{FileOutputStream, FileWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
-
+import scala.collection.mutable.Map
 
 class StandardLibrary[T](env: Environment[T]) {
 
@@ -22,11 +22,32 @@ class StandardLibrary[T](env: Environment[T]) {
   }
 
   val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(),
-    List(abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile), None)
+    List(inc, dec, abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile), None)
+
+  def inc = Procedure(
+    "INC",
+    List(ParameterByReference("x", IntegerType)),
+    Map(),
+    None,
+    List(),
+    List(),
+    MetaStmt(() => AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+  )
+
+  def dec = Procedure(
+    "DEC",
+    List(ParameterByReference("x", IntegerType)),
+    Map(),
+    None,
+    List(),
+    List(),
+    MetaStmt(() => AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(-1))))
+  )
 
   def abs = Procedure(
     "ABS",                             // name
     List(ParameterByValue("x", IntegerType)), // formal arguments
+    Map(),                             // referenceMap
     Some(IntegerType),                 // return type
     List(),                            // local constants
     List(),                            // local variables
@@ -44,6 +65,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def odd = Procedure(
     "ODD",
     List(ParameterByValue("x", IntegerType)),
+    Map(),                             // referenceMap
     Some(BooleanType),
     List(),
     List(),
@@ -56,6 +78,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def ceil = Procedure(
     "CEIL",                         // name
     List(ParameterByValue("x", RealType)), // formal arguments
+    Map(),                             // referenceMap
     Some(IntegerType),                 // return type
     List(),                         // local constants
     List(),                         // local variables
@@ -68,6 +91,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def floor = Procedure(
     "FLOOR",
     List(ParameterByValue("x", RealType)),
+    Map(),                             // referenceMap
     Some(IntegerType),
     List(),
     List(),
@@ -79,6 +103,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def round = Procedure(
     "RND",
     List(ParameterByValue("x", RealType)),
+    Map(),                             // referenceMap
     Some(IntegerType),
     List(),
     List(),
@@ -90,6 +115,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def intToFloat = Procedure(
     "FLT",
     List(ParameterByValue("x", IntegerType)),
+    Map(),                             // referenceMap
     Some(RealType),
     List(),
     List(),
@@ -100,6 +126,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def power = Procedure(
     "POW",
     List(ParameterByValue("x", RealType), ParameterByValue("y", RealType)),
+    Map(),                             // referenceMap
     Some(RealType),
     List(),
     List(),
@@ -110,6 +137,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def sqrroot = Procedure(
     "SQR",
     List(ParameterByValue("x", RealType)),
+    Map(),                             // referenceMap
     Some(RealType),
     List(),
     List(),
@@ -124,6 +152,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def readFile = Procedure(
     "READFILE",
     List(ParameterByValue("x",StringType)),
+    Map(),                             // referenceMap
     Some(StringType),
     List(),
     List(),
@@ -156,6 +185,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def writeFile = Procedure(
     "WRITEFILE",                       // name
     List(ParameterByValue("PATH", StringType), ParameterByValue("CONTENT", StringType)), // arguments
+    Map(),                             // referenceMap
     Some(StringType),                  // return the File Path
     List(),                            // local constants
     List(),                            // local variables
@@ -185,6 +215,7 @@ class StandardLibrary[T](env: Environment[T]) {
   def appendFile = Procedure(
     "APPENDFILE",                       // name
     List(ParameterByValue("PATH", StringType), ParameterByValue("CONTENT", StringType)), // arguments
+    Map(),                             // referenceMap
     Some(StringType),                  // return the File Path
     List(),                            // local constants
     List(),                            // local variables

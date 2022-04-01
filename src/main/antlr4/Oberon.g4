@@ -93,8 +93,6 @@ statement
  | 'readInt'        '(' var = Id ')'                                                                                          #ReadIntStmt
  | 'readShortInt'   '(' var = Id ')'                                                                                          #ReadShortIntStmt
  | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
- | 'INC' '(' var = Id ')'                                                                                                     #IncStmt
- | 'DEC' '(' var = Id ')'                                                                                                     #DecStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
  | 'IF' cond = expression 'THEN' thenStmt = statement ('ELSE' elseStmt = statement)? 'END'                                    #IfElseStmt

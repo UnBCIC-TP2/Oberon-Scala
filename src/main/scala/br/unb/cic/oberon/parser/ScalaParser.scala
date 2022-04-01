@@ -3,6 +3,7 @@ package br.unb.cic.oberon.parser
 import br.unb.cic.oberon.util.Resources
 import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ast._
+import scala.collection.mutable.Map
 import org.antlr.stringtemplate.language.FormalArgument
 
 import scala.collection.mutable.ListBuffer
@@ -160,7 +161,7 @@ class ParserVisitor {
 
     val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
 
-    Procedure(name, args, returnType, constants, variables, block.get)
+    Procedure(name, args, Map(), returnType, constants, variables, block.get)
   }
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {
@@ -513,15 +514,7 @@ class ParserVisitor {
       stmt = WriteStmt(visitor.exp)
     }
 
-    override def visitIncStmt(ctx: OberonParser.IncStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = IncStmt(varName)
-    }
 
-    override def visitDecStmt(ctx: OberonParser.DecStmtContext): Unit = {
-      val varName = ctx.`var`.getText
-      stmt = DecStmt(varName)
-    }
 
     override def visitProcedureCall(ctx: OberonParser.ProcedureCallContext): Unit = {
       val name = ctx.name.getText

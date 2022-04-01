@@ -527,27 +527,16 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
-  test(testName = "Test for the INC function"){
-    val module = ScalaParser.parseResource("stmts/INCTest.oberon")
+  test("Testing procedure06"){
+    val module = ScalaParser.parseResource("procedures/procedure06.oberon")
 
-    assert(module.name == "INCTest")
-
+    assert(module.name == "Procedure06")
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(RealValue(10.0)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(-7)))
+    assert(interpreter.env.lookup("a") == Some(IntValue(2)))
+    assert(interpreter.env.lookup("b") == Some(IntValue(4)))
+    assert(interpreter.env.lookup("c") == Some(IntValue(1)))
 
-  }
-
-  test(testName = "Test for the DEC function"){
-    val module = ScalaParser.parseResource("stmts/DECTest.oberon")
-
-    assert(module.name == "DECTest")
-
-    module.accept(interpreter)
-
-    assert(interpreter.env.lookup("x") == Some(IntValue(8)))
-    assert(interpreter.env.lookup("y") == Some(RealValue(-9.0)))
   }
 
   test(testName = "Testing boolean32"){

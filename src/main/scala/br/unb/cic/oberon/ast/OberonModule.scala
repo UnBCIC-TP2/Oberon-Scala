@@ -2,7 +2,7 @@ package br.unb.cic.oberon.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
-
+import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
 
@@ -35,6 +35,7 @@ case class OberonModule(name: String,
 /* procedure declaration definition */
 case class Procedure(name: String,
                      args: List[FormalArg],
+                     referenceMap : Map[String, String],
                      returnType: Option[Type],
                      constants: List[Constant],
                      variables: List[VariableDeclaration],
@@ -197,8 +198,6 @@ case class ReadLongIntStmt(varName: String) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class ReadShortIntStmt(varName: String) extends Statement
 case class ReadCharStmt(varName: String) extends Statement
-case class IncStmt(varName: String) extends Statement
-case class DecStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement

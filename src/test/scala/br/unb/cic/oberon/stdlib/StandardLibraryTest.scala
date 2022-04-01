@@ -7,13 +7,39 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class StandardLibraryTest extends AnyFunSuite {
 
+  val interpreter = new Interpreter()
+
+  interpreter.setTestEnvironment()
+
+  test(testName = "Test for the INC function"){
+    val module = ScalaParser.parseResource("stmts/INCTest.oberon")
+
+    assert(module.name == "INCTest")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(RealValue(10.0)))
+    assert(interpreter.env.lookup("y") == Some(IntValue(-7)))
+
+  }
+
+  test(testName = "Test for the DEC function"){
+    val module = ScalaParser.parseResource("stmts/DECTest.oberon")
+
+    assert(module.name == "DECTest")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(8)))
+    assert(interpreter.env.lookup("y") == Some(RealValue(-9.0)))
+  }
+
+
   test("Test for the ABS function") {
     val module = ScalaParser.parseResource("stdlib/ABSTest.oberon")
 
     assert(module.name == "ABSTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(-10)))
@@ -26,8 +52,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "ODDTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -42,8 +66,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "FLOORTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -56,8 +78,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "RNDTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -70,8 +90,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "FLTTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -84,8 +102,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "POWTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -98,8 +114,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "SQRTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -112,8 +126,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "CEILTest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -127,8 +139,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "READFILETest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -141,8 +151,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "WRITEFILETest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 
@@ -161,8 +169,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "APPENDFILETest")
 
-    val interpreter = new Interpreter
-    interpreter.setTestEnvironment()
 
     module.accept(interpreter)
 

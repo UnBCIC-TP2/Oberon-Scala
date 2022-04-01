@@ -1,0 +1,30 @@
+MODULE Procedure06;
+
+VAR
+  a: Integer;
+  b: Integer;
+  c: Integer;
+
+PROCEDURE inc(VAR x: INTEGER);
+    BEGIN
+        x := x + 1
+    END inc
+
+PROCEDURE teste(y : INTEGER) : INTEGER;
+    BEGIN
+        y := 0;
+        inc(y);
+        RETURN y
+    END teste
+
+BEGIN
+    a := 2;
+    b := 3;
+    c := teste(a);
+    inc(b);
+    write(c);
+    write(a);
+    write(b)
+END
+
+END Procedure06.

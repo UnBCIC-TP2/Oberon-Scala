@@ -73,6 +73,7 @@ class CoreVisitor extends OberonVisitorAdapter {
     for (procedure <- listProcedures){
       listProceduresCore += Procedure(name = procedure.name,
         args = procedure.args,
+        referenceMap = procedure.referenceMap,
         returnType = procedure.returnType,
         constants = procedure.constants,
         variables = procedure.variables,
