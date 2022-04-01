@@ -408,7 +408,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(100)))
   }
 
-  test("stmt35") {
+  ignore("stmt35") {
     val module = ScalaParser.parseResource("stmts/stmt35.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -418,7 +418,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("b", 1).contains(IntValue(10)))
   }
   
-  test("stmt36") {
+  ignore("stmt36") {
     val module = ScalaParser.parseResource("stmts/stmt36.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -430,7 +430,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookupArrayIndex("a", 2).contains(IntValue(25)))
   }
 
-  test("stmt37") {
+  ignore("stmt37") {
     val module = ScalaParser.parseResource("stmts/stmt37.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -482,7 +482,7 @@ class InterpreterTest extends AnyFunSuite {
     //assert(interpreter.env.lookup("x") == Some(IntValue(2)))
   }
 
-  ignore("Testing ArrayAssignmentStmt03"){
+  test("Testing ArrayAssignmentStmt03"){
     val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt03.oberon")
 
     assert(module.name == "ArrayAssignmentStmt03")
@@ -491,14 +491,29 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("outroarray").isDefined)
 
 
-    assert(interpreter.env.lookupArrayIndex("outoarray", 0) == Some(IntValue(1)))
-    assert(interpreter.env.lookupArrayIndex("outoarray", 1) == Some(IntValue(5)))
+    assert(interpreter.env.lookupArrayIndex("outroarray", 0) == Some(IntValue(1)))
+    assert(interpreter.env.lookupArrayIndex("outroarray", 1) == Some(IntValue(5)))
 
     for (i <- 0 to 2){
       assert(interpreter.env.lookupArrayIndex("array", i) == Some(IntValue(10*(i+1))))
     }
   }
 
+  test("Testing ArrayAssignmentStmt06"){
+    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt06.oberon")
+
+    assert(module.name == "ArrayAssignmentStmt06")
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("i").isDefined)
+    assert(interpreter.env.lookup("arr").isDefined)
+
+    assert(interpreter.env.lookupArrayIndex("arr", 5) == Some(Undef()))
+    assert(interpreter.env.lookupArrayIndex("arr", 0) == Some(IntValue(1)))
+    assert(interpreter.env.lookupArrayIndex("arr", 9) == Some(IntValue(2)))
+    assert(interpreter.env.lookupArrayIndex("arr", -1) == Some(IntValue(2)))
+    assert(interpreter.env.lookupArrayIndex("arr", -10) == Some(IntValue(1)))
+  }
+  
   test("Testing aritmetic37"){
     val module = ScalaParser.parseResource("aritmetic/aritmetic37.oberon")
 

@@ -6,7 +6,7 @@ import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.stdlib.StandardLibrary
 import br.unb.cic.oberon.util.Values
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
-
+import scala.collection.mutable.ListBuffer
 import scala.io.StdIn
 
 /**
@@ -56,7 +56,10 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   override def visit(variable: VariableDeclaration): Unit = {
-    env.setGlobalVariable(variable.name, Undef())
+    variable.variableType match {
+      case ArrayType(length, _) => env.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef())))
+      case _ => env.setGlobalVariable(variable.name, Undef())
+    }
   }
 
   override def visit(userType: UserDefinedType): Unit = {
@@ -282,6 +285,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case NullValue => NullValue
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
+    case ArraySubscript(arrayBase, index) => arrayBase match {
+      case VarExpression(name) => interpreter.env.lookupArrayIndex(name, index.accept(this).asInstanceOf[Value]
+        .value.asInstanceOf[Int]).get
+    }
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
