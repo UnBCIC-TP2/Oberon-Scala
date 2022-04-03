@@ -5,13 +5,14 @@ import br.unb.cic.oberon.ast._
 
 trait BasicParsers extends JavaTokenParsers {
     def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
-    def real: Parser[RealValue] = ("-?[0-9]+\\.[0-9]+".r | "-?[0-9]+".r) ^^ (i => RealValue(i.toDouble))
+    def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
-    def string: Parser[StringValue] = ("\"[^\"]+\"".r | "\'[^\']+\'".r)  ^^ (i =>  StringValue(i.substring(1, i.length()-1)))
-    
-    def char: String = "[A-z]"
+    def string: Parser[StringValue] = "\"[^\"]+\"".r  ^^ (i => StringValue(i.substring(1, i.length()-1)))
+    def char: Parser[CharValue] = ("\'[^\']\'".r)  ^^ (i => CharValue(i.charAt(1)))
+
+    def alpha: String = "[A-z]"
     def digit: Parser[String] = "[0-9]".r ^^ (i => i)
-    def identifier: Parser[String] = (char +"(" + char + "|" + digit + "|_)*").r ^^ (i => i)
+    def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
 
     def typeParser: Parser[Type] = (
         "INTEGER" ^^ (i => IntegerType)
@@ -26,7 +27,7 @@ trait BasicParsers extends JavaTokenParsers {
 
 trait ExpressionParser extends BasicParsers {
     def expressionParser: Parser[Expression] = (
-        "(" ~ expressionParser ~ ")" ^^ {case _ ~ a ~ _ => Brackets(a)}
+        "(" ~ expressionParser ~ ")" ^^ { case _ ~ a ~ _ => Brackets(a) }
         |   expValueParser
     // |   qualifiedNameParser ^^ (a => VarExpression())
     // |   qualifiedNameParser ~ "(" ~ opt(argumentsParser) ~ ")" ^^ {
@@ -40,12 +41,13 @@ trait ExpressionParser extends BasicParsers {
     // |   expressionParser ~ "(\*|/|&&)".r ~ expression
     // |   expressionParser ~ "(\+|-|\|\|)".r ~ expression
     )
-    def qualifiedNameParser: Parser[Expression]
-    def argumentsParser: Parser[List[Expression]]
+
+    // def qualifiedNameParser: Parser[Expression]
+    // def argumentsParser: Parser[List[Expression]]
     def expValueParser: Parser[Expression] = (
-        int
-    |   real
-    |   char.r ^^ (i => CharValue(i.toCharArray.head))
+        real
+    |   int
+    |   char
     |   string
     |   bool
     |   "NIL" ^^ (i => NullValue)
