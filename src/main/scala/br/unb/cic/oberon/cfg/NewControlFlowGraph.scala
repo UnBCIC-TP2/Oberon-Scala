@@ -30,7 +30,7 @@ class NewControlFlowGraph {
 
   def finalFG(stmtFG: Statement) : Set[Statement] = {
     stmtFG match {
-      case AssignmentStmt(name, exp) => Set(AssignmentStmt(name, exp))
+      //case AssignmentStmt(name, exp) => Set(AssignmentStmt(name, exp))
       case SequenceStmt(stmts) => finalFG(stmts.last)
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (elseStmt.isDefined){
@@ -46,10 +46,12 @@ class NewControlFlowGraph {
           stmtsIfElseIf = stmtsIfElseIf concat finalFG(elseIf)
         }
 
-        if(elseStmt.isDefined)
+        if(elseStmt.isDefined) {
           stmtsIfElseIf concat finalFG(elseStmt.get)
-
-        stmtsIfElseIf
+        }
+        else {
+          stmtsIfElseIf
+        }
       case ElseIfStmt(condition, thenStmt) => finalFG(thenStmt)
       case CaseStmt(exp, cases, elseStmt) =>
         var stmtsCase : Set[Statement] = Set()
@@ -71,9 +73,8 @@ class NewControlFlowGraph {
     }
   }
 
-  def flow(stmtFG : Statement) : Set[Object] = {
+  def flow(stmtFG : Statement) : Set[(Statement, Statement)] = {
     stmtFG match {
-      case AssignmentStmt(varName, exp) => Set()
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (elseStmt.isDefined)
           flow(thenStmt) concat flow(elseStmt.get) concat Set((stmtFG, init(thenStmt)),
@@ -83,13 +84,14 @@ class NewControlFlowGraph {
       case WhileStmt(condition, stmt) =>
         var result = flow(stmt) concat Set((stmtFG, init(stmt)))
         val finalWhile = finalFG(stmt)
-        for (s <- finalWhile){
-          result = result concat Set((s, stmtFG))
+        for (stmtFinal <- finalWhile){
+          result = result concat Set((stmtFinal, stmtFG))
         }
 
         result
       case SequenceStmt(stmts) =>
-        var result : Set[Object] = Set()
+        var result : Set[(Statement, Statement)] = Set()
+
         for (stmt <- stmts){
           result = result concat flow(stmt)
         }
@@ -103,8 +105,7 @@ class NewControlFlowGraph {
         }
 
         result
-
-
+      case _ => Set()
     }
 
   }
