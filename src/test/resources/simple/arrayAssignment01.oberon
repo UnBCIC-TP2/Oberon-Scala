@@ -1,0 +1,11 @@
+MODULE SimpleModule;
+
+VAR
+  x: INTEGER;
+
+BEGIN
+    x := a[2+6];
+    write(x)
+END
+
+END SimpleModule.

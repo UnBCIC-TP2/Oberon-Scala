@@ -1,0 +1,13 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+int a[10];
+
+int main() {
+
+    a[0] = 5;
+    a[1] = 10 + 15;
+    a[2] = 10 * 15;
+    a[3] = 10 / 15;
+    a[4] = 10 - 15;
+}
