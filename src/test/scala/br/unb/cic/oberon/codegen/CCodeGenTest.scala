@@ -9,7 +9,7 @@ import java.io.{BufferedWriter, File, FileWriter}
 
 class CCodeGenTest extends AnyFunSuite {
 
-  private def testGenerator(oberonFile: String, lineSpaces: Int = 4) = {
+  private def testGenerator(oberonFile: String) = {
 
     val module = ScalaParser.parseResource(oberonFile)
     val coreModule = if (module.stmt.isDefined) {
@@ -19,12 +19,11 @@ class CCodeGenTest extends AnyFunSuite {
       module
     }
 
-    val generatedCCode = PaigesBasedGenerator(lineSpaces).generateCode(coreModule)
+    val generatedCCode = PaigesBasedGenerator().generateCode(coreModule)
     val CFile: String = s"cCode/$oberonFile".replace(".oberon", ".c")
 
     saveStringToFile(generatedCCode, s"c:/$CFile")
     val cCode = Resources.getContent(CFile)
-
 
     assert(generatedCCode == cCode)
   }
@@ -55,7 +54,7 @@ class CCodeGenTest extends AnyFunSuite {
     }
   }
 
-  for (i <- 1 to 3) {
+  for (i <- 1 to 4) {
     val procedureNumber = "%02d".format(i)
     test(s" C generator for interpreter_factorial$procedureNumber") {
       testGenerator(s"procedures/interpreter_factorial$procedureNumber.oberon")
@@ -143,13 +142,16 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("simple/userTypeSimple06.oberon")
   }
 
-  test("C generator for ExpressionNameParser2.oberon") {
-    testGenerator("stmts/ExpressionNameParser2.oberon")
+  for (i <- 2 to 3) {
+    test(s"C generator for ExpressionNameParser$i.oberon") {
+      testGenerator(s"stmts/ExpressionNameParser$i.oberon")
+    }
   }
 
-  test("C generator for ExpressionNameParser3.oberon") {
-    testGenerator("stmts/ExpressionNameParser3.oberon")
+  test("C generator for Array Usage") {
+    testGenerator("stmts/ArrayUsage.oberon")
   }
+
 
 
 }

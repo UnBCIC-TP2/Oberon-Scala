@@ -1,155 +1,136 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ast.{UserDefinedType, _}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.transformations.CoreChecker
-import org.typelevel.paiges._
+import org.typelevel.paiges.Doc
+import org.typelevel.paiges.Doc._
 
-class NotOberonCoreException(s:String) extends Exception(s){}
+class NotOberonCoreException(s: String) extends Exception(s) {}
 
 abstract class CCodeGenerator extends CodeGenerator {}
 
-case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
-
+case class PaigesBasedGenerator() extends CCodeGenerator {
+  val indentSize: Int = 4
+  val twoLines: Doc = line * 2
 
   override def generateCode(module: OberonModule): String = {
 
     if (module.stmt.isDefined && !CoreChecker.isModuleCore(module))
       throw new NotOberonCoreException("Não podemos compilar módulo C que não seja OberonCore")
 
-    val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.text(
-      "#include <stdbool.h>"
-    ) + Doc.line + Doc.line
-    val procedureDocs = module.procedures.map(procedure => generateProcedure(procedure, lineSpaces))
+    val mainHeader = text("#include <stdio.h>") / text("#include <stdbool.h>") + twoLines
+    val procedureDocs = module.procedures.map(procedure => generateProcedure(procedure, module.userTypes))
     val mainProcedures =
-      if (procedureDocs.nonEmpty)
-        Doc.intercalate(
-          Doc.line + Doc.line,
-          procedureDocs
-        ) + Doc.line + Doc.line
-      else Doc.empty
+      if (procedureDocs.nonEmpty) intercalate(twoLines, procedureDocs) + twoLines
+      else empty
     val mainDefines = generateConstants(module.constants)
-    val mainDeclarations = generateDeclarations(module.variables, module.userTypes, lineSpaces)
-    val userDefinedTypes = generateUserDefinedTypes(module.userTypes, lineSpaces)
+    val mainDeclarations = generateDeclarations(module.variables, module.userTypes)
+    val userDefinedTypes = generateUserDefinedTypes(module.userTypes)
     val mainBody = module.stmt match {
       case Some(stmt) =>
-        Doc.text("int main() ") + Doc.char(
-          '{'
-        ) + Doc.line + mainDeclarations + Doc.line + generateStatement(
+        text("int main() {") / mainDeclarations / generateStmt(
           stmt,
-          lineSpaces,
-          lineSpaces
+          indentSize
         ) + Doc.char('}')
-      case None => Doc.text("int main() {}")
+      case None => text("int main() {}")
     }
-    val main = mainHeader + userDefinedTypes + mainDefines + mainProcedures + Doc.line + mainBody
+    val main = mainHeader + userDefinedTypes + mainDefines + mainProcedures / mainBody
     main.render(60)
   }
 
-  def generateProcedure(procedure: Procedure, lineSpaces: Int = 2): Doc = {
+  def generateProcedure(procedure: Procedure, userTypes: List[UserDefinedType]): Doc = {
     val returnType = procedure.returnType match {
-      case Some(varType) => generateType(varType)
-      case None          => Doc.text("void")
+      case Some(varType) => getCType(varType, userTypes)
+      case None => "void"
     }
+
     val args = procedure.args.map {
       case parameterByValue =>
-        val argumentType = generateType(parameterByValue.argumentType)
-        argumentType + Doc.space + Doc.text(parameterByValue.name)
+        val argumentType = getCType(parameterByValue.argumentType, userTypes)
+        text(s"$argumentType ${parameterByValue.name}")
       case parameterByReference =>
-        val argumentType = generateType(parameterByReference.argumentType)
-        argumentType + Doc.space + Doc.text(parameterByReference.name)
+        val argumentType = getCType(parameterByReference.argumentType, userTypes)
+        text(s"$argumentType ${parameterByReference.name}")
     }
 
     val procedureDeclarations = generateDeclarations(procedure.variables, List())
-    val procedureArgs = Doc.intercalate(Doc.char(',') + Doc.space, args)
-    val procedureName =
-      returnType + Doc.space + Doc.text(procedure.name) + Doc.char('(')
-    val procedureHeader =
-      procedureArgs.tightBracketBy(procedureName, Doc.char(')'))
-    val procedureBody =
-      generateStatement(procedure.stmt, lineSpaces, lineSpaces)
+    val procedureArgs = intercalate(Doc.char(',') + space, args)
+    val procedureName = text(s"$returnType ${procedure.name}(")
+    val procedureHeader = procedureArgs.tightBracketBy(procedureName, Doc.char(')'))
+    val procedureBody = generateStmt(procedure.stmt)
 
-    procedureHeader + Doc.space + Doc.char(
+    procedureHeader + space + Doc.char(
       '{'
-    ) + Doc.line + procedureDeclarations + procedureBody +
+    ) / procedureDeclarations + procedureBody +
       Doc.char('}')
   }
 
-  def generateDeclarations(
-      variables: List[VariableDeclaration],
-      userTypes: List[UserDefinedType],
-      lineSpaces: Int = 2
-  ): Doc = {
-    val intVariables = variables.filter(_.variableType == IntegerType).map(intVar => Doc.text(intVar.name))
-    val intDeclaration =
-      if (intVariables.nonEmpty)
-        formatLine(lineSpaces) + Doc.text("int ") + Doc.intercalate(
-          Doc.comma + Doc.space,
-          intVariables
-        ) + Doc.char(';') + Doc.line
-      else Doc.empty
+  def generateDeclarations(variables: List[VariableDeclaration], userTypes: List[UserDefinedType]): Doc = {
 
-    val boolVariables = variables.filter(_.variableType == BooleanType).map(boolVar => Doc.text(boolVar.name))
-    val boolDeclaration =
-      if (boolVariables.nonEmpty)
-        formatLine(lineSpaces) + Doc.text("bool ") + Doc.intercalate(
-          Doc.comma + Doc.space,
-          boolVariables
-        ) + Doc.char(';') + Doc.line
-      else Doc.empty
+    var basicVariablesDoc = empty
+    for (varType <- List(IntegerType, BooleanType)) {
+      val variablesOfType = variables.filter(_.variableType == varType).map(variable => variable.name)
+      if (variablesOfType.nonEmpty) {
+        val CVarType = getCType(varType, userTypes)
+        val varNames = variablesOfType.mkString(", ")
+        val newDeclarationLine = textln(indentSize, s"$CVarType $varNames;")
+        basicVariablesDoc = basicVariablesDoc + newDeclarationLine
+      }
+    }
 
-    var userVariablesDoc = Doc.empty
+    var userVariablesDoc = empty
 
-    for (variable <- variables){
+    for (variable <- variables) {
       variable.variableType match {
-        case ReferenceToUserDefinedType(name) =>
-          val (userType, userTypeName) = stringToType(name, userTypes)
+        case ReferenceToUserDefinedType(userTypeName) =>
+          val userType = stringToType(userTypeName, userTypes)
 
           userType match {
 
             case ArrayType(length, innerType) =>
               val variableType: String = getCType(innerType, userTypes)
-              userVariablesDoc += formatLine(lineSpaces) + Doc.text(s"$variableType ${variable.name}[$length];") + Doc.line
+              userVariablesDoc += textln(indentSize,s"$variableType ${variable.name}[$length];")
 
             case RecordType(_) =>
-              userVariablesDoc += formatLine(lineSpaces) + Doc.text(s"struct $userTypeName ${variable.name};") + Doc.line
+              userVariablesDoc += textln(indentSize,s"struct $userTypeName ${variable.name};")
           }
 
         case _ => ()
       }
     }
 
-    intDeclaration + boolDeclaration + userVariablesDoc
+    basicVariablesDoc + userVariablesDoc
   }
 
+  def generateUserDefinedTypes(userTypes: List[UserDefinedType]): Doc = {
 
-  def generateUserDefinedTypes(userTypes:List[UserDefinedType] , lineSpaces:Int): Doc = {
-
-    var text:Doc = Doc.empty
+    var generatedDoc: Doc = empty
 
     for (userType <- userTypes) {
-      text += (userType.baseType match {
+      generatedDoc += (userType.baseType match {
         case ArrayType(length, innerType) =>
           val variableType: String = getCType(innerType, userTypes)
-          Doc.text(s"$variableType ${userType.name}[$length];") + Doc.line
+          textln(s"$variableType ${userType.name}[$length];")
         case RecordType(variables) =>
-          Doc.text(s"struct ${userType.name} {") +
-            Doc.line + generateDeclarations(variables, userTypes, lineSpaces) +
-            Doc.text("};") + Doc.line
+          val structName = userType.name
+          text(s"struct $structName {") /
+            generateDeclarations(variables, userTypes) +
+            textln("};")
       })
     }
-    text
+    generatedDoc
   }
 
-  def stringToType(typeAsString:String, userTypes:List[UserDefinedType]):Type  = {
-    for (userType <- userTypes){
-      if (userType.name == typeAsString){
+  def stringToType(typeAsString: String, userTypes: List[UserDefinedType]): Type = {
+    for (userType <- userTypes) {
+      if (userType.name == typeAsString) {
         return userType.baseType
       }
     }
-     throw new Exception("Type not Found.")
+    throw new Exception("Type not defined.")
   }
 
-  def getCType(variableType:Type, userTypes:List[UserDefinedType]):String= {
+  def getCType(variableType: Type, userTypes: List[UserDefinedType]): String = {
     variableType match {
       case IntegerType => "int"
       case BooleanType => "bool"
@@ -162,111 +143,79 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
         }
     }
   }
-  // É possível refatorar isso aqui.
-  def generateType(varType: Type): Doc = {
-    varType match {
-      case IntegerType => Doc.text("int")
-      case BooleanType => Doc.text("bool")
-      case _           => Doc.text("undefined")
-    }
-  }
 
   def generateConstants(constants: List[Constant]): Doc = {
     val constantsDeclaration = constants.map {
-      constant =>
-        Doc.text("#define ") + Doc.text(
-          constant.name
-        ) + Doc.space + Doc.text(genExp(constant.exp))
+      constant => text(s"#define ${constant.name} ${genExp(constant.exp)}")
     }
     if (constantsDeclaration.nonEmpty)
-      Doc.intercalate(Doc.line, constantsDeclaration) + Doc.line + Doc.line
+      intercalate(line, constantsDeclaration) + twoLines
     else
-      Doc.empty
+      empty
   }
 
-  def generateStatement(
-      statement: Statement,
-      startSpaces: Int = 2,
-      padSpaces: Int = 2
-  ): Doc = {
+  def generateStmt(statement: Statement, indent: Int = indentSize): Doc = {
+
     statement match {
-      case AssignmentStmt(varName, expression) =>
-        formatLine(startSpaces) + Doc.text(varName) + Doc.space + Doc.char(
-          '='
-        ) + Doc.space + Doc.text(genExp(expression)) + Doc.char(
-          ';'
-        ) + Doc.line
+      case AssignmentStmt(varName, exp) =>
+        textln(indent,s"$varName = ${genExp(exp)};")
       case SequenceStmt(stmts) =>
-        val multipleStmts = stmts.map(stmt => generateStatement(stmt, startSpaces, padSpaces))
-        Doc.intercalate(Doc.empty, multipleStmts)
+        val multipleStmts = stmts.map(stmt => generateStmt(stmt, indent))
+        intercalate(empty, multipleStmts)
       case ReadIntStmt(varName) =>
-        formatLine(startSpaces) + Doc.text("scanf(\"%d\", &") + Doc.text(
-          varName
-        ) + Doc.text(
-          ");"
-        ) + Doc.line
+        textln(indent,s"""scanf("%d", &$varName);""")
       case WriteStmt(expression) =>
-        formatLine(startSpaces) + Doc.text(
-          "printf(\"%d\\n\", "
-        ) + Doc.text(genExp(expression)) + Doc.text(");") + Doc.line
+        textln(indent,s"""printf("%d\\n", ${genExp(expression)});""")
       case ProcedureCallStmt(name, args) =>
-        val expressions = args.map(arg => Doc.text(genExp(arg)))
-        val functionArgs = Doc.intercalate(Doc.char(',') + Doc.space, expressions)
+        val expressions = args.map(arg => text(genExp(arg)))
+        val functionArgs = intercalate(Doc.char(',') + space, expressions)
         functionArgs.tightBracketBy(
-          formatLine(startSpaces) + Doc.text(name) + Doc.char('('),
-          Doc.text(");")
-        ) + Doc.line
+          indentation(indent) + text(name + '('),
+          text(");")
+        ) + line
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val ifCond =
-          formatLine(startSpaces) + Doc.text("if (") + Doc.text(genExp(condition)) + Doc.text(
-            ")"
-          ) + Doc.text(" {") + Doc.line + generateStatement(
-            thenStmt,
-            startSpaces + padSpaces,
-            padSpaces
-          ) + formatLine(startSpaces) + Doc.char('}')
+          textln(indent, s"if (${genExp(condition)}) {") +
+            generateStmt(thenStmt, indent + indentSize) +
+            indentation(indent) + text("}")
         val elseCond = elseStmt match {
           case Some(stmt) =>
-            Doc.text(" else {") + Doc.line + generateStatement(
+            textln(" else {") + generateStmt(
               stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
-          case None => Doc.line
+              indent + indentSize
+            ) + textln(indent,"}")
+          case None => line
         }
         ifCond + elseCond
       case WhileStmt(condition, stmt) =>
-        formatLine(startSpaces) + Doc.text("while (") + Doc.text(genExp(condition)) + Doc.text(")") +
-          Doc.text(" {") + Doc.line + generateStatement(
-          stmt,
-          startSpaces + padSpaces,
-          padSpaces
-        ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+        textln(indent,s"while (${genExp(condition)}) {") +
+          generateStmt(stmt, indent + indentSize) +
+          textln(indent,"}")
       case ReturnStmt(exp) =>
-        formatLine(startSpaces) + Doc.text("return ") + Doc.text(genExp(exp)) + Doc
-          .char(';') + Doc.line
+        textln(indent,s"return ${genExp(exp)};")
 
       case EAssignmentStmt(designator, exp) =>
         designator match {
           case ArrayAssignment(array, elem) =>
-            array match {
-              case VarExpression(name) =>
-                val index = genExp(elem)
-                formatLine(startSpaces) + Doc.text(s"$name[$index] = ${genExp(exp)};") + Doc.line
-            }
+            val varName = genExp(array)
+            val index = genExp(elem)
+            val value = genExp(exp)
+            textln(indent,s"$varName[$index] = $value;")
+
           case RecordAssignment(record, atrib) =>
-            formatLine(startSpaces) + Doc.text(s"${genExp(record)}.$atrib = ${genExp(exp)};") + Doc.line
+            val structName = genExp(record)
+            val value = genExp(exp)
+            textln(indent,s"$structName.$atrib = $value;")
         }
 
       case ExitStmt() =>
-        formatLine(startSpaces) + Doc.text("break; ") + Doc.line
+       textln(indent,"break; ")
 
-      case _ => Doc.empty
+      case _ => empty
     }
   }
 
-  def genExp(exp: Expression) : String = {
-
+  def genExp(exp: Expression): String = {
     exp match {
       case IntValue(v) => v.toString
       case Brackets(exp) => s"( ${genExp(exp)} )"
@@ -275,10 +224,10 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
 
       case VarExpression(name) => name
       case FunctionCallExpression(name, args) =>
-        val expressions = args.map(arg => Doc.text(genExp(arg)))
-        val functionArgs = Doc.intercalate(Doc.char(',') + Doc.space, expressions)
+        val expressions = args.map(arg => text(genExp(arg)))
+        val functionArgs = intercalate(Doc.char(',') + space, expressions)
         functionArgs.tightBracketBy(
-          Doc.text(name) + Doc.char('('),
+          text(name + '('),
           Doc.char(')')
         ).render(10000)
       case EQExpression(left, right) => s"${genExp(left)} == ${genExp(right)}"
@@ -291,31 +240,21 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
       case SubExpression(left, right) => s"${genExp(left)} - ${genExp(right)}"
       case MultExpression(left, right) => s"${genExp(left)} * ${genExp(right)}"
       case DivExpression(left, right) => s"${genExp(left)} / ${genExp(right)}"
-      case OrExpression(left, right) => s"${genExp(left)} | ${genExp(right)}"
-      case AndExpression(left, right) => s"${genExp(left)} & ${genExp(right)}"
-      case FieldAccessExpression(exp, name) => s"${genExp(exp)}.${name}"
+      case OrExpression(left, right) => s"${genExp(left)} || ${genExp(right)}"
+      case AndExpression(left, right) => s"${genExp(left)} && ${genExp(right)}"
+      case FieldAccessExpression(exp, name) => s"${genExp(exp)}.$name"
+      case ArraySubscript(arrayBase, index) =>
+        val arrayName = genExp(arrayBase)
+        val arrayIndex = genExp(index)
+        s"$arrayName[$arrayIndex]"
       case _ => throw new Exception("expression not found")
     }
   }
 
+  def textln(str: String): Doc = text(str) + line
+  def textln(indentSize: Int, str: String): Doc = indentation(indentSize) + text(str) + line
 
-  def generateBinExpression(
-      left: Expression,
-      right: Expression,
-      sign: String
-  ): Doc =
-    Doc.text(genExp(left)) + Doc.space + Doc.text(
-      sign
-    ) + Doc.space + Doc.text(genExp(right))
-
-
-
-
-  def formatLine(spaces: Int): Doc =
-    Doc.intercalate(
-      Doc.empty,
-      List.fill(spaces)(Doc.space)
-    ) // adiciona a indentação na quantidade de espaços definidos
+  def indentation(size: Int = indentSize): Doc = intercalate(empty, List.fill(size)(space))
 
 }
 
