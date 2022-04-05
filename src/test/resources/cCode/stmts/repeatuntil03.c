@@ -10,7 +10,7 @@ int main() {
     while (true) {
         x = x + 1;
         y = y + 1;
-        if (x >= 10 & y >= 20) {
+        if (x >= 10 && y >= 20) {
             break; 
         }
     }
