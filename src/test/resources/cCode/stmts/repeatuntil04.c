@@ -20,6 +20,7 @@ int power(int b, int e) {
     return r;
 }
 
+
 int main() {
     int x, y;
 

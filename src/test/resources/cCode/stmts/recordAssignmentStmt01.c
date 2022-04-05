@@ -6,5 +6,7 @@ struct date {
 };
 
 int main() {
+    struct date d1;
 
+    d1.day = 5;
 }

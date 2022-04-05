@@ -7,6 +7,7 @@ int calcmult(int i, int base) {
     return i * base;
 }
 
+
 int main() {
     int base, count, mult;
 

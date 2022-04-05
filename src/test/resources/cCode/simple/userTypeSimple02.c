@@ -5,7 +5,6 @@ struct HALLS {
     int matricula;
     bool integrante;
 };
-
 struct HALLS HALLS_array[9];
 
 int main() {
