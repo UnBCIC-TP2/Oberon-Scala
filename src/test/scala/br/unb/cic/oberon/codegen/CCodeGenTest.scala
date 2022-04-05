@@ -1,5 +1,6 @@
 package br.unb.cic.oberon.codegen
 
+import br.unb.cic.oberon.ast.{BooleanType, RecordType, UserDefinedType, VariableDeclaration}
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.util.Resources
@@ -9,11 +10,16 @@ import java.io.{BufferedWriter, File, FileWriter}
 
 class CCodeGenTest extends AnyFunSuite {
 
-  private def testGenerator(oberonFile :String, lineSpaces :Int = 4) = {
+  private def testGenerator(oberonFile :String, lineSpaces :Int = 4, useCoreTransformer:Boolean = true) = {
 
     val module = ScalaParser.parseResource(oberonFile)
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
+    val coreModule = if (useCoreTransformer) {
+        val coreVisitor = new CoreVisitor()
+        coreVisitor.transformModule(module)
+      }else{
+         module
+      }
+
     val generatedCCode = PaigesBasedGenerator(lineSpaces).generateCode(coreModule)
     val CFile :String = s"cCode/$oberonFile".replace(".oberon", ".c")
 
@@ -105,8 +111,18 @@ class CCodeGenTest extends AnyFunSuite {
   test("Testing C generator for recordAssignmentStmt01 (Record Declaration)") {
     testGenerator("stmts/recordAssignmentStmt01.oberon" )
   }
+
   test("Testing C generator for userTypeSimple02 (User Type Declaration)") {
     testGenerator("simple/userTypeSimple02.oberon" )
+  }
+
+  // Core Transformer não executa corretamente.
+  ignore("Testing C generator for userTypeSimple03 (Struct inside Struct)") {
+    testGenerator("simple/userTypeSimple03.oberon" )
+  }
+
+  test("Testing C generator for userTypeSimple05b (Array Inside Struct)") {
+    testGenerator("simple/userTypeSimple05b.oberon", useCoreTransformer = false)
   }
 
 

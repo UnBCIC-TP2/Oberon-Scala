@@ -100,31 +100,43 @@ case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
   }
 
 
-  def generateUserDefinedTypes(userTypes: List[UserDefinedType], lineSpaces:Int): Doc = {
+  def generateUserDefinedTypes(userTypes:List[UserDefinedType] , lineSpaces:Int): Doc = {
 
-    def generate(userType: UserDefinedType): Doc = {
-      userType.baseType match {
-      case ArrayType(length, vType) =>
-        val variableType: String = getCType(vType)
-        Doc.text(s"$variableType ${userType.name}[$length];") + Doc.line
-      case RecordType(variables) =>
-        Doc.text(s"struct ${userType.name} {") + Doc.line + generateDeclarations(variables, lineSpaces) + Doc.text("};") + Doc.line
-      }
-    }
     var text:Doc = Doc.empty
+
     for (userType <- userTypes) {
-      text += generate(userType)
+      text += (userType.baseType match {
+        case ArrayType(length, innerType) =>
+          val variableType: String = getCType(innerType, userTypes)
+          Doc.text(s"$variableType ${userType.name}[$length];") + Doc.line + Doc.line
+        case RecordType(variables) =>
+          Doc.text(s"struct ${userType.name} {") + Doc.line + generateDeclarations(variables, lineSpaces) + Doc.text("};") + Doc.line + Doc.line
+      })
     }
     text
   }
-  def getCType(variableType:Type):String= {
+
+  def stringToType(typeAsString:String, userTypes:List[UserDefinedType]):(Type, String)  = {
+    for (userType <- userTypes){
+      if (userType.name == typeAsString){
+        return (userType.baseType, userType.name)
+      }
+    }
+     throw new Exception("Type not Found.")
+  }
+
+  def getCType(variableType:Type, userTypes:List[UserDefinedType]):String= {
     variableType match {
       case IntegerType => "int"
       case BooleanType => "bool"
       case CharacterType => "char"
       case RealType => "float"
-      case ReferenceToUserDefinedType(name) => name
-      //struct
+      case ReferenceToUserDefinedType(name) =>
+        val (userType, userName) = stringToType(name, userTypes)
+        userType match {
+          case RecordType(_) => s"struct $userName"
+        }
+
     }
   }
 
