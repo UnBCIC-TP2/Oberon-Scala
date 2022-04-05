@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
-  int x, y;
+int main() {
+    int x, y;
 
-  scanf("%d", &x);
-  for (y = x; y < 100; y++) {
-    y = y * y;
-  }
-  printf("%d\n", y);
+    scanf("%d", &x);
+    y = x;
+    while (y < 100) {
+        y = y * y;
+    }
+    printf("%d\n", y);
 }

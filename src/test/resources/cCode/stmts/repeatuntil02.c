@@ -1,17 +1,23 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void main() {
-  int x, y;
+int main() {
+    int x, y;
 
-  x = 0;
-  y = 0;
-  do {
-    x = x + 1;
-    do {
-      y = y + 1;
-    } while (!(y >= 10));
-  } while (!(x >= 10));
-  printf("%d\n", x);
-  printf("%d\n", y);
+    x = 0;
+    y = 0;
+    while (true) {
+        x = x + 1;
+        while (true) {
+            y = y + 1;
+            if (y >= 10) {
+                break; 
+            }
+        }
+        if (x >= 10) {
+            break; 
+        }
+    }
+    printf("%d\n", x);
+    printf("%d\n", y);
 }

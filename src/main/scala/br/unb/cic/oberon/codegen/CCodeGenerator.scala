@@ -1,19 +1,25 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ast._
-import scala.annotation.tailrec
+import br.unb.cic.oberon.ast.{UserDefinedType, _}
+import br.unb.cic.oberon.transformations.CoreChecker
 import org.typelevel.paiges._
+
+class NotOberonCoreException(s:String) extends Exception(s){}
 
 abstract class CCodeGenerator extends CodeGenerator {}
 
-case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
+case class PaigesBasedGenerator(lineSpaces: Int = 4) extends CCodeGenerator {
+
+
   override def generateCode(module: OberonModule): String = {
+
+    if (!CoreChecker.isModuleCore(module))
+      throw new NotOberonCoreException("Não podemos compilar módulo C que não seja OberonCore")
+
     val mainHeader = Doc.text("#include <stdio.h>") + Doc.line + Doc.text(
       "#include <stdbool.h>"
     ) + Doc.line + Doc.line
-    val procedureDocs = module.procedures.map {
-      case (procedure) => generateProcedure(procedure, lineSpaces)
-    }
+    val procedureDocs = module.procedures.map(procedure => generateProcedure(procedure, lineSpaces))
     val mainProcedures =
       if (procedureDocs.nonEmpty)
         Doc.intercalate(
@@ -23,18 +29,19 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       else Doc.empty
     val mainDefines = generateConstants(module.constants)
     val mainDeclarations = generateDeclarations(module.variables, lineSpaces)
+    val userDefinedTypes = generateUserDefinedTypes(module.userTypes, lineSpaces)
     val mainBody = module.stmt match {
       case Some(stmt) =>
-        Doc.text("void main() ") + Doc.char(
+        Doc.text("int main() ") + Doc.char(
           '{'
         ) + Doc.line + mainDeclarations + Doc.line + generateStatement(
           stmt,
           lineSpaces,
           lineSpaces
         ) + Doc.char('}')
-      case None => Doc.text("void main() {}")
+      case None => Doc.text("int main() {}")
     }
-    val main = mainHeader + mainDefines + mainProcedures + mainBody
+    val main = mainHeader + userDefinedTypes + mainDefines + mainProcedures + mainBody
     main.render(60)
   }
 
@@ -44,10 +51,10 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       case None          => Doc.text("void")
     }
     val args = procedure.args.map {
-      case (parameterByValue) =>
+      case parameterByValue =>
         val argumentType = generateType(parameterByValue.argumentType)
         argumentType + Doc.space + Doc.text(parameterByValue.name)
-      case (parameterByReference) =>
+      case parameterByReference =>
         val argumentType = generateType(parameterByReference.argumentType)
         argumentType + Doc.space + Doc.text(parameterByReference.name)
     }
@@ -71,9 +78,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       variables: List[VariableDeclaration],
       lineSpaces: Int = 2
   ): Doc = {
-    val intVariables = variables.filter(_.variableType == IntegerType).map {
-      case (intVar) => Doc.text(intVar.name)
-    }
+    val intVariables = variables.filter(_.variableType == IntegerType).map(intVar => Doc.text(intVar.name))
     val intDeclaration =
       if (intVariables.nonEmpty)
         formatLine(lineSpaces) + Doc.text("int ") + Doc.intercalate(
@@ -82,9 +87,7 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         ) + Doc.char(';') + Doc.line
       else Doc.empty
 
-    val boolVariables = variables.filter(_.variableType == BooleanType).map {
-      case (boolVar) => Doc.text(boolVar.name)
-    }
+    val boolVariables = variables.filter(_.variableType == BooleanType).map(boolVar => Doc.text(boolVar.name))
     val boolDeclaration =
       if (boolVariables.nonEmpty)
         formatLine(lineSpaces) + Doc.text("bool ") + Doc.intercalate(
@@ -96,9 +99,38 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
     intDeclaration + boolDeclaration
   }
 
+
+  def generateUserDefinedTypes(userTypes: List[UserDefinedType], lineSpaces:Int): Doc = {
+
+    def generate(userType: UserDefinedType): Doc = {
+      userType.baseType match {
+      case ArrayType(length, vType) =>
+        val variableType: String = getCType(vType)
+        Doc.text(s"$variableType ${userType.name}[$length];") + Doc.line
+      case RecordType(variables) =>
+        Doc.text(s"struct ${userType.name} {") + Doc.line + generateDeclarations(variables, lineSpaces) + Doc.text("};") + Doc.line
+      }
+    }
+    var text:Doc = Doc.empty
+    for (userType <- userTypes) {
+      text += generate(userType)
+    }
+    text
+  }
+  def getCType(variableType:Type):String= {
+    variableType match {
+      case IntegerType => "int"
+      case BooleanType => "bool"
+      case CharacterType => "char"
+      case RealType => "float"
+      case ReferenceToUserDefinedType(name) => name
+      //struct
+    }
+  }
+
   def generateConstants(constants: List[Constant]): Doc = {
     val constantsDeclaration = constants.map {
-      case (constant) =>
+      constant =>
         Doc.text("#define ") + Doc.text(
           constant.name
         ) + Doc.space + generateExpression(constant.exp)
@@ -121,38 +153,29 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
         ) + Doc.space + generateExpression(expression) + Doc.char(
           ';'
         ) + Doc.line
-      case SequenceStmt(stmts) => {
-        val multipleStmts = stmts.map {
-          case (stmt) => generateStatement(stmt, startSpaces, padSpaces)
-        }
+      case SequenceStmt(stmts) =>
+        val multipleStmts = stmts.map(stmt => generateStatement(stmt, startSpaces, padSpaces))
         Doc.intercalate(Doc.empty, multipleStmts)
-      }
       case ReadIntStmt(varName) =>
         formatLine(startSpaces) + Doc.text("scanf(\"%d\", &") + Doc.text(
           varName
         ) + Doc.text(
           ");"
         ) + Doc.line
-      case WriteStmt(expression) => {
+      case WriteStmt(expression) =>
         formatLine(startSpaces) + Doc.text(
           "printf(\"%d\\n\", "
         ) + generateExpression(
           expression
         ) + Doc.text(");") + Doc.line
-      }
-      case ProcedureCallStmt(name, args) => {
-        val expressions = args.map {
-          case (arg) =>
-            generateExpression(arg)
-        }
-        val functionArgs =
-          Doc.intercalate(Doc.char(',') + Doc.space, expressions)
+      case ProcedureCallStmt(name, args) =>
+        val expressions = args.map(arg => generateExpression(arg))
+        val functionArgs = Doc.intercalate(Doc.char(',') + Doc.space, expressions)
         functionArgs.tightBracketBy(
           formatLine(startSpaces) + Doc.text(name) + Doc.char('('),
           Doc.text(");")
         ) + Doc.line
-      }
-      case IfElseStmt(condition, thenStmt, elseStmt) => {
+      case IfElseStmt(condition, thenStmt, elseStmt) =>
         val ifCond =
           formatLine(startSpaces) + Doc.text("if (") + generateExpression(
             condition
@@ -162,21 +185,18 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
             thenStmt,
             startSpaces + padSpaces,
             padSpaces
-          ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+          ) + formatLine(startSpaces) + Doc.char('}')
         val elseCond = elseStmt match {
-          case Some(stmt) => {
-            formatLine(startSpaces) + Doc.text("else") +
-              Doc.text(" {") + Doc.line + generateStatement(
+          case Some(stmt) =>
+             Doc.text(" else {") + Doc.line + generateStatement(
               stmt,
               startSpaces + padSpaces,
               padSpaces
-            ) + Doc.char('}') + Doc.line
-          }
-          case None => Doc.empty
+            ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
+          case None => Doc.line
         }
         ifCond + elseCond
-      }
-      case WhileStmt(condition, stmt) => {
+      case WhileStmt(condition, stmt) =>
         formatLine(startSpaces) + Doc.text("while (") + generateExpression(
           condition
         ) + Doc.text(")") +
@@ -185,127 +205,15 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
           startSpaces + padSpaces,
           padSpaces
         ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
-      }
-      case RepeatUntilStmt(condition, stmt) => {
-        formatLine(startSpaces) + Doc.text("do {") + Doc.line +
-          generateStatement(stmt, startSpaces + padSpaces, padSpaces) +
-          formatLine(startSpaces) + Doc.text("} while (!(") +
-          generateExpression(condition) + Doc.text("));") + Doc.line
-      }
-      case ForStmt(init: Statement, condition, stmt) => {
-        init match {
-          case AssignmentStmt(varName, expression) => {
-            formatLine(startSpaces) + Doc.text("for (") + Doc.text(
-              varName
-            ) + Doc.space + Doc.char('=') + Doc.space +
-              generateExpression(expression) + Doc.text(
-              "; "
-            ) + generateExpression(condition) + Doc.text("; ") +
-              Doc.text(varName) + Doc.text("++") + Doc.text(
-              ") {"
-            ) + Doc.line + generateStatement(
-              stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(
-              startSpaces
-            ) +
-              Doc.text("}") + Doc.line
-          }
-          case _ => Doc.empty
-        }
-      }
-
       case ReturnStmt(exp) =>
         formatLine(startSpaces) + Doc.text("return ") + generateExpression(
           exp
         ) + Doc
           .char(';') + Doc.line
 
-      case CaseStmt(exp, cases, elseStmt) => {
-        val caseStmts = cases.map {
-          case SimpleCase(condition, stmt) =>
-            formatLine(startSpaces) + Doc.text("case ") + generateExpression(
-              condition
-            ) + Doc.char(':') + Doc.line + generateStatement(
-              stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces + padSpaces) + Doc.text("break;")
-          case RangeCase(min, max, stmt) =>
-            formatLine(startSpaces) + Doc.text("case ") + generateExpression(
-              min
-            ) + Doc.text(" ... ") + generateExpression(max) + Doc.char(
-              ':'
-            ) + Doc.line + generateStatement(
-              stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces + padSpaces) + Doc.text("break;")
-        }
-        val stmtDefault = elseStmt match {
-          case Some(stmt) =>
-            formatLine(startSpaces) + Doc.text(
-              "default:"
-            ) + Doc.line + generateStatement(
-              stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces + padSpaces) + Doc.text(
-              "break;"
-            ) + Doc.line
-          case None => Doc.empty
-        }
-        val stmts = Doc.intercalate(Doc.line, caseStmts :+ stmtDefault)
+      case ExitStmt() =>
+        formatLine(startSpaces) + Doc.text("break; ") + Doc.line
 
-        formatLine(startSpaces) + Doc.text("switch ") + Doc.char(
-          '('
-        ) + generateExpression(exp) + Doc.text(
-          ") {"
-        ) + Doc.line + stmts + formatLine(startSpaces) + Doc.char(
-          '}'
-        ) + Doc.line
-      }
-
-      case IfElseIfStmt(condition, thenStmt, elsifStmt, elseStmt) => {
-        val ifCond =
-          formatLine(startSpaces) + Doc.text("if (") + generateExpression(
-            condition
-          ) + Doc.text(
-            ")"
-          ) + Doc.text(" {") + Doc.line + generateStatement(
-            thenStmt,
-            startSpaces + padSpaces,
-            padSpaces
-          ) + formatLine(startSpaces) + Doc.char('}') + Doc.line
-
-        val elsifCond = elsifStmt.map {
-          case ElseIfStmt(elsifCondition, elsifThenStmt) =>
-            formatLine(startSpaces) + Doc.text("else if (") + generateExpression(
-              elsifCondition
-            ) + Doc.text(
-              ")"
-            ) + Doc.text(" {") + Doc.line + generateStatement(
-              elsifThenStmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces) + Doc.char('}')
-        }
-
-        val elseCond = elseStmt match {
-          case Some(stmt) => {
-              Doc.line + formatLine(startSpaces) + Doc.text("else") +
-              Doc.text(" {") + Doc.line + generateStatement(
-              stmt,
-              startSpaces + padSpaces,
-              padSpaces
-            ) + formatLine(startSpaces) +  Doc.char('}') + Doc.line
-          }
-          case None => Doc.line + Doc.empty
-        }
-        val stmts = Doc.intercalate(Doc.line, elsifCond)
-        ifCond + stmts + elseCond
-      }
       case _ => Doc.empty
     }
   }
@@ -315,22 +223,17 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
       case Brackets(exp) =>
         Doc.char('(') + generateExpression(exp) + Doc
           .char(')')
-      case IntValue(v)         => Doc.text(v.toString())
+      case IntValue(v)         => Doc.text(v.toString)
       case BoolValue(v)        => Doc.text(if (v) "true" else "false")
       case Undef()             => Doc.text("undefined")
       case VarExpression(name) => Doc.text(name)
-      case FunctionCallExpression(name, args) => {
-        val expressions = args.map {
-          case (arg) =>
-            generateExpression(arg)
-        }
-        val functionArgs =
-          Doc.intercalate(Doc.char(',') + Doc.space, expressions)
+      case FunctionCallExpression(name, args) =>
+        val expressions = args.map(arg => generateExpression(arg))
+        val functionArgs = Doc.intercalate(Doc.char(',') + Doc.space, expressions)
         functionArgs.tightBracketBy(
           Doc.text(name) + Doc.char('('),
           Doc.char(')')
         )
-      }
       case EQExpression(left, right) => generateBinExpression(left, right, "==")
       case NEQExpression(left, right) =>
         generateBinExpression(left, right, "!=")
@@ -350,7 +253,6 @@ case class PaigesBasedGenerator(lineSpaces: Int = 2) extends CCodeGenerator {
 
       case _ => Doc.text("expression not found")
     }
-
   }
 
   def generateBinExpression(
