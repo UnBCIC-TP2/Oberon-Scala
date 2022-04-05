@@ -89,10 +89,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
             case ArrayType(length, innerType) =>
               val variableType: String = getCType(innerType, userTypes)
-              userVariablesDoc += textln(indentSize,s"$variableType ${variable.name}[$length];")
+              userVariablesDoc += textln(indentSize, s"$variableType ${variable.name}[$length];")
 
             case RecordType(_) =>
-              userVariablesDoc += textln(indentSize,s"struct $userTypeName ${variable.name};")
+              userVariablesDoc += textln(indentSize, s"struct $userTypeName ${variable.name};")
           }
 
         case _ => ()
@@ -158,14 +158,14 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
     statement match {
       case AssignmentStmt(varName, exp) =>
-        textln(indent,s"$varName = ${genExp(exp)};")
+        textln(indent, s"$varName = ${genExp(exp)};")
       case SequenceStmt(stmts) =>
         val multipleStmts = stmts.map(stmt => generateStmt(stmt, indent))
         intercalate(empty, multipleStmts)
       case ReadIntStmt(varName) =>
-        textln(indent,s"""scanf("%d", &$varName);""")
+        textln(indent, s"""scanf("%d", &$varName);""")
       case WriteStmt(expression) =>
-        textln(indent,s"""printf("%d\\n", ${genExp(expression)});""")
+        textln(indent, s"""printf("%d\\n", ${genExp(expression)});""")
       case ProcedureCallStmt(name, args) =>
         val expressions = args.map(arg => text(genExp(arg)))
         val functionArgs = intercalate(Doc.char(',') + space, expressions)
@@ -183,16 +183,16 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             textln(" else {") + generateStmt(
               stmt,
               indent + indentSize
-            ) + textln(indent,"}")
+            ) + textln(indent, "}")
           case None => line
         }
         ifCond + elseCond
       case WhileStmt(condition, stmt) =>
-        textln(indent,s"while (${genExp(condition)}) {") +
+        textln(indent, s"while (${genExp(condition)}) {") +
           generateStmt(stmt, indent + indentSize) +
-          textln(indent,"}")
+          textln(indent, "}")
       case ReturnStmt(exp) =>
-        textln(indent,s"return ${genExp(exp)};")
+        textln(indent, s"return ${genExp(exp)};")
 
       case EAssignmentStmt(designator, exp) =>
         designator match {
@@ -200,16 +200,16 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             val varName = genExp(array)
             val index = genExp(elem)
             val value = genExp(exp)
-            textln(indent,s"$varName[$index] = $value;")
+            textln(indent, s"$varName[$index] = $value;")
 
           case RecordAssignment(record, atrib) =>
             val structName = genExp(record)
             val value = genExp(exp)
-            textln(indent,s"$structName.$atrib = $value;")
+            textln(indent, s"$structName.$atrib = $value;")
         }
 
       case ExitStmt() =>
-       textln(indent,"break; ")
+        textln(indent, "break; ")
 
       case _ => empty
     }
@@ -252,6 +252,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   }
 
   def textln(str: String): Doc = text(str) + line
+
   def textln(indentSize: Int, str: String): Doc = indentation(indentSize) + text(str) + line
 
   def indentation(size: Int = indentSize): Doc = intercalate(empty, List.fill(size)(space))
