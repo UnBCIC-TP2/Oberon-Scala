@@ -169,5 +169,9 @@ class CCodeGenTest extends AnyFunSuite {
 
   }
 
+  test("C generator for Type Int"){
+    testGenerator("type/typeInt.oberon")
+  }
+
 
 }
