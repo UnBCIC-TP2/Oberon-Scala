@@ -5,6 +5,7 @@ import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
 import java.nio.file.{Files, Paths}
+import javax.sound.midi.Sequence
 
 class CoreTransformerTest extends AnyFunSuite {
 
@@ -1111,5 +1112,105 @@ class CoreTransformerTest extends AnyFunSuite {
 
     assert(!isCore)
     assert(isCore2)
+  }
+
+  test("Testing case conversion with FunctionCallExpression") {
+    val caseStmt =
+      CaseStmt(
+        FunctionCallExpression("func", List(VarExpression("x"))),
+        List(SimpleCase(IntValue(0), AssignmentStmt("x", IntValue(37)))),
+        None
+      )
+    val moduleStmt =
+      SequenceStmt(List(AssignmentStmt("x", IntValue(0)), caseStmt))
+    val module = OberonModule(
+      name = "Test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(moduleStmt)
+    )
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val coreStmt = coreModule.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(
+      coreModule.variables.length == module.variables.length + 1,
+      "Case transformation must add a new variable"
+    )
+
+    assert(
+      coreStmt(1) ==
+        AssignmentStmt(
+          "case_exp#0",
+          FunctionCallExpression("func", List(VarExpression("x")))
+        ),
+      "Case transformation must assign expression to the new variable"
+    )
+    assert(
+      coreStmt(2) ==
+        IfElseStmt(
+          EQExpression(VarExpression("case_exp#0"), IntValue(0)),
+          AssignmentStmt("x", IntValue(37)),
+          None
+        ),
+      "Case must be transformed to IfElseStmt using the new variable"
+    )
+  }
+
+  test("Testing multiple cases with FunctionCallExpression") {
+    val caseStmt1 =
+      CaseStmt(
+        FunctionCallExpression("func", List(VarExpression("x"))),
+        List(SimpleCase(IntValue(0), AssignmentStmt("x", IntValue(37)))),
+        None
+      )
+    val caseStmt2 =
+      CaseStmt(
+        FunctionCallExpression("func", List(VarExpression("x"))),
+        List(SimpleCase(IntValue(1), AssignmentStmt("x", IntValue(20)))),
+        None
+      )
+    val moduleStmt =
+      SequenceStmt(List(AssignmentStmt("x", IntValue(0)), caseStmt1, caseStmt2))
+    val module = OberonModule(
+      name = "Test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(moduleStmt)
+    )
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val coreStmt = coreModule.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(
+      coreModule.variables.length == module.variables.length + 2,
+      "Case transformations must add two new variables"
+    )
+
+    assert(
+      coreStmt(3) ==
+        AssignmentStmt(
+          "case_exp#1",
+          FunctionCallExpression("func", List(VarExpression("x")))
+        ),
+      "Second case transformation must assign expression to different variable"
+    )
+    assert(
+      coreStmt(4) ==
+        IfElseStmt(
+          EQExpression(VarExpression("case_exp#1"), IntValue(1)),
+          AssignmentStmt("x", IntValue(20)),
+          None
+        ),
+      "Case must be transformed to IfElseStmt using new variable"
+    )
   }
 }
