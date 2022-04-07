@@ -1,0 +1,17 @@
+MODULE procedures_with_local_var_array;
+
+VAR global : ARRAY 1 OF INTEGER;
+
+PROCEDURE Double(argument:ARRAY 1 OF INTEGER): INTEGER;
+    VAR local: ARRAY 1 OF INTEGER;
+BEGIN
+    local[0] := argument[0]*2;
+    RETURN local[0]
+END Double
+
+BEGIN
+    global[0] := 10;
+    global[0] := Double(global);
+    write(global[0])
+END
+END procedures_with_local_var.

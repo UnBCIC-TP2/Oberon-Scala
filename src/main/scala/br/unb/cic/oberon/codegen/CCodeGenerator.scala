@@ -24,19 +24,21 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       if (procedureDocs.nonEmpty) intercalate(twoLines, procedureDocs) + twoLines
       else empty
     val mainDefines = generateConstants(module.constants)
-    val mainDeclarations = generateDeclarations(module.variables, module.userTypes)
     val userDefinedTypes = generateUserDefinedTypes(module.userTypes)
+    val globalVars = declareVars(module.variables, module.userTypes, 0)
     val mainBody = module.stmt match {
       case Some(stmt) =>
-        text("int main() {") / mainDeclarations / generateStmt(
+        text("int main() {") / generateStmt(
           stmt,
           indentSize
         ) + Doc.char('}')
       case None => text("int main() {}")
     }
-    val main = mainHeader + userDefinedTypes + mainDefines + mainProcedures / mainBody
-    main.render(60)
+    val CCode = mainHeader + userDefinedTypes / globalVars / mainDefines + mainProcedures / mainBody
+    CCode.render(60)
   }
+
+
 
   def generateProcedure(procedure: Procedure, userTypes: List[UserDefinedType]): Doc = {
     val returnType = procedure.returnType match {
@@ -46,14 +48,12 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
     val args = procedure.args.map {
       case parameterByValue =>
-        val argumentType = getCType(parameterByValue.argumentType, userTypes)
-        text(s"$argumentType ${parameterByValue.name}")
+        text(convertVariable(parameterByValue.name, parameterByValue.argumentType, userTypes, true))
       case parameterByReference =>
-        val argumentType = getCType(parameterByReference.argumentType, userTypes)
-        text(s"$argumentType ${parameterByReference.name}")
+        text(convertVariable(parameterByReference.name, parameterByReference.argumentType, userTypes, true))
     }
 
-    val procedureDeclarations = generateDeclarations(procedure.variables, List())
+    val procedureDeclarations = declareVars(procedure.variables, List(), indentSize)
     val procedureArgs = intercalate(Doc.char(',') + space, args)
     val procedureName = text(s"$returnType ${procedure.name}(")
     val procedureHeader = procedureArgs.tightBracketBy(procedureName, Doc.char(')'))
@@ -65,7 +65,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       Doc.char('}')
   }
 
-  def generateDeclarations(variables: List[VariableDeclaration], userTypes: List[UserDefinedType]): Doc = {
+  def declareVars(variables: List[VariableDeclaration], userTypes: List[UserDefinedType], localIndent:Int): Doc = {
 
     var basicVariablesDoc = empty
     for (varType <- List(IntegerType, BooleanType)) {
@@ -73,7 +73,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       if (variablesOfType.nonEmpty) {
         val CVarType = getCType(varType, userTypes)
         val varNames = variablesOfType.mkString(", ")
-        val newDeclarationLine = textln(indentSize, s"$CVarType $varNames;")
+        val newDeclarationLine = textln(localIndent, s"$CVarType $varNames;")
         basicVariablesDoc = basicVariablesDoc + newDeclarationLine
       }
     }
@@ -89,11 +89,15 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
             case ArrayType(length, innerType) =>
               val variableType: String = getCType(innerType, userTypes)
-              userVariablesDoc += textln(indentSize, s"$variableType ${variable.name}[$length];")
+              userVariablesDoc += textln(localIndent, s"$variableType ${variable.name}[$length];")
 
             case RecordType(_) =>
-              userVariablesDoc += textln(indentSize, s"struct $userTypeName ${variable.name};")
+              userVariablesDoc += textln(localIndent, s"struct $userTypeName ${variable.name};")
           }
+
+        case ArrayType(length, innerType) =>
+          val variableType: String = getCType(innerType, userTypes)
+          userVariablesDoc += textln(localIndent, s"$variableType ${variable.name}[$length];")
 
         case _ => ()
       }
@@ -114,7 +118,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         case RecordType(variables) =>
           val structName = userType.name
           text(s"struct $structName {") /
-            generateDeclarations(variables, userTypes) +
+            declareVars(variables, userTypes, 0) +
             textln("};")
       })
     }
@@ -127,7 +131,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         return userType.baseType
       }
     }
-    throw new Exception("Type not defined.")
+    throw new Exception(s"Type not defined: $typeAsString")
   }
 
   def getCType(variableType: Type, userTypes: List[UserDefinedType]): String = {
@@ -136,11 +140,28 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case BooleanType => "bool"
       case CharacterType => "char"
       case RealType => "float"
+
       case ReferenceToUserDefinedType(name) =>
         val userType = stringToType(name, userTypes)
         userType match {
           case RecordType(_) => s"struct $name"
         }
+    }
+  }
+
+  def convertVariable(name:String, varType:Type, userTypes: List[UserDefinedType], isArgument:Boolean = false ): String = {
+    varType match {
+      case ArrayType(length, arrayVarType) =>
+        val innerCType = getCType(arrayVarType, userTypes)
+        if (isArgument) {
+          s"$innerCType $name[]"
+        }else{
+          s"$innerCType $name[$length]"
+        }
+
+      case _ =>
+        val CType = getCType(varType, userTypes)
+        s"$CType $name"
     }
   }
 

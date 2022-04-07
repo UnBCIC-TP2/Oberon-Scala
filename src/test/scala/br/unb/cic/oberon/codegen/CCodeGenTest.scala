@@ -152,6 +152,22 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/ArrayUsage.oberon")
   }
 
+  test("C generator for Array and Records") {
+    testGenerator("simple/arraysAndRecordsDeclaration.oberon")
+  }
+
+  test("C generator for Array") {
+    testGenerator("simple/arrayScopes.oberon")
+  }
+
+  test("C generator for Procedure with local var"){
+    testGenerator("procedures/procedure_with_local_var.oberon")
+  }
+
+  test("C generator for Procedure with local var array"){
+    testGenerator("procedures/procedure_with_local_var_array.oberon")
+
+  }
 
 
 }
