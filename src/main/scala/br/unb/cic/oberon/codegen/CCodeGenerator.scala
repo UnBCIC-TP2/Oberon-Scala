@@ -83,17 +83,19 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     for (variable <- variables) {
       variable.variableType match {
         case ReferenceToUserDefinedType(userTypeName) =>
-          val userType = stringToType(userTypeName, userTypes)
+          userVariablesDoc += textln(localIndent, s"$userTypeName ${variable.name};")
 
-          userType match {
+        /*val userType = stringToType(userTypeName, userTypes)
 
-            case ArrayType(length, innerType) =>
-              val variableType: String = getCType(innerType, userTypes)
-              userVariablesDoc += textln(localIndent, s"$variableType ${variable.name}[$length];")
+        userType match {
 
-            case RecordType(_) =>
-              userVariablesDoc += textln(localIndent, s"struct $userTypeName ${variable.name};")
-          }
+          case ArrayType(length, innerType) =>
+            val variableType: String = getCType(innerType, userTypes)
+            userVariablesDoc += textln(localIndent, s"$variableType ${variable.name}[$length];")
+
+          case RecordType(_) =>
+            userVariablesDoc += textln(localIndent, s"struct $userTypeName ${variable.name};")
+        }*/
 
         case ArrayType(length, innerType) =>
           val variableType: String = getCType(innerType, userTypes)
@@ -112,14 +114,16 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
     for (userType <- userTypes) {
       generatedDoc += (userType.baseType match {
-        case ArrayType(length, innerType) =>
+        case ArrayType(length, innerType) => //
           val variableType: String = getCType(innerType, userTypes)
-          textln(s"$variableType ${userType.name}[$length];")
+          textln(s"typedef $variableType ${userType.name} [$length];")
+          //textln(s"$variableType ${userType.name}[$length];")
         case RecordType(variables) =>
           val structName = userType.name
-          text(s"struct $structName {") /
-            declareVars(variables, userTypes, 0) +
-            textln("};")
+          text(s"struct ${structName}_struct {") /
+            declareVars(variables, userTypes, indentSize) +
+            textln("};") +
+          textln(s"typedef struct ${structName}_struct $structName;")
       })
     }
     generatedDoc
