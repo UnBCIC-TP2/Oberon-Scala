@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-struct date {
+struct date_struct {
     int day, month;
 };
+typedef struct date_struct date;
+
+date d1;
+
 
 int main() {
-    struct date d1;
-
     d1.day = 5;
 }

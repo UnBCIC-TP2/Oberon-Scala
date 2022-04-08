@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int a, b, c;
+int a, b, c;
 
+
+int main() {
     scanf("%d", &a);
     scanf("%d", &b);
     scanf("%d", &c);

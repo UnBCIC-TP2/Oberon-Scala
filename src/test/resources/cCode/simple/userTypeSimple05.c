@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int simple[10];
-struct complicated {
+typedef int simple[10];
+struct complicated_struct {
     int variable1;
     bool variable2;
-    int variable3[10];
+    simple variable3;
 };
+typedef struct complicated_struct complicated;
+
+simple x;
+simple y;
+complicated z;
+
 
 int main() {}

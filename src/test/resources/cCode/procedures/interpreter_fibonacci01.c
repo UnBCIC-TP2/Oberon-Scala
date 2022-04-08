@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int i, n, ant, prox, soma;
+int i, n, ant, prox, soma;
 
+
+int main() {
     ant = 0;
     prox = 1;
     soma = 0;

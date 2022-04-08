@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int u, v, y, z, x, w;
+int u, v, y, z, x, w;
 
+
+int main() {
     scanf("%d", &x);
     v = 0;
     y = 0;

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
+int base, count, mult;
+
 #define limit 10
 
 int calcmult(int i, int base) {
@@ -9,8 +12,6 @@ int calcmult(int i, int base) {
 
 
 int main() {
-    int base, count, mult;
-
     scanf("%d", &base);
     count = 1;
     while (count < limit) {

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
+int res;
+
 int factorial(int i) {
     if (i == 1) {
         return 1;
@@ -10,8 +13,6 @@ int factorial(int i) {
 
 
 int main() {
-    int res;
-
     res = factorial(5);
     printf("%d\n", res);
 }

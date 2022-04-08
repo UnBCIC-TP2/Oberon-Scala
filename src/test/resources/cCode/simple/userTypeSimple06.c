@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int cheesewithbread[10];
-struct cheesewithoutbread {
+typedef int cheesewithbread[10];
+struct cheesewithoutbread_struct {
     int var1;
-    int var2[10];
+    cheesewithbread var2;
 };
-struct cheesewithoutbread cheesewithhalfabread[100000];
+typedef struct cheesewithoutbread_struct cheesewithoutbread;
+typedef cheesewithoutbread cheesewithhalfabread[100000];
+
+
 
 int main() {}

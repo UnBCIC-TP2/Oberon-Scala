@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int x, y;
+int x, y;
 
+
+int main() {
     scanf("%d", &x);
     if (x < 5) {
         y = 1;

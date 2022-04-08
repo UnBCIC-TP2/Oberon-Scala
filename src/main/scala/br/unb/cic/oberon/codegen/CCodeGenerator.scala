@@ -48,9 +48,9 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
     val args = procedure.args.map {
       case parameterByValue =>
-        text(convertVariable(parameterByValue.name, parameterByValue.argumentType, userTypes, true))
+        text(convertVariable(parameterByValue.name, parameterByValue.argumentType, userTypes, isArgument = true))
       case parameterByReference =>
-        text(convertVariable(parameterByReference.name, parameterByReference.argumentType, userTypes, true))
+        text(convertVariable(parameterByReference.name, parameterByReference.argumentType, userTypes, isArgument = true))
     }
 
     val procedureDeclarations = declareVars(procedure.variables, List(), indentSize)
@@ -114,10 +114,13 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
 
     for (userType <- userTypes) {
       generatedDoc += (userType.baseType match {
-        case ArrayType(length, innerType) => //
-          val variableType: String = getCType(innerType, userTypes)
-          textln(s"typedef $variableType ${userType.name} [$length];")
-          //textln(s"$variableType ${userType.name}[$length];")
+        case ArrayType(length, innerType) =>
+          val variableType: String = innerType match {
+            case ReferenceToUserDefinedType(name) =>  name
+            case _ => getCType(innerType, userTypes)
+          }
+
+          textln(s"typedef $variableType ${userType.name}[$length];")
         case RecordType(variables) =>
           val structName = userType.name
           text(s"struct ${structName}_struct {") /

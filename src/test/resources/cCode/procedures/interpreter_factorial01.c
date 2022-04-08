@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int x, y;
+int x, y;
 
+
+int main() {
     y = 1;
     x = 5;
     while (x > 1) {

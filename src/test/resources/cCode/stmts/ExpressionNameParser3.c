@@ -2,7 +2,8 @@
 #include <stdbool.h>
 
 
-int main() {
 
+
+int main() {
     printf("%d\n", variable.tail.tail.tail.name);
 }

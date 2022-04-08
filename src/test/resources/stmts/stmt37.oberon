@@ -1,7 +1,10 @@
 MODULE UserTypeModule;
 
 TYPE
-  a = ARRAY 10 OF INTEGER
+  A = ARRAY 10 OF INTEGER
+
+VAR
+ a : A;
 
 BEGIN
    a[0] := 5;

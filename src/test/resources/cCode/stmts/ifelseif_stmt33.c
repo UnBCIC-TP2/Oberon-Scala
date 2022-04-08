@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 
-int main() {
-    int x, y, gt;
+int x, y, gt;
 
+
+int main() {
     scanf("%d", &x);
     scanf("%d", &y);
     if (x > y) {

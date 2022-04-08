@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
+int x, y;
+
 int power(int b, int e) {
     int r;
     r = b;
@@ -22,8 +25,6 @@ int power(int b, int e) {
 
 
 int main() {
-    int x, y;
-
     x = 2;
     y = 2;
     printf("%d\n", power(x, y));

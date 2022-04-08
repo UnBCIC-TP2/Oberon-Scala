@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int a[10];
+typedef int A[10];
+
+A a;
+
 
 int main() {
-
     a[0] = 5;
     a[1] = 10 + 15;
     a[2] = 10 * 15;
