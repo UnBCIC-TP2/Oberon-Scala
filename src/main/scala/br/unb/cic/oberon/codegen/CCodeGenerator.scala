@@ -16,7 +16,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   override def generateCode(module: OberonModule): String = {
 
     if (module.stmt.isDefined && !CoreChecker.isModuleCore(module))
-      throw new NotOberonCoreException("Não podemos compilar módulo C que não seja OberonCore")
+      throw new NotOberonCoreException("Não podemos compilar módulo que não seja OberonCore")
 
     val mainHeader = text("#include <stdio.h>") / text("#include <stdbool.h>") + twoLines
     val procedureDocs = module.procedures.map(procedure => generateProcedure(procedure, module.userTypes))
@@ -84,18 +84,6 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       variable.variableType match {
         case ReferenceToUserDefinedType(userTypeName) =>
           userVariablesDoc += textln(localIndent, s"$userTypeName ${variable.name};")
-
-        /*val userType = stringToType(userTypeName, userTypes)
-
-        userType match {
-
-          case ArrayType(length, innerType) =>
-            val variableType: String = getCType(innerType, userTypes)
-            userVariablesDoc += textln(localIndent, s"$variableType ${variable.name}[$length];")
-
-          case RecordType(_) =>
-            userVariablesDoc += textln(localIndent, s"struct $userTypeName ${variable.name};")
-        }*/
 
         case ArrayType(length, innerType) =>
           val variableType: String = getCType(innerType, userTypes)

@@ -22,7 +22,7 @@ class CCodeGenTest extends AnyFunSuite {
     val generatedCCode = PaigesBasedGenerator().generateCode(coreModule)
     val CFile: String = s"cCode/$oberonFile".replace(".oberon", ".c")
 
-    saveStringToFile(generatedCCode, s"c:/$CFile")
+    //saveStringToFile(generatedCCode, s"c:/$CFile")
     val cCode = Resources.getContent(CFile)
 
     assert(generatedCCode == cCode)
@@ -171,6 +171,10 @@ class CCodeGenTest extends AnyFunSuite {
 
   test("C generator for Type Int"){
     testGenerator("type/typeInt.oberon")
+  }
+
+  test("C generator for Record Usage"){
+    testGenerator("stmts/recordUsage.oberon")
   }
 
 
