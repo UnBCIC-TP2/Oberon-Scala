@@ -20,17 +20,29 @@ trait NewControlFlowGraphBuilder {
   def createControlFlowGraph(stmt: Statement): Graph[GraphNode, GraphEdge.DiEdge] // Graph
 }
 
-class NewControlFlowGraph {
+class NewControlFlowGraph() {
+  var nomeProcedure = Map[String, Procedure]()
+  var start = Map[String, StartProcStmt]()
+  var end = Map[String, EndProcStmt]()
+
+  def setProcedures(procedures: List[Procedure]): Unit ={
+    for (procedure <- procedures){
+      nomeProcedure += (procedure.name -> procedure)
+      start += (procedure.name -> StartProcStmt(procedure))
+      end += (procedure.name -> EndProcStmt(procedure))
+    }
+  }
+
   def init(stmtFG : Statement) : Statement = {
     stmtFG match {
       case SequenceStmt(stmts) =>  init(stmts.head)
+      case ProcedureCallStmt(name, args) => CallStmt(stmtFG)
       case _ => stmtFG
     }
   }
 
   def finalFG(stmtFG: Statement) : Set[Statement] = {
     stmtFG match {
-      //case AssignmentStmt(name, exp) => Set(AssignmentStmt(name, exp))
       case SequenceStmt(stmts) => finalFG(stmts.last)
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (elseStmt.isDefined){
@@ -69,6 +81,7 @@ class NewControlFlowGraph {
 
         stmtsCase
 
+      case ProcedureCallStmt(name, args) => Set(ReturnFromProcStmt(stmtFG))
       case _ => Set(stmtFG)
     }
   }
@@ -105,6 +118,15 @@ class NewControlFlowGraph {
         }
 
         result
+      case ProcedureCallStmt(name, args) =>
+        var result : Set[(Statement, Statement)] = Set()
+        if (nomeProcedure contains name){
+          var call = init(stmtFG)
+          var rtrn = finalFG(stmtFG)
+          result = Set((call, start(name)), (end(name), rtrn.head))
+        }
+        result
+
       case _ => Set()
     }
 

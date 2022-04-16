@@ -2,6 +2,8 @@ package br.unb.cic.oberon.graph
 
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, NewControlFlowGraph, SimpleNode, StartNode}
+import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.transformations.CoreVisitor
 import org.scalactic.source.Position
 import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
@@ -268,5 +270,23 @@ class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
 
   }
 
+  test("Test for the interprocedural dataflow analysis"){
+    val module = ScalaParser.parseResource("procedures/procedure01.oberon")
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val args : List[Expression] = List(VarExpression("x"), VarExpression("y"))
+    val stmt = ProcedureCallStmt("sum", args)
+
+    val grafo = new NewControlFlowGraph()
+    val proc = grafo.setProcedures(coreModule.procedures)
+    val interProceduralTest = grafo.flow(stmt)
+
+    assert(interProceduralTest == Set((CallStmt(stmt), grafo.start(stmt.name)), (grafo.end(stmt.name),
+      ReturnFromProcStmt(stmt))))
+
+  }
+
   override protected def before(fun: => Any)(implicit pos: Position): Unit = Statement.reset()
 }
+
+

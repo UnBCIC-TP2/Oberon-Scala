@@ -188,6 +188,12 @@ object Statement{
   }
 }
 
+// Fake Statements
+case class CallStmt(statement: Statement) extends Statement
+case class ReturnFromProcStmt(statement: Statement) extends Statement
+case class StartProcStmt(procedure: Procedure) extends  Statement
+case class EndProcStmt(procedure: Procedure) extends  Statement
+
 case class AssignmentStmt(varName: String, exp: Expression) extends Statement
 case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
