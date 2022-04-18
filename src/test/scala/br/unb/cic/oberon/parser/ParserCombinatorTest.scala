@@ -55,4 +55,24 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(BoolValue(false) == parseAbs(parse(expValueParser, "FALSE")))
         assert(NullValue == parseAbs(parse(expValueParser, "NIL")))
     }
+
+    test("Testing expressionParser") {
+        assert(IntValue(16) == parseAbs(parse(expressionParser, "16")))
+        assert(RealValue(-35.2) == parseAbs(parse(expressionParser, "-35.2")))
+        assert(CharValue('a') == parseAbs(parse(expressionParser, "'a'")))
+        assert(StringValue("teste") == parseAbs(parse(expressionParser, "\"teste\"")))
+        assert(BoolValue(true) == parseAbs(parse(expressionParser, "TRUE")))
+        assert(BoolValue(false) == parseAbs(parse(expressionParser, "FALSE")))
+        assert(NullValue == parseAbs(parse(expressionParser, "NIL")))
+        assert(Brackets(StringValue("testao")) == parseAbs(parse(expressionParser, "(\"testao\")")))
+
+        var exp1 = IntValue(16)
+        var exp2 = RealValue(-35.2)
+        assert(MultExpression(exp1, exp2) == parseAbs(parse(expressionParser, "16 * -35.2")))
+        assert(DivExpression(exp1, exp2) == parseAbs(parse(expressionParser, "16 / -35.2")))
+        assert(AndExpression(exp1, exp2) == parseAbs(parse(expressionParser, "16 && -35.2")))
+
+        assert(AndExpression(DivExpression(DivExpression(MultExpression(Brackets(DivExpression(IntValue(16),IntValue(4))),RealValue(-35.2)),IntValue(-4)),IntValue(3)),IntValue(4)) == parseAbs(parse(expressionParser, "(16 / 4) * -35.2 / -4 / 3 && 4")))
+        assert(AndExpression(MultExpression(MultExpression(DivExpression(Brackets(IntValue(16)),IntValue(4)),Brackets(DivExpression(RealValue(-35.2),IntValue(-4)))),IntValue(3)),IntValue(-66)) == parseAbs(parse(expressionParser, "(16) / 4 * (-35.2 / -4) * 3 && -66")))
+    }
 }
