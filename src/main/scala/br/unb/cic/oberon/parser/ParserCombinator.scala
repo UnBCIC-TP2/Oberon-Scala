@@ -26,12 +26,11 @@ trait BasicParsers extends JavaTokenParsers {
 }
 
 trait ExpressionParser extends BasicParsers {
-    def expressionParser: Parser[Expression] = addTerm ~ rep(boolExpParser) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-    def mulTerm  : Parser[Expression] = factor ~ rep(mulExpParser) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
-    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
+    def aggregator(r:  Expression ~ List[Expression => Expression]): Expression = { r match { case a~b => (a /: b)((acc,f) => f(acc)) } }
+    def expressionParser: Parser[Expression] = addTerm ~ rep(boolExpParser) ^^ aggregator
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator
+    def mulTerm  : Parser[Expression] = factor ~ rep(mulExpParser) ^^ aggregator
+    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ Brackets
 
     def boolExpParser: Parser[Expression => Expression] = (
         "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
