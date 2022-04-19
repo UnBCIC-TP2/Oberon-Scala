@@ -25,9 +25,13 @@ trait BasicParsers extends JavaTokenParsers {
     )
 }
 trait ExpressionParser extends BasicParsers {
-    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ {case a~b => (a /: b)((acc,f) => f(acc))}
-    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ {case a~b => (a /: b)((acc,f) => f(acc))}
-    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
+    def aggregator(r:  Expression ~ List[Expression => Expression]): Expression = { 
+        r match { case a~b => (a /: b)((acc,f) => f(acc)) } 
+    }
+
+    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator
+    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
     def complexTerm : Parser[Expression] = (
         factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
     |   factor ~ "." ~ identifier ^^ { case a ~ _ ~ b => FieldAccessExpression(a, b)}
@@ -38,7 +42,7 @@ trait ExpressionParser extends BasicParsers {
     |   pointerParser
     |   functionParser  
     |   variableParser
-    | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
+    | "(" ~> expressionParser <~ ")" ^^ Brackets
     )
     def pointerParser: Parser[Expression] = identifier ~ "^" ^^ { case a ~ _ => PointerAccessExpression(a)}
     def variableParser: Parser[Expression] = qualifiedName ^^ {case a => VarExpression(a)}
