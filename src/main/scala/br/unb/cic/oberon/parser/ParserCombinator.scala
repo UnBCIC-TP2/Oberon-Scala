@@ -26,7 +26,35 @@ trait BasicParsers extends JavaTokenParsers {
 }
 
 trait ExpressionParser extends BasicParsers {
-        def expValueParser: Parser[Expression] = (
+    def expressionParser: Parser[Expression] = addTerm ~ rep(boolExpParser) ^^ 
+        {case a~b => (a /: b)((acc,f) => f(acc))}
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ 
+        {case a~b => (a /: b)((acc,f) => f(acc))}
+    def mulTerm  : Parser[Expression] = factor ~ rep(mulExpParser) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
+    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
+
+    def boolExpParser: Parser[Expression => Expression] = (
+        "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
+    |   "#" ~ addTerm ^^ { case _ ~ b => NEQExpression(_, b) }
+    |   "<=" ~ addTerm ^^ { case _ ~ b => LTEExpression(_, b) }
+    |   ">=" ~ addTerm ^^ { case _ ~ b => GTEExpression(_, b) }
+    |   "<" ~ addTerm ^^ { case _ ~ b => LTExpression(_, b) }
+    |   ">" ~ addTerm ^^ { case _ ~ b => GTExpression(_, b) }
+    )
+
+    def addExpParser: Parser[Expression => Expression] = (
+        "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
+    |   "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
+    |   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
+    )
+    
+    def mulExpParser: Parser[Expression => Expression] = (
+        "*" ~ factor ^^ { case _ ~ b => MultExpression(_, b) }
+    |   "/" ~ factor ^^ { case _ ~ b => DivExpression(_, b) }
+    |   "&&" ~ factor ^^ { case _ ~ b => AndExpression(_, b) }
+    )
+
+    def expValueParser: Parser[Expression] = (
         int
     |   real
     |   char
@@ -34,36 +62,6 @@ trait ExpressionParser extends BasicParsers {
     |   bool
     |   "NIL" ^^ (i => NullValue)
     )
-    def expressionParser: Parser[Expression] = term ~ rep(boolExpParser) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-
-    def eqParser: Parser[Expression => Expression] =  "=" ~ term ^^ { case _ ~ b => EQExpression(_, b) }
-    def neqParser: Parser[Expression => Expression] =  "#" ~ term ^^ { case _ ~ b => NEQExpression(_, b) }
-    def lteParser: Parser[Expression => Expression] =  "<=" ~ term ^^ { case _ ~ b => LTEExpression(_, b) }
-    def gteParser: Parser[Expression => Expression] =  ">=" ~ term ^^ { case _ ~ b => GTEExpression(_, b) }
-    def ltParser: Parser[Expression => Expression] =  "<" ~ term ^^ { case _ ~ b => LTExpression(_, b) }
-    def gtParser: Parser[Expression => Expression] =  ">" ~ term ^^ { case _ ~ b => GTExpression(_, b) }
-
-   def boolExpParser: Parser[Expression => Expression] = (
-        eqParser
-    |   neqParser
-    |   lteParser
-    |   gteParser
-    |   ltParser
-    |   gteParser
-    )
-
-    def term: Parser[Expression] =  term2 ~ rep(plus | minus | or) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-    def plus  : Parser[Expression => Expression] = "+" ~ term2 ^^ { case _ ~ b => AddExpression(_, b) }
-    def minus : Parser[Expression => Expression] = "-" ~ term2 ^^ { case _ ~ b => SubExpression(_, b) }
-    def or : Parser[Expression => Expression] = "||" ~ term2 ^^ { case _ ~ b => OrExpression(_, b) }
-    def term2  : Parser[Expression] = factor ~ rep(times | divide | and) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
-    def times : Parser[Expression => Expression] =  "*" ~ factor ^^ { case _ ~ b => MultExpression(_, b) }
-    def divide : Parser[Expression => Expression] =  "/" ~ factor ^^ { case _ ~ b => DivExpression(_, b) }
-    def and : Parser[Expression => Expression] =  "&&" ~ factor ^^ { case _ ~ b => AndExpression(_, b) }
-
-    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
 }
 
 trait Oberon2ScalaParser extends ExpressionParser {
