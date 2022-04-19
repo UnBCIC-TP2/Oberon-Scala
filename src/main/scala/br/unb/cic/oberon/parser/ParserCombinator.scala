@@ -4,13 +4,13 @@ import scala.util.parsing.combinator._
 import br.unb.cic.oberon.ast._
 
 trait BasicParsers extends JavaTokenParsers {
-    def int: Parser[IntValue] = "-?[0-9]+".r <~ not('.') ^^ (i => IntValue(i.toInt))
+    def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
     def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
     def string: Parser[StringValue] = "\"[^\"]+\"".r  ^^ (i => StringValue(i.substring(1, i.length()-1)))
     def char: Parser[CharValue] = ("\'[^\']\'".r)  ^^ (i => CharValue(i.charAt(1)))
 
-    def alpha: String = "[A-z]"
+    def alpha: String = "[A-Za-z]"
     def digit: Parser[String] = "[0-9]".r ^^ (i => i)
     def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
 
@@ -24,16 +24,33 @@ trait BasicParsers extends JavaTokenParsers {
     |   identifier ^^ (i =>  ReferenceToUserDefinedType(i))
     )
 }
-
 trait ExpressionParser extends BasicParsers {
-    def expressionParser: Parser[Expression] = addTerm ~ rep(boolExpParser) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ 
-        {case a~b => (a /: b)((acc,f) => f(acc))}
-    def mulTerm  : Parser[Expression] = factor ~ rep(mulExpParser) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
-    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
+    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ {case a~b => (a /: b)((acc,f) => f(acc))}
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ {case a~b => (a /: b)((acc,f) => f(acc))}
+    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ { case a~b => (a /: b)((acc,f) => f(acc))}
+    def complexTerm : Parser[Expression] = (
+        factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
+    |   factor ~ "." ~ identifier ^^ { case a ~ _ ~ b => FieldAccessExpression(a, b)}
+    |   factor
+    )
+    def factor: Parser[Expression] =  (
+        expValueParser 
+    |   pointerParser
+    |   functionParser  
+    |   variableParser
+    | "(" ~> expressionParser <~ ")" ^^ {Brackets(_)}
+    )
+    def pointerParser: Parser[Expression] = identifier ~ "^" ^^ { case a ~ _ => PointerAccessExpression(a)}
+    def variableParser: Parser[Expression] = qualifiedName ^^ {case a => VarExpression(a)}
+    def qualifiedName: Parser[String] =  identifier
 
-    def boolExpParser: Parser[Expression => Expression] = (
+    def functionParser: Parser[Expression] = qualifiedName ~ "(" ~ argumentsParser ~ ")" ^^ {
+        case name ~ _ ~ argList ~ _ => FunctionCallExpression(name, argList)
+    }
+    def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep(argTerm) ^^ { case a ~ b => List(a) ++ b }
+    def argTerm: Parser[Expression] = "," ~ expressionParser ^^ {case _ ~ b => b}
+
+    def relExpParser: Parser[Expression => Expression] = (
         "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
     |   "#" ~ addTerm ^^ { case _ ~ b => NEQExpression(_, b) }
     |   "<=" ~ addTerm ^^ { case _ ~ b => LTEExpression(_, b) }
@@ -49,14 +66,14 @@ trait ExpressionParser extends BasicParsers {
     )
     
     def mulExpParser: Parser[Expression => Expression] = (
-        "*" ~ factor ^^ { case _ ~ b => MultExpression(_, b) }
-    |   "/" ~ factor ^^ { case _ ~ b => DivExpression(_, b) }
-    |   "&&" ~ factor ^^ { case _ ~ b => AndExpression(_, b) }
+        "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
+    |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
+    |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
     )
 
     def expValueParser: Parser[Expression] = (
-        int
-    |   real
+        real
+    |   int
     |   char
     |   string
     |   bool
