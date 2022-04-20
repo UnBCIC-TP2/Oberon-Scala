@@ -168,8 +168,10 @@ class TypeChecker extends OberonVisitorAdapter {
       varType
     case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
     //TODO
-    // case ArrayAssignment
-    // case RecordAssignment
+    case ArrayAssignment(array, elem) => ???
+      //"array" and "elem" are expressions.
+    case RecordAssignment(record, atrib) => ???
+      //"record" is an expression and "atrib" is a string.
   }
 
 private def visitIfElseStmt(stmt: Statement) = stmt match {
