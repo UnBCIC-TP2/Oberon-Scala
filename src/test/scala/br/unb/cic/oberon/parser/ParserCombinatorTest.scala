@@ -75,4 +75,34 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(AndExpression(DivExpression(DivExpression(MultExpression(Brackets(DivExpression(IntValue(16),IntValue(4))),RealValue(-35.2)),IntValue(-4)),IntValue(3)),IntValue(4)) == parseAbs(parse(expressionParser, "(16 / 4) * -35.2 / -4 / 3 && 4")))
         assert(AndExpression(MultExpression(MultExpression(DivExpression(Brackets(IntValue(16)),IntValue(4)),Brackets(DivExpression(RealValue(-35.2),IntValue(-4)))),IntValue(3)),IntValue(-66)) == parseAbs(parse(expressionParser, "(16) / 4 * (-35.2 / -4) * 3 && -66")))
     }
+    test("Testing addExpParser"){
+        assert(OrExpression(SubExpression(AddExpression(IntValue(2),IntValue(4)),IntValue(3)),IntValue(2)) == parseAbs(parse(expressionParser, "2 + 4 - 3 || 2")))
+    }
+    test("Testing mulExpParser"){
+        assert(AndExpression(DivExpression(MultExpression(IntValue(2),IntValue(4)),IntValue(3)),IntValue(2)) == parseAbs(parse(expressionParser, "2 * 4 / 3 && 2")))
+    }
+    test("Testing relExpParser"){
+        assert(GTEExpression(GTExpression(LTEExpression(LTExpression(NEQExpression(EQExpression(IntValue(2),IntValue(4)),IntValue(3)),IntValue(2)),IntValue(4)),IntValue(1)),IntValue(7)) == parseAbs(parse(expressionParser, "2 = 4 # 3 < 2 <= 4 > 1 >= 7")))
+    }
+
+    test("Testing Aritmetic operations") {
+        assert(EQExpression(AddExpression(IntValue(25), IntValue(12)), IntValue(5)) == parseAbs(parse(expressionParser, "25 + 12 = 5")))
+        assert(EQExpression(AddExpression(IntValue(25), MultExpression(IntValue(12), IntValue(3))), IntValue(5)) == parseAbs(parse(expressionParser, "25 + 12 * 3 = 5")))
+    }
+
+    test("Testing FieldAcces") {
+        assert(FieldAccessExpression(VarExpression("abc"), "ab") == parseAbs(parse(expressionParser, "abc.ab")))
+    }
+    test("Testing variable parser"){
+        assert(VarExpression("abc") == parseAbs(parse(expressionParser, "abc")))
+    }
+    test("Testing function parser"){
+        assert(FunctionCallExpression("abc", List(IntValue(12), StringValue("oi"))) == parseAbs(parse(expressionParser, "abc(12, \"oi\")")))
+    }
+    test("Testing pointer parser"){
+        assert(PointerAccessExpression("abc") == parseAbs(parse(expressionParser, "abc^")))
+    }
+    test("Testing ArraySubscript parser"){
+        assert( ArraySubscript(VarExpression("abc"), IntValue(3)) == parseAbs(parse(expressionParser, "abc[3]")))
+    }
 }

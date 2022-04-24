@@ -4,13 +4,13 @@ import scala.util.parsing.combinator._
 import br.unb.cic.oberon.ast._
 
 trait BasicParsers extends JavaTokenParsers {
-    def int: Parser[IntValue] = "-?[0-9]+".r <~ not('.') ^^ (i => IntValue(i.toInt))
+    def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
     def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
     def string: Parser[StringValue] = "\"[^\"]+\"".r  ^^ (i => StringValue(i.substring(1, i.length()-1)))
     def char: Parser[CharValue] = ("\'[^\']\'".r)  ^^ (i => CharValue(i.charAt(1)))
 
-    def alpha: String = "[A-z]"
+    def alpha: String = "[A-Za-z]"
     def digit: Parser[String] = "[0-9]".r ^^ (i => i)
     def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
 
@@ -24,40 +24,60 @@ trait BasicParsers extends JavaTokenParsers {
     |   identifier ^^ (i =>  ReferenceToUserDefinedType(i))
     )
 }
-
 trait ExpressionParser extends BasicParsers {
-    def expressionParser: Parser[Expression] = (
-    // |   qualifiedNameParser ^^ (a => VarExpression())
-    // |   qualifiedNameParser ~ "(" ~ opt(argumentsParser) ~ ")" ^^ {
-    //         case a ~ _ ~ Some(b) ~ _ => FunctionCallExpression()
-    //         case a ~ _ ~ None ~ _ => FunctionCallExpression()
-    //         }
-    // |   expressionParser ~ "." ~ identifier ^^ {case a ~ _ ~ b => FieldAccessExpression()]
-    // |   expressionParser ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~ _ => ArraySubscript(a, b) }
-    // |   identifier ~ "^" ^^ PointerAccessExpression()
-    // |   expressionParser ~ "(=|#|<|<=|>|>=)".r ~ expression ^^ {case a ~ "=" ~ b => } 
-    // |   expressionParser ~ "(\+|-|\|\|)".r ~ expression
-        multParser
-    |    "(" ~> expressionParser <~ ")" ^^ { Brackets(_) }
-    |   expValueParser
+    def aggregator(r:  Expression ~ List[Expression => Expression]): Expression = { 
+        r match { case a~b => (a /: b)((acc,f) => f(acc)) } 
+    }
+
+    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator
+    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
+    def complexTerm : Parser[Expression] = (
+        factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
+    |   factor ~ "." ~ identifier ^^ { case a ~ _ ~ b => FieldAccessExpression(a, b)}
+    |   factor
+    )
+    def factor: Parser[Expression] =  (
+        expValueParser 
+    |   pointerParser
+    |   functionParser  
+    |   variableParser
+    | "(" ~> expressionParser <~ ")" ^^ Brackets
+    )
+    def pointerParser: Parser[Expression] = identifier ~ "^" ^^ { case a ~ _ => PointerAccessExpression(a)}
+    def variableParser: Parser[Expression] = qualifiedName ^^ {case a => VarExpression(a)}
+    def qualifiedName: Parser[String] =  identifier
+
+    def functionParser: Parser[Expression] = qualifiedName ~ "(" ~ argumentsParser ~ ")" ^^ {
+        case name ~ _ ~ argList ~ _ => FunctionCallExpression(name, argList)
+    }
+    def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep(argTerm) ^^ { case a ~ b => List(a) ++ b }
+    def argTerm: Parser[Expression] = "," ~ expressionParser ^^ {case _ ~ b => b}
+
+    def relExpParser: Parser[Expression => Expression] = (
+        "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
+    |   "#" ~ addTerm ^^ { case _ ~ b => NEQExpression(_, b) }
+    |   "<=" ~ addTerm ^^ { case _ ~ b => LTEExpression(_, b) }
+    |   ">=" ~ addTerm ^^ { case _ ~ b => GTEExpression(_, b) }
+    |   "<" ~ addTerm ^^ { case _ ~ b => LTExpression(_, b) }
+    |   ">" ~ addTerm ^^ { case _ ~ b => GTExpression(_, b) }
     )
 
-    def multParser: Parser[Expression] = (
-        factor ~ rep(times | divide | and) ^^ { case left ~ right => (left /: right)((acc,f) => f(acc)) }
+    def addExpParser: Parser[Expression => Expression] = (
+        "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
+    |   "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
+    |   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
+    )
+    
+    def mulExpParser: Parser[Expression => Expression] = (
+        "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
+    |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
+    |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
     )
 
-    def times : Parser[Expression => Expression] =  "*" ~ factor ^^ { case _ ~ b => MultExpression(_, b) }
-    def divide : Parser[Expression => Expression] =  "/" ~ factor ^^ { case _ ~ b => DivExpression(_, b) }
-    def and : Parser[Expression => Expression] =  "&&" ~ factor ^^ { case _ ~ b => AndExpression(_, b) }
-
-    def factor: Parser[Expression] = expValueParser | "(" ~> expressionParser <~ ")" ^^ { Brackets(_) }
-
-
-    // def qualifiedNameParser: Parser[Expression]
-    // def argumentsParser: Parser[List[Expression]]
     def expValueParser: Parser[Expression] = (
-        int
-    |   real
+        real
+    |   int
     |   char
     |   string
     |   bool
