@@ -112,9 +112,6 @@ trait StatementParser extends ExpressionParser {
 
   def statementParser: Parser[Statement] = (
       identifier ~ ":=" ~ expressionParser ^^ { case id ~ _ ~ expression => AssignmentStmt(id, expression)}
-  |   expressionParser ~ "[" ~ expressionParser ~ "]" ~ ":=" ~ expressionParser ^^ { 
-      case a ~ _ ~ b ~ _ ~ _ ~ expression => EAssignmentStmt(ArrayAssignment(a, b), expression)
-  }
   |   designator ~ ":=" ~ expressionParser ^^ { case des ~ _ ~ expression => EAssignmentStmt(des, expression)}
 //  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
   |   "readReal" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadRealStmt(id) }
