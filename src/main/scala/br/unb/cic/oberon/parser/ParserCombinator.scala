@@ -23,7 +23,7 @@ trait ParsersUtil extends JavaTokenParsers {
 trait BasicParsers extends ParsersUtil {
     def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
     def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
-    def bool: Parser[BoolValue] = "(FALSE|TRUE)".r ^^ (i => BoolValue(i=="TRUE"))
+    def bool: Parser[BoolValue] = "(False|True)".r ^^ (i => BoolValue(i=="True"))
     def string: Parser[StringValue] = "\"[^\"]+\"".r ^^ (i => StringValue(i.substring(1, i.length()-1)))
     def char: Parser[CharValue] = ("\'[^\']\'".r) ^^ (i => CharValue(i.charAt(1)))
 

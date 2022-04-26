@@ -24,8 +24,8 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     }
 
     test("Testing Bool Parser") {
-        assert(BoolValue(true) == parseAbs(parse(bool, "TRUE")))
-        assert(BoolValue(false) == parseAbs(parse(bool, "FALSE")))
+        assert(BoolValue(true) == parseAbs(parse(bool, "True")))
+        assert(BoolValue(false) == parseAbs(parse(bool, "False")))
     }
 
     test("Testing String Parser") {
@@ -54,8 +54,8 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(RealValue(-35.2) == parseAbs(parse(expValueParser, "-35.2")))
         assert(CharValue('a') == parseAbs(parse(expValueParser, "'a'")))
         assert(StringValue("teste") == parseAbs(parse(expValueParser, "\"teste\"")))
-        assert(BoolValue(true) == parseAbs(parse(expValueParser, "TRUE")))
-        assert(BoolValue(false) == parseAbs(parse(expValueParser, "FALSE")))
+        assert(BoolValue(true) == parseAbs(parse(expValueParser, "True")))
+        assert(BoolValue(false) == parseAbs(parse(expValueParser, "False")))
         assert(NullValue == parseAbs(parse(expValueParser, "NIL")))
     }
 
@@ -64,8 +64,8 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(RealValue(-35.2) == parseAbs(parse(expressionParser, "-35.2")))
         assert(CharValue('a') == parseAbs(parse(expressionParser, "'a'")))
         assert(StringValue("teste") == parseAbs(parse(expressionParser, "\"teste\"")))
-        assert(BoolValue(true) == parseAbs(parse(expressionParser, "TRUE")))
-        assert(BoolValue(false) == parseAbs(parse(expressionParser, "FALSE")))
+        assert(BoolValue(true) == parseAbs(parse(expressionParser, "True")))
+        assert(BoolValue(false) == parseAbs(parse(expressionParser, "False")))
         assert(NullValue == parseAbs(parse(expressionParser, "NIL")))
         assert(Brackets(StringValue("testao")) == parseAbs(parse(expressionParser, "(\"testao\")")))
 
@@ -244,15 +244,23 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(SequenceStmt(List(ReadRealStmt("oi"), ReadRealStmt("oi"))) == parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
     }
 
-    test("Testing the oberon simple02 code. This module has one constants and two variables") {
-    val module = parseResource("simple/simple02.oberon")
+    test("Testing the oberon simple01 code") {
+        val module = parseResource("simple/simple01.oberon")
 
-    assert(module.name == "SimpleModule2")
-    assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("x", IntValue(5)))
-    assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
-    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+        assert(module.name == "SimpleModule1")
+        assert(module.constants.size == 1)
+        assert(module.constants.head == Constant("x", IntValue(5)))
+    }
+
+    test("Testing the oberon simple02 code. This module has one constants and two variables") {
+        val module = parseResource("simple/simple02.oberon")
+
+        assert(module.name == "SimpleModule2")
+        assert(module.constants.size == 1)
+        assert(module.constants.head == Constant("x", IntValue(5)))
+        assert(module.variables.size == 2)
+        assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+        assert(module.variables(1) == VariableDeclaration("def", BooleanType))
     }
 
     test("Testing the oberon simple03 code. This module has three constants and two variables") {
@@ -344,5 +352,5 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(module.constants.size == 1)
         assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
     }
-
+    
 }
