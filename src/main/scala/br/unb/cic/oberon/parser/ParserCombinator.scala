@@ -8,11 +8,13 @@ import br.unb.cic.oberon.ast._
 trait ParsersUtil extends JavaTokenParsers {
     // Encapsulator aggregator function
     def aggregator[T](r: T ~ List[T => T]): T = { r match { case a ~ b => (a /: b)((acc,f) => f(acc)) } }
+
     // List Helper Function
     def listOpt[T](parser: Parser[List[T]]): Parser[List[T]] = opt(parser) ^^ {
         case Some(a) => a
         case None => List[T]()
     }
+
     // Option Helper Function
     def optSolver[T](parser: Parser[T]): Parser[Option[T]] = opt(parser) ^^ {
         case Some(a) => Option(a)
@@ -43,24 +45,37 @@ trait BasicParsers extends ParsersUtil {
 }
 
 trait ExpressionParser extends BasicParsers {
-    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator[Expression]
-    def addTerm: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator[Expression]
-    def mulTerm: Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator[Expression]
+    def pointerParser: Parser[Expression] = identifier <~ "^" ^^ PointerAccessExpression
+    def qualifiedName: Parser[String] = identifier // TODO
+    def variableParser: Parser[Expression] = qualifiedName ^^ VarExpression
+    def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep("," ~> expressionParser) ^^ { case a ~ b => List(a) ++ b }
+    def functionParser: Parser[Expression] = qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
+        case name ~ None => FunctionCallExpression(name, List())
+        case name ~ Some(argList) => FunctionCallExpression(name, argList)
+    }
+    def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
+
+    def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | "(" ~> expressionParser <~ ")" ^^ Brackets
+
     def complexTerm: Parser[Expression] = (
         factor ~ ("[" ~> expressionParser <~ ("]" ~ not(":="))) ^^ { case a ~ b => ArraySubscript(a, b)}
     |   factor ~ ("." ~> identifier) ^^ { case a ~ b => FieldAccessExpression(a, b)}
     |   factor
     )
-    def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | "(" ~> expressionParser <~ ")" ^^ Brackets
-    def pointerParser: Parser[Expression] = identifier <~ "^" ^^ PointerAccessExpression
-    def variableParser: Parser[Expression] = qualifiedName ^^ VarExpression
-    def qualifiedName: Parser[String] = identifier // TODO
 
-    def functionParser: Parser[Expression] = qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
-        case name ~ None => FunctionCallExpression(name, List())
-        case name ~ Some(argList) => FunctionCallExpression(name, argList)
-    }
-    def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep("," ~> expressionParser) ^^ { case a ~ b => List(a) ++ b }
+    def mulExpParser: Parser[Expression => Expression] = (
+        "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
+    |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
+    |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
+    )
+    def mulTerm: Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
+
+    def addExpParser: Parser[Expression => Expression] = (
+        "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
+    |   "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
+    |   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
+    )
+    def addTerm: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator
 
     def relExpParser: Parser[Expression => Expression] = (
         "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
@@ -71,19 +86,8 @@ trait ExpressionParser extends BasicParsers {
     |   ">" ~ addTerm ^^ { case _ ~ b => GTExpression(_, b) }
     )
 
-    def addExpParser: Parser[Expression => Expression] = (
-        "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
-    |   "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
-    |   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
-    )
     
-    def mulExpParser: Parser[Expression => Expression] = (
-        "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
-    |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
-    |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
-    )
-
-    def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
+    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator
 }
 
 
@@ -101,14 +105,7 @@ trait StatementParser extends ExpressionParser {
         (expressionParser <~ ':') ~ statementParser ^^ { case cond ~ stmt => SimpleCase(cond, stmt) }
     |   (expressionParser <~ "..") ~ (expressionParser <~ ':') ~ statementParser ^^ { case min ~ max ~ stmt => RangeCase(min, max, stmt) }
     );
-
-    def multStatementParser: Parser[Statement] = (statementParser ~ rep(";" ~> statementParser) ^^ 
-        { case a ~ b => List(a) ++ b } ^^ {
-            case a :: Nil => a
-            case a :: b => SequenceStmt(a :: b)
-        }
-    );
-
+    
     def statementParser: Parser[Statement] = (
         identifier ~ (":=" ~> expressionParser) ^^ { case id ~ expression => AssignmentStmt(id, expression) }
     |   designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => EAssignmentStmt(des, expression) }
@@ -133,6 +130,14 @@ trait StatementParser extends ExpressionParser {
     //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
     // }
     // | stmt += statement (';' stmt += statement)+ #SequenceStmt
+    );
+
+    // Final Multiple Statements Parser
+    def multStatementParser: Parser[Statement] = (statementParser ~ rep(";" ~> statementParser) ^^ 
+        { case a ~ b => List(a) ++ b } ^^ {
+            case a :: Nil => a
+            case a :: b => SequenceStmt(a :: b)
+        }
     );
 }
 
