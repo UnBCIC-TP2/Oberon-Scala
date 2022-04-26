@@ -199,13 +199,7 @@ trait OberonParserFull extends StatementParser {
 
     def blockParser: Parser[Statement] = "BEGIN" ~ multStatementParser ~ "END" ^^ { case _ ~ stmt ~ _ => stmt }
     def importParser: Parser[Set[String]] = opt("IMPORT" ~> rep(identifier)) ^^ {
-        case Some(a) => {
-            var set = Set[String]()
-            a.foreach((e) =>{
-                set += e
-            })
-            set
-        }
+        case Some(a) => a.toSet
         case None => Set[String]()
     }
     def moduleParser: Parser[OberonModule] = "MODULE" ~ identifier ~ ";" ~ importParser ~ declarationsParser ~ blockParser ~ "END" ~ identifier ~ "." ^^ {
