@@ -34,6 +34,9 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
 
     test("Testing identifier parser") {
         assert("teste" == parseAbs(parse(identifier, "teste")))
+        assert("teste_" == parseAbs(parse(identifier, "teste_")))
+        assert("teste1" == parseAbs(parse(identifier, "teste1")))
+        ("teste_1abc" == parseAbs(parse(identifier, "teste_1abc")))
     }
 
     test("Testing type parser") {
@@ -240,7 +243,106 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     test("Testing Statement sequence parser") {
         println(parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
     }
-    test("parse resource") {
-        parseResource("simple/simple01.oberon")
-    }
+
+test("Testing the oberon simple02 code. This module has one constants and two variables") {
+    val module = parseResource("simple/simple02.oberon")
+
+    assert(module.name == "SimpleModule2")
+    assert(module.constants.size == 1)
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+  test("Testing the oberon simple03 code. This module has three constants and two variables") {
+    val module = parseResource("simple/simple03.oberon")
+
+    assert(module.name == "SimpleModule3")
+    assert(module.constants.size == 3)
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", BoolValue(true)))
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+  test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
+    val module = parseResource("simple/simple04.oberon")
+    assert(module.name == "SimpleModule4")
+    assert(module.constants.size == 3)
+    assert(module.constants.head == Constant("x", IntValue(5)))
+    assert(module.constants(1) == Constant("y", IntValue(10)))
+    assert(module.constants(2) == Constant("z", AddExpression(IntValue(5), IntValue(10))))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+  test("Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables") {
+    val module = parseResource("simple/simple05.oberon")
+
+    assert(module.name == "SimpleModule5")
+    assert(module.constants.size == 1)
+    assert(module.constants.head == Constant("z", MultExpression(IntValue(5), IntValue(10))))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+
+  test("Testing the oberon simple06 code. This module has one constants, complex expression, and two variables") {
+    val module = parseResource("simple/simple06.oberon")
+
+    assert(module.name == "SimpleModule6")
+    assert(module.constants.size == 1)
+    assert(module.constants.head == Constant("z", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+  test("Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables") {
+    val module = parseResource("simple/simple07.oberon")
+
+    assert(module.name == "SimpleModule7")
+    assert(module.constants.size == 2)
+    assert(module.constants.head == Constant("x", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
+      assert(module.constants(1) == Constant("y",
+        AddExpression(IntValue(5),
+         DivExpression(
+           MultExpression(IntValue(10), IntValue(3)),
+           IntValue(5)))))
+
+    assert(module.variables.size == 2)
+    assert(module.variables.head == VariableDeclaration("abc", IntegerType))
+    assert(module.variables(1) == VariableDeclaration("def", BooleanType))
+  }
+
+  test("Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables") {
+    val module = parseResource("simple/simple08.oberon")
+
+    assert(module.name == "SimpleModule8")
+    assert(module.constants.size == 3)
+    assert(module.constants.head == Constant("x", BoolValue(false)))
+    assert(module.constants(1) == Constant("y", BoolValue(true)))
+    assert(module.constants(2) == Constant("z", AndExpression(BoolValue(true), BoolValue(false))))
+  }
+
+  test("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
+    val module = parseResource("simple/simple09.oberon")
+
+    assert(module.name == "SimpleModule9")
+    assert(module.constants.size == 1)
+    assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+  }
+
 }

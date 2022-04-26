@@ -13,7 +13,7 @@ trait BasicParsers extends JavaTokenParsers {
     def char: Parser[CharValue] = ("\'[^\']\'".r)  ^^ (i => CharValue(i.charAt(1)))
 
     def alpha: String = "[A-Za-z]"
-    def digit: Parser[String] = "[0-9]".r ^^ (i => i)
+    def digit: String = "[0-9]"
     def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r ^^ (i => i)
 
     def typeParser: Parser[Type] = (
@@ -175,13 +175,13 @@ trait OberonParserFull extends StatementParser {
 
     // Constant
     def constantParserTerm: Parser[Constant] = identifier ~ "=" ~ expressionParser ^^ { case a ~ _ ~ b => Constant(a, b) } 
-    def constantParser: Parser[List[Constant]] = "CONST" ~> rep1(constantParserTerm)
+    def constantParser: Parser[List[Constant]] = "CONST" ~> rep1(constantParserTerm <~";")
 
     // VariableDeclaration
     def varListParser: Parser[List[String]] = identifier ~ rep("," ~> identifier) ^^ { case a ~ b => List(a) ++ b  }
     def varDeclarationParserTerm: Parser[List[VariableDeclaration]] =  varListParser ~ ":" ~ (typeParser | userTypeParser) ^^ 
     { case varList ~ _ ~ varType => varList.map(VariableDeclaration(_, varType)) }
-    def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> rep1(varDeclarationParserTerm) ^^ { case a => a.flatten }
+    def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> rep1(varDeclarationParserTerm <~ ";") ^^ { case a => a.flatten }
 
     // Procedure
     def procedureParser: Parser[List[Procedure]] = "PROCEDURE" ^^ (_ => List[Procedure]()) // TODO
@@ -193,7 +193,7 @@ trait OberonParserFull extends StatementParser {
     }
 
     // Final Parsers
-    def importParser: Parser[Set[String]] = listOpt("IMPORT" ~> rep(identifier)) ^^ { case a => a.toSet }
+    def importParser: Parser[Set[String]] = listOpt("IMPORT" ~> rep(identifier) <~ ";") ^^ { case a => a.toSet }
     
     class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
     def declarationsParser: Parser[DeclarationProps] =
@@ -201,8 +201,11 @@ trait OberonParserFull extends StatementParser {
             case userTypes ~ constants ~ vars ~ procedures => new DeclarationProps(userTypes, constants, vars, procedures)
         }
 
-    def blockParser: Parser[Statement] = "BEGIN" ~ multStatementParser ~ "END" ^^ { case _ ~ stmt ~ _ => stmt }
-
+    def blockParser: Parser[Option[Statement]] = opt("BEGIN" ~> multStatementParser <~ "END") ^^ {
+        case Some(a) => Option[Statement](a)
+        case None => None: Option[Statement]
+    }
+    
     def oberonParser: Parser[OberonModule] = "MODULE" ~ identifier ~ ";" ~ importParser ~ declarationsParser ~ blockParser ~ "END" ~ identifier ~ "." ^^ {
         case _ ~ name ~ _ ~  imports ~ declarations ~ statements ~ _ ~ _ ~ _  => OberonModule(
             name,
@@ -211,7 +214,7 @@ trait OberonParserFull extends StatementParser {
             declarations.constants,
             declarations.variables,
             declarations.procedures,
-            Option(statements)
+            statements
     )}
 }
 
