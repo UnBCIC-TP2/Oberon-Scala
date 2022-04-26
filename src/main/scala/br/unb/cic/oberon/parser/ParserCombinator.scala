@@ -110,10 +110,14 @@ trait StatementParser extends ExpressionParser {
       case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
   }
 
+  def statementsParser: Parser[Statement] = stmtSequenceParser ^^ {case a => SequenceStmt(a)}
+
+  def stmtSequenceParser: Parser[List[Statement]] = statementParser ~ rep(stmtSequenceTerm) ^^ { case a ~ b => List(a) ++ b }
+  def stmtSequenceTerm: Parser[Statement] = ";" ~ statementParser ^^ {case _ ~ b => b}
+
   def statementParser: Parser[Statement] = (
       identifier ~ ":=" ~ expressionParser ^^ { case id ~ _ ~ expression => AssignmentStmt(id, expression)}
   |   designator ~ ":=" ~ expressionParser ^^ { case des ~ _ ~ expression => EAssignmentStmt(des, expression)}
-//  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
   |   "readReal" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadRealStmt(id) }
   |   "readInt" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadIntStmt(id) }
   |   "readChar" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadCharStmt(id) }

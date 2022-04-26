@@ -110,4 +110,8 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         println(parseAbs(parse(statementParser, "readReal(oi)")))
         println(parseAbs(parse(statementParser, "abrobrinha[123] := 456")))
     }
+
+    test("Testing Statement sequence parser") {
+        println(parseAbs(parse(statementsParser, "readReal(oi);readReal(oi)")))
+    }
 }
