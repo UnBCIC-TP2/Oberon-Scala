@@ -161,17 +161,73 @@ trait StatementParser extends ExpressionParser {
   );
 }
 
+trait OberonParser extends StatementParser {
+    
+    def userTypeParser: Parser[Type] = (
+        "ARRAY" ~ int ~ "OF" ~ (typeParser | userTypeParser) ^^ { case _ ~ a ~ _ ~ b => ArrayType(a.value, b)} 
+    |   "RECORD" ~> varDeclarationParser <~ "END" ^^ RecordType
+    |   ("POINTER" ~ "TO") ~> (typeParser | userTypeParser) ^^ PointerType
+    )
+    def userTypeDeclarationTerm: Parser[UserDefinedType] = identifier ~ "=" ~ userTypeParser ^^ { case a ~ _ ~ b => UserDefinedType(a, b) }
+    def userTypeDeclarationParser: Parser[List[UserDefinedType]] = opt("TYPE" ~> rep1(userTypeDeclarationTerm)) ^^ {
+        case Some(a) => a
+        case None => List[UserDefinedType]()
+    }
 
-trait Oberon2ScalaParser extends StatementParser {
-    def oberonParser: Parser[OberonModule] = multStatementParser ^^ {case a => OberonModule(
-        "Oberon",
-        Set[String](),
-        List[UserDefinedType](),
-        List[Constant](),
-        List[VariableDeclaration](),
-        List[Procedure](),
-        Option(a)
+    def constantParserTerm: Parser[Constant] = identifier ~ "=" ~ expressionParser ^^ { case a ~ _ ~ b => Constant(a, b)} 
+    def constantParser: Parser[List[Constant]] = opt("CONST" ~> rep1(constantParserTerm)) ^^ {
+        case Some(a) => a
+        case None => List[Constant]()
+    }
+
+    def varListParser: Parser[List[String]] = identifier ~ rep("," ~> identifier) ^^ { case a ~ b => List(a) ++ b  }
+    def varDeclarationParserTerm: Parser[List[VariableDeclaration]] =  varListParser ~ ":" ~ (typeParser | userTypeParser) ^^ {
+        case varList ~ _ ~ varType => varList.map(VariableDeclaration(_, varType))
+    }
+    def varDeclarationParser: Parser[List[VariableDeclaration]] = opt("VAR" ~> rep1(varDeclarationParserTerm)) ^^ {
+        case Some(a) => a.flatten
+        case None => List[VariableDeclaration]()
+    }
+
+    def procedureParser: Parser[List[Procedure]] = "PROCEDURE" ^^ (_ => List[Procedure]())
+    
+    def declarationsParser: Parser[List[List[UserDefinedType] | List[Constant] | List[VariableDeclaration] | List[Procedure] ]] =
+        userTypeDeclarationParser ~ constantParser ~ varDeclarationParser ~ procedureParser ^^ {
+            case userTypes ~ constants ~ vars ~ procedures => List(userTypes, constants, vars, procedures)
+        }
+
+    def blockParser: Parser[Statement] = "BEGIN" ~ multStatementParser ~ "END" ^^ { case _ ~ stmt ~ _ => stmt }
+    def importParser: Parser[Set[String]] = opt("IMPORT" ~> rep(identifier)) ^^ {
+        case Some(a) => {
+            var set = Set[String]()
+            a.foreach((e) =>{
+                set += e
+            })
+            set
+        }
+        case None => Set[String]()
+    }
+    def moduleParser: Parser[OberonModule] = "MODULE" ~ identifier ~ ";" ~ importParser ~ declarationsParser ~ blockParser ~ "END" ~ identifier ~ "." ^^ {
+        case _ ~ name ~ _ ~  imports ~ declarations ~ statements ~ _ ~ _ ~ _  => OberonModule(
+            name,
+            imports,
+            declarations(0),
+            declarations(1),
+            declarations(2),
+            declarations(3),
+            Option(statements)
     )}
+    
+    def oberonParser: Parser[OberonModule] = moduleParser
+}
+
+
+trait Oberon2ScalaParser extends OberonParser {
+
+    def parseResource(resource: String): OberonModule = {
+        return parseAbs(parse(oberonParser, Resources.getContent(resource))) 
+    }
+
     def parseAbs[T](result: ParseResult[T]): T = {
         return result match {
             case Success(matched, _) => matched
