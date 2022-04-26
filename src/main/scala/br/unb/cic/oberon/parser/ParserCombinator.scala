@@ -161,7 +161,7 @@ trait StatementParser extends ExpressionParser {
   );
 }
 
-trait OberonParser extends StatementParser {
+trait OberonParserFull extends StatementParser {
     
     def userTypeParser: Parser[Type] = (
         "ARRAY" ~ int ~ "OF" ~ (typeParser | userTypeParser) ^^ { case _ ~ a ~ _ ~ b => ArrayType(a.value, b)} 
@@ -190,10 +190,11 @@ trait OberonParser extends StatementParser {
     }
 
     def procedureParser: Parser[List[Procedure]] = "PROCEDURE" ^^ (_ => List[Procedure]())
-    
-    def declarationsParser: Parser[List[List[UserDefinedType] | List[Constant] | List[VariableDeclaration] | List[Procedure] ]] =
+
+    def declarationsParser: Parser[List[Either[Either[Either[List[Procedure],List[VariableDeclaration]],List[Constant]],List[UserDefinedType]]]] =
         userTypeDeclarationParser ~ constantParser ~ varDeclarationParser ~ procedureParser ^^ {
-            case userTypes ~ constants ~ vars ~ procedures => List(userTypes, constants, vars, procedures)
+            case userTypes ~ constants ~ vars ~ procedures => 
+                List(Right(userTypes), Left(Right(constants)), Left(Left(Right(vars))), Left(Left(Left(procedures))))
         }
 
     def blockParser: Parser[Statement] = "BEGIN" ~ multStatementParser ~ "END" ^^ { case _ ~ stmt ~ _ => stmt }
@@ -211,10 +212,10 @@ trait OberonParser extends StatementParser {
         case _ ~ name ~ _ ~  imports ~ declarations ~ statements ~ _ ~ _ ~ _  => OberonModule(
             name,
             imports,
-            declarations(0),
-            declarations(1),
-            declarations(2),
-            declarations(3),
+            declarations(0) match { case Right(userTypes) => userTypes },
+            declarations(1) match { case Left(Right(constants)) => constants },
+            declarations(2) match { case Left(Left(Right(vars))) => vars },
+            declarations(3) match { case Left(Left(Left(procedures))) => procedures },
             Option(statements)
     )}
     
@@ -222,7 +223,7 @@ trait OberonParser extends StatementParser {
 }
 
 
-trait Oberon2ScalaParser extends OberonParser {
+trait Oberon2ScalaParser extends OberonParserFull {
 
     def parseResource(resource: String): OberonModule = {
         return parseAbs(parse(oberonParser, Resources.getContent(resource))) 
