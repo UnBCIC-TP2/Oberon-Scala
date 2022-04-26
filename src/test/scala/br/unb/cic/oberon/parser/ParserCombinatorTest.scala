@@ -238,9 +238,10 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     }
 
     test("Testing Statement sequence parser") {
-        println(parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
+        assert(SequenceStmt(List(ReadRealStmt("oi"), ReadRealStmt("oi"))) == parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
     }
-    test("parse resource") {
+    
+    ignore("Testing parse resource") {
         parseResource("simple/simple01.oberon")
     }
 }
