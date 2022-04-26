@@ -107,7 +107,133 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     }
 
     test("Testing Statement parser") {
-        println(parseAbs(parse(statementParser, "readReal(oi)")))
-        println(parseAbs(parse(statementParser, "abrobrinha[123] := 456")))
+        // identifier 
+        assert(AssignmentStmt("functionTest",IntValue(456)) == parseAbs(parse(statementParser, "functionTest := 456")))
+        // designator
+        assert(EAssignmentStmt(ArrayAssignment(FunctionCallExpression("functionTest",List()),IntValue(123)),IntValue(456)) == parseAbs(parse(statementParser, "functionTest()[123] := 456")))
+        // readReal, readInt, readChar, write
+        assert(ReadRealStmt("oi") == parseAbs(parse(statementParser, "readReal(oi)")))
+        assert(ReadIntStmt("oi") == parseAbs(parse(statementParser, "readInt(oi)")))
+        assert(ReadCharStmt("oi") == parseAbs(parse(statementParser, "readChar(oi)")))
+        assert(WriteStmt(StringValue("oi")) == parseAbs(parse(statementParser, "write(\"oi\")")))
+        // Procedure Call
+        assert(ProcedureCallStmt("teste", List()) == parseAbs(parse(statementParser, "teste()")))
+        assert(ProcedureCallStmt("teste", List(IntValue(1), IntValue(2))) == parseAbs(parse(statementParser, "teste(1, 2)")))
+        assert(ProcedureCallStmt("teste", List(StringValue("oi"), VarExpression("banana"), IntValue(12))) == parseAbs(parse(statementParser, "teste(\"oi\", banana, 12)")))
+        // IF THEN ELSE
+        assert(
+            IfElseStmt(
+                Brackets(
+                    GTExpression(
+                        MultExpression(IntValue(2),IntValue(5)),
+                        FunctionCallExpression("teste",List(IntValue(1))))
+                    ),
+                EAssignmentStmt(
+                    ArrayAssignment(
+                        FunctionCallExpression("functionTest",List()),
+                        IntValue(123)
+                    ),
+                    IntValue(456)
+                ),
+                Some(
+                    EAssignmentStmt(
+                        ArrayAssignment(
+                            FunctionCallExpression("testFunc",List()),
+                            IntValue(321)
+                        ),
+                        IntValue(567)
+                    )
+                )
+            ) == parseAbs(parse(statementParser, "IF (2 * 5 > teste(1)) THEN functionTest()[123] := 456 ELSE testFunc()[321] := 567 END"))
+        )
+        // IF THEN ELSIF THEN ELSE END
+        assert(
+            IfElseIfStmt(
+                GTExpression(IntValue(2),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(456)),
+                List(
+                    ElseIfStmt(
+                        LTExpression(IntValue(3),IntValue(5)),
+                        AssignmentStmt("functionTest",IntValue(567))
+                    )
+                ),
+                Some(AssignmentStmt("functionTest",IntValue(678)))
+            ) == parseAbs(parse(statementParser, "IF 2 > 5 THEN functionTest := 456 ELSIF 3 < 5 THEN functionTest := 567 ELSE functionTest := 678 END"))
+        )
+        // IF THEN ELSIF THEN ELSE END
+        assert(
+            IfElseIfStmt(
+                GTExpression(IntValue(2),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(456)),
+                List(
+                    ElseIfStmt(
+                        LTExpression(IntValue(3),IntValue(5)),
+                        AssignmentStmt("functionTest",IntValue(567))
+                    )
+                ),
+                Some(AssignmentStmt("functionTest",IntValue(678)))
+            ) == parseAbs(parse(statementParser, "IF 2 > 5 THEN functionTest := 456 ELSIF 3 < 5 THEN functionTest := 567 ELSE functionTest := 678 END"))
+        )
+        // IF THEN ELSIF THEN END
+        assert(
+            IfElseIfStmt(
+                GTExpression(IntValue(2),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(456)),
+                List(
+                    ElseIfStmt(
+                        LTExpression(IntValue(3),IntValue(5)),
+                        AssignmentStmt("functionTest",IntValue(567))
+                    )
+                ),
+                None : Option[Statement]
+            ) == parseAbs(parse(statementParser, "IF 2 > 5 THEN functionTest := 456 ELSIF 3 < 5 THEN functionTest := 567 END"))
+        )
+        // WHILE DO END
+        assert(
+            WhileStmt(
+                GTExpression(IntValue(2),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(456))
+            ) == parseAbs(parse(statementParser, "WHILE 2 > 5 DO functionTest := 456 END"))
+        )
+        // REPEAT UNTIL
+        assert(
+            RepeatUntilStmt(
+                GTExpression(IntValue(2),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(456))
+            ) == parseAbs(parse(statementParser, "REPEAT functionTest := 456 UNTIL 2 > 5"))
+        )
+        // FOR TO DO END
+        assert(
+            ForStmt(
+                AssignmentStmt("functionTest",IntValue(456)),
+                LTExpression(IntValue(3),IntValue(5)),
+                AssignmentStmt("functionTest",IntValue(678))
+            ) == parseAbs(parse(statementParser, "FOR functionTest := 456 TO 3 < 5 DO functionTest := 678 END"))
+        )
+        // LOOP END
+        assert(
+            LoopStmt(
+                AssignmentStmt("functionTest",IntValue(456))
+            ) == parseAbs(parse(statementParser, "LOOP functionTest := 456 END"))
+        )
+        // RETURN
+        assert(
+            ReturnStmt(
+                LTExpression(IntValue(3),IntValue(5))
+            ) == parseAbs(parse(statementParser, "RETURN 3 < 5"))
+        )
+        // CASE OF ELSE END
+        assert(
+            CaseStmt(
+                VarExpression("X"),
+                List(
+                    SimpleCase(IntValue(0),AssignmentStmt("X",IntValue(2))), 
+                    RangeCase(IntValue(123),IntValue(321),AssignmentStmt("X",IntValue(5)))
+                ),
+                Some(AssignmentStmt("functionTest",IntValue(678)))
+            ) == parseAbs(parse(statementParser, "CASE X OF 0: X := 2 | 123..321: X := 5 ELSE functionTest := 678 END"))
+        )
+        // EXIT
+        assert(ExitStmt() == parseAbs(parse(statementParser, "EXIT")))
     }
 }

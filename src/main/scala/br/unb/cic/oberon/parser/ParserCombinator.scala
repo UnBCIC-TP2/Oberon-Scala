@@ -96,6 +96,10 @@ trait StatementParser extends ExpressionParser {
   |   identifier ^^ {case a => VarAssignment(a)}
   )
 
+  def elseIfStmtParser: Parser[ElseIfStmt] = expressionParser ~ "THEN" ~ statementParser ^^ {
+      case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
+  }
+
   def caseAlternativeParser: Parser[CaseAlternative] = (
       expressionParser ~ ':' ~ statementParser ^^ { case cond ~ _ ~ stmt => SimpleCase(cond, stmt) }
   |   expressionParser ~ ".." ~ expressionParser ~ ':' ~ statementParser ^^ { 
@@ -103,17 +107,9 @@ trait StatementParser extends ExpressionParser {
       }
   );
 
-  def caseAlternativesParser: Parser[List[CaseAlternative]] = caseAlternativeParser ~ rep(caseAlternativesTerm) ^^ { case a ~ b => List(a) ++ b }
-  def caseAlternativesTerm: Parser[CaseAlternative] = '|' ~ caseAlternativeParser ^^ {case _ ~ b => b}
-
-  def elseIfStmtParser: Parser[ElseIfStmt] = expressionParser ~ "THEN" ~ statementParser ^^ {
-      case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
-  }
-
   def statementParser: Parser[Statement] = (
       identifier ~ ":=" ~ expressionParser ^^ { case id ~ _ ~ expression => AssignmentStmt(id, expression)}
   |   designator ~ ":=" ~ expressionParser ^^ { case des ~ _ ~ expression => EAssignmentStmt(des, expression)}
-//  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
   |   "readReal" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadRealStmt(id) }
   |   "readInt" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadIntStmt(id) }
   |   "readChar" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadCharStmt(id) }
@@ -139,16 +135,17 @@ trait StatementParser extends ExpressionParser {
   | "FOR" ~ statementParser ~ "TO" ~ expressionParser ~ "DO" ~ statementParser ~ "END" ^^ {
       case _ ~ indexes ~ _ ~ cond ~ _ ~ stmt ~ _ => ForStmt(indexes, cond, stmt)
   }
+  | "LOOP" ~ statementParser ~ "END" ^^ { case _ ~ stmt ~ _ => LoopStmt(stmt) }
+  | "RETURN" ~ expressionParser ^^ { case _ ~ exp => ReturnStmt(exp) }
+  | "CASE" ~ expressionParser ~ "OF" ~ caseAlternativeParser ~ rep("|" ~> caseAlternativeParser) ~ opt("ELSE" ~> statementParser) ~ "END" ^^ {
+      case _ ~ exp ~ _ ~ case1 ~ cases ~ None ~ _ => CaseStmt(exp, List(case1) ++ cases, None : Option[Statement])
+      case _ ~ exp ~ _ ~ case1 ~ cases ~ Some(stmt) ~ _ => CaseStmt(exp, List(case1) ++ cases, Option(stmt))
+  }
+  | "EXIT" ^^ { case _ => ExitStmt() }
   // | "FOR" ~ identifier ~ "IN" ~ expressionParser ~ ".." ~ expressionParser ~ "DO" ~ statementParser ~ "END" {
   //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
   // }
-  | "LOOP" ~ statementParser ~ "END" ^^ { case _ ~ stmt ~ _ => LoopStmt(stmt) }
-  | "RETURN" ~ expressionParser ^^ { case _ ~ exp => ReturnStmt(exp) }
-  | "CASE" ~ expressionParser ~ "OF" ~ caseAlternativesParser ~ opt("ELSE" ~ statementParser) ~ "END" ^^ {
-      case _ ~ exp ~ _ ~ cases ~ None ~ _ => CaseStmt(exp, cases, None : Option[Statement])
-      case _ ~ exp ~ _ ~ cases ~ Some(_ ~ stmt) ~ _ => CaseStmt(exp, cases, Option(stmt))
-  }
-  | "EXIT" ^^ { case _ => ExitStmt() }
+  // | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
   );
 }
 
