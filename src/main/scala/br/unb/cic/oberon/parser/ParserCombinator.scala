@@ -158,7 +158,15 @@ trait StatementParser extends ExpressionParser {
 
 
 trait Oberon2ScalaParser extends StatementParser {
-
+    def oberonParser: Parser[OberonModule] = statementsParser ^^ {case a => OberonModule(
+        "Oberon",
+        Set[String](),
+        List[UserDefinedType](),
+        List[Constant](),
+        List[VariableDeclaration](),
+        List[Procedure](),
+        Option(a)
+    )}
     def parseAbs[T](result: ParseResult[T]): T = {
         return result match {
             case Success(matched, _) => matched
