@@ -190,11 +190,11 @@ trait OberonParserFull extends StatementParser {
     }
 
     def procedureParser: Parser[List[Procedure]] = "PROCEDURE" ^^ (_ => List[Procedure]())
-
-    def declarationsParser: Parser[List[Either[Either[Either[List[Procedure],List[VariableDeclaration]],List[Constant]],List[UserDefinedType]]]] =
+    
+    class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
+    def declarationsParser: Parser[DeclarationProps] =
         userTypeDeclarationParser ~ constantParser ~ varDeclarationParser ~ procedureParser ^^ {
-            case userTypes ~ constants ~ vars ~ procedures => 
-                List(Right(userTypes), Left(Right(constants)), Left(Left(Right(vars))), Left(Left(Left(procedures))))
+            case userTypes ~ constants ~ vars ~ procedures => new DeclarationProps(userTypes, constants, vars, procedures)
         }
 
     def blockParser: Parser[Statement] = "BEGIN" ~ multStatementParser ~ "END" ^^ { case _ ~ stmt ~ _ => stmt }
@@ -206,10 +206,10 @@ trait OberonParserFull extends StatementParser {
         case _ ~ name ~ _ ~  imports ~ declarations ~ statements ~ _ ~ _ ~ _  => OberonModule(
             name,
             imports,
-            declarations(0) match { case Right(userTypes) => userTypes },
-            declarations(1) match { case Left(Right(constants)) => constants },
-            declarations(2) match { case Left(Left(Right(vars))) => vars },
-            declarations(3) match { case Left(Left(Left(procedures))) => procedures },
+            declarations.userTypes,
+            declarations.constants,
+            declarations.variables,
+            declarations.procedures,
             Option(statements)
     )}
     
