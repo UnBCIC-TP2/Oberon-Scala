@@ -34,7 +34,7 @@ trait ExpressionParser extends BasicParsers {
     def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator[Expression]
     def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator[Expression]
     def complexTerm : Parser[Expression] = (
-        // factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
+        factor ~ "[" ~ expressionParser ~ "]" ~ not(":=") ^^ { case a ~ _ ~ b ~_ ~_ => ArraySubscript(a, b)}
     |   factor ~ "." ~ identifier ^^ { case a ~ _ ~ b => FieldAccessExpression(a, b)}
     |   factor
     )
