@@ -89,12 +89,24 @@ trait ExpressionParser extends BasicParsers {
 
 
 trait StatementParser extends ExpressionParser {
+  def multStatementParser: Parser[Statement] = stmtSequenceParser ^^ {case a => {
+      if(a.length > 1){
+          SequenceStmt(a)
+      }
+      else
+          a(0)
+    }}
+
   def designator: Parser[AssignmentAlternative] = (
       expressionParser ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~ _ => ArrayAssignment(a, b)}
   |   expressionParser ~ "." ~ identifier ^^ { case a ~ _ ~ b => RecordAssignment(a, b)}
   |   identifier ~ "^" ^^ { case a ~ _ => PointerAssignment(a)}
   |   identifier ^^ {case a => VarAssignment(a)}
   )
+
+  def elseIfStmtParser: Parser[ElseIfStmt] = expressionParser ~ "THEN" ~ statementParser ^^ {
+      case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
+  }
 
   def caseAlternativeParser: Parser[CaseAlternative] = (
       expressionParser ~ ':' ~ statementParser ^^ { case cond ~ _ ~ stmt => SimpleCase(cond, stmt) }
@@ -103,16 +115,8 @@ trait StatementParser extends ExpressionParser {
       }
   );
 
-  def caseAlternativesParser: Parser[List[CaseAlternative]] = caseAlternativeParser ~ rep(caseAlternativesTerm) ^^ { case a ~ b => List(a) ++ b }
-  def caseAlternativesTerm: Parser[CaseAlternative] = '|' ~ caseAlternativeParser ^^ {case _ ~ b => b}
-
-  def elseIfStmtParser: Parser[ElseIfStmt] = expressionParser ~ "THEN" ~ statementParser ^^ {
-      case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
-  }
-
-  def statementsParser: Parser[Statement] = stmtSequenceParser ^^ {case a => SequenceStmt(a)}
-
   def stmtSequenceParser: Parser[List[Statement]] = statementParser ~ rep(stmtSequenceTerm) ^^ { case a ~ b => List(a) ++ b }
+      
   def stmtSequenceTerm: Parser[Statement] = ";" ~ statementParser ^^ {case _ ~ b => b}
 
   def statementParser: Parser[Statement] = (
@@ -143,22 +147,23 @@ trait StatementParser extends ExpressionParser {
   | "FOR" ~ statementParser ~ "TO" ~ expressionParser ~ "DO" ~ statementParser ~ "END" ^^ {
       case _ ~ indexes ~ _ ~ cond ~ _ ~ stmt ~ _ => ForStmt(indexes, cond, stmt)
   }
+  | "LOOP" ~ statementParser ~ "END" ^^ { case _ ~ stmt ~ _ => LoopStmt(stmt) }
+  | "RETURN" ~ expressionParser ^^ { case _ ~ exp => ReturnStmt(exp) }
+  | "CASE" ~ expressionParser ~ "OF" ~ caseAlternativeParser ~ rep("|" ~> caseAlternativeParser) ~ opt("ELSE" ~> statementParser) ~ "END" ^^ {
+      case _ ~ exp ~ _ ~ case1 ~ cases ~ None ~ _ => CaseStmt(exp, List(case1) ++ cases, None : Option[Statement])
+      case _ ~ exp ~ _ ~ case1 ~ cases ~ Some(stmt) ~ _ => CaseStmt(exp, List(case1) ++ cases, Option(stmt))
+  }
+  | "EXIT" ^^ { case _ => ExitStmt() }
   // | "FOR" ~ identifier ~ "IN" ~ expressionParser ~ ".." ~ expressionParser ~ "DO" ~ statementParser ~ "END" {
   //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
   // }
-  | "LOOP" ~ statementParser ~ "END" ^^ { case _ ~ stmt ~ _ => LoopStmt(stmt) }
-  | "RETURN" ~ expressionParser ^^ { case _ ~ exp => ReturnStmt(exp) }
-  | "CASE" ~ expressionParser ~ "OF" ~ caseAlternativesParser ~ opt("ELSE" ~ statementParser) ~ "END" ^^ {
-      case _ ~ exp ~ _ ~ cases ~ None ~ _ => CaseStmt(exp, cases, None : Option[Statement])
-      case _ ~ exp ~ _ ~ cases ~ Some(_ ~ stmt) ~ _ => CaseStmt(exp, cases, Option(stmt))
-  }
-  | "EXIT" ^^ { case _ => ExitStmt() }
+  // | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
   );
 }
 
 
 trait Oberon2ScalaParser extends StatementParser {
-    def oberonParser: Parser[OberonModule] = statementsParser ^^ {case a => OberonModule(
+    def oberonParser: Parser[OberonModule] = multStatementParser ^^ {case a => OberonModule(
         "Oberon",
         Set[String](),
         List[UserDefinedType](),
