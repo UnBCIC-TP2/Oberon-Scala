@@ -24,16 +24,17 @@ trait BasicParsers extends JavaTokenParsers {
     |   identifier ^^ (i =>  ReferenceToUserDefinedType(i))
     )
 }
+
 trait ExpressionParser extends BasicParsers {
-    def aggregator(r:  Expression ~ List[Expression => Expression]): Expression = { 
+    def aggregator[T](r:  T ~ List[T => T]): T = { 
         r match { case a~b => (a /: b)((acc,f) => f(acc)) } 
     }
 
-    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator
-    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator
-    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
+    def expressionParser: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator[Expression]
+    def addTerm: Parser[Expression] =  mulTerm ~ rep(addExpParser) ^^ aggregator[Expression]
+    def mulTerm  : Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator[Expression]
     def complexTerm : Parser[Expression] = (
-        factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
+        // factor ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~_ => ArraySubscript(a, b)}
     |   factor ~ "." ~ identifier ^^ { case a ~ _ ~ b => FieldAccessExpression(a, b)}
     |   factor
     )
@@ -48,8 +49,9 @@ trait ExpressionParser extends BasicParsers {
     def variableParser: Parser[Expression] = qualifiedName ^^ {case a => VarExpression(a)}
     def qualifiedName: Parser[String] =  identifier
 
-    def functionParser: Parser[Expression] = qualifiedName ~ "(" ~ argumentsParser ~ ")" ^^ {
-        case name ~ _ ~ argList ~ _ => FunctionCallExpression(name, argList)
+    def functionParser: Parser[Expression] = qualifiedName ~ "(" ~ opt(argumentsParser) ~ ")" ^^ {
+        case name ~ _ ~ None ~ _ => FunctionCallExpression(name, List())
+        case name ~ _ ~ Some(argList) ~ _ => FunctionCallExpression(name, argList)
     }
     def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep(argTerm) ^^ { case a ~ b => List(a) ++ b }
     def argTerm: Parser[Expression] = "," ~ expressionParser ^^ {case _ ~ b => b}
@@ -85,7 +87,76 @@ trait ExpressionParser extends BasicParsers {
     )
 }
 
-trait Oberon2ScalaParser extends ExpressionParser {
+
+trait StatementParser extends ExpressionParser {
+  def designator: Parser[AssignmentAlternative] = (
+      expressionParser ~ "[" ~ expressionParser ~ "]" ^^ { case a ~ _ ~ b ~ _ => ArrayAssignment(a, b)}
+  |   expressionParser ~ "." ~ identifier ^^ { case a ~ _ ~ b => RecordAssignment(a, b)}
+  |   identifier ~ "^" ^^ { case a ~ _ => PointerAssignment(a)}
+  |   identifier ^^ {case a => VarAssignment(a)}
+  )
+
+  def caseAlternativeParser: Parser[CaseAlternative] = (
+      expressionParser ~ ':' ~ statementParser ^^ { case cond ~ _ ~ stmt => SimpleCase(cond, stmt) }
+  |   expressionParser ~ ".." ~ expressionParser ~ ':' ~ statementParser ^^ { 
+          case min ~ _ ~ max ~ _ ~ stmt => RangeCase(min, max, stmt)
+      }
+  );
+
+  def caseAlternativesParser: Parser[List[CaseAlternative]] = caseAlternativeParser ~ rep(caseAlternativesTerm) ^^ { case a ~ b => List(a) ++ b }
+  def caseAlternativesTerm: Parser[CaseAlternative] = '|' ~ caseAlternativeParser ^^ {case _ ~ b => b}
+
+  def elseIfStmtParser: Parser[ElseIfStmt] = expressionParser ~ "THEN" ~ statementParser ^^ {
+      case cond ~ _ ~ stmt => ElseIfStmt(cond, stmt)
+  }
+
+  def statementParser: Parser[Statement] = (
+      identifier ~ ":=" ~ expressionParser ^^ { case id ~ _ ~ expression => AssignmentStmt(id, expression)}
+  |   expressionParser ~ "[" ~ expressionParser ~ "]" ~ ":=" ~ expressionParser ^^ { 
+      case a ~ _ ~ b ~ _ ~ _ ~ expression => EAssignmentStmt(ArrayAssignment(a, b), expression)
+  }
+  |   designator ~ ":=" ~ expressionParser ^^ { case des ~ _ ~ expression => EAssignmentStmt(des, expression)}
+//  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
+  |   "readReal" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadRealStmt(id) }
+  |   "readInt" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadIntStmt(id) }
+  |   "readChar" ~ '(' ~ identifier ~ ')' ^^ { case _ ~ _ ~ id ~ _ => ReadCharStmt(id) }
+  |   "write" ~ '(' ~ expressionParser ~ ')' ^^ { case _ ~ _ ~ exp ~ _ => WriteStmt(exp) }
+  |   identifier ~ '(' ~ opt(argumentsParser) ~ ')' ^^ { 
+      case id ~ _ ~ None ~ _ => ProcedureCallStmt(id, List())
+      case id ~ _ ~ Some(args) ~ _ => ProcedureCallStmt(id, args)
+  }
+  | "IF" ~ expressionParser ~ "THEN" ~ statementParser ~ opt("ELSE" ~> statementParser) ~ "END" ^^ {
+      case _ ~ cond ~ _ ~ stmt ~ None ~ _ => IfElseStmt(cond, stmt, None : Option[Statement])
+      case _ ~ cond ~ _ ~ stmt ~ Some(elseStmt) ~ _ => IfElseStmt(cond, stmt, Option(elseStmt))
+  }
+  | "IF" ~ expressionParser ~ "THEN" ~ statementParser ~ rep1("ELSIF" ~> elseIfStmtParser) ~ opt("ELSE" ~> statementParser) ~ "END" ^^ {
+      case _ ~ cond ~ _ ~ stmt ~ elseifs ~ None ~ _ => IfElseIfStmt(cond, stmt, elseifs, None : Option[Statement])
+      case _ ~ cond ~ _ ~ stmt ~ elseifs ~ Some(elseStmt) ~ _ => IfElseIfStmt(cond, stmt, elseifs, Option(elseStmt))
+  }
+  | "WHILE" ~ expressionParser ~ "DO" ~ statementParser ~ "END" ^^ { 
+      case _ ~ cond ~ _ ~ stmt ~ _ => WhileStmt(cond, stmt)
+  }
+  | "REPEAT" ~ statementParser ~ "UNTIL" ~ expressionParser ^^ { 
+      case _ ~ stmt ~ _ ~ cond => RepeatUntilStmt(cond, stmt)
+  }
+  | "FOR" ~ statementParser ~ "TO" ~ expressionParser ~ "DO" ~ statementParser ~ "END" ^^ {
+      case _ ~ indexes ~ _ ~ cond ~ _ ~ stmt ~ _ => ForStmt(indexes, cond, stmt)
+  }
+  // | "FOR" ~ identifier ~ "IN" ~ expressionParser ~ ".." ~ expressionParser ~ "DO" ~ statementParser ~ "END" {
+  //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
+  // }
+  | "LOOP" ~ statementParser ~ "END" ^^ { case _ ~ stmt ~ _ => LoopStmt(stmt) }
+  | "RETURN" ~ expressionParser ^^ { case _ ~ exp => ReturnStmt(exp) }
+  | "CASE" ~ expressionParser ~ "OF" ~ caseAlternativesParser ~ opt("ELSE" ~ statementParser) ~ "END" ^^ {
+      case _ ~ exp ~ _ ~ cases ~ None ~ _ => CaseStmt(exp, cases, None : Option[Statement])
+      case _ ~ exp ~ _ ~ cases ~ Some(_ ~ stmt) ~ _ => CaseStmt(exp, cases, Option(stmt))
+  }
+  | "EXIT" ^^ { case _ => ExitStmt() }
+  );
+}
+
+
+trait Oberon2ScalaParser extends StatementParser {
 
     def parseAbs[T](result: ParseResult[T]): T = {
         return result match {

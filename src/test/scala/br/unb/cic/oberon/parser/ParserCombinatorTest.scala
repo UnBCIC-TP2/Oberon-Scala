@@ -93,16 +93,21 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     test("Testing FieldAcces") {
         assert(FieldAccessExpression(VarExpression("abc"), "ab") == parseAbs(parse(expressionParser, "abc.ab")))
     }
-    test("Testing variable parser"){
+    test("Testing variable parser") {
         assert(VarExpression("abc") == parseAbs(parse(expressionParser, "abc")))
     }
-    test("Testing function parser"){
+    test("Testing function parser") {
         assert(FunctionCallExpression("abc", List(IntValue(12), StringValue("oi"))) == parseAbs(parse(expressionParser, "abc(12, \"oi\")")))
     }
-    test("Testing pointer parser"){
+    test("Testing pointer parser") {
         assert(PointerAccessExpression("abc") == parseAbs(parse(expressionParser, "abc^")))
     }
-    test("Testing ArraySubscript parser"){
+    test("Testing ArraySubscript parser") {
         assert( ArraySubscript(VarExpression("abc"), IntValue(3)) == parseAbs(parse(expressionParser, "abc[3]")))
+    }
+
+    test("Testing Statement parser") {
+        println(parseAbs(parse(statementParser, "readReal(oi)")))
+        println(parseAbs(parse(statementParser, "abrobrinha[123] := 456")))
     }
 }
