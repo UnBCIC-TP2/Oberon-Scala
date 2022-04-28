@@ -270,7 +270,7 @@ class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
 
   }
 
-  test("Test for the interprocedural dataflow analysis"){
+  test("Test for the interprocedural dataflow analysis for statements"){
     val module = ScalaParser.parseResource("procedures/procedure01.oberon")
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -283,6 +283,24 @@ class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
 
     assert(interProceduralTest == Set((CallStmt(stmt), grafo.start(stmt.name)), (grafo.end(stmt.name),
       ReturnFromProcStmt(stmt))))
+
+  }
+
+  test("Test for the interprocedural dataflow analysis for programs"){
+    val module = ScalaParser.parseResource("procedures/procedure01.oberon")
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val args : List[Expression] = List(VarExpression("x"), VarExpression("y"))
+    val stmt = ProcedureCallStmt("sum", args)
+    val nomeProcedure = coreModule.procedures.head.name
+    val expSum = AddExpression(VarExpression("v1"), VarExpression("v2"))
+
+    val grafo = new NewControlFlowGraph()
+    val proc = grafo.setProcedures(coreModule.procedures)
+    val interProceduralProgramTest = grafo.flow(coreModule.procedures.head)
+
+    assert(interProceduralProgramTest == Set((grafo.start(nomeProcedure), ReturnStmt(expSum)), (ReturnStmt(expSum),
+      grafo.end(stmt.name))))
 
   }
 

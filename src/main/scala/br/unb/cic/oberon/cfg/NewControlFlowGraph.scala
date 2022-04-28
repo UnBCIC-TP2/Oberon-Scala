@@ -131,4 +131,16 @@ class NewControlFlowGraph() {
     }
 
   }
+
+  def flow(procedureFG : Procedure) : Set[(Statement, Statement)] = {
+    var result : Set[(Statement, Statement)] = Set()
+    result = result concat Set((start(procedureFG.name), init(procedureFG.stmt)))
+    result = result concat flow(procedureFG.stmt)
+
+    for (finalStmt <- finalFG(procedureFG.stmt)){
+      result = result concat Set((finalStmt, end(procedureFG.name)))
+    }
+
+    result
+  }
 }
