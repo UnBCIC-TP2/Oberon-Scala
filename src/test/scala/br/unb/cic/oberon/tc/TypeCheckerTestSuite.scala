@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
+import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, RealValue, RealType, ReadRealStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
 import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
@@ -11,12 +11,23 @@ import br.unb.cic.oberon.transformations.CoreVisitor
 
 class TypeCheckerTestSuite  extends AnyFunSuite {
 
-  test("Test read statement type checker") {
+  test("Test read int statement type checker") {
     val visitor = new TypeChecker()
     val read01 = ReadIntStmt("x")
     val read02 = ReadIntStmt("y")
 
     visitor.env.setGlobalVariable("x", IntegerType)
+
+    assert(read01.accept(visitor) == List())
+    assert(read02.accept(visitor).size == 1)
+  }
+  
+  test("Test read real statement type checker") {
+    val visitor = new TypeChecker()
+    val read01 = ReadRealStmt("x")
+    val read02 = ReadRealStmt("y")
+
+    visitor.env.setGlobalVariable("x", RealType)
 
     assert(read01.accept(visitor) == List())
     assert(read02.accept(visitor).size == 1)
