@@ -213,6 +213,22 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
                 AssignmentStmt("functionTest",IntValue(678))
             ) == parseAbs(parse(multStatementParser, "FOR functionTest := 456 TO 3 < 5 DO functionTest := 678 END"))
         )
+        // FOR IN DO END
+        assert(
+            ForStmt(
+                AssignmentStmt("functionTest",IntValue(1)),
+                LTEExpression(VarExpression("functionTest"),IntValue(5)),
+                SequenceStmt(
+                    List(
+                        AssignmentStmt("functionTest0",IntValue(456)),
+                        AssignmentStmt(
+                            "functionTest",
+                            AddExpression(VarExpression("functionTest"),IntValue(1))
+                        )
+                    )
+                )
+            ) == parseAbs(parse(multStatementParser, "FOR functionTest IN 1..5 DO functionTest0 := 456 END"))
+        )
         // LOOP END
         assert(
             LoopStmt(
