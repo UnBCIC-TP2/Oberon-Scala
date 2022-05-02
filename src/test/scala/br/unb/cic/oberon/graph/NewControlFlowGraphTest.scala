@@ -275,14 +275,14 @@ class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
     val args : List[Expression] = List(VarExpression("x"), VarExpression("y"))
-    val stmt = ProcedureCallStmt("sum", args)
+    val procStmt = ProcedureCallStmt("sum", args)
 
     val grafo = new NewControlFlowGraph()
-    val proc = grafo.setProcedures(coreModule.procedures)
-    val interProceduralTest = grafo.flow(stmt)
+    grafo.setProcedures(coreModule.procedures)
+    val interProceduralTest = grafo.flow(procStmt)
 
-    assert(interProceduralTest == Set((CallStmt(stmt), grafo.start(stmt.name)), (grafo.end(stmt.name),
-      ReturnFromProcStmt(stmt))))
+    assert(interProceduralTest == Set((CallStmt(procStmt), grafo.startProc(procStmt.name)), (grafo.endProc(procStmt.name),
+      ReturnFromProcStmt(procStmt))))
 
   }
 
@@ -291,16 +291,42 @@ class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
     val args : List[Expression] = List(VarExpression("x"), VarExpression("y"))
-    val stmt = ProcedureCallStmt("sum", args)
+    val procStmt = ProcedureCallStmt("sum", args)
+
     val nomeProcedure = coreModule.procedures.head.name
     val expSum = AddExpression(VarExpression("v1"), VarExpression("v2"))
 
     val grafo = new NewControlFlowGraph()
-    val proc = grafo.setProcedures(coreModule.procedures)
+    grafo.setProcedures(coreModule.procedures)
     val interProceduralProgramTest = grafo.flow(coreModule.procedures.head)
 
-    assert(interProceduralProgramTest == Set((grafo.start(nomeProcedure), ReturnStmt(expSum)), (ReturnStmt(expSum),
-      grafo.end(stmt.name))))
+    assert(interProceduralProgramTest == Set((grafo.startProc(nomeProcedure), ReturnStmt(expSum)), (ReturnStmt(expSum),
+      grafo.endProc(procStmt.name))))
+
+  }
+
+  test("Test for the interprocedural analysis for all the program"){
+    val module = ScalaParser.parseResource("procedures/procedure06.oberon")
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val readInt1 = ReadIntStmt("x")
+    val readInt2 = ReadIntStmt("y")
+    val args : List[Expression] =  List(VarExpression("x"), VarExpression("y"))
+    val procStmt = ProcedureCallStmt("sum", args)
+
+    val grafo = new NewControlFlowGraph()
+    val interProceduralAllProgramTest = grafo.flow(coreModule)
+
+    val startProc = grafo.startProc("sum")
+    val endProc = grafo.endProc("sum")
+    val expSum = AddExpression(VarExpression("v1"), VarExpression("v2"))
+
+
+    assert(interProceduralAllProgramTest == Set((startProc, ReturnStmt(expSum)), (ReturnStmt(expSum), endProc),
+      (endProc, ReturnFromProcStmt(procStmt)),
+      (CallStmt(procStmt), startProc),
+      (readInt1, readInt2),
+      (readInt2, CallStmt(procStmt))))
 
   }
 

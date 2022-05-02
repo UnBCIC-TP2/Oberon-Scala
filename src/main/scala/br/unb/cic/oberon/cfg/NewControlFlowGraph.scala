@@ -21,15 +21,15 @@ trait NewControlFlowGraphBuilder {
 }
 
 class NewControlFlowGraph() {
-  var nomeProcedure = Map[String, Procedure]()
-  var start = Map[String, StartProcStmt]()
-  var end = Map[String, EndProcStmt]()
+  var nomesProcedures = Map[String, Procedure]()
+  var startProc = Map[String, StartProcStmt]()
+  var endProc = Map[String, EndProcStmt]()
 
   def setProcedures(procedures: List[Procedure]): Unit ={
     for (procedure <- procedures){
-      nomeProcedure += (procedure.name -> procedure)
-      start += (procedure.name -> StartProcStmt(procedure))
-      end += (procedure.name -> EndProcStmt(procedure))
+      nomesProcedures += (procedure.name -> procedure)
+      startProc += (procedure.name -> StartProcStmt(procedure))
+      endProc += (procedure.name -> EndProcStmt(procedure))
     }
   }
 
@@ -120,10 +120,10 @@ class NewControlFlowGraph() {
         result
       case ProcedureCallStmt(name, args) =>
         var result : Set[(Statement, Statement)] = Set()
-        if (nomeProcedure contains name){
+        if (nomesProcedures contains name){
           var call = init(stmtFG)
           var rtrn = finalFG(stmtFG)
-          result = Set((call, start(name)), (end(name), rtrn.head))
+          result = Set((call, startProc(name)), (endProc(name), rtrn.head))
         }
         result
 
@@ -134,12 +134,24 @@ class NewControlFlowGraph() {
 
   def flow(procedureFG : Procedure) : Set[(Statement, Statement)] = {
     var result : Set[(Statement, Statement)] = Set()
-    result = result concat Set((start(procedureFG.name), init(procedureFG.stmt)))
+    result = result concat Set((startProc(procedureFG.name), init(procedureFG.stmt)))
     result = result concat flow(procedureFG.stmt)
 
     for (finalStmt <- finalFG(procedureFG.stmt)){
-      result = result concat Set((finalStmt, end(procedureFG.name)))
+      result = result concat Set((finalStmt, endProc(procedureFG.name)))
     }
+
+    result
+  }
+
+  def flow(moduleFG : OberonModule) : Set[(Statement, Statement)] = {
+    setProcedures(moduleFG.procedures)
+    var result : Set[(Statement, Statement)] = Set()
+    for (procedure <- moduleFG.procedures) {
+      result = result concat flow(procedure)
+    }
+
+    result = result concat flow(moduleFG.stmt.get)
 
     result
   }
