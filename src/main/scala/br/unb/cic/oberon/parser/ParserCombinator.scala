@@ -105,6 +105,15 @@ trait StatementParser extends ExpressionParser {
         (expressionParser <~ ':') ~ statementParser ^^ { case cond ~ stmt => SimpleCase(cond, stmt) }
     |   (expressionParser <~ "..") ~ (expressionParser <~ ':') ~ statementParser ^^ { case min ~ max ~ stmt => RangeCase(min, max, stmt) }
     );
+
+    def buildForRangeStmt(id: String, min: Expression, max: Expression, stmt: Statement): Statement = {
+        val variable = VarExpression(id)
+        val init = AssignmentStmt(id, min)
+        val condition = LTEExpression(variable, max)
+        val accumulator = AssignmentStmt(id, AddExpression(variable, IntValue(1)))
+        val realBlock = SequenceStmt(List(stmt, accumulator))
+        ForStmt(init, condition, realBlock)
+    }
     
     def statementParser: Parser[Statement] = (
         identifier ~ (":=" ~> expressionParser) ^^ { case id ~ expression => AssignmentStmt(id, expression) }
@@ -120,15 +129,15 @@ trait StatementParser extends ExpressionParser {
         { case cond ~ stmt ~ elseifs ~ elseStmt => IfElseIfStmt(cond, stmt, elseifs, elseStmt) }
     |   "WHILE" ~> expressionParser ~ ("DO" ~> statementParser <~ "END") ^^ { case cond ~ stmt => WhileStmt(cond, stmt) }
     |   "REPEAT" ~> (statementParser <~ "UNTIL") ~ expressionParser ^^ { case stmt ~ cond => RepeatUntilStmt(cond, stmt) }
-    |   "FOR" ~> statementParser ~ ("TO" ~> expressionParser <~ "DO") ~ statementParser <~ "END" ^^ { case indexes ~ cond ~ stmt => ForStmt(indexes, cond, stmt) }
+    |   "FOR" ~> statementParser ~ ("TO" ~> expressionParser <~ "DO") ~ statementParser <~ "END" ^^ 
+        { case indexes ~ cond ~ stmt => ForStmt(indexes, cond, stmt) }
+    |   ("FOR" ~> identifier <~ "IN") ~ expressionParser ~ (".." ~> expressionParser <~ "DO") ~ statementParser <~ "END" ^^
+        { case id ~ min ~ max ~ stmt => buildForRangeStmt(id, min, max, stmt) }
     |   "LOOP" ~> statementParser <~ "END" ^^ LoopStmt
     |   "RETURN" ~> expressionParser ^^ ReturnStmt
     |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
     |   "EXIT" ^^ { _ => ExitStmt() }
-    // | "FOR" ~ identifier ~ "IN" ~ expressionParser ~ ".." ~ expressionParser ~ "DO" ~ statementParser ~ "END" {
-    //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
-    // }
     );
 
     // Final Multiple Statements Parser
