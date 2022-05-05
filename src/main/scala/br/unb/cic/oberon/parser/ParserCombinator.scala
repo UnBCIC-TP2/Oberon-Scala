@@ -129,7 +129,6 @@ trait StatementParser extends ExpressionParser {
     // | "FOR" ~ identifier ~ "IN" ~ expressionParser ~ ".." ~ expressionParser ~ "DO" ~ statementParser ~ "END" {
     //     case _ ~ id ~ _ ~ min ~ _ ~ max ~ _ ~ stmt => ForRangeStmt(id, min, max, stmt)
     // }
-    // | stmt += statement (';' stmt += statement)+ #SequenceStmt
     );
 
     // Final Multiple Statements Parser
@@ -162,8 +161,47 @@ trait OberonParserFull extends StatementParser {
         { case varList ~ varType => varList.map(VariableDeclaration(_, varType)) }
     def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> rep1(varDeclarationParserTerm <~ ";") ^^ { a => a.flatten }
 
-    // Procedure
-    def procedureParser: Parser[List[Procedure]] = "PROCEDURE" ^^ (_ => List[Procedure]()) // TODO
+    // Procedure 
+
+    def procedureParser: Parser[Procedure] = 
+    "PROCEDURE" ~ identifier ~ ("(" ~> formalArgs <~ ")") ~ procedureTypeParser ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^
+    {   case _ ~ name ~ args ~ procedureType ~ _ ~ constants ~ variables ~ statements ~ endName => {
+            if(name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
+            Procedure(
+                name,
+                args,
+                procedureType,
+                constants,
+                variables,
+                statements
+            )
+        }
+    }
+
+    def procedureTypeParser: Parser[Option[Type]]= opt(":" ~> (typeParser | userTypeParser)) ^^ {
+        case Some(procedureType) => Option(procedureType)
+        case None => None: Option[Type]
+    }
+
+    def formalArgs: Parser[List[FormalArg]] = opt(formalArg ~ rep("," ~> formalArg)) ^^ {
+        case Some(a ~ b) => a ::: b.flatten
+        case None => List[FormalArg]()
+    }
+
+    def formalArg: Parser[List[FormalArg]] = (
+        identifier ~ rep("," ~> identifier) ~ ":" ~ (typeParser | userTypeParser) ^^ {
+            case head ~ tail ~ _ ~ argType => {
+                val args = List(head) ++ tail
+                args.map((x: String) => ParameterByValue(x, argType))
+            }
+        }
+    |   "VAR" ~ identifier ~ rep(("," ~ "VAR") ~> identifier) ~ ":" ~ (typeParser | userTypeParser) ^^ {
+            case _ ~ head ~ tail ~ _ ~ argType => {
+                val args = List(head) ++ tail
+                args.map((x: String) => ParameterByReference(x, argType))
+            }
+        }
+    )
 
     // Final Parsers
 
@@ -171,7 +209,7 @@ trait OberonParserFull extends StatementParser {
     
     class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
     def declarationsParser: Parser[DeclarationProps] =
-        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(procedureParser) ^^ 
+        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ^^ 
         { case userTypes ~ constants ~ vars ~ procedures => new DeclarationProps(userTypes, constants, vars, procedures) }
     
     def blockParser: Parser[Option[Statement]] = optSolver("BEGIN" ~> multStatementParser <~ "END")
