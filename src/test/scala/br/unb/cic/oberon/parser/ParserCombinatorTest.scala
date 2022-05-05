@@ -260,6 +260,28 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         assert(SequenceStmt(List(ReadRealStmt("oi"), ReadRealStmt("oi"))) == parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
     }
 
+    test("Testing Procedure parser"){
+        assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b")))) 
+        == parseAbs(parse(procedureParser, """
+        PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
+        BEGIN 
+            RETURN a + b 
+        END 
+        addFunc
+        """)))
+
+        val thrown = intercept[Exception] {
+            parseAbs(parse(procedureParser, """
+            PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
+            BEGIN 
+                RETURN a + b 
+            END 
+            addFun
+            """))
+        }
+        assert(thrown.getMessage == "Procedure name (addFunc) doesn't match the end identifier (addFun)")
+    }
+
     test("Testing the oberon simple01 code") {
         val module = parseResource("simple/simple01.oberon")
 
