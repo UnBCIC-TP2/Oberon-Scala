@@ -169,8 +169,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
     //TODO
     case ArrayAssignment(array, elem) =>
-      val array = arr.accept(expVisitor).get
-      val ArrayType(index, varType) = array
+      val ArrayType(index, varType) = array.accept(expVisitor).get
       varType
       //"array" and "elem" are expressions.
     case RecordAssignment(record, atrib) => FieldAccessExpression(record, atrib)
