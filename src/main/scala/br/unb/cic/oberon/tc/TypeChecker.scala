@@ -211,13 +211,15 @@ class TypeChecker extends OberonVisitorAdapter {
       val PointerType(varType) = pointer
       varType
     case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
-    //TODO
-    case ArrayAssignment(array, elem) =>
-      val ArrayType(index, varType) = array.accept(expVisitor).get
+    
+    case ArrayAssignment(arr, elem) =>
+      val array = arr.accept(expVisitor).get
+      val ArrayType(lenght, varType) = array
       varType
-      //"array" and "elem" are expressions.
-    case RecordAssignment(record, atrib) => FieldAccessExpression(record, atrib)
-      //"record" is an expression and "atrib" is a string.
+    case RecordAssignment(rec, atrib) =>
+      val record = rec.accept(expVisitor).get
+      val RecordType(variables: List[VariableDeclaration]) = record
+      variables.find(_.name == atrib).get.variableType
   }
 
 private def visitIfElseStmt(stmt: Statement) = stmt match {
