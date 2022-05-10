@@ -2,7 +2,7 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, RealValue, RealType, ReadRealStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
@@ -937,4 +937,248 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   }
 
+  test("Test array subscript") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test array subscript, expression of wrong type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", IntegerType)
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test array subscript, index of wrong type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), BoolValue(false)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test array subscript, expression is ArrayValue") {
+    val visitor = new TypeChecker()
+
+    val stmt =
+      WriteStmt(ArraySubscript(ArrayValue(List(IntValue(0))), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test array subscript, expression is empty ArrayValue") {
+    val visitor = new TypeChecker()
+
+    val stmt =
+      WriteStmt(ArraySubscript(ArrayValue(List()), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call") {
+    val visitor = new TypeChecker()
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = Nil,
+        returnType = None,
+        constants = Nil,
+        variables = Nil,
+        stmt = WriteStmt(IntValue(0))
+      )
+    )
+
+    val stmt = WriteStmt(FunctionCallExpression("proc", Nil))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with args and return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), BoolValue(true)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with one argument") {
+    val visitor = new TypeChecker()
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(ParameterByValue("x", IntegerType)),
+        returnType = None,
+        constants = Nil,
+        variables = Nil,
+        stmt = WriteStmt(IntValue(0))
+      )
+    )
+
+    val stmt = WriteStmt(
+      FunctionCallExpression("proc", List(IntValue(5)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("s", StringType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = Nil,
+        returnType = Some(StringType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(StringValue("ret"))
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "s",
+      FunctionCallExpression("proc", Nil)
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call, wrong args") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), IntValue(0)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call, less args than needed") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(0)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call, wrong args and return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), VarExpression("404")))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
 }

@@ -20,7 +20,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case StringValue(_) => Some(StringType)
     case NullValue => Some(NullType)
     case Undef() => None
-    case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
+    case VarExpression(name) =>
+      typeChecker.env.lookup(name).flatMap(_.accept(this))
     case EQExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType, RealType, BooleanType), BooleanType)
     case NEQExpression(left, right) =>
@@ -45,7 +46,50 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    // TODO: function call ...
+    case FunctionCallExpression(name, args) => {
+      try  {
+        val procedure = typeChecker.env.findProcedure(name)
+        
+        if(args.length != procedure.args.length) {
+          return None
+        }
+
+        val givenArgumentTypes = args.map(_.accept(this))
+        val neededArgumentTypes = procedure.args.map(_.argumentType)
+
+        val areArgTypesWrong = givenArgumentTypes.zip(neededArgumentTypes).map({
+          case (Some(givenType), neededType) if givenType == neededType =>
+            Some(givenType)
+          case _ => None
+        }).contains(None)
+
+        if(areArgTypesWrong) {
+          None
+        } else {
+          Some(procedure.returnType.getOrElse(NullType))
+        }
+      } catch { 
+        case _ : NoSuchElementException => None
+      }
+    }
+    case ArrayValue(value) => {
+      val firstExpressionType = value.headOption.flatMap(_.accept(this))
+
+      if (!firstExpressionType.isDefined) {
+        Some(ArrayType(value.length, UndefinedType))
+      } else {
+        firstExpressionType.map(ArrayType(value.length, _))
+      }
+    }
+    case ArraySubscript(array, index) => {
+      (array.accept(this), index.accept(this)) match {
+        case (Some(ArrayType(_, UndefinedType)), _) =>
+          None
+        case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
+          Some(typeElements)
+        case _ => None
+      }
+    }
 
     case FieldAccessExpression(exp, attributeName) => {
       val expType = visit(exp)
