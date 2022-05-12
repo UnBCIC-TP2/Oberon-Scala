@@ -37,7 +37,7 @@ class Environment[T] {
     userDefinedTypes += userDefinedTypeName(userType) -> userType
     userType.baseType match {
       case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
-      case _ => ???
+      case _ => ()
     }
   }
 
