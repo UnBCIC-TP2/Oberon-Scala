@@ -1181,4 +1181,179 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     assert(typeCheckerErrors.length == 1)
   }
+
+  test("Test EAssignment") {
+    val visitor = new TypeChecker()
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("b", PointerType(BooleanType))
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt01 = EAssignmentStmt(VarAssignment("x"), IntValue(0))
+    val stmt02 = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt03 = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt04 = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), StringValue("teste"))
+    val stmt05 = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), RealValue(6.9))
+
+    val stmts = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
+
+    val typeCheckerErrors = stmts.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+  
+  test("Test EAssignment, PointerAssignment, missing variable") {
+    val visitor = new TypeChecker()
+
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, left side not PointerType") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", IntegerType)
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, invalid left side Type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", PointerType(UndefinedType))
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, wrong right side Type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", PointerType(IntegerType))
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong array type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", IntegerType)
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong index type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), BoolValue(true)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, missing array type") {
+    val visitor = new TypeChecker()
+
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, missing index type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), VarExpression("i")), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong array element type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, IntegerType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(RecordType), missing attribute") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "404"), StringValue("teste"))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(RecordType), wrong attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), IntValue(8))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), missing custom type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x"), RealValue(3.0))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), missing attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "404"), RealValue(3.0))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), wrong attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), IntValue(3))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
 }
