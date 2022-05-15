@@ -2,21 +2,33 @@ package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{AddExpression, AssignmentStmt, BoolValue, BooleanType, ForStmt, IfElseStmt, IntValue, IntegerType, ReadIntStmt, SequenceStmt, Undef, VarExpression, WhileStmt, WriteStmt, CaseStmt, RangeCase, SimpleCase, RepeatUntilStmt, IfElseIfStmt, ElseIfStmt}
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
 import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
+import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
 
 class TypeCheckerTestSuite  extends AnyFunSuite {
 
-  test("Test read statement type checker") {
+  test("Test read int statement type checker") {
     val visitor = new TypeChecker()
     val read01 = ReadIntStmt("x")
     val read02 = ReadIntStmt("y")
 
     visitor.env.setGlobalVariable("x", IntegerType)
+
+    assert(read01.accept(visitor) == List())
+    assert(read02.accept(visitor).size == 1)
+  }
+  
+  test("Test read real statement type checker") {
+    val visitor = new TypeChecker()
+    val read01 = ReadRealStmt("x")
+    val read02 = ReadRealStmt("y")
+
+    visitor.env.setGlobalVariable("x", RealType)
 
     assert(read01.accept(visitor) == List())
     assert(read02.accept(visitor).size == 1)
@@ -356,12 +368,24 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor).size == 1)
+    assert(testModuleCore.accept(visitor).size == 1)
   }
 
   test ("Test switch-case statement type checker RangeCase (invalid case02 min expression) ") {
@@ -381,12 +405,24 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor).size == 1)
+    assert(testModuleCore.accept(visitor).size == 1)
   }
 
   test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 min expression) ") {
@@ -406,12 +442,24 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor).size == 2)
+    assert(testModuleCore.accept(visitor).size == 2)
   }
 
   test ("Test switch-case statement type checker RangeCase (invalid case01 and case02 max expression) ") {
@@ -430,15 +478,27 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor).size == 2)
+    assert(testModuleCore.accept(visitor).size == 2)
   }
 
-  ignore ("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
+  test ("Test switch-case statement type checker RangeCase (invalid CaseStmt exp) ") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -455,15 +515,27 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(Undef(), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(Undef(), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor).size == 1)
+    assert(testModuleCore.accept(visitor).size == 1)
   }
 
-  test ("Test switch-case statement type checker SimpleCase (Boolean cases)") {
+  ignore ("Test switch-case statement type checker SimpleCase (Boolean cases)") {
     val coreTransformer = new CoreVisitor
     val visitor = new TypeChecker()
 
@@ -477,11 +549,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(BoolValue(false), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(BoolValue(true), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt02 = CaseStmt(BoolValue(true), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt02)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
+    assert(testModuleCore.accept(visitor) == List())
   }
 
   test ("Test switch-case statement type checker SimpleCase (invalid case02 condition)") {
@@ -498,11 +582,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(BoolValue(false), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt02)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size ==  1)
+    assert(testModuleCore.accept(visitor).size ==  1)
   }
 
   test ("Test switch-case statement type checker SimpleCase (invalid case01 and case02 condition)") {
@@ -519,11 +615,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(Undef(), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt02)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size ==  2)
+    assert(testModuleCore.accept(visitor).size ==  2)
   }
 
   test ("Test switch-case statement type checker RangeCase") {
@@ -543,12 +651,24 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     val cases = List(case01, case02)
 
-    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt03 = CaseStmt(IntValue(11), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt03)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt03.accept(visitor) == List())
+    assert(testModuleCore.accept(visitor) == List())
   }
 
   test ("Test switch-case statement type checker SimpleCase") {
@@ -565,11 +685,23 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val case02 = SimpleCase(IntValue(20), stmt01)
     val cases = List(case01, case02)
 
-    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse)).accept(coreTransformer)
+    val stmt02 = CaseStmt(IntValue(10), cases, Some(caseElse))
+
+    val testModule = OberonModule(
+      name="switch-case-test",
+      submodules = Set(),
+      userTypes = Nil,
+      constants = Nil,
+      variables = List(VariableDeclaration("x", IntegerType)),
+      procedures = Nil,
+      stmt = Some(stmt02)
+    )
+
+    val testModuleCore = coreTransformer.transformModule(testModule)
 
     assert(stmt01.accept(visitor) == List())
     assert(caseElse.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
+    assert(testModuleCore.accept(visitor) == List())
   }
 
   /*
@@ -805,4 +937,423 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
   }
 
+  test("Test array subscript") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test array subscript, expression of wrong type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", IntegerType)
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test array subscript, index of wrong type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
+
+    val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), BoolValue(false)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test array subscript, expression is ArrayValue") {
+    val visitor = new TypeChecker()
+
+    val stmt =
+      WriteStmt(ArraySubscript(ArrayValue(List(IntValue(0))), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test array subscript, expression is empty ArrayValue") {
+    val visitor = new TypeChecker()
+
+    val stmt =
+      WriteStmt(ArraySubscript(ArrayValue(List()), IntValue(0)))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call") {
+    val visitor = new TypeChecker()
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = Nil,
+        returnType = None,
+        constants = Nil,
+        variables = Nil,
+        stmt = WriteStmt(IntValue(0))
+      )
+    )
+
+    val stmt = WriteStmt(FunctionCallExpression("proc", Nil))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with args and return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), BoolValue(true)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with one argument") {
+    val visitor = new TypeChecker()
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(ParameterByValue("x", IntegerType)),
+        returnType = None,
+        constants = Nil,
+        variables = Nil,
+        stmt = WriteStmt(IntValue(0))
+      )
+    )
+
+    val stmt = WriteStmt(
+      FunctionCallExpression("proc", List(IntValue(5)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call with return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("s", StringType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = Nil,
+        returnType = Some(StringType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(StringValue("ret"))
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "s",
+      FunctionCallExpression("proc", Nil)
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+
+  test("Test function call, wrong args") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), IntValue(0)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call, less args than needed") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(0)))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test function call, wrong args and return type") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.declareProcedure(
+      Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+          ReturnStmt(AddExpression(VarExpression("x"), IntValue(1))),
+          Some(ReturnStmt(AddExpression(VarExpression("x"), IntValue(-1))))
+        )
+      )
+    )
+
+    val stmt = AssignmentStmt(
+      "x",
+      FunctionCallExpression("proc", List(IntValue(5), VarExpression("404")))
+    )
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment") {
+    val visitor = new TypeChecker()
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("b", PointerType(BooleanType))
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt01 = EAssignmentStmt(VarAssignment("x"), IntValue(0))
+    val stmt02 = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt03 = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt04 = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), StringValue("teste"))
+    val stmt05 = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), RealValue(6.9))
+
+    val stmts = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
+
+    val typeCheckerErrors = stmts.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
+  }
+  
+  test("Test EAssignment, PointerAssignment, missing variable") {
+    val visitor = new TypeChecker()
+
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, left side not PointerType") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", IntegerType)
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, invalid left side Type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", PointerType(UndefinedType))
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, PointerAssignment, wrong right side Type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("b", PointerType(IntegerType))
+    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong array type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", IntegerType)
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong index type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), BoolValue(true)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, missing array type") {
+    val visitor = new TypeChecker()
+
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, missing index type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), VarExpression("i")), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, ArrayAssignment, wrong array element type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("arr", ArrayType(3, IntegerType))
+    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(RecordType), missing attribute") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "404"), StringValue("teste"))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(RecordType), wrong attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), IntValue(8))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), missing custom type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x"), RealValue(3.0))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), missing attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "404"), RealValue(3.0))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Test EAssignment, RecordAssignment(ReferenceToUserDefinedType), wrong attribute type") {
+    val visitor = new TypeChecker()
+
+    visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
+    visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
+    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), IntValue(3))
+
+    val typeCheckerErrors = stmt.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
+  }
 }

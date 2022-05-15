@@ -20,7 +20,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case StringValue(_) => Some(StringType)
     case NullValue => Some(NullType)
     case Undef() => None
-    case VarExpression(name) => if(typeChecker.env.lookup(name).isDefined) typeChecker.env.lookup(name).get.accept(this) else None
+    case VarExpression(name) =>
+      typeChecker.env.lookup(name).flatMap(_.accept(this))
     case EQExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType, RealType, BooleanType), BooleanType)
     case NEQExpression(left, right) =>
@@ -45,39 +46,83 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    // TODO: function call ...
+    case FunctionCallExpression(name, args) => {
+      try  {
+        val procedure = typeChecker.env.findProcedure(name)
+        
+        if(args.length != procedure.args.length) {
+          return None
+        }
 
-    case FieldAccessExpression(exp, attributeName) => {
-      val expType = visit(exp)
-      if (expType.isEmpty) None
-      expType.get match {
-        case ReferenceToUserDefinedType(userTypeName) => {
-          val userType = typeChecker.env.lookupUserDefinedType(userTypeName)
-          println(userType)
-          if (userType.isEmpty) None
-          val UserDefinedType(name, baseType) = userType.get
-          if (baseType.isInstanceOf[RecordType]) {
-            val recordType = baseType.asInstanceOf[RecordType]
-            val attribute = recordType.variables.find(v => v.name.equals(attributeName))
-            if(attribute.isDefined) Some(attribute.get.variableType) else None
-          } else None
+        val givenArgumentTypes = args.map(_.accept(this))
+        val neededArgumentTypes = procedure.args.map(_.argumentType)
+
+        val areArgTypesWrong = givenArgumentTypes.zip(neededArgumentTypes).map({
+          case (Some(givenType), neededType) if givenType == neededType =>
+            Some(givenType)
+          case _ => None
+        }).contains(None)
+
+        if(areArgTypesWrong) {
+          None
+        } else {
+          Some(procedure.returnType.getOrElse(NullType))
         }
-        case RecordType(variables) => {
-          val attribute = variables.find(v => v.name.equals(attributeName))
-          if(attribute.isDefined) Some(attribute.get.variableType) else None
+      } catch { 
+        case _ : NoSuchElementException => None
+      }
+    }
+    case ArrayValue(value) => {
+      val firstExpressionType = value.headOption.flatMap(_.accept(this))
+
+      if (!firstExpressionType.isDefined) {
+        Some(ArrayType(value.length, UndefinedType))
+      } else {
+        firstExpressionType.map(ArrayType(value.length, _))
+      }
+    }
+    case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
+
+    case FieldAccessExpression(exp, attributeName) =>
+      fieldAccessCheck(exp, attributeName)
+
+    case PointerAccessExpression(name) => pointerAccessCheck(name)
+  }
+
+  def arrayElementAccessCheck(array: Expression, index: Expression): T = {
+    (array.accept(this), index.accept(this)) match {
+      case (Some(ArrayType(_, UndefinedType)), _) =>
+        None
+      case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
+        Some(typeElements)
+      case _ => None
+    }
+  }
+
+  def fieldAccessCheck(exp: Expression, attributeName: String): T = {
+    exp.accept(this) match {
+      case Some(ReferenceToUserDefinedType(userTypeName)) => {
+        typeChecker.env.lookupUserDefinedType(userTypeName) match {
+          case Some(UserDefinedType(_, RecordType(variables))) => 
+            variables.find(v => v.name.equals(attributeName)).map(_.variableType)
+          case _ => None
         }
+      }
+      case Some(RecordType(variables)) => {
+        val attribute = variables.find(v => v.name.equals(attributeName))
+        if (attribute.isDefined) Some(attribute.get.variableType) else None
+      }
+      case _ => None
+    }
+  }
+
+  def pointerAccessCheck(name: String) = {
+    typeChecker.env.lookup(name)
+      .flatMap(_.accept(this))
+      .flatMap({
+        case PointerType(varType) => Some(varType)
         case _ => None
-      }
-    }
-
-    case PointerAccessExpression(name) => {
-      if(typeChecker.env.lookup(name).isDefined) {
-        val pointerType = typeChecker.env.lookup(name).get.accept(this).get
-        val PointerType(varType) = pointerType
-        Some(varType)
-      }
-      else None
-    }
+      })
   }
 
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
@@ -155,21 +200,21 @@ class TypeChecker extends OberonVisitorAdapter {
   private def visitEAssignment(stmt: Statement) = stmt match {
     case EAssignmentStmt(designator, exp) => 
       val varType = visitAssignmentAlternative(designator)
-      if (varType == exp.accept(expVisitor).get){
+      if (varType.isDefined && varType == exp.accept(expVisitor)){
         List()
       }
       else List((stmt, s"Expression $exp doesn't match variable type."))
   }
 
-  private def visitAssignmentAlternative(designator: AssignmentAlternative) = designator match {
-    case PointerAssignment(pointerName) => 
-      val pointer = env.lookup(pointerName).get.accept(expVisitor).get
-      val PointerType(varType) = pointer
-      varType
-    case VarAssignment(varName) => env.lookup(varName).get.accept(expVisitor).get
-    //TODO
-    // case ArrayAssignment
-    // case RecordAssignment
+  private def visitAssignmentAlternative(designator: AssignmentAlternative): Option[Type] = designator match {
+    case PointerAssignment(pointerName) =>
+      expVisitor.pointerAccessCheck(pointerName)
+    case VarAssignment(varName) =>
+      env.lookup(varName).flatMap(_.accept(expVisitor))
+    case ArrayAssignment(array, elem) =>
+      expVisitor.arrayElementAccessCheck(array, elem)
+    case RecordAssignment(record, atrib) =>
+      expVisitor.fieldAccessCheck(record, atrib)
   }
 
 private def visitIfElseStmt(stmt: Statement) = stmt match {
