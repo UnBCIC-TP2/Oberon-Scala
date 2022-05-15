@@ -1,0 +1,17 @@
+MODULE RecordUsage;
+
+TYPE
+   DATE = RECORD
+      day: INTEGER;
+      month: INTEGER;
+   END
+
+VAR
+    date1 : DATE;
+    day_global : INTEGER;
+BEGIN
+    date1.day := 5;
+    day_global := date1.day
+END
+
+END RecordUsage.

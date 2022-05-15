@@ -1,0 +1,20 @@
+MODULE arrayScopes;
+
+VAR table_global : ARRAY 2 OF INTEGER;
+
+PROCEDURE Copy(table_arg: ARRAY 2 OF INTEGER);
+    VAR table_local : ARRAY 2 OF INTEGER;
+BEGIN
+    table_local[0] := table_arg[0];
+    table_local[1] := table_arg[1]
+END Copy
+
+BEGIN
+    table_global[0] := 10;
+    table_global[1] := 20;
+
+    Copy(table_global)
+END
+
+
+END arrayScopes.

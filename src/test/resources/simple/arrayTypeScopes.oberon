@@ -1,0 +1,33 @@
+MODULE arrayScopes;
+
+TYPE
+    Table = ARRAY 5 OF INTEGER
+
+VAR
+    table_1 : Table;
+    table_2 : ARRAY 5 OF INTEGER;
+
+    PROCEDURE Copy1(table_a: Table)
+        VAR
+            table_3 : Table;
+    BEGIN
+        FOR i := 0 TO 4 DO
+            table_3[i] := table_a[i]
+        END ;
+
+    END Copy1;
+
+    PROCEDURE Copy2(table_b: ARRAY 5 OF INTEGER)
+        VAR
+            table_4 : ARRAY 5 OF INTEGER;
+    BEGIN
+        FOR i := 0 TO 4 DO
+            table_4[i] := table_a[i]
+        END ;
+
+    END Copy2;
+
+BEGIN
+
+
+END arrayScopes.

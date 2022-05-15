@@ -1,0 +1,26 @@
+MODULE test;
+
+TYPE
+    Grades = ARRAY 5 OF INTEGER
+    
+    Student = RECORD
+        id : INTEGER;
+        grades : Grades;
+    END
+
+    Students = ARRAY 5 OF Student
+
+    Classroom = RECORD
+        students : Students;
+        room_id : INTEGER;
+    END
+
+VAR
+    standalone_grades : Grades;
+    array_ints : ARRAY 10 OF INTEGER;
+    fulano : Student;
+    tp2 : Classroom;
+    number : INTEGER;
+
+
+END test.

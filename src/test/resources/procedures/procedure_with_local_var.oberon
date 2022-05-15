@@ -1,0 +1,17 @@
+MODULE procedures_with_local_var;
+
+
+VAR global : INTEGER;
+
+PROCEDURE Double(argument:INTEGER): INTEGER;
+    VAR local: INTEGER;
+BEGIN
+    local := argument*2;
+    RETURN local
+END Double
+
+BEGIN
+    global := 10;
+    global := Double(global)
+END
+END procedures_with_local_var.

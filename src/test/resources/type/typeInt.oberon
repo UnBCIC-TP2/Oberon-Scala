@@ -1,0 +1,7 @@
+MODULE TypeInt;
+
+TYPE NovoInt = ARRAY 1 OF INTEGER
+VAR
+  x: NovoInt;
+
+END TypeInt.

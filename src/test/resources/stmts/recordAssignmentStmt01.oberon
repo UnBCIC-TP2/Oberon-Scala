@@ -7,7 +7,7 @@ TYPE
    END
 
 VAR
-    d1 : record;
+    d1 : date;
 BEGIN
     d1.day := 5
 END

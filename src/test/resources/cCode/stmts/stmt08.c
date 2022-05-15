@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int main() {
-    int x, y, z, k;
 
+int x, y, z, k;
+
+
+int main() {
     scanf("%d", &y);
     x = 0;
     while (x < y) {

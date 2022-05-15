@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int main() {
-    int x, y;
 
+int x, y;
+
+
+int main() {
     y = 1;
     x = 0;
     while (x > 1) {

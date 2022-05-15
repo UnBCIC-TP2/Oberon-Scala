@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int main() {
-    int y, z;
 
+int y, z;
+
+
+int main() {
     y = 0;
     while (y < 10) {
         z = z + y;

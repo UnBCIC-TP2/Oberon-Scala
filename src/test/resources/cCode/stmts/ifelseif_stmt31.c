@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int main() {
-    int first, second, third, temp;
 
+int first, second, third, temp;
+
+
+int main() {
     scanf("%d", &first);
     scanf("%d", &second);
     scanf("%d", &third);

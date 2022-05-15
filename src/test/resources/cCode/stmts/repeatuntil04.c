@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
+int x, y;
+
 int power(int b, int e) {
-  int r;
+    int r;
     r = b;
-    if (b < 0 | e < 0) {
+    if (b < 0 || e < 0) {
         return 0;
     }
     if (e == 0) {
@@ -20,9 +23,8 @@ int power(int b, int e) {
     return r;
 }
 
-int main() {
-    int x, y;
 
+int main() {
     x = 2;
     y = 2;
     printf("%d\n", power(x, y));

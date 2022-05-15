@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-int main() {
-    int x, max;
 
+int x, max;
+
+
+int main() {
     scanf("%d", &x);
     scanf("%d", &max);
     if (x > max) {
