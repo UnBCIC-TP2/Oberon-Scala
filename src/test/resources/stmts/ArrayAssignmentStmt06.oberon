@@ -1,0 +1,18 @@
+MODULE ArrayAssignmentStmt06;
+
+VAR
+  i: Integer;
+  arr : ARRAY 10 OF INTEGER;
+
+BEGIN
+    i := -1;
+    arr[i+1] := 1;
+    arr[9] := 2;
+    write(arr[5]);
+    write(arr[0]);
+    write(arr[9]);
+    write(arr[-1]);
+    write(arr[-10])
+END
+
+END ArrayAssignmentStmt06.

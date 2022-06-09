@@ -100,7 +100,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)
   }
   /** Whilestmt test */
-  ignore("Test control flow graph for stmt04.oberon") {
+  test("Test control flow graph for stmt04.oberon") {
     val s3_1 = AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x")))
     val s1 = ReadIntStmt("x")
     val s2 = ReadIntStmt("y")
@@ -130,7 +130,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
   /**Forstmt Test*/
-  ignore("Test control flow graph for stmt11.oberon") {
+  test("Test control flow graph for stmt11.oberon") {
 
 
     /**
@@ -145,26 +145,28 @@ test("Test control flow graph for stmt01.oberon") {
      *
      */
 
-    val s3_1 = ReadIntStmt("z")
     val s1 = ReadIntStmt("x")
-    val s2 = AssignmentStmt("y", IntValue(0))
-    val s3 = ForStmt(s2, LTExpression(VarExpression("y"), VarExpression("x")), s3_1)
-    val s4 = AssignmentStmt("z", DivExpression(VarExpression("z"), AddExpression(VarExpression("y"), IntValue(1))))
-    val s5 = WriteStmt(VarExpression("z"))
+
+    val s2_0 = AssignmentStmt("y", IntValue(0))
+    val s2_1 = ReadIntStmt("z")
+    val s2_2 = AssignmentStmt("z", DivExpression(VarExpression("z"), AddExpression(VarExpression("y"), IntValue(1))))
+    val s2_3 = WriteStmt(VarExpression("z"))
+    val s2 = ForStmt(s2_0, LTExpression(VarExpression("y"), VarExpression("x")), SequenceStmt(List(s2_1, s2_2, s2_3)))
 
 
     // we manually build the "expected" graph, to run the test case.
     var expected = Graph[GraphNode, GraphEdge.DiEdge]() //Expected: 7 nodes
 
     expected += StartNode() ~> SimpleNode(s1)
-    expected += SimpleNode(s1) ~> SimpleNode(s2)
-    expected += SimpleNode(s2) ~> SimpleNode(s3)
-    expected += SimpleNode(s3) ~> SimpleNode(s3_1)
-    expected += SimpleNode(s3_1) ~> SimpleNode(s4)
-    expected += SimpleNode(s4) ~> SimpleNode(s5)
-    expected += SimpleNode(s5) ~> EndNode()
+    expected += SimpleNode(s1) ~> SimpleNode(s2_0)
+    expected += SimpleNode(s2_0) ~> SimpleNode(s2)
+    expected += SimpleNode(s2) ~> SimpleNode(s2_1)
+    expected += SimpleNode(s2_1) ~> SimpleNode(s2_2)
+    expected += SimpleNode(s2_2) ~> SimpleNode(s2_3)
+    expected += SimpleNode(s2_3) ~> SimpleNode(s2)
+    expected += SimpleNode(s2) ~> EndNode()
 
-    val stmts = List(s1, s2, s3, s4, s5)
+    val stmts = List(s1, s2)
 
     val builder = new IntraProceduralGraphBuilder()
     val g = builder.createControlFlowGraph(SequenceStmt(stmts))
@@ -175,7 +177,7 @@ test("Test control flow graph for stmt01.oberon") {
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
 
-  ignore("Test control flow graph for stmt12.oberon") {
+  test("Test control flow graph for stmt12.oberon") {
 
 
     /**
@@ -208,14 +210,14 @@ test("Test control flow graph for stmt01.oberon") {
     val s3_0 = AssignmentStmt("y", IntValue(0))
     val s3_1 = ReadIntStmt("w")
     val s3_2 = AssignmentStmt("v", AddExpression(VarExpression("v"), MultExpression(VarExpression("w"), AddExpression(VarExpression("y"), IntValue(1)))))
-    val s3 = ForStmt(s3_0, LTExpression(VarExpression("y"), VarExpression("x")), s3_1)
+    val s3 = ForStmt(s3_0, LTExpression(VarExpression("y"), VarExpression("x")), SequenceStmt(List(s3_1,s3_2)))
 
     val s4 = AssignmentStmt("v", DivExpression(VarExpression("v"), VarExpression("x")))
 
     val s5_0 = AssignmentStmt("z", IntValue(0))
     val s5_1 = ReadIntStmt("w")
     val s5_2 = AssignmentStmt("u", AddExpression(VarExpression("u"), VarExpression("w")))
-    val s5 = ForStmt(s5_0, LTExpression(VarExpression("z"), VarExpression("x")), s5_1)
+    val s5 = ForStmt(s5_0, LTExpression(VarExpression("z"), VarExpression("x")), SequenceStmt(List(s5_1, s5_2)))
 
 
     val s6 = AssignmentStmt("u", DivExpression(VarExpression("u"), VarExpression("x")))
@@ -228,13 +230,15 @@ test("Test control flow graph for stmt01.oberon") {
 
     expected += StartNode() ~> SimpleNode(s1)
     expected += SimpleNode(s1) ~> SimpleNode(s2)
-    expected += SimpleNode(s2) ~> SimpleNode(s3)
+    expected += SimpleNode(s2) ~> SimpleNode(s3_0)
+    expected += SimpleNode(s3_0) ~> SimpleNode(s3)
     expected += SimpleNode(s3) ~> SimpleNode(s3_1)
     expected += SimpleNode(s3_1) ~> SimpleNode(s3_2)
     expected += SimpleNode(s3_2) ~> SimpleNode(s3)
     expected += SimpleNode(s3) ~> SimpleNode(s4)
 
-    expected += SimpleNode(s4) ~> SimpleNode(s5)
+    expected += SimpleNode(s4) ~> SimpleNode(s5_0)
+    expected += SimpleNode(s5_0) ~> SimpleNode(s5)
     expected += SimpleNode(s5) ~> SimpleNode(s5_1)
     expected += SimpleNode(s5_1) ~> SimpleNode(s5_2)
     expected += SimpleNode(s5_2) ~> SimpleNode(s5)
@@ -245,18 +249,17 @@ test("Test control flow graph for stmt01.oberon") {
 
     expected += SimpleNode(s8) ~> EndNode()
 
-    val stmts = List(s1, s2, s3, s3_2, s4, s5, s5_2, s6, s7, s8)
+    val stmts = List(s1, s2, s3 , s4, s5, s6, s7, s8)
 
     val builder = new IntraProceduralGraphBuilder()
     val g = builder.createControlFlowGraph(SequenceStmt(stmts))
 
     assert( 15 == g.nodes.size)
-    assert( 15 == g.edges.size)
-
+    assert( 17 == g.edges.size)
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }
 
-  ignore("Test control flow graph for stmt13.oberon") {
+  test("Test control flow graph for stmt13.oberon") {
 
 
     /**
@@ -300,7 +303,7 @@ test("Test control flow graph for stmt01.oberon") {
     val g = builder.createControlFlowGraph(SequenceStmt(stmts))
 
     assert( 7 == g.nodes.size)
-    assert( 6 == g.edges.size)
+    assert( 7 == g.edges.size)
 
     assert(expected == g)  // does the resulting control-flow graph match with the expected graph?
   }

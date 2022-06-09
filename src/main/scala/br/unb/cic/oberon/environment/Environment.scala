@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, Expression, Procedure, Undef, UserDefinedType, Location}
+import br.unb.cic.oberon.ast.{ArrayType, ArrayValue, Expression, Location, Procedure, Undef, UserDefinedType}
 
 import scala.collection.mutable.{ListBuffer, Map, Stack}
 
@@ -25,7 +25,7 @@ class Environment[T] {
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
 
-  private val userArrayTypes = Map.empty[String, ListBuffer[Expression]]
+
 
   def setGlobalVariable(name: String, value: T): Unit = {
     top_loc += 1
@@ -35,10 +35,6 @@ class Environment[T] {
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes += userDefinedTypeName(userType) -> userType
-    userType.baseType match {
-      case ArrayType(length, variableType) => userArrayTypes += userType.name -> ListBuffer.fill(length)(Undef())
-      case _ => ()
-    }
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
@@ -67,14 +63,34 @@ class Environment[T] {
   }
 
   def reassignArray(name: String, index: Int, value: Expression) : Unit = {
-    if (userArrayTypes.contains(name)) {
-      userArrayTypes(name).update(index, value)
+    if(stack.nonEmpty && stack.top.contains(name)) {
+      locations(stack.top(name)).asInstanceOf[ArrayValue].value.update(index, value)
     }
+    else if(global.contains(name)) {
+      locations(global(name)).asInstanceOf[ArrayValue].value.update(index, value)
+    }
+    else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
   def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
-    if (userArrayTypes.contains(name) && userArrayTypes(name).length > index) {
-      Some(userArrayTypes(name)(index))
+    var list = new ListBuffer[Expression]
+
+    if(stack.nonEmpty && stack.top.contains(name)){
+      list = locations(stack.top(name)).asInstanceOf[ArrayValue].value
+    }
+    else if(global.contains(name)){
+      list = locations(global(name)).asInstanceOf[ArrayValue].value
+    }
+    else throw new RuntimeException("Variable " + name + " is not defined")
+
+    if (list.length > index) {
+      if (index >= 0) {
+        Some(list(index))
+      }
+      else if (index >= -list.length) {
+        Some(list(list.length + index))
+      }
+      else None
     }
     else None
   }

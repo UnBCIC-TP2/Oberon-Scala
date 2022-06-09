@@ -72,9 +72,10 @@ expression
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
  | name = Id '^'                                                                          #PointerAccess
+ | '~' exp = expression                                                                   #NotExpression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
  | left = expression opr = ('*' | '/' | '&&') right = expression                          #MultExpression
- | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ | left = expression opr = ('MOD' | '+' | '-' | '||') right = expression                  #AddExpression
  ;
 
 qualifiedName
@@ -86,8 +87,11 @@ statement
  : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
  | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
+ | 'readLongReal'   '(' var = Id ')'                                                                                          #ReadLongRealStmt
  | 'readReal'       '(' var = Id ')'                                                                                          #ReadRealStmt
+ | 'readLongInt'    '(' var = Id ')'                                                                                          #ReadLongIntStmt
  | 'readInt'        '(' var = Id ')'                                                                                          #ReadIntStmt
+ | 'readShortInt'   '(' var = Id ')'                                                                                          #ReadShortIntStmt
  | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall

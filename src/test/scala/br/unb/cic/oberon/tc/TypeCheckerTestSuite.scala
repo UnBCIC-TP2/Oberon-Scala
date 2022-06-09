@@ -1,14 +1,15 @@
 package br.unb.cic.oberon.tc
 
 import java.nio.file.{Files, Paths}
-
 import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.ast.{LTExpression, LTEExpression, AndExpression, EQExpression, GTEExpression}
-import br.unb.cic.oberon.parser.OberonParser.ReadIntStmtContext
+import br.unb.cic.oberon.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
+import scala.collection.mutable.Map
+
+import scala.collection.mutable.ListBuffer
 
 class TypeCheckerTestSuite  extends AnyFunSuite {
 
@@ -974,7 +975,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(List(IntValue(0))), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0))), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -985,7 +986,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(List()), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer()), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -998,6 +999,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
       Procedure(
         name = "proc",
         args = Nil,
+        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1022,6 +1024,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1049,6 +1052,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
       Procedure(
         name = "proc",
         args = List(ParameterByValue("x", IntegerType)),
+        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1072,6 +1076,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
       Procedure(
         name = "proc",
         args = Nil,
+        Map(),
         returnType = Some(StringType),
         constants = Nil,
         variables = Nil,
@@ -1099,6 +1104,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1130,6 +1136,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1161,6 +1168,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,

@@ -1,4 +1,8 @@
-MODULE SimpleModule;
+MODULE ArrayAssignmentStmt03;
+
+VAR
+  array : ARRAY 3 OF INTEGER;
+  outroarray : ARRAY 2 OF INTEGER;
 
 BEGIN
  array[0] := 10;
@@ -8,4 +12,4 @@ BEGIN
  outroarray[1] := 5
 END
 
-END SimpleModule.
+END ArrayAssignmentStmt03.

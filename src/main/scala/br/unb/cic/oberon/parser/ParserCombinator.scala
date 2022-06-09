@@ -4,6 +4,7 @@ import scala.reflect.runtime.universe.TypeTag
 import scala.reflect.runtime.universe.typeOf
 import br.unb.cic.oberon.util.Resources
 import br.unb.cic.oberon.ast._
+import scala.collection.mutable.Map
 
 trait ParsersUtil extends JavaTokenParsers {
     // Encapsulator aggregator function
@@ -177,12 +178,13 @@ trait OberonParserFull extends StatementParser {
     {   case _ ~ name ~ args ~ procedureType ~ _ ~ constants ~ variables ~ statements ~ endName => {
             if(name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
             Procedure(
-                name,
-                args,
-                procedureType,
-                constants,
-                variables,
-                statements
+              name,
+              args,
+              Map(),
+              procedureType,
+              constants,
+              variables,
+              statements
             )
         }
     }

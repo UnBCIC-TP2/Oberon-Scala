@@ -126,6 +126,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
       val coreStmt = procedure.stmt.accept(this)
       listProceduresCore += Procedure(name = procedure.name,
         args = procedure.args,
+        referenceMap = procedure.referenceMap,
         returnType = procedure.returnType,
         constants = procedure.constants,
         variables = procedure.variables ++ addedVariables,

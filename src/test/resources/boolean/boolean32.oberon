@@ -1,0 +1,16 @@
+MODULE Boolean32;
+
+VAR
+  x : BOOLEAN;
+  a : BOOLEAN;
+  b : BOOLEAN;
+
+
+BEGIN
+    x := True;
+    a := ~x;
+    b := ~a
+
+END
+
+END Boolean32.

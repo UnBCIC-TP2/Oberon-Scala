@@ -1794,7 +1794,7 @@ class ParserTestSuite extends AnyFunSuite {
 
   }
 
-  ignore("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"){
+  test("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"){
     val module = ScalaParser.parseResource("simple/userTypeSimple07.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1888,7 +1888,7 @@ class ParserTestSuite extends AnyFunSuite {
     assert(stmts(9) == WriteStmt(VarExpression("z")))
   }
 
-  ignore("Reading new types") {
+  test("Reading new types") {
     val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").toURI)
 
     assert(path != null)

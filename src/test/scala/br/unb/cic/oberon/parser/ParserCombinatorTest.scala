@@ -1,11 +1,8 @@
 package br.unb.cic.oberon.parser
 
-import scala.util.parsing.combinator._
 import br.unb.cic.oberon.ast._
-import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalactic.TolerantNumerics
-
+import scala.collection.mutable.Map
 
 class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     test("Testing Int Parser") {
@@ -261,7 +258,7 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
     }
 
     test("Testing Procedure parser"){
-        assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b")))) 
+        assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Map(), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b"))))
         == parseAbs(parse(procedureParser, """
         PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
         BEGIN 

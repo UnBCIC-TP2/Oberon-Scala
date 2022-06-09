@@ -1,0 +1,13 @@
+MODULE DECTest;
+
+VAR
+  x : INTEGER;
+  y : REAL;
+
+BEGIN
+    x := 9;
+    y := -8.0;
+    DEC(x);
+    DEC(y)
+END
+END DECTest.

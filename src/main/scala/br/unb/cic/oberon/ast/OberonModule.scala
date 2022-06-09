@@ -2,6 +2,8 @@ package br.unb.cic.oberon.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
+import scala.collection.mutable.Map
+import scala.collection.mutable.ListBuffer
 
 
 /** Abstract representation of an Oberon Module
@@ -33,6 +35,7 @@ case class OberonModule(name: String,
 /* procedure declaration definition */
 case class Procedure(name: String,
                      args: List[FormalArg],
+                     referenceMap : Map[String, String],
                      returnType: Option[Type],
                      constants: List[Constant],
                      variables: List[VariableDeclaration],
@@ -94,7 +97,12 @@ sealed trait Number extends Expression {
   def /(that: Number): Number
 
 }
-case class IntValue(value: Int) extends Value with Number{
+
+sealed trait Modular extends Number {
+  def mod(that: Modular): Modular
+}
+
+case class IntValue(value: Int) extends Value with Modular {
   type T = Int
   def +(that: Number): Number = that match {
     case other: IntValue => IntValue(value + other.value)
@@ -116,6 +124,11 @@ case class IntValue(value: Int) extends Value with Number{
     case other: RealValue => RealValue(value / other.value)
   }
 
+  val positiveMod = (x: Int, y:Int) => {val res = x % y; if (x < 0) res + y else res}
+
+  def mod(that: Modular): Modular = that match{
+    case other: IntValue => IntValue(positiveMod(value, other.value))
+  }
 }
 
 case class RealValue(value: Double) extends Value with Number {
@@ -149,7 +162,7 @@ case class BoolValue(value: Boolean) extends Value { type T = Boolean }
 case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
-case class ArrayValue(value: List[Expression]) extends Value { type T = List[Expression] }
+case class ArrayValue(value: ListBuffer[Expression]) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
@@ -168,6 +181,8 @@ case class MultExpression(left: Expression, right: Expression) extends Expressio
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
+case class ModExpression(left: Expression, right: Expression) extends Expression
+case class NotExpression(exp: Expression) extends Expression
 
 /* Statements */
 trait Statement {

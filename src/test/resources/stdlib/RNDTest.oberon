@@ -2,8 +2,8 @@ MODULE RNDTest;
 
 VAR
   x : REAL;
-  y : REAL;
-  z : REAL;
+  y : INTEGER;
+  z : INTEGER;
   w : REAL;
 
 BEGIN
