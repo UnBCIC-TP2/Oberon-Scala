@@ -515,7 +515,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(IntValue(100)))
   }
 
-  test("stmt35") {
+  test("Testing array manipulation using the stmt35 oberon module") {
     val module = ScalaParser.parseResource("stmts/stmt35.oberon")
 
     val coreVisitor = new CoreVisitor()
