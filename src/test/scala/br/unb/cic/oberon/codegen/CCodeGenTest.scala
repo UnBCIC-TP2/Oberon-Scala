@@ -20,6 +20,7 @@ class CCodeGenTest extends AnyFunSuite {
     }
 
     val generatedCCode = PaigesBasedGenerator().generateCode(coreModule)
+
     val CFile: String = s"cCode/$oberonFile".replace(".oberon", ".c")
 
     //saveStringToFile(generatedCCode, s"c:/$CFile")

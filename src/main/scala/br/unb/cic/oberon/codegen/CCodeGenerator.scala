@@ -173,8 +173,6 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def generateStmt(statement: Statement, indent: Int = indentSize): Doc = {
 
     statement match {
-      case AssignmentStmt(varName, exp) =>
-        textln(indent, s"$varName = ${genExp(exp)};")
       case SequenceStmt(stmts) =>
         val multipleStmts = stmts.map(stmt => generateStmt(stmt, indent))
         intercalate(empty, multipleStmts)
@@ -219,7 +217,6 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             val index = genExp(elem)
             val value = genExp(exp)
             textln(indent, s"$varName[$index] = $value;")
-
           case RecordAssignment(record, atrib) =>
             val structName = genExp(record)
             val value = genExp(exp)

@@ -519,7 +519,7 @@ test("Testing the oberon stmt06 code. This module has a simple case statement") 
     })
 
     myCaseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
@@ -744,7 +744,7 @@ test("Testing the oberon stmt18 code. this module has a simple case statement wi
     assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
 
     caseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
@@ -794,7 +794,7 @@ test("Testing the oberon stmt19 code. This module has three variabels, two case 
     })
 
     caseStmt1.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "y")
         assert(exp == IntValue(41))
       }
@@ -818,7 +818,7 @@ test("Testing the oberon stmt19 code. This module has three variabels, two case 
     })
 
     caseStmt2.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "z")
         assert(exp == IntValue(1))
       }

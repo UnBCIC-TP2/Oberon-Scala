@@ -309,7 +309,7 @@ class ParserTestSuite extends AbstractTestSuite {
     })
 
     myCaseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
@@ -758,7 +758,7 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
 
     caseStmt.elseStmt.getOrElse(false) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "xs")
         assert(exp == IntValue(0))
       }
@@ -808,7 +808,7 @@ class ParserTestSuite extends AbstractTestSuite {
     })
 
     caseStmt1.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "y")
         assert(exp == IntValue(41))
       }
@@ -832,7 +832,7 @@ class ParserTestSuite extends AbstractTestSuite {
     })
 
     caseStmt2.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "z")
         assert(exp == IntValue(1))
       }
@@ -927,7 +927,7 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(caseAlts.head == SimpleCase(VarExpression("x"), AssignmentStmt("aux",IntValue(0))))
 
     caseStmt.elseStmt.getOrElse(None) match {
-      case AssignmentStmt(varName, exp) => {
+      case AssignmentStmt(VarAssignment(varName), exp) => {
         assert(varName == "aux")
         assert(exp == IntValue(1))
       }
