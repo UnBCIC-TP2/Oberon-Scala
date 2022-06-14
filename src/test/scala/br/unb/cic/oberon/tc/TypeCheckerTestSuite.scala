@@ -1,5 +1,7 @@
 package br.unb.cic.oberon.tc
 
+import br.unb.cic.oberon.AbstractTestSuite
+
 import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
@@ -7,11 +9,11 @@ import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
-import scala.collection.mutable.Map
 
+import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
-class TypeCheckerTestSuite  extends AnyFunSuite {
+class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   test("Test read int statement type checker") {
     val visitor = new TypeChecker()
@@ -1198,11 +1200,11 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
     visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
     visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
-    val stmt01 = EAssignmentStmt(VarAssignment("x"), IntValue(0))
-    val stmt02 = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
-    val stmt03 = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
-    val stmt04 = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), StringValue("teste"))
-    val stmt05 = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), RealValue(6.9))
+    val stmt01 = new AssignmentStmt(VarAssignment("x"), IntValue(0))
+    val stmt02 = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt03 = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt04 = new AssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), StringValue("teste"))
+    val stmt05 = new AssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), RealValue(6.9))
 
     val stmts = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
 
@@ -1214,7 +1216,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   test("Test EAssignment, PointerAssignment, missing variable") {
     val visitor = new TypeChecker()
 
-    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1225,7 +1227,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("b", IntegerType)
-    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1236,7 +1238,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("b", PointerType(UndefinedType))
-    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1247,7 +1249,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("b", PointerType(IntegerType))
-    val stmt = EAssignmentStmt(PointerAssignment("b"), BoolValue(false))
+    val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1258,7 +1260,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("arr", IntegerType)
-    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1269,7 +1271,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
-    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), BoolValue(true)), CharValue('a'))
+    val stmt = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), BoolValue(true)), CharValue('a'))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1279,7 +1281,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
   test("Test EAssignment, ArrayAssignment, missing array type") {
     val visitor = new TypeChecker()
 
-    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1290,7 +1292,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("arr", ArrayType(3, CharacterType))
-    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), VarExpression("i")), CharValue('a'))
+    val stmt = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), VarExpression("i")), CharValue('a'))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1301,7 +1303,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("arr", ArrayType(3, IntegerType))
-    val stmt = EAssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
+    val stmt = new AssignmentStmt(ArrayAssignment(VarExpression("arr"), IntValue(0)), CharValue('a'))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1312,7 +1314,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
-    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "404"), StringValue("teste"))
+    val stmt = new AssignmentStmt(RecordAssignment(VarExpression("rec"), "404"), StringValue("teste"))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1323,7 +1325,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("rec", RecordType(List(VariableDeclaration("x", StringType))))
-    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), IntValue(8))
+    val stmt = new AssignmentStmt(RecordAssignment(VarExpression("rec"), "x"), IntValue(8))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1334,7 +1336,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
     val visitor = new TypeChecker()
 
     visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
-    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x"), RealValue(3.0))
+    val stmt = new AssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x"), RealValue(3.0))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1346,7 +1348,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
     visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
-    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "404"), RealValue(3.0))
+    val stmt = new AssignmentStmt(RecordAssignment(VarExpression("userDefType"), "404"), RealValue(3.0))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -1358,7 +1360,7 @@ class TypeCheckerTestSuite  extends AnyFunSuite {
 
     visitor.env.addUserDefinedType(UserDefinedType("customType", RecordType(List(VariableDeclaration("x1", RealType)))))
     visitor.env.setGlobalVariable("userDefType", ReferenceToUserDefinedType("customType"))
-    val stmt = EAssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), IntValue(3))
+    val stmt = new AssignmentStmt(RecordAssignment(VarExpression("userDefType"), "x1"), IntValue(3))
 
     val typeCheckerErrors = stmt.accept(visitor)
 

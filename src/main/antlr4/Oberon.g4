@@ -84,8 +84,7 @@ qualifiedName
 
 
 statement
- : var = Id ':=' exp = expression                                                                                             #AssignmentStmt
- | des = designator ':=' exp = expression                                                                                     #EAssignmentStmt
+ : des = designator ':=' exp = expression                                                                                     #AssignmentStmt
  | stmt += statement (';' stmt += statement)+                                                                                 #SequenceStmt
  | 'readLongReal'   '(' var = Id ')'                                                                                          #ReadLongRealStmt
  | 'readReal'       '(' var = Id ')'                                                                                          #ReadRealStmt

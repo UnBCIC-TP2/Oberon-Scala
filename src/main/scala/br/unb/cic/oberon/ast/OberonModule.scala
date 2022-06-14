@@ -203,8 +203,7 @@ object Statement{
   }
 }
 
-case class AssignmentStmt(varName: String, exp: Expression) extends Statement
-case class EAssignmentStmt(designator: AssignmentAlternative, exp: Expression) extends Statement
+case class AssignmentStmt(designator: Designator, exp: Expression) extends Statement
 case class SequenceStmt(stmts: List[Statement]) extends Statement
 case class ReadLongRealStmt(varName: String) extends Statement
 case class ReadRealStmt(varName: String) extends Statement
@@ -233,12 +232,12 @@ trait CaseAlternative {
 case class SimpleCase(condition: Expression, stmt: Statement) extends CaseAlternative
 case class RangeCase(min: Expression, max: Expression, stmt: Statement) extends CaseAlternative
 
-trait AssignmentAlternative
+sealed trait Designator
 
-case class VarAssignment(varName: String) extends AssignmentAlternative
-case class ArrayAssignment(array: Expression, elem: Expression) extends AssignmentAlternative
-case class RecordAssignment(record: Expression, atrib: String) extends AssignmentAlternative
-case class PointerAssignment(pointerName: String) extends AssignmentAlternative
+case class VarAssignment(varName: String) extends Designator
+case class ArrayAssignment(array: Expression, index: Expression) extends Designator
+case class RecordAssignment(record: Expression, field: String) extends Designator
+case class PointerAssignment(pointerName: String) extends Designator
 
 
 /**

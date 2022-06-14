@@ -210,8 +210,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case ReturnStmt(exp) =>
         textln(indent, s"return ${genExp(exp)};")
 
-      case EAssignmentStmt(designator, exp) =>
+      case AssignmentStmt(designator, exp) =>
         designator match {
+          case VarAssignment(varName) =>
+            textln(indent, s"$varName = ${genExp(exp)};")
           case ArrayAssignment(array, elem) =>
             val varName = genExp(array)
             val index = genExp(elem)

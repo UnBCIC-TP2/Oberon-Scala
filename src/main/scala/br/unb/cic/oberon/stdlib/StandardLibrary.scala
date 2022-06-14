@@ -31,7 +31,7 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() => AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+    MetaStmt(() => AssignmentStmt(VarAssignment("x"), AddExpression(VarExpression("x"), IntValue(1))))
   )
 
   def dec = Procedure(
@@ -41,7 +41,7 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() => AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(-1))))
+    MetaStmt(() => AssignmentStmt(VarAssignment("x"), AddExpression(VarExpression("x"), IntValue(-1))))
   )
 
   def abs = Procedure(

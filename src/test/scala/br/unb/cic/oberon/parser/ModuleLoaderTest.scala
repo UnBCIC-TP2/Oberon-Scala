@@ -1,11 +1,12 @@
 package br.unb.cic.oberon.parser
 
-import java.nio.file.{Files, Paths}
+import br.unb.cic.oberon.AbstractTestSuite
 
+import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
 
-class ModuleLoaderTestSuite extends AnyFunSuite {
+class ModuleLoaderTestSuite extends AbstractTestSuite {
 
   def makeModule(name: String = "",
                  submodules: Set[String] = Set(),

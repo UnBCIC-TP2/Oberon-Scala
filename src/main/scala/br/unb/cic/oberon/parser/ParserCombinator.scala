@@ -93,7 +93,7 @@ trait ExpressionParser extends BasicParsers {
 
 
 trait StatementParser extends ExpressionParser {
-    def designator: Parser[AssignmentAlternative] = (
+    def designator: Parser[Designator] = (
         expressionParser ~ ("[" ~> expressionParser <~ "]") ^^ { case a ~ b => ArrayAssignment(a, b)}
     |   expressionParser ~ ("." ~> identifier) ^^ { case a ~ b => RecordAssignment(a, b)}
     |   identifier <~ "^" ^^ PointerAssignment
@@ -109,16 +109,15 @@ trait StatementParser extends ExpressionParser {
 
     def buildForRangeStmt(id: String, min: Expression, max: Expression, stmt: Statement): Statement = {
         val variable = VarExpression(id)
-        val init = AssignmentStmt(id, min)
+        val init = AssignmentStmt(VarAssignment(id), min)
         val condition = LTEExpression(variable, max)
-        val accumulator = AssignmentStmt(id, AddExpression(variable, IntValue(1)))
+        val accumulator = AssignmentStmt(VarAssignment(id), AddExpression(variable, IntValue(1)))
         val realBlock = SequenceStmt(List(stmt, accumulator))
         ForStmt(init, condition, realBlock)
     }
     
     def statementParser: Parser[Statement] = (
-        identifier ~ (":=" ~> expressionParser) ^^ { case id ~ expression => AssignmentStmt(id, expression) }
-    |   designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => EAssignmentStmt(des, expression) }
+        designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => AssignmentStmt(des, expression) }
     |   "readReal" ~> ('(' ~> identifier <~ ')') ^^ ReadRealStmt
     |   "readInt" ~> ('(' ~> identifier <~ ')') ^^ ReadIntStmt
     |   "readChar" ~> ('(' ~> identifier <~ ')') ^^ ReadCharStmt

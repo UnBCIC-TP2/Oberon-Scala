@@ -1,10 +1,13 @@
 package br.unb.cic.oberon.parser
 
+import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.ast._
 import org.scalatest.funsuite.AnyFunSuite
+
 import scala.collection.mutable.Map
 
-class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
+
+class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParser {
     test("Testing Int Parser") {
         assert(IntValue(123) == parseAbs(parse(int, "123"))) // positive number
         assert(IntValue(-321) == parseAbs(parse(int, "-321"))) // negative number
@@ -110,7 +113,7 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
         // identifier 
         assert(AssignmentStmt("functionTest",IntValue(456)) == parseAbs(parse(multStatementParser, "functionTest := 456")))
         // designator
-        assert(EAssignmentStmt(ArrayAssignment(FunctionCallExpression("functionTest",List()),IntValue(123)),IntValue(456)) == parseAbs(parse(multStatementParser, "functionTest()[123] := 456")))
+        assert(new AssignmentStmt(ArrayAssignment(FunctionCallExpression("functionTest",List()),IntValue(123)),IntValue(456)) == parseAbs(parse(multStatementParser, "functionTest()[123] := 456")))
         // readReal, readInt, readChar, write
         assert(ReadRealStmt("oi") == parseAbs(parse(multStatementParser, "readReal(oi)")))
         assert(ReadIntStmt("oi") == parseAbs(parse(multStatementParser, "readInt(oi)")))
@@ -128,7 +131,7 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
                         MultExpression(IntValue(2),IntValue(5)),
                         FunctionCallExpression("teste",List(IntValue(1))))
                     ),
-                EAssignmentStmt(
+                new AssignmentStmt(
                     ArrayAssignment(
                         FunctionCallExpression("functionTest",List()),
                         IntValue(123)
@@ -136,7 +139,7 @@ class ParserCombinatorTestSuite extends AnyFunSuite with Oberon2ScalaParser {
                     IntValue(456)
                 ),
                 Some(
-                    EAssignmentStmt(
+                    new AssignmentStmt(
                         ArrayAssignment(
                             FunctionCallExpression("testFunc",List()),
                             IntValue(321)

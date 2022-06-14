@@ -51,7 +51,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
       case VarExpression(name) => name
       case _ => f"case_exp#${getNextCaseId}"
     }
-    val caseExpressionEvaluation = AssignmentStmt(caseExpressionId, exp)
+    val caseExpressionEvaluation = AssignmentStmt(VarAssignment(caseExpressionId), exp)
 
     def casesToIfElseStmt(cases: List[CaseAlternative]): IfElseStmt =
       cases match {

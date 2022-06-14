@@ -87,7 +87,7 @@ class Interpreter extends OberonVisitorAdapter {
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
-      case EAssignmentStmt(indexDesignator, exp) =>
+      case AssignmentStmt(indexDesignator, exp) =>
         indexDesignator match {
           case ArrayAssignment(arrayExpression, indexExpression) =>
             env.reassignArray(arrayExpression.asInstanceOf[VarExpression].name, evalExpression(indexExpression).asInstanceOf[IntValue].value, evalExpression(exp))
@@ -95,11 +95,8 @@ class Interpreter extends OberonVisitorAdapter {
           //TODO:
           case RecordAssignment(_, _) => ???
           case PointerAssignment(_) => ???
-          case _ => ???
+          case VarAssignment(name) => env.setVariable(name, evalExpression(exp))
         }
-
-      case AssignmentStmt(name, exp) =>
-        env.setVariable(name, evalExpression(exp))
 
       case SequenceStmt(stmts) =>
         stmts.foreach(s => s.accept(this))

@@ -1,14 +1,14 @@
 package br.unb.cic.oberon.graph
 
+import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode}
-import org.scalatest.funsuite.AnyFunSuite
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
 
 
-class ControlFlowGraphTest extends AnyFunSuite {
+class ControlFlowGraphTest extends AbstractTestSuite {
 
   /**
    * This is the test case for a control-flow graph for the following Oberon Code:

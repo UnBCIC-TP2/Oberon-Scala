@@ -1,15 +1,13 @@
 package br.unb.cic.oberon.graph
 
+import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, NewControlFlowGraph, SimpleNode, StartNode}
+import br.unb.cic.oberon.cfg.NewControlFlowGraph
 import org.scalactic.source.Position
 import org.scalatest.BeforeAndAfter
-import org.scalatest.funsuite.AnyFunSuite
-import scalax.collection.mutable.Graph
-import scalax.collection.GraphEdge
-import scalax.collection.GraphPredef.EdgeAssoc
 
-class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
+
+class NewControlFlowGraphTest extends AbstractTestSuite with BeforeAndAfter{
 
 
   ignore("Test the labels for statements"){

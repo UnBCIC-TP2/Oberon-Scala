@@ -152,7 +152,6 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
-    case EAssignmentStmt(_, _) => visitEAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
     case ExitStmt() => visitExitStmt()
@@ -170,7 +169,7 @@ class TypeChecker extends OberonVisitorAdapter {
   }
 
   private def visitAssignment(stmt: Statement) = stmt match {
-    case AssignmentStmt(v, exp) =>
+    case AssignmentStmt(VarAssignment(v), exp) =>
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined){
           if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get){
@@ -195,18 +194,17 @@ class TypeChecker extends OberonVisitorAdapter {
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
-  }
-
-  private def visitEAssignment(stmt: Statement) = stmt match {
-    case EAssignmentStmt(designator, exp) => 
+    case AssignmentStmt(designator, exp) => {
       val varType = visitAssignmentAlternative(designator)
       if (varType.isDefined && varType == exp.accept(expVisitor)){
         List()
       }
       else List((stmt, s"Expression $exp doesn't match variable type."))
+    }
   }
 
-  private def visitAssignmentAlternative(designator: AssignmentAlternative): Option[Type] = designator match {
+
+  private def visitAssignmentAlternative(designator: Designator): Option[Type] = designator match {
     case PointerAssignment(pointerName) =>
       expVisitor.pointerAccessCheck(pointerName)
     case VarAssignment(varName) =>

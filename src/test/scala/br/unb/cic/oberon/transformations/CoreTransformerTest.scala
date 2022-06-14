@@ -1,13 +1,14 @@
 package br.unb.cic.oberon.transformations
 
+import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ast._
-import java.nio.file.{Files, Paths}
-import javax.sound.midi.Sequence
 
-class CoreTransformerTest extends AnyFunSuite {
+import java.nio.file.{Files, Paths}
+
+class CoreTransformerTest extends AbstractTestSuite {
 
   test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
