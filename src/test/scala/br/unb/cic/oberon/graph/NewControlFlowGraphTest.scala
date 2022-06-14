@@ -12,7 +12,7 @@ import scalax.collection.GraphPredef.EdgeAssoc
 class NewControlFlowGraphTest extends AnyFunSuite with BeforeAndAfter{
 
 
-  test("Test the labels for statements"){
+  ignore("Test the labels for statements"){
     val firstAssignmentStmt = AssignmentStmt("x", IntValue(6))
     val secondAssignmentStmt = AssignmentStmt("x", IntValue(1))
     val thirdAssignmentStmt = Some(AssignmentStmt("x", IntValue(0)))
