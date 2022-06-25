@@ -161,7 +161,7 @@ class ParserVisitor {
 
     val returnType = if (ctx.procedureType != null) Some(visitOberonType(ctx.procedureType)) else None
 
-    Procedure(name, args, Map(), returnType, constants, variables, block.get)
+    Procedure(name, args, returnType, constants, variables, block.get)
   }
 
   def visitFormalArg(ctx: OberonParser.FormalArgContext): List[FormalArg] = {

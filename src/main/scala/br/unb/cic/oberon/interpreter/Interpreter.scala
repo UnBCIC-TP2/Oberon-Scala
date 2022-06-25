@@ -23,6 +23,8 @@ import scala.language.{existentials, postfixOps}
  * a runtime exception might be thrown.
  */
 class Interpreter extends OberonVisitorAdapter {
+
+
   type T = Unit
 
   var exit = false
@@ -131,7 +133,7 @@ class Interpreter extends OberonVisitorAdapter {
       case MetaStmt(f) => f().accept(this)
 
       case ProcedureCallStmt(name, args) =>
-        visitProcedureCall(name, args)
+        callProcedure(name, args)
         env.pop()
     }
   }
@@ -164,7 +166,7 @@ class Interpreter extends OberonVisitorAdapter {
   private def setReturnExpression(exp: Expression): Unit =
     env.setLocalVariable(Values.ReturnKeyWord, exp)
 
-  def visitProcedureCall(name: String, args: List[Expression]): Unit = {
+  def callProcedure(name: String, args: List[Expression]): Unit = {
     val procedure = env.findProcedure(name)
     updateEnvironmentWithProcedureCall(procedure, args)
     procedure.stmt.accept(this)
@@ -188,10 +190,8 @@ class Interpreter extends OberonVisitorAdapter {
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
   }
 
-  def updateParameterByReferenceVariables(procedure: Procedure): Unit = {
-    val auxMap = procedure.referenceMap map {case (reference, local) => (local, env.lookup(reference).get)}
+  def returnProcedure() = {
     env.pop()
-    auxMap foreach {case (local, value) => env.setVariable(local, value)}
   }
 
   def evalCondition(expression: Expression): Boolean = {
@@ -258,7 +258,6 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => {
       val exp = visitFunctionCall(name, args)
-      interpreter.updateParameterByReferenceVariables(interpreter.env.findProcedure(name))
       exp
     }
 
@@ -268,8 +267,9 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
   }
 
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {
-    interpreter.visitProcedureCall(name, args)
+    interpreter.callProcedure(name, args)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
+    interpreter.returnProcedure()
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }
