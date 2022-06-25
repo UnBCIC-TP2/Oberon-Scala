@@ -1001,7 +1001,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = Nil,
-        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1026,7 +1025,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
-        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1054,7 +1052,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = List(ParameterByValue("x", IntegerType)),
-        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1078,7 +1075,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = Nil,
-        Map(),
         returnType = Some(StringType),
         constants = Nil,
         variables = Nil,
@@ -1106,7 +1102,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
-        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1138,7 +1133,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
-        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1170,7 +1164,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
-        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
