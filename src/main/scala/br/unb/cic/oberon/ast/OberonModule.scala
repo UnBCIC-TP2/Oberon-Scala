@@ -35,7 +35,6 @@ case class OberonModule(name: String,
 /* procedure declaration definition */
 case class Procedure(name: String,
                      args: List[FormalArg],
-                     referenceMap : Map[String, String],
                      returnType: Option[Type],
                      constants: List[Constant],
                      variables: List[VariableDeclaration],
