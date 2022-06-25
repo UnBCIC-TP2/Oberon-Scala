@@ -100,6 +100,7 @@ statement
  | 'REPEAT' stmt = statement 'UNTIL' cond = expression                                                                        #RepeatUntilStmt
  | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
  | 'FOR' var = Id 'IN' min = expression '..' max = expression 'DO' stmt = statement 'END'                                     #ForRangeStmt
+ | 'FOREACH' varType = oberonType varName = Id ':' arrayExp = expression stmt = statement 'END'                                                                     #ForEachStmt
  | 'LOOP' stmt = statement 'END'                                                                                              #LoopStmt
  | 'RETURN' exp = expression                                                                                                  #ReturnStmt
  | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt
