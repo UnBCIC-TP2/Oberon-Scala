@@ -18,14 +18,13 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
+
   private var top_loc = 0
   private val locations = Map.empty[Location, T]
   private val global = Map.empty[String, Location]
   private val stack = Stack.empty[Map[String, Location]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
-
-
 
   def setGlobalVariable(name: String, value: T): Unit = {
     top_loc += 1
@@ -35,6 +34,10 @@ class Environment[T] {
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
     userDefinedTypes += userDefinedTypeName(userType) -> userType
+  }
+
+  def setParameterReference(name: String, loc: Location): Unit = {
+    stack.top += name -> loc
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
@@ -54,6 +57,12 @@ class Environment[T] {
       locations(global(name)) = value
     }
     else throw new RuntimeException("Variable " + name + " is not defined")
+  }
+
+  def pointsTo(name: String): Option[Location] = {
+    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
+    else if(global.contains(name)) Some(global(name))
+    else None
   }
 
   def lookup(name: String) : Option[T] = {

@@ -113,8 +113,6 @@ class Interpreter extends OberonVisitorAdapter {
       case WriteStmt(exp) =>
         printStream.println(evalExpression(exp))
 
-
-
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         if (evalCondition(condition)) thenStmt.accept(this)
         else if (elseStmt.isDefined) elseStmt.get.accept(this)
@@ -133,12 +131,8 @@ class Interpreter extends OberonVisitorAdapter {
       case MetaStmt(f) => f().accept(this)
 
       case ProcedureCallStmt(name, args) =>
-        val actualArguments = args map (arg => arg -> evalExpression(arg)) toMap
-
-        env.push() // after that, we can "push", to indicate a procedure call.
-        visitProcedureCall(name, actualArguments) // then we execute the procedure.
-        updateParameterByReferenceVariables(env.findProcedure(name)) // it updates the parameter by reference after
-                                                                     // poping the stack
+        visitProcedureCall(name, args)
+        env.pop()
     }
   }
 
@@ -170,18 +164,26 @@ class Interpreter extends OberonVisitorAdapter {
   private def setReturnExpression(exp: Expression): Unit =
     env.setLocalVariable(Values.ReturnKeyWord, exp)
 
-  def visitProcedureCall(name: String, args: Map[Expression, Expression]): Unit = {
+  def visitProcedureCall(name: String, args: List[Expression]): Unit = {
     val procedure = env.findProcedure(name)
     updateEnvironmentWithProcedureCall(procedure, args)
     procedure.stmt.accept(this)
   }
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: Map[Expression, Expression]): Unit = {
-    procedure.args.zip(args).foreach(pair => { pair._1 match {
-      case ParameterByReference(name, _) => procedure.referenceMap += name -> pair._2._1.asInstanceOf[VarExpression].name
-      case _ =>
-    }
-      env.setLocalVariable(pair._1.name, pair._2._2)})
+  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
+    val mappedArgs = procedure.args.zip(args).map(pair => pair match {
+      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, env.pointsTo(name2))
+      case (ParameterByReference(_, _), _) => throw new RuntimeException
+      case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(exp))
+    })
+
+    env.push() // after that, we can "push", to indicate a procedure call.
+
+    mappedArgs.foreach(pair => pair match {
+      case (ParameterByReference(name, _), Some(location: Location)) => env.setParameterReference(name, location)
+      case (ParameterByReference(_, _), _) => throw new RuntimeException
+      case (ParameterByValue(name, _), exp: Expression) => env.setLocalVariable(name, exp)
+    })
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
   }
@@ -255,10 +257,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => {
-      val actualArguments = args map (arg => arg -> arg.accept(this)) toMap
-
-      interpreter.env.push()
-      val exp = visitFunctionCall(name, actualArguments)
+      val exp = visitFunctionCall(name, args)
       interpreter.updateParameterByReferenceVariables(interpreter.env.findProcedure(name))
       exp
     }
@@ -268,7 +267,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     //TODO PointerAccessExpression
   }
 
-  def visitFunctionCall(name: String, args: Map[Expression, Expression]): Expression = {
+  def visitFunctionCall(name: String, args: List[Expression]): Expression = {
     interpreter.visitProcedureCall(name, args)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
