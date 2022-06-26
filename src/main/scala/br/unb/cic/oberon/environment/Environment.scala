@@ -71,39 +71,6 @@ class Environment[T] {
     else None
   }
 
-  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
-    if(stack.nonEmpty && stack.top.contains(name)) {
-      locations(stack.top(name)).asInstanceOf[ArrayValue].value.update(index, value)
-    }
-    else if(global.contains(name)) {
-      locations(global(name)).asInstanceOf[ArrayValue].value.update(index, value)
-    }
-    else throw new RuntimeException("Variable " + name + " is not defined")
-  }
-
-  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
-    var list = new ListBuffer[Expression]
-
-    if(stack.nonEmpty && stack.top.contains(name)){
-      list = locations(stack.top(name)).asInstanceOf[ArrayValue].value
-    }
-    else if(global.contains(name)){
-      list = locations(global(name)).asInstanceOf[ArrayValue].value
-    }
-    else throw new RuntimeException("Variable " + name + " is not defined")
-
-    if (list.length > index) {
-      if (index >= 0) {
-        Some(list(index))
-      }
-      else if (index >= -list.length) {
-        Some(list(list.length + index))
-      }
-      else None
-    }
-    else None
-  }
-
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
 
   def declareProcedure(procedure: Procedure): Unit = procedures(procedure.name) = procedure
