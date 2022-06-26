@@ -73,6 +73,16 @@ class Interpreter extends OberonVisitorAdapter {
     env.declareProcedure(procedure)
   }
 
+  def visitArrayAssignment(baseExp: Expression, indexExp: Expression, exp: Expression): Unit = {
+    val array = evalExpression(baseExp)
+    val index = evalExpression(indexExp)
+
+    (array, index) match {
+      case (ArrayValue(values), IntValue(v)) => values(v) = evalExpression(exp)
+      case _ => throw new RuntimeException
+    }
+  }
+
   override def visit(stmt: Statement): Unit = {
     // we first check if we have encountered a return stmt.
     // if so, we should not execute any other statement
@@ -89,11 +99,9 @@ class Interpreter extends OberonVisitorAdapter {
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
-      case AssignmentStmt(indexDesignator, exp) =>
-        indexDesignator match {
-          case ArrayAssignment(arrayExpression, indexExpression) =>
-            env.reassignArray(arrayExpression.asInstanceOf[VarExpression].name, evalExpression(indexExpression).asInstanceOf[IntValue].value, evalExpression(exp))
-          
+      case AssignmentStmt(designator, exp) =>
+        designator match {
+          case ArrayAssignment(array, index) => visitArrayAssignment(array, index, exp)
           //TODO:
           case RecordAssignment(_, _) => ???
           case PointerAssignment(_) => ???
@@ -228,6 +236,7 @@ class Interpreter extends OberonVisitorAdapter {
 class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorAdapter {
   type T = Expression
 
+
   override def visit(exp: Expression): Expression = exp match {
     case Brackets(expression) => expression.accept(this)
     case IntValue(v) => IntValue(v)
@@ -238,10 +247,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case NullValue => NullValue
     case Undef() => Undef()
     case VarExpression(name) => interpreter.env.lookup(name).get
-    case ArraySubscript(arrayBase, index) => arrayBase match {
-      case VarExpression(name) => interpreter.env.lookupArrayIndex(name, index.accept(this).asInstanceOf[Value]
-        .value.asInstanceOf[Int]).get
-    }
+    case ArraySubscript(a, i) => visitArraySubscriptExpression(ArraySubscript(a, i))
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
@@ -262,10 +268,18 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     }
 
     //TODO FieldAccessExpression
-    //TODO ArraySubscriptExpression
     //TODO PointerAccessExpression
   }
 
+  def visitArraySubscriptExpression(arraySubscript: ArraySubscript): Expression = {
+    val array =  arraySubscript.arrayBase.accept(this)
+    val idx = arraySubscript.index.accept(this)
+
+    (array, idx) match {
+      case (ArrayValue(values: ListBuffer[Expression]), IntValue(v)) => values(v)
+      case _ => throw new RuntimeException
+    }
+  }
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {
     interpreter.callProcedure(name, args)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
