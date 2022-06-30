@@ -73,7 +73,7 @@ class ParserVisitor {
     val name = ctx.name
     val submodules = visitImport(ctx.imports())
     val constants = ctx.declarations().constant().asScala.toList.map(c => visitConstant(c))
-    variables = ctx.declarations().varDeclaration().asScala.toList.map(v => visitVariableDeclaration(v)).flatten
+    variables = ctx.declarations().varDeclaration().asScala.toList.flatMap(v => visitVariableDeclaration(v))
     val procedures = ctx.declarations().procedure().asScala.toList.map(p => visitProcedureDeclaration(p))
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
@@ -608,6 +608,27 @@ class ParserVisitor {
       stmt = WhileStmt(condition, whileStmt)
     }
 
+
+    /**
+     * {@inheritDoc  }
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #   visitChildren} on {@code ctx}.</p>
+     */
+    override def visitForEachStmt(ctx: OberonParser.ForEachStmtContext): Unit = {
+      val varName = ctx.varName.getText
+
+      val visitor = new ExpressionVisitor()
+      ctx.expression().accept(visitor)
+
+      val arrayExp =  visitor.exp
+
+      ctx.stmt.accept(this)
+
+      val body = this.stmt
+
+      stmt = ForEachStmt(varName, arrayExp, body)
+    }
 
     override def visitRepeatUntilStmt(ctx: OberonParser.RepeatUntilStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
