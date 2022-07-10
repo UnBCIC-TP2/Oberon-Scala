@@ -60,7 +60,7 @@ class Interpreter extends OberonVisitorAdapter {
 
   override def visit(variable: VariableDeclaration): Unit = {
     variable.variableType match {
-      case ArrayType(length, _) => env.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef())))
+      case ArrayType(length, baseType) => env.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
       case _ => env.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -78,7 +78,7 @@ class Interpreter extends OberonVisitorAdapter {
     val index = evalExpression(indexExp)
 
     (array, index) match {
-      case (ArrayValue(values), IntValue(v)) => values(v) = evalExpression(exp)
+      case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(exp)
       case _ => throw new RuntimeException
     }
   }
@@ -276,7 +276,7 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     val idx = arraySubscript.index.accept(this)
 
     (array, idx) match {
-      case (ArrayValue(values: ListBuffer[Expression]), IntValue(v)) => values(v)
+      case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
       case _ => throw new RuntimeException
     }
   }

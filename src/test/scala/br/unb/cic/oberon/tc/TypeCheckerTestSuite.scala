@@ -9,6 +9,7 @@ import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
+import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
@@ -977,22 +978,22 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0))), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0)), ArrayType(1, IntegerType)), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
-    assert(typeCheckerErrors.length == 0)
+    assert(typeCheckerErrors.isEmpty)
   }
 
   test("Test array subscript, expression is empty ArrayValue") {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer()), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(), ArrayType(0, IntegerType)), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
-    assert(typeCheckerErrors.length == 1)
+    assert(typeCheckerErrors.isEmpty)
   }
 
   test("Test function call") {
@@ -1358,5 +1359,33 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val typeCheckerErrors = stmt.accept(visitor)
 
     assert(typeCheckerErrors.length == 1)
+  }
+
+  test("Type checking foreach stmt") {
+    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
+    assert(module.name == "ForEachStmt")
+
+    val visitor = new TypeChecker()
+
+    assert(module.accept(visitor) == List())
+  }
+
+  test("Type checking expressions with user defined types") {
+    val visitor = new TypeChecker()
+
+    val as = br.unb.cic.oberon.ast.AssignmentStmt
+    val arrayType: ArrayType = ArrayType(5, IntegerType)
+    val udt : UserDefinedType = UserDefinedType("MediaArray", arrayType)
+    val simpleAssignment: Statement = AssignmentStmt("x", IntValue(5))
+    val arrayAssigment: Statement = as(ArrayAssignment(VarExpression("medias"), IntValue(0)), IntValue(5))
+
+    visitor.env.addUserDefinedType(udt)
+
+    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env.setGlobalVariable("medias", ReferenceToUserDefinedType("MediaArray"))
+
+    assert(simpleAssignment.accept(visitor) == List())
+
+    assert(arrayAssigment.accept(visitor) == List())
   }
 }

@@ -161,7 +161,7 @@ case class BoolValue(value: Boolean) extends Value { type T = Boolean }
 case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
-case class ArrayValue(value: ListBuffer[Expression]) extends Value { type T = ListBuffer[Expression] }
+case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
@@ -265,7 +265,7 @@ case object NullType extends Type
 case object LocationType extends Type
 
 case class RecordType(variables: List[VariableDeclaration]) extends Type
-case class ArrayType(length: Int, variableType: Type) extends Type
+case class ArrayType(length: Int, baseType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type

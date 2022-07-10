@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{ArrayType, ArrayValue, Expression, Location, Procedure, Undef, UserDefinedType}
+import br.unb.cic.oberon.ast.{Location, Procedure, UserDefinedType}
 
 import scala.collection.mutable.{ListBuffer, Map, Stack}
 

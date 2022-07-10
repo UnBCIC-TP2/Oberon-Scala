@@ -1,0 +1,20 @@
+MODULE ForEachStmt;
+
+TYPE
+  intArray = ARRAY 3 OF INTEGER
+
+VAR
+  mediaTurma : intArray;
+  v: INTEGER;
+  
+BEGIN
+  mediaTurma[0] := 1;
+  mediaTurma[1] := 2;
+  mediaTurma[2] := 3;
+  
+  FOREACH v IN mediaTurma
+    write(v)
+  END
+END
+
+END ForEachStmt.
