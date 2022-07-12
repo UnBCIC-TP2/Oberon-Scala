@@ -41,10 +41,11 @@ class Interpreter extends OberonVisitorAdapter {
 
   override def visit(module: OberonModule): Unit = {
     // set up the global declarations
+    module.userTypes.foreach(userType => userType.accept(this))
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
-    module.userTypes.foreach(userType => userType.accept(this))
+
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
@@ -59,8 +60,8 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   override def visit(variable: VariableDeclaration): Unit = {
-    variable.variableType match {
-      case ArrayType(length, baseType) => env.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
+    env.baseType(variable.variableType) match {
+      case Some(ArrayType(length, baseType)) => env.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
       case _ => env.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -132,6 +133,21 @@ class Interpreter extends OberonVisitorAdapter {
           whileStmt.accept(this)
         exit = false
 
+      case ForEachStmt(v, exp, stmt) =>
+         val valArray = evalExpression(exp)
+         valArray match {
+           case ArrayValue(values, _) => {
+             values.foreach(value => {
+                 env.setVariable(v, evalExpression(value))
+                 stmt.accept(this)
+//               val assignment = AssignmentStmt(VarAssignment(v), value)
+//               val stmts = SequenceStmt(List(assignment, stmt))
+//               stmts.accept(this)
+             })
+           }
+
+           case _ => throw new RuntimeException("erro.... melhorar")
+         }
       case ExitStmt() =>
         exit = true
 

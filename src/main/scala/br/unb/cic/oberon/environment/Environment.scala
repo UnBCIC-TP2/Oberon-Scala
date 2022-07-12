@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{Location, Procedure, UserDefinedType}
+import br.unb.cic.oberon.ast.{Location, Procedure, ReferenceToUserDefinedType, Type, UserDefinedType}
 
 import scala.collection.mutable.{ListBuffer, Map, Stack}
 
@@ -69,6 +69,11 @@ class Environment[T] {
     if(stack.nonEmpty && stack.top.contains(name)) Some(locations(stack.top(name)))
     else if(global.contains(name)) Some(locations(global(name)))
     else None
+  }
+
+  def baseType(aType: Type) : Option[Type] = aType match {
+    case ReferenceToUserDefinedType(name) => lookupUserDefinedType(name).flatMap(udt => baseType(udt.baseType))
+    case _ => Some(aType)
   }
 
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)

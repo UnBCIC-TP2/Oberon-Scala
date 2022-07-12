@@ -6,15 +6,19 @@ TYPE
 VAR
   mediaTurma : intArray;
   v: INTEGER;
+  s: INTEGER;
   
 BEGIN
   mediaTurma[0] := 1;
   mediaTurma[1] := 2;
   mediaTurma[2] := 3;
-  
+
+  s := 0;
+
   FOREACH v IN mediaTurma
-    write(v)
-  END
+    s := s + v
+  END;
+  write(s)
 END
 
 END ForEachStmt.

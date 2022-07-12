@@ -6,7 +6,6 @@ import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.scalatest.funsuite.AnyFunSuite
-import scala.collection.mutable.ListBuffer
 
 class InterpreterTest extends AnyFunSuite {
 
@@ -516,7 +515,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
 
-  ignore("Testing array manipulation using the stmt35 oberon module") {
+  test("Testing array manipulation using the stmt35 oberon module") {
     val module = ScalaParser.parseResource("stmts/stmt35.oberon")
 
     val coreVisitor = new CoreVisitor()
@@ -530,7 +529,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(evalArraySubscript("b", 1) == IntValue(10))
   }
   
-  ignore("stmt36") {
+  test("stmt36") {
     val module = ScalaParser.parseResource("stmts/stmt36.oberon")
 
     val coreVisitor = new CoreVisitor()
@@ -545,7 +544,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(evalArraySubscript("a", 2) == IntValue(25))
   }
 
-  ignore("stmt37") {
+  test("stmt37") {
     val module = ScalaParser.parseResource("stmts/stmt37.oberon")
 
     val coreVisitor = new CoreVisitor()
@@ -678,6 +677,18 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("a") == Some(BoolValue(false)))
     assert(interpreter.env.lookup("b") == Some(BoolValue(true)))
   }
+
+  test(testName = "Testing the module ForEachStmt"){
+    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
+    assert(module.name == "ForEachStmt")
+
+    assert(module.stmt.isDefined)
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("s") == Some(IntValue(6)))
+  }
+
 
   def evalArraySubscript(name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))

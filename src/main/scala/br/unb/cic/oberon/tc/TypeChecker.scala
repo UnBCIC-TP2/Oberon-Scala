@@ -9,15 +9,10 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
 
   override def visit(t: Type): Option[Type] = t match {
     case UndefinedType => None
-    case _ => baseType(t)
+    case _ => typeChecker.env.baseType(t)
   }
   
-  override def visit(exp: Expression): Option[Type] = visitExpression(exp).flatMap(t => baseType(t))
-
-  def baseType(aType : Type) : Option[Type] = aType match {
-    case ReferenceToUserDefinedType(name) => typeChecker.env.lookupUserDefinedType(name).map(udt => udt.baseType).flatMap(t => baseType(t))
-    case _ => Some(aType)
-  }
+  override def visit(exp: Expression): Option[Type] = visitExpression(exp).flatMap(t => typeChecker.env.baseType(t))
 
   def visitExpression(exp: Expression): Option[Type] = exp match {
     case Brackets(exp) => exp.accept(this)
@@ -206,7 +201,7 @@ class TypeChecker extends OberonVisitorAdapter {
               else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
                     (exp.accept(expVisitor).get == IntegerType)){
                     List()
-              }              
+              }
               else{
                  List((stmt, s"Assignment between different types: $v, $exp"))
               }
