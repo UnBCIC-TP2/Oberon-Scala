@@ -2251,5 +2251,22 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmts.head == new AssignmentStmt(RecordAssignment(VarExpression("list"), "value"), IntValue(10)))
     assert(stmts(1) == new AssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue))
   }
+
+  test(testName = "Testing the module ForEachStmt"){
+    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
+    assert(module.name == "ForEachStmt")
+
+    assert(module.stmt.isDefined)
+
+    module.stmt.get match {
+      case SequenceStmt(stmts) =>
+        assert(stmts.length == 6)
+        assert(stmts(4).isInstanceOf[ForEachStmt])
+        val forEach = stmts(4).asInstanceOf[ForEachStmt]
+
+        assert(forEach.varName == "v")
+    }
+  }
+
 }
 
