@@ -179,7 +179,6 @@ trait OberonParserFull extends StatementParser {
             Procedure(
               name,
               args,
-              Map(),
               procedureType,
               constants,
               variables,
