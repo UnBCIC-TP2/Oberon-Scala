@@ -1,10 +1,10 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.ast.{REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration}
 import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
+import br.unb.cic.oberon.repl.Repl
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
 
@@ -186,54 +186,3 @@ object Main extends App {
   }
 }
 
-/**
- * Our REPL module singleton class (i.e., an
- * Scala object).
- */
-object Repl {
-
-  /**
-   * Executes the REPL Oberon interpreter
-   */
-  def runREPL(): Unit = {
-    var keepRunning = true
-    var input = ""
-    val interpreter = new Interpreter
-    val expressionEval = new EvalExpressionVisitor(interpreter)
-
-    while(keepRunning) {
-      print("Oberon> ")
-      input = scala.io.StdIn.readLine()
-      if(input == "exit") keepRunning = false
-      else if(input == "") print("")
-      else {
-        try {
-          val command = ScalaParser.parserREPL(input)
-          command match {
-            case v: REPLVarDeclaration =>
-              v.declarations.foreach(variable => variable.accept(interpreter))
-            case c: REPLConstant =>
-              c.constants.accept(interpreter)
-            case u: REPLUserTypeDeclaration =>
-              println(u.userTypes)
-              u.userTypes.accept(interpreter)
-            case s: REPLStatement =>
-              s.stmt.accept(interpreter)
-            case e: REPLExpression =>
-              val result = e.exp.accept(expressionEval)
-              println(result)
-          }
-        }
-        catch {
-          case v: ClassCastException => println("This is an invalid operation: " + v.getMessage)
-          case e: NoSuchElementException => println("A variable is not defined " + e.getMessage)
-          case n: NullPointerException => println("This is an invalid operation")
-          case d: Throwable => println(d)
-        }
-      }
-    }
-  }
-
-
-
-}
