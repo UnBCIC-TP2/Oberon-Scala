@@ -2,7 +2,11 @@ package br.unb.cic.oberon
 
 import br.unb.cic.oberon.ast.{REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration}
 import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
-import br.unb.cic.oberon.interpreter._
+import br.unb.cic.oberon.interpreter.Interpreter
+import br.unb.cic.oberon.interpreter.NullPrintStream
+import br.unb.cic.oberon.interpreter.NullByteArrayOutputStream
+import br.unb.cic.oberon.interpreter.EvalExpressionVisitor
+import br.unb.cic.oberon.interpreter.FInterpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
 import org.rogach.scallop._
@@ -150,7 +154,7 @@ object Main extends App {
     val path = Paths.get(conf.interpreter())
 
     if (Files.exists(path)) {
-      val interpreter = new Interpreter()
+      val interpreter = new FInterpreter()
 
       val content = String.join("\n", Files.readAllLines(path))
       val module = ScalaParser.parse(content)
