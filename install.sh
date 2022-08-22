@@ -11,8 +11,8 @@ curl -s "https://get.sdkman.io" | bash
 
 # Calls a new terminal with source sdk commands (required to run sdk command)
 bash -c "source /home/$USER/.sdkman/bin/sdkman-init.sh; 
-sdk install java;
-sdk install scala
+sdk install java 8.0.302-open;
+sdk install scala;
 sdk install sbt; 
 sdk version;"
 
