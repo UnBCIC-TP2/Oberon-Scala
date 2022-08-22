@@ -1,0 +1,25 @@
+MODULE ArrayInitializationStmt02;
+
+TYPE
+   Party = RECORD
+      guestList : ARRAY 5 OF STRING;
+      expenses : ARRAY 5 OF REAL;
+      anotherRecord : RECORD
+        example : ARRAY 3 OF INTEGER;
+      END;
+   END
+
+VAR
+   dogsBirthday : Party;
+   monthlyExpensesPerWeek : ARRAY 4 OF ARRAY 5 OF REAL;
+   totalPointer : POINTER TO ARRAY 5 OF REAL;
+
+BEGIN
+    dogsBirthday.guestList := ["Marley", "Lassie", "Scoobydoo", "Beethoven", "Toto"];
+    dogsBirthday.expenses := [120.0, 34.50, 12.49, 45.0, 22.0];
+    dogsBirthday.anotherRecord.example := [1, 2, 3];
+    totalPointer^ := dogsBirthday.expenses;
+    totalPointer^ := [160.0, 94.50, 42.49, 45.0, 82.0];
+    monthlyExpensesPerWeek[1] := dogsBirthday.expenses
+    END
+END ArrayInitializationStmt02.
