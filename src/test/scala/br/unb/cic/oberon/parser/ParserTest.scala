@@ -2268,5 +2268,58 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }
 
+ test(testName = "Testing the module ArrayInitializationStmt01"){
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt01.oberon")
+    assert(module.name == "ArrayInitializationStmt01")
+    assert(module.stmt.isDefined)
+
+    module.stmt.get match {
+      case SequenceStmt(stmts) =>
+        assert(stmts.length == 6)
+
+        // Testing simple array initialization.
+        assert(stmts(0).isInstanceOf[AssignmentStmt])
+        val arrayInitializationStmt = stmts(0).asInstanceOf[AssignmentStmt]
+        assert(arrayInitializationStmt.exp.asInstanceOf[SimpleArrayValue].value(2).asInstanceOf[Value].value == 35.20000076293945)
+        assert(arrayInitializationStmt.designator.asInstanceOf[VarAssignment].varName == "temperatureRecords")
+
+        // Testing record array initialization.
+        assert(stmts(2).isInstanceOf[AssignmentStmt])
+        val arrayInitializationStmt2 = stmts(2).asInstanceOf[AssignmentStmt]
+        assert(arrayInitializationStmt2.exp.asInstanceOf[SimpleArrayValue].value(4).asInstanceOf[Value].value == "L. Jackson")
+        assert(arrayInitializationStmt2.designator.asInstanceOf[RecordAssignment].record.asInstanceOf[VarExpression].name
+          + "." +
+          arrayInitializationStmt2.designator.asInstanceOf[RecordAssignment].field
+          == "calculusGrades.studentsNames")
+
+        // Testing subarray initialization.
+        assert(stmts(3).isInstanceOf[AssignmentStmt])
+        val arrayInitializationStmt3 = stmts(3).asInstanceOf[AssignmentStmt]
+        assert(arrayInitializationStmt3.exp.asInstanceOf[SimpleArrayValue].value(0).asInstanceOf[Value].value == 3.4000000953674316)
+        assert(arrayInitializationStmt3.designator.asInstanceOf[ArrayAssignment].array.asInstanceOf[FieldAccessExpression].exp.asInstanceOf[VarExpression].name
+          + "." +
+          arrayInitializationStmt3.designator.asInstanceOf[ArrayAssignment].array.asInstanceOf[FieldAccessExpression].name
+          + '[' +
+          arrayInitializationStmt3.designator.asInstanceOf[ArrayAssignment].index.asInstanceOf[Value].value
+          + ']'
+          == "calculusGrades.studentsGrades[1]")
+
+        // Testing variables and operations as initializers.
+        assert(stmts(5).isInstanceOf[AssignmentStmt])
+        val arrayInitializationStmt5 = stmts(5).asInstanceOf[AssignmentStmt]
+        assert(arrayInitializationStmt5.exp.asInstanceOf[SimpleArrayValue].value(0).asInstanceOf[AddExpression].left.asInstanceOf[Value].value.toString
+          + " + " +
+          arrayInitializationStmt5.exp.asInstanceOf[SimpleArrayValue].value(0).asInstanceOf[AddExpression].right.asInstanceOf[VarExpression].name
+          == "2.0 + sum")
+        assert(arrayInitializationStmt5.designator.asInstanceOf[ArrayAssignment].array.asInstanceOf[FieldAccessExpression].exp.asInstanceOf[VarExpression].name
+          + "." +
+          arrayInitializationStmt5.designator.asInstanceOf[ArrayAssignment].array.asInstanceOf[FieldAccessExpression].name
+          + '[' +
+          arrayInitializationStmt5.designator.asInstanceOf[ArrayAssignment].index.asInstanceOf[Value].value
+          + ']'
+          == "calculusGrades.studentsGrades[2]")
+    }
+  }	
+	
 }
 
