@@ -4,7 +4,7 @@ import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGe
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
-import br.unb.cic.oberon.repl.Repl
+import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
 
@@ -83,7 +83,7 @@ object Main extends App {
    * Executes the REPL (Read, Eval, Print, Loop) program
    */
   private def runREPL() = {
-    Repl.runREPL()
+    REPL.runREPL()
   }
 
   /**

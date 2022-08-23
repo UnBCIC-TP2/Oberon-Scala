@@ -38,5 +38,10 @@ libraryDependencies += "org.rogach" %% "scallop" % "4.0.2"
 libraryDependencies += "org.ow2.asm" % "asm" % "9.1"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1"
 
-Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
+libraryDependencies += "org.jline" % "jline" % "3.21.0"
 
+Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}

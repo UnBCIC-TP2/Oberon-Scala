@@ -2,7 +2,7 @@ package br.unb.cic.oberon.environment
 
 import br.unb.cic.oberon.ast.{Location, Procedure, ReferenceToUserDefinedType, Type, UserDefinedType}
 
-import scala.collection.mutable.{ListBuffer, Map, Stack}
+import scala.collection.mutable.{Map, Stack}
 
 /**
  * The environment represents a memory region, which
@@ -88,4 +88,11 @@ class Environment[T] {
 
   def userDefinedTypeName(userDefinedType: UserDefinedType) : String =
     userDefinedType.name
+
+  def allVariables(): collection.Set[String] = global.keySet
+
+  def delVariable(name: String): Unit = {
+    if(stack.nonEmpty && stack.top.contains(name)) stack.remove(stack.indexOf(name))
+    else if(global.contains(name)) global.remove(name)
+  }
 }
