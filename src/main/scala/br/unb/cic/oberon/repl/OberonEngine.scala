@@ -1,9 +1,8 @@
 package br.unb.cic.oberon.repl
 
-import br.unb.cic.oberon.ast.{Expression, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration}
+import br.unb.cic.oberon.ast.{AssignmentStmt, Constant, Expression, IntValue, IntegerType, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, StringValue, Undef, Value, VarAssignment, VarExpression, VariableDeclaration}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import br.unb.cic.oberon.parser.ScalaParser
-
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
 import org.jline.reader.impl.completer.AggregateCompleter
@@ -12,7 +11,6 @@ import java.io.File
 import java.nio.file.Path
 import java.util
 import java.util.Collections
-
 import scala.jdk.CollectionConverters._
 
 class OberonEngine extends ScriptEngine {
@@ -37,10 +35,26 @@ class OberonEngine extends ScriptEngine {
   override def hasVariable(name: String): Boolean = interpreter.env.lookup(name).isDefined
 
   override def put(name: String, value: Object): Unit = {
-    interpreter.env.setVariable(name, value.asInstanceOf[Expression])
+    // println(f"put call ($name = $value)")
+    val valueExpr = value.asInstanceOf[Any] match {
+      case i: Int => IntValue(i)
+      case s: String => StringValue(s)
+      case e: Exception => StringValue(e.getMessage)
+      case e: Expression => e
+      //case _: BoxedUnit => Undef()
+      case default => {
+        println(f"Invalid .put call $name = ${value.toString} (${default.getClass.getSimpleName})")
+        IntValue(0)
+      }
+    }
+
+    Constant(name, valueExpr).accept(interpreter)
   }
 
-  override def get(name: String): Object = interpreter.env.lookup(name).orNull
+  override def get(name: String): Object = {
+    val variable = interpreter.env.lookup(name)
+    if (variable.isDefined) variable.get.accept(expressionEval) else null
+  }
 
   override def find(name: String): util.Map[String, Object] = {
     if (name == null) {
@@ -72,6 +86,7 @@ class OberonEngine extends ScriptEngine {
    * TODO: implement toJson
    */
   override def toJson(obj: Object): String = {
+    println("toJson call")
     "TODO: toJson"
   }
 
@@ -79,6 +94,7 @@ class OberonEngine extends ScriptEngine {
    * TODO: implement toString
    */
   override def toString(obj: Object): String = {
+    println("toString call")
     "TODO: toString"
   }
 
@@ -86,6 +102,9 @@ class OberonEngine extends ScriptEngine {
    * TODO: implement toMap
    */
   override def toMap(obj: Object): util.Map[String, Object] = {
+    println("toMap call")
+    println(obj)
+    println(obj.getClass.getSimpleName)
     null
   }
 
@@ -129,9 +148,9 @@ class OberonEngine extends ScriptEngine {
   }
 
   /*
-   * TODO: execute string statement
+   * TODO: improve execute statement
    */
-  override def execute(statement: String): Unit = {
+  override def execute(statement: String): Any = {
     try {
       val command = ScalaParser.parserREPL(statement)
       command match {
@@ -139,14 +158,23 @@ class OberonEngine extends ScriptEngine {
           v.declarations.foreach(variable => variable.accept(interpreter))
         case c: REPLConstant =>
           c.constants.accept(interpreter)
+          val result = c.constants.exp.accept(expressionEval)
+          result match {
+            case v: Value => return v.value
+            case _: Undef => return
+          }
+          return result
         case u: REPLUserTypeDeclaration =>
-          println(u.userTypes)
           u.userTypes.accept(interpreter)
         case s: REPLStatement =>
           s.stmt.accept(interpreter)
         case e: REPLExpression =>
           val result = e.exp.accept(expressionEval)
-          println(result)
+          result match {
+            case v: Value => return v.value
+            case _: Undef => return
+          }
+          return result
       }
     }
     catch {
@@ -155,6 +183,7 @@ class OberonEngine extends ScriptEngine {
       case n: NullPointerException => println("This is an invalid operation")
       case d: Throwable => println(d)
     }
+    null
   }
 
   override def execute(closure: Object, args: Object*): Object = ???

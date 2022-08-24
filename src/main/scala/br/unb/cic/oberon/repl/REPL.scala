@@ -50,9 +50,8 @@ object REPL {
      * Create jnanorc config file
      */
 
-    //val file = new File(REPL.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath)
-    //val root = file.getCanonicalPath.replace("classes", "").replaceAll("\\\\", "/")
-    println("A")
+    // val file = new File(REPL.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath)
+    // val root = file.getCanonicalPath.replace("classes", "").replaceAll("\\\\", "/")
     val root = workDir().toFile.getCanonicalPath
     val jnanorcFile = Paths.get(root, DEFAULT_NANORC_FILE).toFile
     if (!jnanorcFile.exists) {
@@ -62,53 +61,40 @@ object REPL {
         fw.write("include " + root + "nanorc/*.nanorc\n")
       } finally if (fw != null) fw.close()
     }
-    println("B")
 
     /*
      * REPLEngine and command registries
      */
-    println("C")
     val scriptEngine = new OberonEngine
     val configPath = new ConfigurationPath(Paths.get(root), Paths.get(root))
     val printer = new DefaultPrinter(scriptEngine, configPath)
-    val consoleEngine = new ConsoleEngineImpl(scriptEngine, printer, workDir.asJava, configPath)
+    val consoleEngine = new REPLConsoleEngine(scriptEngine, printer, workDir, configPath)
     val builtins = new Builtins(workDir.asJava, configPath, (fun: String) => new ConsoleEngine.WidgetCreator(consoleEngine, fun))
-    println("D")
 
-    println("E")
     val myCommands = new MyCommands(workDir)
     val systemRegistry = new REPLSystemRegistry(parser, terminal, workDir, configPath)
     systemRegistry.register("oberon", new REPLCommand(scriptEngine, printer))
     systemRegistry.setCommandRegistries(consoleEngine, builtins, myCommands)
     systemRegistry.addCompleter(scriptEngine.getScriptCompleter)
     systemRegistry.setScriptDescription(scriptEngine.scriptDescription)
-    println("F")
 
     /*
      * Command line highlighter
      */
-    println("G")
     val jnanorc = configPath.getConfig(DEFAULT_NANORC_FILE)
-    println("GA")
     val commandHighlighter = SyntaxHighlighter.build(jnanorc, "COMMAND")
-    println("GC")
     val argsHighlighter = SyntaxHighlighter.build(jnanorc, "ARGS")
-    println("GD")
-    val groovyHighlighter = SyntaxHighlighter.build(jnanorc, "Oberon")
-    println("GE")
-    val highlighter = new SystemHighlighter(commandHighlighter, argsHighlighter, groovyHighlighter)
-    println("GF")
+    val oberonHighlighter = SyntaxHighlighter.build(jnanorc, "Oberon")
+    val highlighter = new SystemHighlighter(commandHighlighter, argsHighlighter, oberonHighlighter)
     // if (!OSUtils.IS_WINDOWS) highlighter.setSpecificHighlighter("!", SyntaxHighlighter.build(jnanorc, "SH-REPL"))
     highlighter.addFileHighlight("nano", "less", "slurp")
-    // highlighter.addFileHighlight("oberon", "classloader", List("-a", "--add").asJavaCollection)
+    highlighter.addFileHighlight("oberon", "classloader", List("-a", "--add").asJavaCollection)
     // highlighter.addExternalHighlighterRefresh(printer.refresh)
     // highlighter.addExternalHighlighterRefresh(scriptEngine.refresh)
-    println("H")
 
     /*
      * Line reader
      */
-    println("I")
     val reader = LineReaderBuilder.builder
       .terminal(terminal)
       .completer(systemRegistry.completer)
@@ -123,25 +109,18 @@ object REPL {
       .option(LineReader.Option.USE_FORWARD_SLASH, true) // use forward slash in directory separator
       .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true).build
     if (OSUtils.IS_WINDOWS) reader.setVariable(LineReader.BLINK_MATCHING_PAREN, 0) // if enabled cursor remains in begin parenthesis (gitbash)
-    println("J")
 
     // complete command registries
     consoleEngine.setLineReader(reader)
     builtins.setLineReader(reader)
     myCommands.setLineReader(reader)
-    println("K")
 
     // widgets and console initialization
     val cmdDesc = (v: CmdLine) => systemRegistry.commandDescription(v)
-    println("KA")
     new TailTipWidgets(reader, cmdDesc.asJava, 5, TipType.COMPLETER)
-    println("KB")
     val keyMap = reader.getKeyMaps.get("main")
-    println("KC")
     keyMap.bind(new Reference(Widgets.TAILTIP_TOGGLE), KeyMap.alt("s"))
-    println("KD")
-    systemRegistry.initialize(Paths.get(root, "init.jline").toFile)
-    println("L")
+    //systemRegistry.initialize(Paths.get(root, "init.jline").toFile)
 
     /*
      * REPL loop
@@ -155,22 +134,23 @@ object REPL {
         var line: String = reader.readLine("oberon-repl> ")
         line = if (parser.getCommand(line).startsWith("!")) line.replaceFirst("!", "! ") else line
 
-        val result: Any = systemRegistry.execute(line)
+        val result: Object = systemRegistry.execute(line)
         consoleEngine.println(result)
       } catch {
         case u: UserInterruptException => // ignore
         case e: EndOfFileException =>
           val pl: String = e.getPartialLine
           if (pl != null) { // execute last line from redirected file (required for Windows)
-            try consoleEngine.println(systemRegistry.execute(pl))
-            catch {
-              case e2: Exception =>
-                systemRegistry.trace(e2)
+            try {
+              val result = systemRegistry.execute(pl)
+              consoleEngine.println(result)
+            } catch {
+              case e2: Exception => systemRegistry.trace(e2) // e2.printStackTrace()
             }
           }
           keepRunning = false
         case e@(_: Exception | _: Error) =>
-          println("ERROR")
+          // e.printStackTrace()
           systemRegistry.trace(e) // print exception and save it to console variable
       }
     }
