@@ -52,13 +52,13 @@ object REPL {
 
     // val file = new File(REPL.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath)
     // val root = file.getCanonicalPath.replace("classes", "").replaceAll("\\\\", "/")
-    val root = workDir().toFile.getCanonicalPath
+    val root = workDir().toFile.getCanonicalPath.replaceAll("\\\\", "/")
     val jnanorcFile = Paths.get(root, DEFAULT_NANORC_FILE).toFile
     if (!jnanorcFile.exists) {
       val fw = new FileWriter(jnanorcFile)
       try {
-        fw.write("theme " + root + "nanorc/dark.nanorctheme\n")
-        fw.write("include " + root + "nanorc/*.nanorc\n")
+        fw.write("theme " + root + "/nanorc/dark.nanorctheme\n")
+        fw.write("include " + root + "/nanorc/*.nanorc\n")
       } finally if (fw != null) fw.close()
     }
 

@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.repl
 
-import br.unb.cic.oberon.ast.{AssignmentStmt, Constant, Expression, IntValue, IntegerType, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, StringValue, Undef, Value, VarAssignment, VarExpression, VariableDeclaration}
+import br.unb.cic.oberon.ast.{ArrayAssignment, AssignmentStmt, Constant, Expression, IntValue, IntegerType, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment, VarExpression, VariableDeclaration}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import br.unb.cic.oberon.parser.ScalaParser
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
@@ -12,6 +12,7 @@ import java.nio.file.Path
 import java.util
 import java.util.Collections
 import scala.jdk.CollectionConverters._
+import scala.runtime.BoxedUnit
 
 class OberonEngine extends ScriptEngine {
   object Format extends Enumeration {
@@ -35,25 +36,13 @@ class OberonEngine extends ScriptEngine {
   override def hasVariable(name: String): Boolean = interpreter.env.lookup(name).isDefined
 
   override def put(name: String, value: Object): Unit = {
-    // println(f"put call ($name = $value)")
-    val valueExpr = value.asInstanceOf[Any] match {
-      case i: Int => IntValue(i)
-      case s: String => StringValue(s)
-      case e: Exception => StringValue(e.getMessage)
-      case e: Expression => e
-      //case _: BoxedUnit => Undef()
-      case default => {
-        println(f"Invalid .put call $name = ${value.toString} (${default.getClass.getSimpleName})")
-        IntValue(0)
-      }
-    }
-
-    Constant(name, valueExpr).accept(interpreter)
+    //println(f"put call ($name = $value)")
+    interpreter.env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
     val variable = interpreter.env.lookup(name)
-    if (variable.isDefined) variable.get.accept(expressionEval) else null
+    if (variable.isDefined) expressionValue(variable.get).asInstanceOf[Object] else null
   }
 
   override def find(name: String): util.Map[String, Object] = {
@@ -86,7 +75,7 @@ class OberonEngine extends ScriptEngine {
    * TODO: implement toJson
    */
   override def toJson(obj: Object): String = {
-    println("toJson call")
+    println("toJson call", obj)
     "TODO: toJson"
   }
 
@@ -94,17 +83,23 @@ class OberonEngine extends ScriptEngine {
    * TODO: implement toString
    */
   override def toString(obj: Object): String = {
-    println("toString call")
-    "TODO: toString"
+    // println("toString call", obj.getClass)
+    obj match {
+      case s: String => s
+      case i: Integer => i.toString
+      case v: Value => v.value.toString
+      case m: util.Map[Object, Object] => "{}"
+      case _ =>
+        if (obj == null) "null"
+        else s"toString not implemented for $obj (${obj.getClass})"
+    }
   }
 
   /*
    * TODO: implement toMap
    */
   override def toMap(obj: Object): util.Map[String, Object] = {
-    println("toMap call")
-    println(obj)
-    println(obj.getClass.getSimpleName)
+    println("toMap call", obj)
     null
   }
 
@@ -151,39 +146,52 @@ class OberonEngine extends ScriptEngine {
    * TODO: improve execute statement
    */
   override def execute(statement: String): Any = {
-    try {
-      val command = ScalaParser.parserREPL(statement)
-      command match {
-        case v: REPLVarDeclaration =>
-          v.declarations.foreach(variable => variable.accept(interpreter))
-        case c: REPLConstant =>
-          c.constants.accept(interpreter)
-          val result = c.constants.exp.accept(expressionEval)
-          result match {
-            case v: Value => return v.value
-            case _: Undef => return
-          }
-          return result
-        case u: REPLUserTypeDeclaration =>
-          u.userTypes.accept(interpreter)
-        case s: REPLStatement =>
-          s.stmt.accept(interpreter)
-        case e: REPLExpression =>
-          val result = e.exp.accept(expressionEval)
-          result match {
-            case v: Value => return v.value
-            case _: Undef => return
-          }
-          return result
-      }
-    }
-    catch {
-      case v: ClassCastException => println("This is an invalid operation: " + v.getMessage)
-      case e: NoSuchElementException => println("A variable is not defined " + e.getMessage)
-      case n: NullPointerException => println("This is an invalid operation")
-      case d: Throwable => println(d)
+    val command = ScalaParser.parserREPL(statement)
+    command match {
+      case v: REPLVarDeclaration =>
+        v.declarations.foreach(variable => variable.accept(interpreter))
+      case c: REPLConstant =>
+        c.constants.accept(interpreter)
+      case u: REPLUserTypeDeclaration =>
+        u.userTypes.accept(interpreter)
+      case s: REPLStatement =>
+        s.stmt match {
+          case AssignmentStmt(des, exp) =>
+            des match {
+              // TODO: Other types of assignment
+              case ArrayAssignment(_, _) => ???
+              case RecordAssignment(_, _) => ???
+              case PointerAssignment(_) => ???
+              case VarAssignment(name) =>
+                put(name, exp)
+            }
+          case s: Statement => interpreter.visit(s)
+        }
+      case e: REPLExpression => return expressionValue(e.exp)
     }
     null
+  }
+
+  private def expressionValue(exp: Expression): Any = {
+    val result = exp.accept(expressionEval)
+    result match {
+      case v: Value => return v.value
+      case _: Undef => return null
+    }
+    exp
+  }
+
+  private def objectToExpression(obj: Object): Expression = {
+    obj.asInstanceOf[Any] match {
+      case i: Int => IntValue(i)
+      case s: String => StringValue(s)
+      case e: Exception => StringValue(e.getMessage)
+      case e: Expression => e.accept(expressionEval)
+      //case _: BoxedUnit => Undef()
+      case _ =>
+        if (obj != null) println(f"Cannot convert $obj to expression")
+        Undef()
+    }
   }
 
   override def execute(closure: Object, args: Object*): Object = ???

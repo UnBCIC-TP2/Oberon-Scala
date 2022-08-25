@@ -262,7 +262,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case StringValue(v) => StringValue(v)
     case NullValue => NullValue
     case Undef() => Undef()
-    case VarExpression(name) => interpreter.env.lookup(name).get
+    case VarExpression(name) =>
+      val variable = interpreter.env.lookup(name)
+      if (variable.isEmpty) throw new NoSuchElementException(f"Variable $name is not defined")
+      interpreter.env.lookup(name).get
     case ArraySubscript(a, i) => visitArraySubscriptExpression(ArraySubscript(a, i))
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)

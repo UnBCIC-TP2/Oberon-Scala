@@ -1,9 +1,9 @@
 package br.unb.cic.oberon.repl
 
 import org.jline.reader.Parser.ParseContext
-import org.jline.reader.{CompletingParsedLine, ParsedLine, Parser}
+import org.jline.reader.{CompletingParsedLine, EOFError, ParsedLine, Parser}
 
-import scala.collection.mutable.{StringBuilder, ListBuffer}
+import scala.collection.mutable.{ListBuffer, StringBuilder}
 import scala.jdk.CollectionConverters._
 
 class REPLParser extends Parser {
@@ -27,7 +27,9 @@ class REPLParser extends Parser {
         rawWordLength = handleDelimiterAndGetRawWordLength(current, words, rawWordStart, rawWordCursor, rawWordLength, i)
         rawWordStart = i + 1
       } else {
-        current += line.charAt(i)
+        if (!isEscapeChar(line, i) || context == ParseContext.SPLIT_LINE) {
+          current += line.charAt(i)
+        }
       }
     }
 
@@ -44,6 +46,9 @@ class REPLParser extends Parser {
     }
 
     if ((context != ParseContext.COMPLETE) && (context != ParseContext.SPLIT_LINE)) {
+      if (isEscapeChar(line, line.length() - 1)) {
+        throw new EOFError(-1, -1, "Escaped new line", "newline");
+      }
       // TODO: throw EOF errors
     }
 
@@ -60,6 +65,10 @@ class REPLParser extends Parser {
   }
 
   def isDelimiter(buffer: CharSequence, pos: Int): Boolean = Character.isWhitespace(buffer.charAt(pos))
+  def isEscapeChar(buffer: CharSequence, pos: Int): Boolean = {
+    if (pos < 0) false
+    else isEscapeChar(buffer.charAt(pos))
+  }
 
   class ArgumentList(line: String, words: List[String], wordIndex: Int, wordCursor: Int, cursor: Int, rawWordCursor: Int, rawWordLength: Int) extends ParsedLine with CompletingParsedLine {
     override def word(): String = words(wordIndex)

@@ -255,7 +255,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
           return engine.get(trimmedLine)
         } else if (parser.getVariable(trimmedLine) == null) {
           val out = engine.execute(trimmedLine)
-          engine.put("_", out.asInstanceOf[Object])
+          engine.put("r_", out.asInstanceOf[Object])
           return out.asInstanceOf[Object]
         } else {
           engine.execute(trimmedLine)
@@ -318,7 +318,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     } else {
       val _result = if(result == null) _output else result
       val status = saveResult(consoleVar, _result)
-      new ExecutionResult(status, if(consoleVar != null && !consoleVar.startsWith("_")) null else _result)
+      new ExecutionResult(status, if(consoleVar != null && !consoleVar.startsWith("r_")) null else _result)
     }
   }
 
@@ -333,7 +333,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
       status = saveResult(consoleVar, result)
       out = null
     } else if (!parser.getCommand(line).equals("show")) {
-      status = if (result != null) saveResult("_", result) else 1
+      status = if (result != null) saveResult("r_", result) else 1
     }
     new ExecutionResult(status, out)
   }
@@ -401,6 +401,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     } else if (level > 1 && className == "CommandData") {
       toPrint = obj.toString
     }
+    // if (obj.isInstanceOf[Exception]) obj.asInstanceOf[Exception].printStackTrace()
     printer.println(options, toPrint)
   }
 
@@ -411,7 +412,11 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   }
 
   override def println(obj: Object): Unit = {
-    printer.println(obj)
+    val options = Map[String, Object](
+      Printer.VALUE_STYLE -> "GRON",
+      Printer.BORDER -> "|"
+    )
+    printer.println(options.asJava, obj)
   }
 
   override def persist(file: Path, obj: Object): Unit = engine.persist(file, obj)
@@ -496,8 +501,12 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     def this(command: String, cmdLine: String, args: Array[String]) {
       // if (!parser.validCommandName(command)) throw new IllegalArgumentException("Invalid command name!")
       this(ScriptFile.getScriptCommandFile(command), cmdLine, args, false)
-      setScriptExtension(command)
-      doArgs(args)
+      try {
+        setScriptExtension(command)
+        doArgs(args)
+      } catch {
+        case e: Exception => // ignore
+      }
     }
 
     def this(script: File, cmdLine: String, args: Array[String]) {
@@ -509,7 +518,6 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
 
     def setScriptExtension(command: String): Unit = {
       extension = if (command.contains(".")) command.substring(command.lastIndexOf(".") + 1) else ""
-      System.out.println(command, extension, engine.getExtensions)
       if (!isEngineScript && !isConsoleScript) {
         throw new IllegalArgumentException("Command not found: " + command)
       }
@@ -591,7 +599,6 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     }
 
     private def internalExecute(): Unit = {
-      System.out.println(extension, isEngineScript, engine.getExtensions)
       if (isEngineScript) {
         result = engine.execute(script, expandParameters(args))
       } else if (isConsoleScript) {
@@ -638,7 +645,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
               case s: SyntaxError => throw s
               case f: EndOfFileException =>
                 done = true
-                result = engine.get("_return")
+                result = engine.get("r_")
                 postProcess(cmdLine, result)
                 break
               case e: Exception =>
