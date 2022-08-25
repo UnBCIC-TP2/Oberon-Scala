@@ -4,11 +4,18 @@ This is an implementation of the Oberon language in Scala.
 
 ## Requirements to run the project
 
-Automated Installation Script:
-- Linux (ubuntu): ``sh install.sh``
-- Windows: (the first line is needed to run a remote script the first time)
-``Set-ExecutionPolicy RemoteSigned -Scope CurrentUser``
-``.\install.ps1``
+**Automated Installation Script:**
+- Linux (ubuntu): 
+```
+sh install.sh
+```
+- Windows (powershell):
+
+*PS: The first line is needed to run a remote script the first time*
+```
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser 
+.\install.ps1
+```
 
 ## Compiling and Testing
 
