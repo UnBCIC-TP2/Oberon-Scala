@@ -736,6 +736,66 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
+  test(testName = "Testing bee2057: Sample Test 1"){
+    val module = ScalaParser.parseResource("stmts/bee2057_stmt01.oberon")
+
+    assert(module.name == "bee2057")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(20)))
+  }
+
+  test(testName = "Testing bee2057: Sample Test 2"){
+    val module = ScalaParser.parseResource("stmts/bee2057_stmt02.oberon")
+
+    assert(module.name == "bee2057")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(2)))
+  }
+
+  test(testName = "Testing bee2057: Sample Test 3"){
+    val module = ScalaParser.parseResource("stmts/bee2057_stmt03.oberon")
+
+    assert(module.name == "bee2057")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(23)))
+  }
+
+  test(testName = "Testing bee2779: Sample Test 1"){
+    val module = ScalaParser.parseResource("stmts/bee2779_stmt01.oberon")
+
+    assert(module.name == "bee2779")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(7)))
+  }
+
+  test(testName = "Testing bee2779: Sample Test 2"){
+    val module = ScalaParser.parseResource("stmts/bee2779_stmt02.oberon")
+
+    assert(module.name == "bee2779")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(3)))
+  }
+
+  test(testName = "Testing bee2779: Sample Test 3"){
+    val module = ScalaParser.parseResource("stmts/bee2779_stmt03.oberon")
+
+    assert(module.name == "bee2779")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("answer") == Some(IntValue(0)))
+  }
+
   def evalArraySubscript(name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
 }
