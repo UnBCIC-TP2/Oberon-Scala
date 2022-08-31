@@ -141,9 +141,9 @@ class FInterpreter extends OberonVisitorAdapter {
              values.foreach(value => {
                  env.setVariable(v, evalExpression(value))
                  stmt.accept(this)
-//               val assignment = AssignmentStmt(VarAssignment(v), value)
-//               val stmts = SequenceStmt(List(assignment, stmt))
-//               stmts.accept(this)
+                // val assignment = AssignmentStmt(VarAssignment(v), value)
+                // val stmts = SequenceStmt(List(assignment, stmt))
+                // stmts.accept(this)
              })
            }
 
@@ -245,45 +245,47 @@ class FInterpreter extends OberonVisitorAdapter {
 
 
     def fEval(exp : Expression) : Expression = exp match {
-        case Brackets(expression) => fEval(expression)
-        case IntValue(v) => IntValue(v)
-        case RealValue(v) => RealValue(v)
-        case CharValue(v) => CharValue(v)
-        case BoolValue(v) => BoolValue(v)
-        case StringValue(v) => StringValue(v)
-        case NullValue => NullValue
-        case Undef() => Undef()
-        case VarExpression(name) => env.lookup(name).get
-        case ArraySubscript(a, i) => evalArraySubscriptExpression(a, i)
-        case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
-        case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
-        case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
-        case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
-        case ModExpression(left, right) => modularExpression(left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
-        case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
-        case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
-        case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
-        case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
-        case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
-        case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
-        case NotExpression(exp) => BoolValue(!fEval(exp).asInstanceOf[Value].value.asInstanceOf[Boolean])
-        case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
-        case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
-        case FunctionCallExpression(name, args) => {
+      case Brackets(expression) => fEval(expression)
+      case IntValue(v) => IntValue(v)
+      case RealValue(v) => RealValue(v)
+      case CharValue(v) => CharValue(v)
+      case BoolValue(v) => BoolValue(v)
+      case StringValue(v) => StringValue(v)
+      case NullValue => NullValue
+      case Undef() => Undef()
+      case VarExpression(name) => env.lookup(name).get
+      case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i))
+      case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
+      case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
+      case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
+      case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
+      case ModExpression(left, right) => modularExpression(left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
+      case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
+      case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
+      case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
+      case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
+      case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
+      case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+      case NotExpression(exp) => BoolValue(!fEval(exp).asInstanceOf[Value].value.asInstanceOf[Boolean])
+      case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
+      case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
+      case FunctionCallExpression(name, args) => {
         val res = evalFunctionCall(name, args)
         res
-        }
+      }
 
         //TODO FieldAccessExpression
         //TODO PointerAccessExpression
     }
 
-    def evalArraySubscriptExpression(array : Expression, idx : Expression): Expression = {
-        (array, idx) match {
-        case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
-        case _ => throw new RuntimeException
+    def evalArraySubscriptExpression(arraySubscript: ArraySubscript): Expression = {
+        
+        (fEval(arraySubscript.arrayBase), fEval(arraySubscript.index)) match {
+          case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
+          case _ => throw new RuntimeException
         }
     }
+
     def evalFunctionCall(name: String, args: List[Expression]): Expression = {
         callProcedure(name, args)
         val returnValue = env.lookup(Values.ReturnKeyWord)

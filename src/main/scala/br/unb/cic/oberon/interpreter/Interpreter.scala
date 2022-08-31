@@ -359,5 +359,5 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
 class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}
 
 class NullByteArrayOutputStream extends ByteArrayOutputStream {
-  override def writeTo(o: OutputStream) {}
+  override def writeTo(o: OutputStream) = {}
 }
