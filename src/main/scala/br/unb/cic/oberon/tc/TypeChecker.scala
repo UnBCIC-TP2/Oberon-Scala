@@ -3,6 +3,7 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import scala.collection.mutable.ListBuffer
 
 class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorAdapter {
   type T = Option[Type]
