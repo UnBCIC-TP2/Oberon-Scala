@@ -4,7 +4,7 @@ VAR
   a: INTEGER;
   b: INTEGER;
   c: INTEGER;
-
+ 
 PROCEDURE inc(VAR x: INTEGER);
     BEGIN
         x := x + 1
