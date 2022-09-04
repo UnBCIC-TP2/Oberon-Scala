@@ -689,6 +689,15 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("s") == Some(IntValue(6)))
   }
 
+test("Testing ArrayInitializationStmt02"){
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt02.oberon")
+    assert(module.name == "ArrayInitializationStmt02")
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("dogsBirthday").isDefined)
+    assert(interpreter.env.lookup("monthlyExpensesPerWeek").isDefined)
+    assert(interpreter.env.lookup("totalPointer").isDefined)
+    print(interpreter.env.lookup("dogsBirthday"))  
+}
 
   def evalArraySubscript(name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
