@@ -2,7 +2,7 @@ MODULE SimpleModule;
 
 VAR
   y : REAL;
-  x : LONGREAL;
+  x : REAL;
 BEGIN
     y := 13.5;
     x := 13.000000005;
