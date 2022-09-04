@@ -318,8 +318,10 @@ class TypeChecker extends OberonVisitorAdapter {
       varType match {
         case ArrayType(length, baseType) =>
           currentLevelStack.append(length)
-          if(baseType == ArrayType) visitDeclarationRelatedToSimpleArrayDesignator(baseType, fieldStack, arrayLevel, currentLevelStack)
-          else (Some(baseType), arrayLevel, currentLevelStack)
+          baseType match {
+            case ArrayType(_,_) => visitDeclarationRelatedToSimpleArrayDesignator(baseType, fieldStack, arrayLevel, currentLevelStack)
+            case _ => (Some(baseType), arrayLevel, currentLevelStack)
+          }
         case PointerType(variableType) =>
           visitDeclarationRelatedToSimpleArrayDesignator(variableType, fieldStack, arrayLevel, currentLevelStack)
         case RecordType(variables) =>
