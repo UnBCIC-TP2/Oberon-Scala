@@ -162,6 +162,8 @@ case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class SimpleArrayValue(value: ListBuffer[Expression]) extends Expression
+case class FieldValue(name: String, value: Expression) extends Expression
+case class RecordValue(value: ListBuffer[FieldValue]) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
