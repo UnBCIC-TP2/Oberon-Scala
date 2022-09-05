@@ -37,13 +37,13 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case LTEExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType), BooleanType)
     case AddExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmethicBinExpressionType(left, right)
     case SubExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmethicBinExpressionType(left, right)
     case MultExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmethicBinExpressionType(left, right)
     case DivExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmethicBinExpressionType(left, right)
     case AndExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
@@ -129,6 +129,21 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     val t2 = right.accept(this)
     if(t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result) else None
   }
+
+  def computeArithmethicBinExpressionType[A](left: Expression, right: Expression) : Option[Type] = {
+    val t1 = left.accept(this).getOrElse()
+    val t2 = right.accept(this).getOrElse()
+    
+    if(t1 == IntegerType && t2 == IntegerType) Some(IntegerType)
+
+    else if(t1 == RealType && t2 == RealType    ||
+            t1 == RealType && t2 == IntegerType ||
+            t1 == IntegerType && t2 == RealType) 
+            Some(RealType)
+    
+    else None
+  }
+
 }
 
 class TypeChecker extends OberonVisitorAdapter {

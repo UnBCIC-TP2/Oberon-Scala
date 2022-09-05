@@ -1,0 +1,15 @@
+MODULE pointer;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  sum : INTEGER;
+
+BEGIN
+    x := 10;
+    y := 20;
+    sum := x + 78
+    
+END
+
+END pointer.

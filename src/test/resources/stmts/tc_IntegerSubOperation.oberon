@@ -1,0 +1,15 @@
+MODULE pointer;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  sub : INTEGER;
+
+BEGIN
+    x := 10;
+    y := 20;
+    sub := x - 78
+    
+END
+
+END pointer.

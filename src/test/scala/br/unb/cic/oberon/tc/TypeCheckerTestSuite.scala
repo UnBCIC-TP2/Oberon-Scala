@@ -1388,4 +1388,46 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     assert(arrayAssigment.accept(visitor) == List())
   }
+
+  //Arithmethic Operations
+
+  
+  //Sum Operations
+  
+  test("Test Integer arithmetic Sum operation") {
+    val module = ScalaParser.parseResource("stmts/tc_IntegerSumOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+
+  //Sum tests with reals
+  //Sum tests with reals and integers
+
+  //Sub Operations
+
+  test("Test Integer arithmetic Sub operation") {
+    val module = ScalaParser.parseResource("stmts/tc_IntegerSubOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  //Sub tests between reals
+  //Sub tests between reals and integers
+
+  //Div
+  //Div tests between integers
+  //Div tests between integers
+  //Div tests between reals
+  
+  //Mult
+  //Mult tests between reals
+  //Mult tests between integers and reals
+  //Mult tests between integers and reals
+  
+
 }
