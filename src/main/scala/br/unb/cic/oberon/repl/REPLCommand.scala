@@ -49,7 +49,6 @@ class REPLCommand(commands: Option[Array[Commands.REPL]], engine: OberonEngine, 
     val option = if (idx < 0) "--info" else input.args()(idx)
     if (option == "-?" || option == "--help") {
       printer.println(helpDesc(Commands.REPL.INSPECT))
-      null
     }
 
     var id = 0

@@ -255,7 +255,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
           return engine.get(trimmedLine)
         } else if (parser.getVariable(trimmedLine) == null) {
           val out = engine.execute(trimmedLine)
-          engine.put("r_", out.asInstanceOf[Object])
+          engine.put("it", out.asInstanceOf[Object])
           return out.asInstanceOf[Object]
         } else {
           engine.execute(trimmedLine)
@@ -318,7 +318,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     } else {
       val _result = if(result == null) _output else result
       val status = saveResult(consoleVar, _result)
-      new ExecutionResult(status, if(consoleVar != null && !consoleVar.startsWith("r_")) null else _result)
+      new ExecutionResult(status, if(consoleVar != null && !consoleVar.startsWith("_")) null else _result)
     }
   }
 
@@ -333,7 +333,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
       status = saveResult(consoleVar, result)
       out = null
     } else if (!parser.getCommand(line).equals("show")) {
-      status = if (result != null) saveResult("r_", result) else 1
+      status = if (result != null) saveResult("it", result) else 1
     }
     new ExecutionResult(status, out)
   }
@@ -645,7 +645,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
               case s: SyntaxError => throw s
               case f: EndOfFileException =>
                 done = true
-                result = engine.get("r_")
+                result = engine.get("it")
                 postProcess(cmdLine, result)
                 break
               case e: Exception =>

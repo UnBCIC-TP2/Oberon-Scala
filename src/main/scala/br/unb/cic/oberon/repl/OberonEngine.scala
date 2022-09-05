@@ -1,18 +1,21 @@
 package br.unb.cic.oberon.repl
 
-import br.unb.cic.oberon.ast.{ArrayAssignment, AssignmentStmt, Constant, Expression, IntValue, IntegerType, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment, VarExpression, VariableDeclaration}
+import br.unb.cic.oberon.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.transformations.CoreVisitor
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
 import org.jline.reader.impl.completer.AggregateCompleter
 
+import java.lang
 import java.io.File
 import java.nio.file.Path
 import java.util
 import java.util.Collections
+import scala.io.Source
 import scala.jdk.CollectionConverters._
-import scala.runtime.BoxedUnit
+import scala.util.matching.Regex
 
 class OberonEngine extends ScriptEngine {
   object Format extends Enumeration {
@@ -22,6 +25,7 @@ class OberonEngine extends ScriptEngine {
 
   val interpreter = new Interpreter
   val expressionEval = new EvalExpressionVisitor(interpreter)
+  val coreVisitor = new CoreVisitor()
 
   override def getEngineName: String = this.getClass.getSimpleName
   override def getExtensions: java.util.List[String] = Collections.singletonList("oberon")
@@ -48,10 +52,10 @@ class OberonEngine extends ScriptEngine {
   override def find(name: String): util.Map[String, Object] = {
     if (name == null) {
       val allVariables = interpreter.env.allVariables()
-      (allVariables zip allVariables.map(v => get(v))).toMap.asJava
+      allVariables.map(v => v -> get(v)).toMap.asJava
     } else {
       val filteredVariables = internalFind(name)
-      (filteredVariables zip filteredVariables.map(v => get(v))).toMap.asJava
+      filteredVariables.map(v => v -> get(v)).toMap.asJava
     }
   }
 
@@ -87,6 +91,7 @@ class OberonEngine extends ScriptEngine {
     obj match {
       case s: String => s
       case i: Integer => i.toString
+      case b: lang.Boolean => b.toString
       case v: Value => v.value.toString
       case m: util.Map[Object, Object] => "{}"
       case _ =>
@@ -139,6 +144,16 @@ class OberonEngine extends ScriptEngine {
    * TODO: execute file with arguments (replace $1, $2, ... with parameters values)
    */
   override def execute(script: File, args: Array[Object]): Object = {
+    val i = Source.fromFile(script)
+    val content = i.getLines().mkString("\n")
+    i.close()
+
+    val pattern: Regex = "\\$(\\d+)".r
+    val module = ScalaParser.parse(pattern.replaceAllIn(content, m => expressionValue(objectToExpression(args(m.group(1).toInt - 1))).toString))
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+
     null
   }
 
@@ -165,7 +180,7 @@ class OberonEngine extends ScriptEngine {
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => interpreter.visit(s)
+          case s: Statement => interpreter.visit(coreVisitor.visit(s))
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }
@@ -185,6 +200,7 @@ class OberonEngine extends ScriptEngine {
     obj.asInstanceOf[Any] match {
       case i: Int => IntValue(i)
       case s: String => StringValue(s)
+      case b: Boolean => BoolValue(b)
       case e: Exception => StringValue(e.getMessage)
       case e: Expression => e.accept(expressionEval)
       //case _: BoxedUnit => Undef()
