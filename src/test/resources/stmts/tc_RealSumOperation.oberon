@@ -1,0 +1,15 @@
+MODULE SumOperation;
+
+VAR
+  x : REAL;
+  y : REAL;
+  sum : REAL;
+
+BEGIN
+    x := 10.5;
+    y := 20.5;
+    sum := x + y
+    
+END
+
+END SumOperation.

@@ -1,0 +1,15 @@
+MODULE MultOperation;
+
+VAR
+  x : REAL;
+  y : REAL;
+  mult : REAL;
+
+BEGIN
+    x := 10.0;
+    y := 10.0;
+    mult := x * y
+    
+END
+
+END MultOperation.

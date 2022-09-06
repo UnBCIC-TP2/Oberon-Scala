@@ -1,4 +1,4 @@
-MODULE pointer;
+MODULE SumOperation;
 
 VAR
   x : INTEGER;
@@ -12,4 +12,4 @@ BEGIN
     
 END
 
-END pointer.
+END SumOperation.

@@ -1,4 +1,4 @@
-MODULE pointer;
+MODULE SubOperation;
 
 VAR
   x : INTEGER;
@@ -12,4 +12,4 @@ BEGIN
     
 END
 
-END pointer.
+END SubOperation.

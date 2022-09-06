@@ -1389,11 +1389,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(arrayAssigment.accept(visitor) == List())
   }
 
-  //Arithmethic Operations
+  // Arithmethic Operations
 
-  
-  //Sum Operations
-  
+  // Sum test with integers
   test("Test Integer arithmetic Sum operation") {
     val module = ScalaParser.parseResource("stmts/tc_IntegerSumOperation.oberon")
     val visitor = new TypeChecker()
@@ -1403,11 +1401,26 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
 
-  //Sum tests with reals
-  //Sum tests with reals and integers
+  // Sum test with reals
+  test("Test Real Sum operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealSumOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
 
-  //Sub Operations
+    assert(errors.size == 0)
+  }
 
+  // Sum test with reals and integers
+  test("Test Real and Integer arithmetic Sum operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealIntegerSumOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+
+  // Sub teste with integers
   test("Test Integer arithmetic Sub operation") {
     val module = ScalaParser.parseResource("stmts/tc_IntegerSubOperation.oberon")
     val visitor = new TypeChecker()
@@ -1416,18 +1429,57 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(errors.size == 0)
   }
 
-  //Sub tests between reals
-  //Sub tests between reals and integers
+  // Sub test between reals
+  test("Test Real Sub operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealSubOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
 
-  //Div
-  //Div tests between integers
-  //Div tests between integers
-  //Div tests between reals
-  
-  //Mult
-  //Mult tests between reals
-  //Mult tests between integers and reals
-  //Mult tests between integers and reals
-  
+    assert(errors.size == 0)
+  }
 
+  // Sub test between reals and integers
+  test("Test Real and Integer arithmetic Sub operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealIntegerSubOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  // Div test between integers
+  test("Test Integer arithmetic Div operation") {
+    val module = ScalaParser.parseResource("stmts/tc_IntegerDivOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  // Div test between reals
+  test("Test Real Div operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealDivOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+  // Mult test between reals
+  test("Test Real Mult operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealMultOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  // Mult test between integers and reals
+  test("Test Real and Integer arithmetic Mult operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealIntegerMultOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
 }
