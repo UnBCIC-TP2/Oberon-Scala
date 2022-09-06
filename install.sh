@@ -1,7 +1,14 @@
 #! /bin/bash
 
-# Remove any previous version of sdkman
-sudo rm -rf ~/.sdkman
+# Check if user wants to clear sdkman previous versions
+echo "[CUIDADO] Deseja limpar qualquer versão prévia do SDKMAN?"
+read -p "Recomendado para uma instalação limpa [y/N]? " choose
+
+# If yes, remove any previous version of sdkman
+if [ "$choose" = "y" ] || [ "$choose" = "Y" ]; 
+then 
+    sudo rm -rf ~/.sdkman 
+fi
 
 # Update or install the basic requirements
 sudo apt install bash zip unzip curl -y
