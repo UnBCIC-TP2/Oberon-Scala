@@ -7,7 +7,14 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class FEvalTest extends AnyFunSuite {
 
+
+  
+  def deltaAssert(v1 : Expression, v2 : Double, delta : Double) = {
+    assert((v1.asInstanceOf[RealValue].value - v2).abs < delta)
+  }
+
   val interpreter = new FInterpreter
+  val delta = 0.0000000000001
 
   test("Test eval on simple values") {
     val val10 = IntValue(10)
@@ -66,6 +73,161 @@ class FEvalTest extends AnyFunSuite {
     assert(interpreter.fEval(exp) == IntValue(40))
   }
 
+  test("Test eval on 0 sum") {
+    val val0 = IntValue(0)
+
+    val exp = AddExpression(val0, val0)
+
+    assert(interpreter.fEval(exp) == IntValue(0))
+  }
+
+  test("Test eval on Sum over 2Bytes Unsigned") {
+    val x = IntValue(32753)
+    val y = IntValue(32783)
+
+    val exp = AddExpression(x, y)
+
+    assert(interpreter.fEval(exp) == IntValue(65536))
+  }
+
+
+  test("Test eval on Sum of Negative Values") {
+    val x = IntValue(-10)
+
+    val exp = AddExpression(x, x)
+
+    assert(interpreter.fEval(exp) == IntValue(-20))
+  }
+
+  test("Test eval on Sum of Negative and Positive Values") {
+    val x = IntValue(-10)
+    val y = IntValue(10)
+
+    val exp = AddExpression(x, y)
+
+    assert(interpreter.fEval(exp) == IntValue(0))
+  }
+  test("Test eval on Sum of Real Values") {
+    val x = RealValue(5.1)
+    val y = RealValue(10.9)
+
+    val exp = AddExpression(x, y)
+
+    assert((interpreter.fEval(exp).asInstanceOf[RealValue].value - (16)).abs < delta)
+  }
+
+  test("Multiplication with 0 and a Integer") {
+    val x = IntValue(0)
+    val y = IntValue(10)
+
+    val exp = MultExpression(x, y)
+
+    assert(interpreter.fEval(exp) == IntValue(0))
+  }
+
+  test("Multiplication with Negative Number") {
+    val x = IntValue(10)
+    val y = IntValue(-5)
+
+    val exp = MultExpression(x, y)
+
+    assert(interpreter.fEval(exp) == IntValue(-50))
+  }
+
+  test("Multiplication with just 0s") {
+    val x = IntValue(0)
+
+    val exp = MultExpression(x, x)
+
+    assert(interpreter.fEval(exp) == IntValue(0))
+  }
+  test("Multiplication with Sum") {
+    val x = IntValue(10)
+    val y = IntValue(4)
+
+    val exp = AddExpression(y, MultExpression(x, x))
+
+    assert(interpreter.fEval(exp) == IntValue(104))
+  }
+  test("Sum of Real Values") {
+    val x = RealValue(15.2)
+    val y = RealValue(4.9)
+
+    val exp = AddExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), 20.1, delta)
+  }
+
+  test("Sum of Real Value with Negative Real Value - 1") {
+    val x = RealValue(18.7)
+    val y = RealValue(-2.91)
+
+    val exp = AddExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), 15.79, delta)
+  }
+
+ test("Sum of Real Value with Negative Real Value - 2") {
+   val x = RealValue(-4.9)
+   val y = RealValue(4)
+
+   val exp = AddExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), -0.9, delta)
+ }
+
+ test("Sum of Negative Real Values") {
+   val x = RealValue(-6.2)
+   val y = RealValue(-203.7)
+
+   val exp = AddExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), -209.9, delta)
+ }
+
+  test("Sum of Real and Integer Values") {
+    val x = RealValue(0.0)
+    val y = IntValue(4)
+
+    val exp = AddExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), 4, delta)
+  }
+
+  test("Multiplication of Real Positive Values") {
+    val x = RealValue(2.3)
+    val y = RealValue(9.13)
+
+    val exp = MultExpression(x, y)
+
+    deltaAssert(interpreter.fEval(exp), 20.999, delta)
+  }
+
+ test("Multiplication of Real Positive and Real Negative Values") {
+   val x = RealValue(4.6)
+   val y = RealValue(-13.5)
+
+   val exp = MultExpression(x, y)
+
+   deltaAssert(interpreter.fEval(exp), -62.1, delta)
+ }
+
+ test("Multiplication of Real and Integer Values") {
+   val x = RealValue(3.7)
+   val y = IntValue(9)
+
+   val exp = MultExpression(x, y)
+
+   deltaAssert(interpreter.fEval(exp), 33.3, delta)
+ }
+
+  test("Multiplication of Real Negative Values") {
+    val x = RealValue(-14.5)
+    val y = RealValue(-0.9835)
+
+    val exp = MultExpression(x, y)
+    
+    deltaAssert(interpreter.fEval(exp), 14.26075, delta)
+  }
   // TODO: Write test cases  dealing with different scopes and name collision.
 }
-
