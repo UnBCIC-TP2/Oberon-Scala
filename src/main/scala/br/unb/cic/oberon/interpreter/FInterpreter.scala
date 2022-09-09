@@ -244,7 +244,7 @@ class FInterpreter extends OberonVisitorAdapter {
   }
 
 
-    def fEval(exp : Expression) : Expression = exp match {
+    def fEval(exp : Expression/*, environ : Environment*/) : Expression = exp match {
       case Brackets(expression) => fEval(expression)
       case IntValue(v) => IntValue(v)
       case RealValue(v) => RealValue(v)
@@ -253,7 +253,7 @@ class FInterpreter extends OberonVisitorAdapter {
       case StringValue(v) => StringValue(v)
       case NullValue => NullValue
       case Undef() => Undef()
-      case VarExpression(name) => env.lookup(name).get
+      case VarExpression(name) => env/*iron*/.lookup(name).get
       case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i))
       case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
       case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
