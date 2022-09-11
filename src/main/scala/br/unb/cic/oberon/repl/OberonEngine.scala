@@ -6,7 +6,7 @@ import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
-import org.jline.reader.impl.completer.AggregateCompleter
+import org.jline.reader.impl.completer.{AggregateCompleter, StringsCompleter}
 
 import java.lang
 import java.io.File
@@ -33,8 +33,20 @@ class OberonEngine extends ScriptEngine {
   /*
    * TODO: implement script completer
    */
-  override def getScriptCompleter: Completer = {
-    new AggregateCompleter()
+  override def getScriptCompleter: Completer = {compileCompleter}
+
+  private def compileCompleter : Completer = {
+    // Exemplo de completer: 
+    val candidates1 = List("memes", "tipos" ).asJava
+    val comp1 = new StringsCompleter(candidates1)
+
+    // Outro exemplo de completer: 
+    val candidates2 = List("de", "carinha").asJava
+    val comp2 = new StringsCompleter(candidates2)
+
+    // Juntando os completers
+    val  completer = new AggregateCompleter(comp1, comp2)
+    return completer
   }
 
   override def hasVariable(name: String): Boolean = interpreter.env.lookup(name).isDefined
