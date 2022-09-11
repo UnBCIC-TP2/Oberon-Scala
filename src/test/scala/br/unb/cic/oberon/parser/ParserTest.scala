@@ -2268,7 +2268,7 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }
 
- test(testName = "Testing the module ArrayInitializationStmt01"){
+  test(testName = "Testing the module ArrayInitializationStmt01"){
     val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt01.oberon")
     assert(module.name == "ArrayInitializationStmt01")
     assert(module.stmt.isDefined)
@@ -2321,5 +2321,44 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }	
 	
+  test(testName = "Testing the module ArrayInitializationStmt03"){
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt03.oberon")
+    assert(module.name == "ArrayInitialization")
+    assert(module.stmt.isDefined)
+
+    module.stmt.get match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("2 statements expected")
+    }
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+
+    // List(
+    //   AssignmentStmt(
+    //     VarAssignment(myProfileArray), 
+    //     SimpleArrayValue(
+    //       ListBuffer(
+    //         SimpleArrayValue(
+    //           ListBuffer(StringValue(Peter), StringValue(Parker))
+    //         ), 
+    //         IntValue(22), 
+    //         RealValue(1.7999999523162842)
+    //       )
+    //     )
+    //   ), 
+    //   WriteStmt(
+    //     ArraySubscript(
+    //       VarExpression(myProfileArray), 
+    //       IntValue(2)
+    //     )
+    //   )
+    // )
+
+    assert(stmts(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[SimpleArrayValue].value(0).asInstanceOf[SimpleArrayValue].value(1).asInstanceOf[Value].value == "Parker")
+    assert(stmts(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[SimpleArrayValue].value(0).asInstanceOf[SimpleArrayValue].value(1).asInstanceOf[Value].value == "Parker")
+    assert(stmts(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[SimpleArrayValue].value(1).asInstanceOf[Value].value == 22)
+    assert(stmts(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[SimpleArrayValue].value(2).asInstanceOf[Value].value == 1.7999999523162842)
+  }
 }
 
