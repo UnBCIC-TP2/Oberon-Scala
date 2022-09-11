@@ -125,7 +125,7 @@ object REPL {
     /*
      * REPL loop
      */
-    println(terminal.getName + ": " + terminal.getType)
+
     var keepRunning = true
     while (keepRunning) {
       try {
@@ -136,6 +136,7 @@ object REPL {
 
         val result: Object = systemRegistry.execute(line)
         consoleEngine.println(result)
+
       } catch {
         case u: UserInterruptException => // ignore
         case e: EndOfFileException =>
