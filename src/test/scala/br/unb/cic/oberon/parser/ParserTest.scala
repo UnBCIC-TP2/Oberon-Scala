@@ -2323,7 +2323,7 @@ class ParserTestSuite extends AbstractTestSuite {
 	
   test(testName = "Testing the module ArrayInitializationStmt03"){
     val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt03.oberon")
-    assert(module.name == "ArrayInitialization")
+    assert(module.name == "ArrayInitializationStmt03")
     assert(module.stmt.isDefined)
 
     module.stmt.get match {

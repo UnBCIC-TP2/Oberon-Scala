@@ -1,4 +1,4 @@
-MODULE ArrayInitialization;
+MODULE ArrayInitializationStmt03;
 
 TYPE
   Profile = RECORD

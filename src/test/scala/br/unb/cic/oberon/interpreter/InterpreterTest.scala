@@ -699,6 +699,14 @@ test("Testing ArrayInitializationStmt02"){
     print(interpreter.env.lookup("dogsBirthday"))  
 }
 
+test("Testing ArrayInitializationStmt03"){
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt03.oberon")
+    assert(module.name == "ArrayInitializationStmt03")
+    module.accept(interpreter)
+    assert(interpreter.env.lookup("myProfileArray").isDefined)
+    assert(evalArraySubscript("myProfileArray", 1) == IntValue(22))
+}
+
   def evalArraySubscript(name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
 }
