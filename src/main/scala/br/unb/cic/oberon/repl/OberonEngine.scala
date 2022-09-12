@@ -252,7 +252,7 @@ class OberonEngine extends ScriptEngine {
       val pref = wordbuffer.substring(0, idx+len)
       val variables = inspector.getVariables()
       for(v <- variables){
-        candidates.add(new Candidate(AttributedString.stripAnsi(pref + v), v, null, null, null, null, true));
+        candidates.add(new Candidate(AttributedString.stripAnsi(pref + v), v, null, null, null, null, false));
       }
     }
   }
