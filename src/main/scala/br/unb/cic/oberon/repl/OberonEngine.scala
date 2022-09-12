@@ -236,9 +236,23 @@ class OberonEngine extends ScriptEngine {
     def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
       assert(commandLine != null)
       assert(candidates != null)
+      val wordbuffer = commandLine.word()
+      val buffer = commandLine.line.substring(0, commandLine.cursor())
+
+      var idx = -1
+      var len = 1
+      try {
+        len = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).toList.last.toString.size
+        idx = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).map(_.start).toList.last
+      }
+      catch{
+        case e: java.util.NoSuchElementException => {}
+      }
+
+      val pref = wordbuffer.substring(0, idx+len)
       val variables = inspector.getVariables()
       for(v <- variables){
-        candidates.add(new Candidate(AttributedString.stripAnsi(v), v, null, null, null, null, true));
+        candidates.add(new Candidate(AttributedString.stripAnsi(pref + v), v, null, null, null, null, true));
       }
     }
   }
