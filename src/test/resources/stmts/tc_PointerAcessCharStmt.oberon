@@ -1,0 +1,10 @@
+MODULE pointerchar;
+
+VAR
+  p : POINTER TO CHAR;
+
+BEGIN
+    p^ := 'a'
+END
+
+END pointerchar.

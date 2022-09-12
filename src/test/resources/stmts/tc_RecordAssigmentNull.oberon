@@ -1,0 +1,14 @@
+MODULE SimpleModule;
+
+TYPE
+   date = RECORD
+      day: INTEGER;
+   END
+
+VAR
+    d1 : date;
+BEGIN
+    d1.day := NIL
+END
+
+END SimpleModule.

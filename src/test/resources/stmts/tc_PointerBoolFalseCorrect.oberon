@@ -1,0 +1,12 @@
+MODULE pointer;
+
+VAR
+    p : POINTER TO BOOLEAN;
+    
+
+BEGIN
+    p^ := False
+
+END
+
+END pointer.

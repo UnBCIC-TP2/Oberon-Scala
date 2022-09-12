@@ -1,0 +1,23 @@
+MODULE SimpleModule;
+
+TYPE
+    date = RECORD
+        day: INTEGER;
+        month: REAL;
+        year: STRING;
+        hour: BOOLEAN;
+        array: ARRAY 10 OF INTEGER;
+        
+    END
+VAR
+   d: date;
+BEGIN
+    d.day := 20;
+    d.month := 10.1;
+    d.year := "1992";
+    d.hour := True;
+    d.array[0] := 1
+
+END
+
+END SimpleModule.

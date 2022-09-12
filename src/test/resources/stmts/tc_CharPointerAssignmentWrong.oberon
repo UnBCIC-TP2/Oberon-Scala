@@ -1,0 +1,15 @@
+MODULE pointer;
+
+VAR
+  p : POINTER TO REAL;
+  x : CHAR;
+
+BEGIN
+    x := 'b';
+    p^ := 'a';
+    x := p;
+    p := x
+    
+END
+
+END pointer.

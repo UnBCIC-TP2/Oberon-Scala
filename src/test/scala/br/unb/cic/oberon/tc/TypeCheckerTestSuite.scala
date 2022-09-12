@@ -891,6 +891,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
 
+  //Pointer Test Cases
+
   test("Test assignment to pointer value") {
     val module = ScalaParser.parseResource("stmts/tc_PointerAccessStmt.oberon")
     val visitor = new TypeChecker()
@@ -932,13 +934,189 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   }
 
-    test("Test assignment of NullValue to pointer") {
+    test("Test assignment of NullValue to integer pointer") {
     val module = ScalaParser.parseResource("stmts/tc_PointerNull.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
     assert(errors.size == 0)
 
+  }
+
+    test("Test assignment of NullValue to integer pointer Value") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerNullValue.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 1)
+
+  }
+
+  test("Test assigment INTEGER type pointer to REAL value") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerValueInteger.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size > 0)
+
+  }
+
+  // Char Pointer Type Test Cases
+
+  test("Test assignment to pointer value CHAR"){
+    val module = ScalaParser.parseResource("stmts/tc_PointerAcessCharStmt.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+
+  }
+
+  test("Test assignment of Pointer CHAR to NullValue") {
+    val module = ScalaParser.parseResource("stmts/tc_CharPointerNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+ test("Test assignment of Pointer Value CHAR to NullValue") {
+    val module = ScalaParser.parseResource("stmts/tc_CharPointerValueNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size > 0)
+  }
+
+  test("Test incorrect assignment between pointer type char and char type variable") {
+    val module = ScalaParser.parseResource("stmts/tc_CharPointerAssignmentWrong.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size > 0)
+  }
+
+  test("Test assigment between pointer type CHAR to INTEGER value "){
+    val module = ScalaParser.parseResource("stmts/tc_PointerCharValueIntValueStmt.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 1)
+
+  }
+
+  // Real Pointer Type Test Cases
+
+   test("Test assignment real to pointer value") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerAssignmentStmt.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  test("Test assignment of Pointer REAL to NullValue") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+
+  }
+
+  test("Test assignment of Pointer value REAL to NullValue") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerValueNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 1)
+
+  }
+
+  test("Test assignment between pointer to real and real type variable") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerAssignment.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+
+  }
+
+  test("Test arithmetic operation with pointer real values") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  test("Test incorrect assignment between pointer to real and arithmetic operation with real") {
+    val module = ScalaParser.parseResource("stmts/tc_RealPointerOperationWithRealValue.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  // Boolean Pointer Type Test Cases
+
+  test("Test assignment to pointer boolean type True") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerBoolTrueCorrect.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+  test("Test assignment to pointer boolean type False") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerBoolFalseCorrect.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+  test("Test incorrect assignment to pointer boolean type True") {
+    val module = ScalaParser.parseResource("stmts/tc_PointerBoolTrueIncorrect.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 1)
+  }
+  
+
+  // Record Test Cases
+
+  test("Test Assigment Record to many types") {
+    val module = ScalaParser.parseResource("stmts/tc_RecordAssigment.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+  test("Test Assigment Record Integer element to Null Value") {
+    val module = ScalaParser.parseResource("stmts/tc_RecordAssigmentNull.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 1)
+  }
+
+  test("Test arithmetic operation with record INTEGER element value") {
+    val module = ScalaParser.parseResource("stmts/tc_IntegerRecordOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+  test("Test arithmetic operation with record REAL element value") {
+    val module = ScalaParser.parseResource("stmts/tc_RealRecordOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
   }
 
   test("Test array subscript") {
@@ -1402,7 +1580,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
 
   // Sum test with reals
-  test("Test Real Sum operation") {
+  test("Test Real arithmetic Sum operation") {
     val module = ScalaParser.parseResource("stmts/tc_RealSumOperation.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -1430,7 +1608,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   // Sub test between reals
-  test("Test Real Sub operation") {
+  test("Test Real arithmetic Sub operation") {
     val module = ScalaParser.parseResource("stmts/tc_RealSubOperation.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -1457,13 +1635,34 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   // Div test between reals
-  test("Test Real Div operation") {
+  test("Test Real arithmetic Div operation") {
     val module = ScalaParser.parseResource("stmts/tc_RealDivOperation.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
     assert(errors.size == 0)
   }
+
+
+  //Div test between real and integer
+  test("Test Real and Integer arithmetic Div operation") {
+    val module = ScalaParser.parseResource("stmts/tc_RealIntegerDivOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
+
+  // Mult test between integers
+  test("Test Integer arithmetic Mult operation") {
+    val module = ScalaParser.parseResource("stmts/tc_IntegerMultOperation.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+
   
   // Mult test between reals
   test("Test Real Mult operation") {
