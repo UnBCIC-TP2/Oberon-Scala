@@ -103,7 +103,7 @@ object REPL {
       .variable(LineReader.SECONDARY_PROMPT_PATTERN, "%M%P > ")
       .variable(LineReader.INDENTATION, 2)
       .variable(LineReader.LIST_MAX, 100)
-      .variable(LineReader.HISTORY_FILE, Paths.get(root, "history"))
+      .variable(LineReader.HISTORY_FILE, Paths.get(root, ".oberon_history"))
       .option(LineReader.Option.INSERT_BRACKET, true)
       .option(LineReader.Option.EMPTY_WORD_OPTIONS, false)
       .option(LineReader.Option.USE_FORWARD_SLASH, true) // use forward slash in directory separator
