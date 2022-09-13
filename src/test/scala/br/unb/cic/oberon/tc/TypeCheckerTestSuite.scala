@@ -1389,7 +1389,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(arrayAssigment.accept(visitor) == List())
   }
   
-  test("Test array initialization") {
+  test("Test array initialization statement 02") {
     val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt02.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
@@ -1397,4 +1397,11 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(errors.size == 0)
   }
   
+  test("Test array initialization statement 03") {
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt03.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 2)
+  }
 }
