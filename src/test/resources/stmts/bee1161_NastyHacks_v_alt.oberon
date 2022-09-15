@@ -1,0 +1,39 @@
+MODULE bee1161valt;
+
+VAR
+    a : ARRAY 3 OF INTEGER;
+    b : ARRAY 3 OF INTEGER;
+    c : ARRAY 3 OF INTEGER;
+    ans : ARRAY 3 OF INTEGER;
+    i, temp, temp2, answer : INTEGER;
+
+BEGIN
+    a[0] := 0;
+    a[1] := 100;
+    a[2] := 100;
+
+    b[0] := 100;
+    b[1] := 130;
+    b[2] := 70;
+
+    c[0] := 70;
+    c[1] := 30;
+    c[2] := 20;
+
+    ans[0] := 0;
+    ans[1] := 0;
+    ans[2] := 0;
+
+    i := 0;
+    temp := 0;
+    answer := 0;
+
+    FOREACH v IN a
+        temp := b[i] - c[i];
+        temp2 := temp - v;
+        answer := answer + temp2;
+        i := i + 1
+    END
+END
+
+END bee1161valt.
