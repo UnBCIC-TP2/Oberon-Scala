@@ -1,0 +1,31 @@
+MODULE bee1013;
+
+VAR
+	a: INTEGER;
+	b: INTEGER;
+	c: INTEGER;
+	answer: INTEGER;
+
+PROCEDURE abs(a : INTEGER) : INTEGER;
+	BEGIN
+		IF (a < 0) THEN
+			a := a * (-1)
+		END;
+   		RETURN a
+ 	END abs
+
+PROCEDURE maxValue(a, b : INTEGER) : INTEGER;
+	BEGIN
+   		RETURN (a + b + abs(a - b)) /2
+	END maxValue
+
+BEGIN
+	a:= 7;
+	b:= 14;
+	c:= 106;
+
+	answer := maxValue(maxValue(a, b), c)
+
+END
+
+END bee1013.
