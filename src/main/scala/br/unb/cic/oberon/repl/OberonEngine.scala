@@ -6,7 +6,11 @@ import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
-import org.jline.reader.impl.completer.AggregateCompleter
+import org.jline.reader.impl.completer.{AggregateCompleter, StringsCompleter}
+import org.jline.reader.Candidate;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
+import org.jline.utils.AttributedString;
 
 import java.lang
 import java.io.File
@@ -33,8 +37,14 @@ class OberonEngine extends ScriptEngine {
   /*
    * TODO: implement script completer
    */
-  override def getScriptCompleter: Completer = {
-    new AggregateCompleter()
+  override def getScriptCompleter: Completer = {compileCompleter}
+
+  private def compileCompleter : Completer = {
+
+    val vCompleter = new VariableCompleter(this)
+    val  completer = new AggregateCompleter(vCompleter)
+
+    return completer
   }
 
   override def hasVariable(name: String): Boolean = interpreter.env.lookup(name).isDefined
@@ -218,5 +228,39 @@ class OberonEngine extends ScriptEngine {
     val out = new CmdDesc
     // TODO: Script description = out.setMainDesc()
     out
-  }//new Inspector(this).scriptDescription(line)
+  }
+
+  private class VariableCompleter(var oberonEngine : OberonEngine) extends Completer {
+    val inspector = new Inspector(oberonEngine)
+
+    def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
+      assert(commandLine != null)
+      assert(candidates != null)
+      val wordbuffer = commandLine.word()
+      val buffer = commandLine.line.substring(0, commandLine.cursor())
+
+      var idx = -1
+      var len = 1
+      try {
+        len = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).toList.last.toString.size
+        idx = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).map(_.start).toList.last
+      }
+      catch{
+        case e: java.util.NoSuchElementException => {}
+      }
+
+      val pref = wordbuffer.substring(0, idx+len)
+      val variables = inspector.getVariables()
+      for(v <- variables){
+        candidates.add(new Candidate(AttributedString.stripAnsi(pref + v), v, null, null, null, null, false));
+      }
+    }
+  }
+
+  private class Inspector(var oberonEngine : OberonEngine) {
+
+    def getVariables(): Iterable[String] = (oberonEngine.find(null).asScala).keys
+
+  }
+
 }
