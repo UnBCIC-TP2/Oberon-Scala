@@ -108,6 +108,7 @@ object REPL {
       .option(LineReader.Option.EMPTY_WORD_OPTIONS, false)
       .option(LineReader.Option.USE_FORWARD_SLASH, true) // use forward slash in directory separator
       .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true).build
+      .option(LineReader.Option.CASE_INSENSITIVE, true)
     if (OSUtils.IS_WINDOWS) reader.setVariable(LineReader.BLINK_MATCHING_PAREN, 0) // if enabled cursor remains in begin parenthesis (gitbash)
 
     // complete command registries

@@ -34,15 +34,13 @@ class OberonEngine extends ScriptEngine {
   override def getEngineName: String = this.getClass.getSimpleName
   override def getExtensions: java.util.List[String] = Collections.singletonList("oberon")
 
-  /*
-   * TODO: implement script completer
-   */
   override def getScriptCompleter: Completer = {compileCompleter}
 
   private def compileCompleter : Completer = {
 
     val vCompleter = new VariableCompleter(this)
-    val  completer = new AggregateCompleter(vCompleter)
+    val kCompleter = new KeywordCompleter(this)
+    val  completer = new AggregateCompleter(vCompleter, kCompleter)
 
     return completer
   }
@@ -261,6 +259,18 @@ class OberonEngine extends ScriptEngine {
 
     def getVariables(): Iterable[String] = (oberonEngine.find(null).asScala).keys
 
+  }
+
+  private class KeywordCompleter (var oberonEngine : OberonEngine) extends Completer {
+
+    def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
+
+      val keywordList: List[String] = List("ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO", "ELSE", "ELSIF", "END","EXIT", "FOR", "IF", "IMPORT", "IN", "IS", "LOOP", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER", "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO", "TYPE", "UNTIL", "VAR", "WHILE", "WITH")
+      
+      for (v <- keywordList) {
+        candidates.add(new Candidate(AttributedString.stripAnsi(v), v, null, null, null, null, false));
+      }
+    }
   }
 
 }
