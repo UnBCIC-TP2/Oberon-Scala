@@ -46,10 +46,33 @@ class REPLParser extends Parser {
     }
 
     if ((context != ParseContext.COMPLETE) && (context != ParseContext.SPLIT_LINE)) {
-      if (isEscapeChar(line, line.length() - 1)) {
+      /*
+        Use of "\" prototype, not working, can't change REPLParser line
+       if (isEscapeChar(line, line.length() - 1)) {       
         throw new EOFError(-1, -1, "Escaped new line", "newline");
+      } */
+      if(isThen(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "THEN new line");
       }
-      // TODO: throw EOF errors
+      if(isElse(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "Else new line");
+      }
+      if(isElseIf(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "ELSEIF new line");
+      }
+      if(isCase(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "CASE new line");
+      }
+      if(isOf(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "Case OF new line");
+      }
+      if(isRepeat(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "REPEAT new line");
+      }
+      /* Not usefull enough
+      if(isUntil(line.substring(line.lastIndexOf(" ") + 1))){
+        throw new EOFError(-1, -1, "UNTIL new line");
+      } */
     }
 
     new ArgumentList(line, words.toList, wordIndex, wordCursor, cursor, rawWordCursor, rawWordLength)
@@ -69,6 +92,14 @@ class REPLParser extends Parser {
     if (pos < 0) false
     else isEscapeChar(buffer.charAt(pos))
   }
+  def isThen(last: String): Boolean = last=="THEN"
+  def isElse(last: String): Boolean = last=="ELSE"
+  def isElseIf(last: String): Boolean = last=="ELSEIF"
+  def isCase(last: String): Boolean = last=="CASE"
+  def isOf(last: String): Boolean = last=="OF"
+  def isRepeat(last: String): Boolean = last=="REPEAT"
+  def isUntil(last: String): Boolean = last=="UNTIL"
+  
 
   class ArgumentList(line: String, words: List[String], wordIndex: Int, wordCursor: Int, cursor: Int, rawWordCursor: Int, rawWordLength: Int) extends ParsedLine with CompletingParsedLine {
     override def word(): String = words(wordIndex)
@@ -86,4 +117,3 @@ class REPLParser extends Parser {
   }
 
 }
-
