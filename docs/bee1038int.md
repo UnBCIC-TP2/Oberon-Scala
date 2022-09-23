@@ -64,7 +64,7 @@ END bee1038int.
 ```
 
 ## Funcionalidades testadas
-### Inicialização de arrays
+### Inicialização de arrays de inteiro
 
 <b>Arrays</b> precisam ter seu tipo declarado antes de serem inicializados. Para tanto, é necessário utilizar a sintaxe <i>typeName = ARRAY X OF Y</i>, onde typeName é o nome do tipo, X é a quantidade de elementos no array e Y é o tipo dos elementos.
 
@@ -79,7 +79,7 @@ VAR
 	banknotesValues: intArray;
 ```
 
-### Aritmética com array
+### Aritmética com array de inteiro
 
 Nesse teste utilizou-se multiplicação de elementos do array.
 <br>"value := banknotesValues[x] * y"
