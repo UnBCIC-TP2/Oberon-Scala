@@ -80,17 +80,17 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       if(value.nonEmpty) {
         val firstType = value(0).accept(this).get
         if (value.forall(v => v.accept(this).get == firstType)) {
-          Some(firstType)
+          Some(ArrayType(value.length, firstType))
         }
         else None
       }
       else None
     
-    case ArrayValue(values, arrayType) =>
-      if(values.isEmpty || values.forall(v => v.accept(this).get == arrayType.baseType)) {
-        Some(arrayType)
-      }
-      else None
+    // case ArrayValue(values, arrayType) =>
+    //   if(values.isEmpty || values.forall(v => v.accept(this).get == arrayType.baseType)) {
+    //     Some(arrayType)
+    //   }
+    //   else None
 
     case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
 
@@ -102,7 +102,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
     (array.accept(this), index.accept(this)) match {
-      case (Some(ArrayType(_, UndefinedType)), _) =>
+      case (Some(UndefinedType), _) =>
         None
       case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
         Some(typeElements)
@@ -225,14 +225,23 @@ class TypeChecker extends OberonVisitorAdapter {
       else List((stmt, s"Variable $v not declared"))
     
     case AssignmentStmt(designator, exp: SimpleArrayValue) =>
-      val (simpleArrayValueType, simpleArrayValueLength) = (exp.accept(expVisitor), exp.value.length)
-      val (designatorType, designatorArrayLevel, designatorLevelStack) = (visitSimpleArrayDesignator(designator))
-      val designatorLength = designatorLevelStack(designatorArrayLevel)
-      if (designatorType.isDefined && designatorType == simpleArrayValueType) {
-        if (designatorLength == simpleArrayValueLength) List()
-        else List((stmt, s"Expression $exp doesn't match array length."))
+      val array = exp.accept(expVisitor)
+      
+      array match {
+        case Some(ArrayType(simpleArrayValueLength, simpleArrayValueType)) =>
+          val (designatorType, designatorArrayLevel, designatorLevelStack) = (visitSimpleArrayDesignator(designator))
+          val designatorLength = designatorLevelStack(designatorArrayLevel)
+          println(s"designatorLength: $designatorLength")
+          println(s"designatorStack: $designatorLevelStack")
+          println(s"designatorArrayLevel: $designatorArrayLevel")
+          if (designatorType.isDefined && designatorType.get == simpleArrayValueType) {
+            if (designatorLength == simpleArrayValueLength) List()
+            else List((stmt, s"Expression $exp doesn't match array length."))
+          }
+          else List((stmt, s"Expression $exp doesn't match array type."))
+        case _ => List((stmt, s"Expression $exp has ill type"))
       }
-      else List((stmt, s"Expression $exp doesn't match array type."))
+
     
     case AssignmentStmt(designator, exp) => {
       val varType = visitAssignmentAlternative(designator)
@@ -250,7 +259,7 @@ class TypeChecker extends OberonVisitorAdapter {
         case PointerAssignment(pointerName) =>
           visitPointerAssignmentAsSimpleArrayDesignator(pointerName, 0)
         case ArrayAssignment(array, _) =>
-          val arrayLevel: Int = 0
+          val arrayLevel: Int = 1
           visitArrayAssignmentAsSimpleArrayDesignator(array, arrayLevel)
         case RecordAssignment(record, field) =>
           visitRecordAssignmentAsSimpleArrayDesignator(record,ListBuffer(field), 0)
