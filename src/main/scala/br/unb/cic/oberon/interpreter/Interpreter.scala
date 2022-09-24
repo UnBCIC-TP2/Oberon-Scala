@@ -124,8 +124,8 @@ class Interpreter extends OberonVisitorAdapter {
             env.setVariable(pointerName, newValue)
           case ArrayAssignment(array, index) =>
             val intIndex = evalExpression(index).asInstanceOf[IntValue]
-            val (varName, currentVarExpValue, targetIndexStack) = getArrayAssignmentInputs(array, ListBuffer(intIndex.value))
-            val newFullValue = getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue.asInstanceOf[SimpleArrayValue], newValue, targetIndexStack)
+            val (varName, currentVarExpValue, targetIndexStack, targetFieldStack) = getArrayAssignmentInputs(array, ListBuffer(intIndex.value), ListBuffer())
+            val newFullValue = getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue, newValue, targetIndexStack, targetFieldStack)
             env.setVariable(varName, newFullValue)
           case RecordAssignment(record, field) =>
             val (varName, currentVarExpValue, targetFieldStack) = getRecordAssignmentInputs(record, ListBuffer(field))
@@ -197,31 +197,45 @@ class Interpreter extends OberonVisitorAdapter {
     }
   }
 
-private def getArrayAssignmentInputs(expression: Expression, targetIndexStack: ListBuffer[Int]): (String, Expression, ListBuffer[Int]) = {
+private def getArrayAssignmentInputs(expression: Expression, targetIndexStack: ListBuffer[Int], targetFieldStack: ListBuffer[String]): (String, Expression, ListBuffer[Int], ListBuffer[String]) = {
     expression match {
       case ArraySubscript(arrayBase, i) =>
         val intIndex = evalExpression(i).asInstanceOf[IntValue].value
-        getArrayAssignmentInputs(arrayBase, targetIndexStack.append(intIndex))
+        getArrayAssignmentInputs(arrayBase, targetIndexStack.append(intIndex), targetFieldStack)
       case VarExpression(name) =>
         val currentVarExpValue = env.lookup(name)
         currentVarExpValue match {
-          case Some(value) => (name, value, targetIndexStack)
-          case _ => (name, Undef(), targetIndexStack)
+          case Some(value) => (name, value, targetIndexStack, targetFieldStack)
+          case _ => (name, Undef(), targetIndexStack, targetFieldStack)
         }
+      case FieldAccessExpression(exp, name) =>
+        getArrayAssignmentInputs(exp, targetIndexStack, targetFieldStack.append(name))
     }
   }
 
-  private def getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue: SimpleArrayValue, newValue: Expression, targetIndexStack: ListBuffer[Int]) : Expression = {
-    if (targetIndexStack.length > 1) {
-      val index = targetIndexStack.last
-      targetIndexStack.dropRightInPlace(1)
-      currentVarExpValue.value(index) = getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue.value(index).asInstanceOf[SimpleArrayValue], newValue, targetIndexStack)
-      currentVarExpValue
+private def getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue: Expression, newValue: Expression, targetIndexStack: ListBuffer[Int], targetFieldStack: ListBuffer[String]) : Expression = {
+    if (targetFieldStack.isEmpty) {
+      if (targetIndexStack.length > 1) {
+        val index = targetIndexStack.last
+        targetIndexStack.dropRightInPlace(1)
+        currentVarExpValue.asInstanceOf[SimpleArrayValue].value(index) = getNewSimpleArrayValueFromArrayAssignment(currentVarExpValue.asInstanceOf[SimpleArrayValue].value(index).asInstanceOf[SimpleArrayValue], newValue, targetIndexStack, targetFieldStack)
+        currentVarExpValue
+      }
+      else {
+        val index = targetIndexStack.last
+        currentVarExpValue.asInstanceOf[SimpleArrayValue].value(index) = newValue
+        currentVarExpValue
+      }
     }
     else {
-      val index = targetIndexStack.last
-      currentVarExpValue.value(index) = newValue
-      currentVarExpValue
+      val field = targetFieldStack.last
+      targetFieldStack.dropRightInPlace(1)
+      val newVarExpValue = RecordValue(ListBuffer())
+      for (f <- currentVarExpValue.asInstanceOf[RecordValue].value) {
+        if (f.name == field) newVarExpValue.value.append(FieldValue(f.name, getNewSimpleArrayValueFromArrayAssignment(f.value, newValue, targetIndexStack, targetFieldStack)))
+        else newVarExpValue.value.append(f)
+      }
+      newVarExpValue
     }
   }
 
