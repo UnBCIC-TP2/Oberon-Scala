@@ -159,7 +159,10 @@ object Main extends App {
       val content = String.join("\n", Files.readAllLines(path))
       val module = ScalaParser.parse(content)
 
-      val result = module.accept(interpreter)
+      val (env, stmt) = interpreter.decomposer(module)
+      if (stmt.isDefined)
+        interpreter.interpret(stmt.get, env)
+      //else
     }
     else {
       println("The file '" + conf.interpreter() + "' does not exist")
