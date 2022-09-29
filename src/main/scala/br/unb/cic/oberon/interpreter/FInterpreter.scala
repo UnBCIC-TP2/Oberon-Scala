@@ -11,13 +11,6 @@ import scala.io.StdIn
 import scala.language.{existentials, postfixOps}
 
 /**
- * The interpreter visitor first updates the
- * Fenvironment with the global constants, variables,
- * and procedures; after that, it visits the
- * main program statement.
- *
- * It uses an additional visitor (EvalExpressionVisitor) to
- * compute the value of the different expressions.
  *
  * We assume the program is well-typed, otherwise,
  * a runtime exception might be thrown.
@@ -87,9 +80,14 @@ class FInterpreter {
     def interpretArrayAssignment(baseExp: Expression, indexExp: Expression, exp: Expression, environ: FEnvironment): Unit = {
       val array = evalExpression(baseExp, environ)
       val index = evalExpression(indexExp, environ)
-      
+
       (array, index) match {
-        case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(exp, environ)
+        case (ArrayValue(values, _), IntValue(v)) => {
+          if(0 <= v && v < values.size)
+            values(v) = evalExpression(exp, environ)
+          else
+            throw new RuntimeException(s"Failed to access array at position ${v}.")
+        }
         case _ => throw new RuntimeException
       }
     }
@@ -103,7 +101,6 @@ class FInterpreter {
       case AssignmentStmt(designator, exp) =>
         designator match {
           case ArrayAssignment(array, index) => {
-            // val newEnv = env
             interpretArrayAssignment(array, index, exp, env)
             return env
           }
@@ -132,17 +129,16 @@ class FInterpreter {
       }
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
-        var newEnv = env
-        if (evalCondition(condition, newEnv)) newEnv = interpret(thenStmt, newEnv)
-        else if (elseStmt.isDefined) newEnv = interpret(elseStmt.get, newEnv)
-        return newEnv
+        if (evalCondition(condition, env)) interpret(thenStmt, env)
+        else if (elseStmt.isDefined) interpret(elseStmt.get, env)
+        else env
 
       case WhileStmt(condition, whileStmt) => {
         var newEnv = env
-        while (evalCondition(condition, newEnv) && exit == false )
+        while (evalCondition(condition, newEnv) && !exit)
           newEnv = interpret(whileStmt, newEnv)
         exit = false
-        return newEnv
+        newEnv
       }
 
       case ForEachStmt(v, exp, stmt) => {
@@ -151,13 +147,10 @@ class FInterpreter {
         valArray match {
           case ArrayValue(values, _) => {
             values.foreach(value => {
-                newEnv.setVariable(v, evalExpression(value, newEnv))
+                newEnv = newEnv.setVariable(v, evalExpression(value, newEnv))
                 newEnv = interpret(stmt, newEnv)
-              // val assignment = AssignmentStmt(VarAssignment(v), value)
-              // val stmts = SequenceStmt(List(assignment, stmt))
-              // stmts.accept(this)
             })
-            return newEnv
+            newEnv
           }
 
           case _ => throw new RuntimeException("erro.... melhorar")
@@ -169,61 +162,20 @@ class FInterpreter {
         return env
       }
 
-      case ReturnStmt(exp: Expression) => {
-        val newEnv = setReturnExpression(evalExpression(exp, env), env)
-        return newEnv
-      }
+      case ReturnStmt(exp: Expression) => setReturnExpression(evalExpression(exp, env), env)
 
       case MetaStmt(f) => interpret(f(), env)
 
-      case ProcedureCallStmt(name, args) => {
-        val newEnv = env
-        callProcedure(name, args, newEnv)
-        newEnv.pop()
-        return newEnv
-      }
+      case ProcedureCallStmt(name, args) => callProcedure(name, args, env).pop()
     }
   }
 
-  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement], oldEnv: FEnvironment): FEnvironment = {
-    var env = oldEnv
-    var matched = false
-    var i = 0
-
-    if (evalCondition(condition, oldEnv)) env = interpret(thenStmt, env)
-    else {
-      while (i < listOfElseIf.size && !matched) {
-        listOfElseIf(i) match {
-          case ElseIfStmt(condition, stmt) => if (evalCondition(condition, env)) {
-            env = interpret(stmt, env)
-            matched = true
-          }
-        }
-        i += 1
-      }
-      if (!matched && elseStmt.isDefined) env = interpret(elseStmt.get, env)
-    }
-
-    return env
-
-  }
-
-  /*
-   * process the ReturnStmt(exp) statement.
-   * In this case, we just create a new entry
-   * in the local variables, assigning
-   * "return" -> exp.
-   */
-  private def setReturnExpression(exp: Expression, oldEnv: FEnvironment): FEnvironment = {
-    val env = oldEnv
+  private def setReturnExpression(exp: Expression, env: FEnvironment): FEnvironment = 
     env.setLocalVariable(Values.ReturnKeyWord, exp)
-    return env
-  }
 
   def callProcedure(name: String, args: List[Expression], env: FEnvironment): FEnvironment = {
     val procedure = env.findProcedure(name)
-    val newEnv = updateEnvironmentWithProcedureCall(procedure, args, env)
-    return interpret(procedure.stmt, newEnv)
+    interpret(procedure.stmt, updateEnvironmentWithProcedureCall(procedure, args, env))
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], oldEnv: FEnvironment): FEnvironment = {
@@ -234,8 +186,8 @@ class FInterpreter {
       case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(exp, env))
     })
 
-    env.push() // after that, we can "push", to indicate a procedure call.
-
+    env.push() // why is this line necessary?
+    
     mappedArgs.foreach(pair => pair match {
       case (ParameterByReference(name, _), Some(location: Location)) => env = env.setParameterReference(name, location)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
@@ -247,95 +199,102 @@ class FInterpreter {
     return env
 
   }
+  
+  /* 
+   *  The lack of this method breaks a single test for C code generation
+   *  still figuring out the reason
+   */
 
-  def returnProcedure(env: FEnvironment): FEnvironment = env.pop()
+  // private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement], oldEnv: FEnvironment): FEnvironment = {
+  //   var env = oldEnv
+  //   var matched = false
+  //   var i = 0
 
-  def evalCondition(expression: Expression, env: FEnvironment): Boolean = fEval(Right(expression), env) match {
+  //   if (evalCondition(condition, oldEnv)) env = interpret(thenStmt, env)
+  //   else {
+  //     while (i < listOfElseIf.size && !matched) {
+  //       listOfElseIf(i) match {
+  //         case ElseIfStmt(condition, stmt) => if (evalCondition(condition, env)) {
+  //           env = interpret(stmt, env)
+  //           matched = true
+  //         }
+  //       }
+  //       i += 1
+  //     }
+  //     if (!matched && elseStmt.isDefined) env = interpret(elseStmt.get, env)
+  //   }
+  //   return env
+  // }
+
+  def evalCondition(expression: Expression, env: FEnvironment): Boolean = fEval(expression, env) match {
     case Left(error) => throw new RuntimeException(error)
     case Right(exp) => exp.asInstanceOf[BoolValue].value
   }
 
-  def evalExpression(expression: Expression, env: FEnvironment): Expression = fEval(Right(expression), env) match {
+  def evalExpression(expression: Expression, env: FEnvironment): Expression = fEval(expression, env) match {
     case Left(error) => throw new RuntimeException(error)
     case Right(exp) => exp
   }
-
-  /*
-   * These methods used to be useful for testing purposes.
-   */
-  // def setGlobalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
-  //   val env = oldEnv
-  //   env.setGlobalVariable(name, exp)
-  //   return env
-  // }
-  // def setLocalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
-  //   val env = oldEnv
-  //   env.setLocalVariable(name, exp)
-  //   return env
-  // }
 
   def setTestEnvironment() = {
     printStream = new PrintStream(new NullPrintStream())
   }
 
 
-  def fEval(expr : Either[String, Expression], env : FEnvironment) : Either[String, Expression] = expr match {
-    case Left(error) => Left(error)
-    case Right(exp) => exp match{
-      case Brackets(expression) => fEval(Right(expression), env)
-      case IntValue(v) => Right(IntValue(v))
-      case RealValue(v) => Right(RealValue(v))
-      case CharValue(v) => Right(CharValue(v))
-      case BoolValue(v) => Right(BoolValue(v))
-      case StringValue(v) => Right(StringValue(v))
-      case NullValue => Right(NullValue)
-      case Undef() => Right(Undef())
-      case VarExpression(name) => { 
-        if(env.lookup(name).isDefined) 
-          Right(env.lookup(name).get)
-        else
-          Left(s"Variable ${name} not defined.")
-      }
-      case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i), env)
-      case AddExpression(left, right) => arithmeticExpression(left, right, false, env , (v1: Number, v2: Number) => v1+v2)
-      case SubExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1-v2)
-      case MultExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1*v2)
-      case DivExpression(left, right) => arithmeticExpression(left, right, true, env, (v1: Number, v2: Number) => v1/v2)
-      case ModExpression(left, right) => modularExpression(left, right, env, (v1: Modular, v2: Modular) => v1.mod(v2))
-      case EQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 == v2))
-      case NEQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 != v2))
-      case GTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 > v2))
-      case LTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 < v2))
-      case GTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
-      case LTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
-      case NotExpression(exp) => fEval(Right(exp), env) match {
-        case Left(error) => Left(error)
-        case Right(bval) => Right(BoolValue(!bval.asInstanceOf[BoolValue].value))
-      }
-      case AndExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
-      case OrExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
-      case FunctionCallExpression(name, args) => evalFunctionCall(name, args, env)
-
-        //TODO FieldAccessExpression
-        //TODO PointerAccessExpression
+  def fEval(exp : Expression, env : FEnvironment) : Either[String, Expression] = exp match {
+    
+    case Brackets(expression) => Right(evalExpression(expression, env))
+    case IntValue(v) => Right(IntValue(v))
+    case RealValue(v) => Right(RealValue(v))
+    case CharValue(v) => Right(CharValue(v))
+    case BoolValue(v) => Right(BoolValue(v))
+    case StringValue(v) => Right(StringValue(v))
+    case NullValue => Right(NullValue)
+    case Undef() => Right(Undef())
+    case VarExpression(name) => { 
+      if(env.lookup(name).isDefined) 
+        Right(env.lookup(name).get)
+      else
+        Left(s"Variable ${name} not defined.")
     }
+    case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i), env)
+    case AddExpression(left, right) => arithmeticExpression(left, right, false, env , (v1: Number, v2: Number) => v1+v2)
+    case SubExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1-v2)
+    case MultExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1*v2)
+    case DivExpression(left, right) => arithmeticExpression(left, right, true, env, (v1: Number, v2: Number) => v1/v2)
+    case ModExpression(left, right) => modularExpression(left, right, env, (v1: Modular, v2: Modular) => v1.mod(v2))
+    case EQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 == v2))
+    case NEQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 != v2))
+    case GTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 > v2))
+    case LTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 < v2))
+    case GTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
+    case LTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+    case NotExpression(expression) => Right(BoolValue(!evalExpression(expression, env).asInstanceOf[BoolValue].value))
+    case AndExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
+    case OrExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
+    case FunctionCallExpression(name, args) => evalFunctionCall(name, args, env)
+
+      //TODO FieldAccessExpression
+      //TODO PointerAccessExpression
   }
 
   def evalArraySubscriptExpression(arraySubscript: ArraySubscript, env : FEnvironment): Either[String, Expression] = {
       
-      (fEval(Right(arraySubscript.arrayBase), env), fEval(Right(arraySubscript.index), env)) match {
-        case (Left(error), _) => Left(error)
-        case (_, Left(error)) => Left(error)
-        case (Right(ArrayValue(values: ListBuffer[Expression], _)), Right(IntValue(v))) => Right(values(v))
-        case _ => Left(s"Failed to access array at position ${arraySubscript.index}.")
+    (evalExpression(arraySubscript.arrayBase, env), evalExpression(arraySubscript.index, env)) match {
+      case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => {
+        if(0 <= v && v < values.size)
+          Right(values(v))
+        else
+          Left(s"Failed to access array at position ${arraySubscript.index}.")
       }
+      case _ => Left(s"Failed to access array at position ${arraySubscript.index}.")
+    }
   }
 
-  //maybe check for errors
   def evalFunctionCall(name: String, args: List[Expression], env : FEnvironment): Either[String, Expression] = {
-      callProcedure(name, args, env)
-      val returnValue = env.lookup(Values.ReturnKeyWord)
-      returnProcedure(env)
+      val newEnv = callProcedure(name, args, env)
+      val returnValue = newEnv.lookup(Values.ReturnKeyWord)
+      newEnv.pop() // might be doing nothing
       assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
       Right(returnValue.get)
   }
@@ -351,18 +310,13 @@ class FInterpreter {
    *         numbers.
    */
   def arithmeticExpression(left: Expression, right: Expression, division: Boolean, env: FEnvironment, fn: (Number, Number) => Number): Either[String, Expression] = {
-    val leftOperand = fEval(Right(left), env)
-    val rightOperand = fEval(Right(right), env)
-    (leftOperand, rightOperand) match {
-      case (Right(l), Right(r)) => if(!(division && r.asInstanceOf[Number].asInstanceOf[IntValue].value == 0))
-          Right(fn(l.asInstanceOf[Number], r.asInstanceOf[Number]))
-        else
-          Left("Division by zero.")
-      case (Left(err), _) => Left(err)
-      case (_, Left(err)) => Left(err)
-      case (_, _) => Left("Super helpful error message.")
-    }
-  
+    
+    val leftOperand = evalExpression(left, env)
+    val rightOperand = evalExpression(right, env)
+    if(!(division && rightOperand.asInstanceOf[Number].asInstanceOf[IntValue].value == 0))
+      Right(fn(leftOperand.asInstanceOf[Number], rightOperand.asInstanceOf[Number]))
+    else
+      Left("Division by zero.")
   }
 
   /**
@@ -376,18 +330,13 @@ class FInterpreter {
    *         numbers.
    */
   def modularExpression(left: Expression, right: Expression, env : FEnvironment, fn: (Modular, Modular) => Modular): Either[String, Expression] = { 
-    val dividend = fEval(Right(left), env)
-    val divider = fEval(Right(right), env)
-    (dividend, divider) match {
-      case (Right(l), Right(r)) => if(r.asInstanceOf[Number].asInstanceOf[IntValue].value != 0)
-          Right(fn(l.asInstanceOf[Modular], r.asInstanceOf[Modular]))
-        else
-          Left("Division by zero.")
-      case (Left(err), _) => Left(err)
-      case (_, Left(err)) => Left(err)
-      case (_, _) => Left("Super helpful error message.")
-    }
     
+    val dividend = evalExpression(left, env)
+    val divider = evalExpression(right, env)
+    if(divider.asInstanceOf[Number].asInstanceOf[IntValue].value != 0)
+      Right(fn(dividend.asInstanceOf[Modular], divider.asInstanceOf[Modular]))
+    else
+      Left("Division by zero.")
   }
   
 
@@ -398,23 +347,19 @@ class FInterpreter {
    * @param left  the left expression
    * @param right the right expression
    * @param fn    a function that constructs an expression. Here we
-   *              are using a high-order function. We assign to
-   *              the "result" visitor attribute the value we compute
-   *              after applying this function.
+   *              are using a high-order function.
    */
   def binExpression(left: Expression, right: Expression, env : FEnvironment, fn: (Value, Value) => Expression): Either[String, Expression] = {
-    val leftOperand = fEval(Right(left), env)
-    val rightOperand = fEval(Right(right), env)
-    (leftOperand, rightOperand) match {
-      case (Right(l), Right(r)) => Right(fn(l.asInstanceOf[Value], r.asInstanceOf[Value]))
-      case (Left(err), _) => Left(err)
-      case (_, Left(err)) => Left(err)
-      case (_, _) => Left("Super helpful error message.")
-    }
-
+    val leftOperand = evalExpression(left, env)
+    val rightOperand = evalExpression(right, env)
+    Right(fn(leftOperand.asInstanceOf[Value], rightOperand.asInstanceOf[Value]))
   }
-
 }
+
+// removing these from the other interpreter breaks code
+// but keeping them in this one breaks code too
+// hypothesis: maybe beacuse there are multiple declarations of the same class
+// hypothesis hasn't been tested
 
 // class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}
 
