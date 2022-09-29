@@ -61,9 +61,9 @@ class FInterpreter {
         }
       }
       
-      case userType: UserDefinedType => newEnv.addUserDefinedType(userType)
+      case userType: UserDefinedType => env.addUserDefinedType(userType)
 
-      case procedure: Procedure => newEnv.declareProcedure(procedure)
+      case procedure: Procedure => env.declareProcedure(procedure)
     }
     
     def getStmt(mod: OberonModule) = mod.stmt
@@ -110,7 +110,7 @@ class FInterpreter {
           //TODO:
           case RecordAssignment(_, _) => ???
           case PointerAssignment(_) => ???
-          case VarAssignment(name) => env.setVariable(name, evalExpression(exp, newEnv))
+          case VarAssignment(name) => env.setVariable(name, evalExpression(exp, env))
           
         }
 
@@ -127,9 +127,8 @@ class FInterpreter {
       case ReadCharStmt(name) => env.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
 
       case WriteStmt(exp) => {
-        val newEnv = env
-        printStream.println(evalExpression(exp, newEnv))
-        return newEnv
+        printStream.println(evalExpression(exp, env))
+        env
       }
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
@@ -154,9 +153,9 @@ class FInterpreter {
             values.foreach(value => {
                 newEnv.setVariable(v, evalExpression(value, newEnv))
                 newEnv = interpret(stmt, newEnv)
-//               val assignment = AssignmentStmt(VarAssignment(v), value)
-//               val stmts = SequenceStmt(List(assignment, stmt))
-//               stmts.accept(this)
+              // val assignment = AssignmentStmt(VarAssignment(v), value)
+              // val stmts = SequenceStmt(List(assignment, stmt))
+              // stmts.accept(this)
             })
             return newEnv
           }
@@ -175,10 +174,7 @@ class FInterpreter {
         return newEnv
       }
 
-      // case MetaStmt(f) => {
-      //   val newEnv = interpret(f, env)
-      //   return newEnv
-      // }
+      case MetaStmt(f) => interpret(f(), env)
 
       case ProcedureCallStmt(name, args) => {
         val newEnv = env
@@ -241,155 +237,182 @@ class FInterpreter {
     env.push() // after that, we can "push", to indicate a procedure call.
 
     mappedArgs.foreach(pair => pair match {
-      case (ParameterByReference(name, _), Some(location: Location)) => env.setParameterReference(name, location)
+      case (ParameterByReference(name, _), Some(location: Location)) => env = env.setParameterReference(name, location)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      case (ParameterByValue(name, _), exp: Expression) => env.setLocalVariable(name, exp)
+      case (ParameterByValue(name, _), exp: Expression) => env = env.setLocalVariable(name, exp)
     })
-    procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
-    procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
+    procedure.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp))
+    procedure.variables.foreach(v => env = env.setLocalVariable(v.name, Undef()))
 
     return env
 
   }
 
-  def returnProcedure(oldEnv: FEnvironment): FEnvironment = {
-    val env = oldEnv
-    env.pop()
-    return env
+  def returnProcedure(env: FEnvironment): FEnvironment = env.pop()
+
+  def evalCondition(expression: Expression, env: FEnvironment): Boolean = fEval(Right(expression), env) match {
+    case Left(error) => throw new RuntimeException(error)
+    case Right(exp) => exp.asInstanceOf[BoolValue].value
   }
 
-  def evalCondition(expression: Expression, env: FEnvironment): Boolean = fEval(expression, env).asInstanceOf[Value].value.asInstanceOf[Boolean]
-
-  def evalExpression(expression: Expression, env: FEnvironment): Expression = fEval(expression, env)
-
-  /*
-   * This method is mostly useful for testing purposes.
-   * That is, here we are considering testability a
-   * design concern.
-   */
-  def setGlobalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
-    val env = oldEnv
-    env.setGlobalVariable(name, exp)
-    return env
+  def evalExpression(expression: Expression, env: FEnvironment): Expression = fEval(Right(expression), env) match {
+    case Left(error) => throw new RuntimeException(error)
+    case Right(exp) => exp
   }
 
   /*
-   * the same here.
+   * These methods used to be useful for testing purposes.
    */
-  def setLocalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
-    val env = oldEnv
-    env.setLocalVariable(name, exp)
-    return env
-  }
+  // def setGlobalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
+  //   val env = oldEnv
+  //   env.setGlobalVariable(name, exp)
+  //   return env
+  // }
+  // def setLocalVariable(name: String, exp: Expression, oldEnv: FEnvironment): FEnvironment = {
+  //   val env = oldEnv
+  //   env.setLocalVariable(name, exp)
+  //   return env
+  // }
 
   def setTestEnvironment() = {
     printStream = new PrintStream(new NullPrintStream())
   }
 
 
-    def fEval(expr : Either[String, Expression], env : FEnvironment) : Either[String, Expression] = expr match {
-      case Left(error) => throw new RuntimeException(error)
-      case Right(exp) => exp match{
-        case Brackets(expression) => fEval(expression, env)
-        case IntValue(v) => Right(IntValue(v))
-        case RealValue(v) => Right(RealValue(v))
-        case CharValue(v) => Right(CharValue(v))
-        case BoolValue(v) => Right(BoolValue(v))
-        case StringValue(v) => Right(StringValue(v))
-        case NullValue => Right(NullValue)
-        case Undef() => Right(Undef())
-        case VarExpression(name) => env.lookup(name).get
-        case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i))
-        case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2, false)
-        case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2, false)
-        case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2, false)
-        case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2, true)
-        case ModExpression(left, right) => modularExpression(left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
-        case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
-        case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
-        case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
-        case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
-        case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
-        case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
-        case NotExpression(exp) => Right(BoolValue(!fEval(exp, env).asInstanceOf[Value].value.asInstanceOf[Boolean]))
-        case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
-        case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
-        case FunctionCallExpression(name, args) => {
-          val res = evalFunctionCall(name, args)
-          res
-        }
-
-          //TODO FieldAccessExpression
-          //TODO PointerAccessExpression
+  def fEval(expr : Either[String, Expression], env : FEnvironment) : Either[String, Expression] = expr match {
+    case Left(error) => Left(error)
+    case Right(exp) => exp match{
+      case Brackets(expression) => fEval(Right(expression), env)
+      case IntValue(v) => Right(IntValue(v))
+      case RealValue(v) => Right(RealValue(v))
+      case CharValue(v) => Right(CharValue(v))
+      case BoolValue(v) => Right(BoolValue(v))
+      case StringValue(v) => Right(StringValue(v))
+      case NullValue => Right(NullValue)
+      case Undef() => Right(Undef())
+      case VarExpression(name) => { 
+        if(env.lookup(name).isDefined) 
+          Right(env.lookup(name).get)
+        else
+          Left(s"Variable ${name} not defined.")
       }
-    }
-
-    def evalArraySubscriptExpression(arraySubscript: ArraySubscript): Either[String, Expression] = {
-        
-        (fEval(arraySubscript.arrayBase), fEval(arraySubscript.index)) match {
-          case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => Right(values(v))
-          case _ => Left(s"Failed to access array at position ${arraySubscript.index}.")
-        }
-    }
-
-    //maybe check for errors
-    def evalFunctionCall(name: String, args: List[Expression]): Either[String, Expression] = {
-        callProcedure(name, args)
-        val returnValue = env.lookup(Values.ReturnKeyWord)
-        returnProcedure()
-        assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
-        Right(returnValue.get)
-    }
-
-    /**
-     * Eval an arithmetic expression on Numbers
-     *
-     * @param left  the left expression
-     * @param right the right expression
-     * @param op    a function representing the operator
-     * @return the application of the operator after
-     *         evaluating left and right to reduce them to
-     *         numbers.
-     */
-    def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number, division: Boolean): Either[String, Expression] = 
-      if(division && right.asInstanceOf[Number].asInstanceOf[IntValue].value == 0)
-        Left("Division by zero.")
-      else
-        Right(fn(fEval(left).asInstanceOf[Number], fEval(right).asInstanceOf[Number]))
-    
-
-    /**
-     * Eval an modular expression on Numbers
-     *
-     * @param left  the left expression
-     * @param right the right expression
-     * @param op    a function representing the operator
-     * @return the application of the operator after
-     *         evaluating left and right to reduce them to
-     *         numbers.
-     */
-    def modularExpression(left: Expression, right: Expression, fn: (Modular, Modular) => Modular): Either[String, Expression] = { 
-      if(right.asInstanceOf[Number].asInstanceOf[IntValue].value != 0)
-        Right(fn(fEval(left).asInstanceOf[Modular], fEval(right).asInstanceOf[Modular]))
-      else
-        Left("Division by zero.")
+      case ArraySubscript(a, i) => evalArraySubscriptExpression(ArraySubscript(a, i), env)
+      case AddExpression(left, right) => arithmeticExpression(left, right, false, env , (v1: Number, v2: Number) => v1+v2)
+      case SubExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1-v2)
+      case MultExpression(left, right) => arithmeticExpression(left, right, false, env, (v1: Number, v2: Number) => v1*v2)
+      case DivExpression(left, right) => arithmeticExpression(left, right, true, env, (v1: Number, v2: Number) => v1/v2)
+      case ModExpression(left, right) => modularExpression(left, right, env, (v1: Modular, v2: Modular) => v1.mod(v2))
+      case EQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 == v2))
+      case NEQExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 != v2))
+      case GTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 > v2))
+      case LTExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 < v2))
+      case GTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
+      case LTEExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+      case NotExpression(exp) => fEval(Right(exp), env) match {
+        case Left(error) => Left(error)
+        case Right(bval) => Right(BoolValue(!bval.asInstanceOf[BoolValue].value))
       }
+      case AndExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
+      case OrExpression(left, right) => binExpression(left, right, env, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
+      case FunctionCallExpression(name, args) => evalFunctionCall(name, args, env)
+
+        //TODO FieldAccessExpression
+        //TODO PointerAccessExpression
+    }
+  }
+
+  def evalArraySubscriptExpression(arraySubscript: ArraySubscript, env : FEnvironment): Either[String, Expression] = {
+      
+      (fEval(Right(arraySubscript.arrayBase), env), fEval(Right(arraySubscript.index), env)) match {
+        case (Left(error), _) => Left(error)
+        case (_, Left(error)) => Left(error)
+        case (Right(ArrayValue(values: ListBuffer[Expression], _)), Right(IntValue(v))) => Right(values(v))
+        case _ => Left(s"Failed to access array at position ${arraySubscript.index}.")
+      }
+  }
+
+  //maybe check for errors
+  def evalFunctionCall(name: String, args: List[Expression], env : FEnvironment): Either[String, Expression] = {
+      callProcedure(name, args, env)
+      val returnValue = env.lookup(Values.ReturnKeyWord)
+      returnProcedure(env)
+      assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
+      Right(returnValue.get)
+  }
+
+  /**
+   * Eval an arithmetic expression on Numbers
+   *
+   * @param left  the left expression
+   * @param right the right expression
+   * @param op    a function representing the operator
+   * @return the application of the operator after
+   *         evaluating left and right to reduce them to
+   *         numbers.
+   */
+  def arithmeticExpression(left: Expression, right: Expression, division: Boolean, env: FEnvironment, fn: (Number, Number) => Number): Either[String, Expression] = {
+    val leftOperand = fEval(Right(left), env)
+    val rightOperand = fEval(Right(right), env)
+    (leftOperand, rightOperand) match {
+      case (Right(l), Right(r)) => if(!(division && r.asInstanceOf[Number].asInstanceOf[IntValue].value == 0))
+          Right(fn(l.asInstanceOf[Number], r.asInstanceOf[Number]))
+        else
+          Left("Division by zero.")
+      case (Left(err), _) => Left(err)
+      case (_, Left(err)) => Left(err)
+      case (_, _) => Left("Super helpful error message.")
+    }
+  
+  }
+
+  /**
+   * Eval an modular expression on Numbers
+   *
+   * @param left  the left expression
+   * @param right the right expression
+   * @param op    a function representing the operator
+   * @return the application of the operator after
+   *         evaluating left and right to reduce them to
+   *         numbers.
+   */
+  def modularExpression(left: Expression, right: Expression, env : FEnvironment, fn: (Modular, Modular) => Modular): Either[String, Expression] = { 
+    val dividend = fEval(Right(left), env)
+    val divider = fEval(Right(right), env)
+    (dividend, divider) match {
+      case (Right(l), Right(r)) => if(r.asInstanceOf[Number].asInstanceOf[IntValue].value != 0)
+          Right(fn(l.asInstanceOf[Modular], r.asInstanceOf[Modular]))
+        else
+          Left("Division by zero.")
+      case (Left(err), _) => Left(err)
+      case (_, Left(err)) => Left(err)
+      case (_, _) => Left("Super helpful error message.")
+    }
     
+  }
+  
 
 
-    /**
-     * Eval a binary expression on values.
-     *
-     * @param left  the left expression
-     * @param right the right expression
-     * @param fn    a function that constructs an expression. Here we
-     *              are using a high-order function. We assign to
-     *              the "result" visitor attribute the value we compute
-     *              after applying this function.
-     */
-    def binExpression(left: Expression, right: Expression, fn: (Value, Value) => Expression): Either[String, Expression] = 
-      Right(fn(fEval(left).asInstanceOf[Value], fEval(right).asInstanceOf[Value]))
-    
+  /**
+   * Eval a binary expression on values.
+   *
+   * @param left  the left expression
+   * @param right the right expression
+   * @param fn    a function that constructs an expression. Here we
+   *              are using a high-order function. We assign to
+   *              the "result" visitor attribute the value we compute
+   *              after applying this function.
+   */
+  def binExpression(left: Expression, right: Expression, env : FEnvironment, fn: (Value, Value) => Expression): Either[String, Expression] = {
+    val leftOperand = fEval(Right(left), env)
+    val rightOperand = fEval(Right(right), env)
+    (leftOperand, rightOperand) match {
+      case (Right(l), Right(r)) => Right(fn(l.asInstanceOf[Value], r.asInstanceOf[Value]))
+      case (Left(err), _) => Left(err)
+      case (_, Left(err)) => Left(err)
+      case (_, _) => Left("Super helpful error message.")
+    }
+
+  }
 
 }
 
