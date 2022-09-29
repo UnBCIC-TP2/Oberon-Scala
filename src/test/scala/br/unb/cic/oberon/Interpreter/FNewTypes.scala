@@ -23,30 +23,31 @@ class FNewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     val (env, stmt) = interpreter.decomposer(module)
-    assert(env.lookup("b") == Some(IntValue(2.toInt))) // FOR TO x
-    assert(env.lookup("h") == Some(IntValue(8.toInt))) // FOR TO x
-    assert(env.lookup("n") == Some(IntValue(14.toInt))) // FOR TO x
-    assert(env.lookup("y") == Some(IntValue(24.toInt))) // FOR TO x
+    val executed = interpreter.interpret(stmt.get, env)
+    assert(executed.lookup("b") == Some(IntValue(2.toInt))) // FOR TO x
+    assert(executed.lookup("h") == Some(IntValue(8.toInt))) // FOR TO x
+    assert(executed.lookup("n") == Some(IntValue(14.toInt))) // FOR TO x
+    assert(executed.lookup("y") == Some(IntValue(24.toInt))) // FOR TO x
 
-    assert(env.lookup("a") == Some(RealValue(1.5.toFloat))) // FOR TO x
-    assert(env.lookup("g") == Some(RealValue(7.5.toFloat))) // FOR TO x
-    assert(env.lookup("l") == Some(RealValue(12.5.toFloat))) // FOR TO x
-    assert(env.lookup("w") == Some(RealValue(21.5.toFloat))) // FOR TO x
+    assert(executed.lookup("a") == Some(RealValue(1.5.toFloat))) // FOR TO x
+    assert(executed.lookup("g") == Some(RealValue(7.5.toFloat))) // FOR TO x
+    assert(executed.lookup("l") == Some(RealValue(12.5.toFloat))) // FOR TO x
+    assert(executed.lookup("w") == Some(RealValue(21.5.toFloat))) // FOR TO x
 
-    assert(env.lookup("e") == Some(IntValue(5))) // FOR TO x
-    assert(env.lookup("f") == Some(IntValue(6))) // FOR TO x
-    assert(env.lookup("m") == Some(IntValue(13))) // FOR TO x
-    assert(env.lookup("z") == Some(IntValue(24))) // FOR TO x
+    assert(executed.lookup("e") == Some(IntValue(5))) // FOR TO x
+    assert(executed.lookup("f") == Some(IntValue(6))) // FOR TO x
+    assert(executed.lookup("m") == Some(IntValue(13))) // FOR TO x
+    assert(executed.lookup("z") == Some(IntValue(24))) // FOR TO x
     
-    assert(env.lookup("c") == Some(IntValue(3))) // FOR TO x
-    assert(env.lookup("j") == Some(IntValue(10))) // FOR TO x
-    assert(env.lookup("k") == Some(IntValue(11))) // FOR TO x
-    assert(env.lookup("x") == Some(IntValue(24))) // FOR TO x
+    assert(executed.lookup("c") == Some(IntValue(3))) // FOR TO x
+    assert(executed.lookup("j") == Some(IntValue(10))) // FOR TO x
+    assert(executed.lookup("k") == Some(IntValue(11))) // FOR TO x
+    assert(executed.lookup("x") == Some(IntValue(24))) // FOR TO x
     
-    assert(env.lookup("d") == Some(RealValue(4.5.toFloat))) // FOR TO x
-    assert(env.lookup("i") == Some(RealValue(9.5.toFloat))) // FOR TO x
-    assert(env.lookup("o") == Some(RealValue(15.5.toFloat))) // FOR TO x
-    assert(env.lookup("t") == Some(RealValue(29.5.toFloat))) // FOR TO x
+    assert(executed.lookup("d") == Some(RealValue(4.5.toFloat))) // FOR TO x
+    assert(executed.lookup("i") == Some(RealValue(9.5.toFloat))) // FOR TO x
+    assert(executed.lookup("o") == Some(RealValue(15.5.toFloat))) // FOR TO x
+    assert(executed.lookup("t") == Some(RealValue(29.5.toFloat))) // FOR TO x
   }
 
   test("Testing LONG and SHORT operations for FInterpreter") {
@@ -60,7 +61,8 @@ class FNewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     val (env, stmt) = interpreter.decomposer(module)
-    assert(env.lookup("x") == Some(IntValue(5000))) // FOR TO x
+    val executed = interpreter.interpret(stmt.get, env)
+    assert(executed.lookup("x") == Some(IntValue(5000))) // FOR TO x
   }
 
   test("Testing LONGREAL and REAL +, for FInterpreter") {
@@ -74,6 +76,7 @@ class FNewTypesTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     val (env, stmt) = interpreter.decomposer(module)
-    assert(env.lookup("x") == Some(RealValue(26.500000005.toFloat))) // FOR TO x
+    val executed = interpreter.interpret(stmt.get, env)
+    assert(executed.lookup("x") == Some(RealValue(26.500000005.toFloat))) // FOR TO x
   }
 }

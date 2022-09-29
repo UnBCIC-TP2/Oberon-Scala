@@ -54,8 +54,8 @@ class EvalExpressionTest extends AnyFunSuite {
   }
 
   test("Test eval on global variables") {
-    val environment =  new FEnvironment()
-    environment.setGlobalVariable("x", IntValue(30))
+    var environment =  new FEnvironment()
+    environment = environment.setGlobalVariable("x", IntValue(30))
 
     val exp = AddExpression(IntValue(10), VarExpression("x"))
 
@@ -63,9 +63,9 @@ class EvalExpressionTest extends AnyFunSuite {
   }
 
   test("Test eval on local (stack) and global variables") {
-    val environment = new FEnvironment()
-    environment.setGlobalVariable("x", IntValue(30))
-    environment.setLocalVariable("y", IntValue(10))
+    var environment = new FEnvironment()
+    environment = environment.setGlobalVariable("x", IntValue(30))
+    environment = environment.setLocalVariable("y", IntValue(10))
 
     val exp = AddExpression(VarExpression("x"), VarExpression("y"))
 
