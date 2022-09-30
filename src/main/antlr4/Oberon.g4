@@ -55,6 +55,10 @@ formalArg
  | args += 'VAR' Id (',' args += 'VAR' Id)* ':' argType = oberonType  #ParameterByReference
  ;
 
+expressionList
+ : expression (',' expression)*
+ ;
+
 arguments
  : expression (',' expression)*
  ;
@@ -71,6 +75,7 @@ expression
  | name = qualifiedName '(' arguments? ')'                                                #FunctionCall
  | exp = expression '.' name = Id                                                         #FieldAccess
  | arrayBase = expression '[' index = expression ']'                                      #ArraySubscript
+ | arrayList = '[' expressionList? ']'                                                    #ArrayList
  | name = Id '^'                                                                          #PointerAccess
  | '~' exp = expression                                                                   #NotExpression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression

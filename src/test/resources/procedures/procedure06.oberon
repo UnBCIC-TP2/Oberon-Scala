@@ -1,10 +1,10 @@
 MODULE Procedure06;
 
 VAR
-  a: Integer;
-  b: Integer;
-  c: Integer;
-
+  a: INTEGER;
+  b: INTEGER;
+  c: INTEGER;
+ 
 PROCEDURE inc(VAR x: INTEGER);
     BEGIN
         x := x + 1

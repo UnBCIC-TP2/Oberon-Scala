@@ -978,7 +978,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0)), ArrayType(1, IntegerType)), IntValue(0)))
+      WriteStmt(ArraySubscript(SimpleArrayValue(ListBuffer(IntValue(0))), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
@@ -989,11 +989,12 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(), ArrayType(0, IntegerType)), IntValue(0)))
+      WriteStmt(ArraySubscript(SimpleArrayValue(ListBuffer()), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
-    assert(typeCheckerErrors.isEmpty)
+    // I dont think we should accept subscripts on empty lists
+    assert(typeCheckerErrors.length == 1)
   }
 
   test("Test function call") {
@@ -1387,5 +1388,21 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(simpleAssignment.accept(visitor) == List())
 
     assert(arrayAssigment.accept(visitor) == List())
+  }
+  
+  test("Test array initialization statement 02") {
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt02.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 0)
+  }
+  
+  test("Test array initialization statement 03") {
+    val module = ScalaParser.parseResource("stmts/ArrayInitializationStmt03.oberon")
+    val visitor = new TypeChecker()
+    val errors = visitor.visit(module)
+
+    assert(errors.size == 2)
   }
 }

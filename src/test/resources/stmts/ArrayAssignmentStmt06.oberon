@@ -1,7 +1,7 @@
 MODULE ArrayAssignmentStmt06;
 
 VAR
-  i: Integer;
+  i: INTEGER;
   arr : ARRAY 10 OF INTEGER;
 
 BEGIN

@@ -3,6 +3,7 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import scala.collection.mutable.ListBuffer
 
 class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorAdapter {
   type T = Option[Type]
@@ -74,11 +75,22 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case _ : NoSuchElementException => None
       }
     }
-    case ArrayValue(values, arrayType) =>
-      if(values.isEmpty || values.forall(v => v.accept(this).get == arrayType.baseType)) {
-        Some(arrayType)
+    
+    case SimpleArrayValue(value) =>
+      if(value.nonEmpty) {
+        val firstType = value(0).accept(this).get
+        if (value.forall(v => v.accept(this).get == firstType)) {
+          Some(ArrayType(value.length, firstType))
+        }
+        else None
       }
       else None
+    
+    // case ArrayValue(values, arrayType) =>
+    //   if(values.isEmpty || values.forall(v => v.accept(this).get == arrayType.baseType)) {
+    //     Some(arrayType)
+    //   }
+    //   else None
 
     case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
 
@@ -90,7 +102,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
     (array.accept(this), index.accept(this)) match {
-      case (Some(ArrayType(_, UndefinedType)), _) =>
+      case (Some(UndefinedType), _) =>
         None
       case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
         Some(typeElements)
@@ -211,6 +223,26 @@ class TypeChecker extends OberonVisitorAdapter {
         else List((stmt, s"Expression $exp is ill typed"))
       }
       else List((stmt, s"Variable $v not declared"))
+    
+    case AssignmentStmt(designator, exp: SimpleArrayValue) =>
+      val array = exp.accept(expVisitor)
+      
+      array match {
+        case Some(ArrayType(simpleArrayValueLength, simpleArrayValueType)) =>
+          val (designatorType, designatorArrayLevel, designatorLevelStack) = (visitSimpleArrayDesignator(designator))
+          val designatorLength = designatorLevelStack(designatorArrayLevel)
+          println(s"designatorLength: $designatorLength")
+          println(s"designatorStack: $designatorLevelStack")
+          println(s"designatorArrayLevel: $designatorArrayLevel")
+          if (designatorType.isDefined && designatorType.get == simpleArrayValueType) {
+            if (designatorLength == simpleArrayValueLength) List()
+            else List((stmt, s"Expression $exp doesn't match array length."))
+          }
+          else List((stmt, s"Expression $exp doesn't match array type."))
+        case _ => List((stmt, s"Expression $exp has ill type"))
+      }
+
+    
     case AssignmentStmt(designator, exp) => {
       val varType = visitAssignmentAlternative(designator)
       if (varType.isDefined && varType == exp.accept(expVisitor)){
@@ -220,7 +252,103 @@ class TypeChecker extends OberonVisitorAdapter {
     }
   }
 
+  private def visitSimpleArrayDesignator(designator: Designator) : (Option[Type],Int,ListBuffer[Int]) = {
+      designator match {
+        case VarAssignment(varName) =>
+          visitVarAssignmentAsSimpleArrayDesignator(varName)
+        case PointerAssignment(pointerName) =>
+          visitPointerAssignmentAsSimpleArrayDesignator(pointerName, 0)
+        case ArrayAssignment(array, _) =>
+          val arrayLevel: Int = 1
+          visitArrayAssignmentAsSimpleArrayDesignator(array, arrayLevel)
+        case RecordAssignment(record, field) =>
+          visitRecordAssignmentAsSimpleArrayDesignator(record,ListBuffer(field), 0)
 
+    }
+  }
+  
+  private def visitArrayAssignmentAsSimpleArrayDesignator(array: Expression, arrayLevel: Int) : (Option[Type],Int,ListBuffer[Int]) = {
+    array match {
+      case VarExpression(varName) =>
+        visitVarExpressionAsSimpleArrayDesignator(varName, arrayLevel)
+      case ArraySubscript(arrayBase, _) =>
+        val newArrayLevel : Int = arrayLevel + 1
+        visitArrayAssignmentAsSimpleArrayDesignator(arrayBase, newArrayLevel)
+      case FieldAccessExpression(exp, name) =>
+        visitRecordAssignmentAsSimpleArrayDesignator(exp, ListBuffer(name), arrayLevel)
+      case PointerAccessExpression(name) =>
+        visitPointerAssignmentAsSimpleArrayDesignator(name, arrayLevel)
+    }
+  }
+
+  private def visitVarExpressionAsSimpleArrayDesignator(varExpressionName: String, arrayLevel: Int ) : (Option[Type],Int,ListBuffer[Int]) = {
+      val varExpressionTypeOpt: Option[Type] = env.lookup(varExpressionName)
+      varExpressionTypeOpt match {
+        case None => (None, 0, ListBuffer())
+        case Some(varExpressionType) =>
+          visitDeclarationRelatedToSimpleArrayDesignator(varExpressionType, ListBuffer(), arrayLevel, ListBuffer())
+    }
+  }
+ 
+  private def visitVarAssignmentAsSimpleArrayDesignator(varAssignmentName: String ) : (Option[Type],Int,ListBuffer[Int]) = {
+      val varAssignmentTypeOpt: Option[Type] = env.lookup(varAssignmentName)
+      varAssignmentTypeOpt match {
+        case None => (None, 0, ListBuffer())
+        case Some(varAssignmentType) =>
+          visitDeclarationRelatedToSimpleArrayDesignator(varAssignmentType, ListBuffer(), 0, ListBuffer())
+    }
+  }
+  
+  private def visitPointerAssignmentAsSimpleArrayDesignator(pointerName: String, arrayLevel: Int ) : (Option[Type],Int,ListBuffer[Int]) = {
+    val pointerAssignmentTypeOpt: Option[Type] = env.lookup(pointerName)
+    pointerAssignmentTypeOpt match {
+      case None => (None, 0, ListBuffer())
+      case Some(pointerAssignmentType) =>
+        visitDeclarationRelatedToSimpleArrayDesignator(pointerAssignmentType.asInstanceOf[PointerType].variableType, ListBuffer(), arrayLevel, ListBuffer())
+    }
+  }
+  
+  private def visitRecordAssignmentAsSimpleArrayDesignator(record : Expression, fieldStack : ListBuffer[String], arrayLevel: Int) : (Option[Type],Int,ListBuffer[Int]) = {
+    record match {
+      case VarExpression(name) =>
+        val recordAssignmentTypeOpt: Option[Type] = env.lookup(name)
+        recordAssignmentTypeOpt match {
+          case None => (None, 0, ListBuffer())
+          case Some(recordAssignmentType) =>
+            visitDeclarationRelatedToSimpleArrayDesignator(recordAssignmentType, fieldStack, arrayLevel, ListBuffer())
+        }
+      case FieldAccessExpression(exp, name) =>
+        visitRecordAssignmentAsSimpleArrayDesignator(exp, fieldStack.append(name), arrayLevel)
+    }
+  }  
+  
+  private def visitDeclarationRelatedToSimpleArrayDesignator(varType : Type, fieldStack: ListBuffer[String], arrayLevel: Int, levelStack: ListBuffer[Int]) : (Option[Type], Int, ListBuffer[Int]) = {
+      var currentLevelStack = levelStack
+      varType match {
+        case ArrayType(length, baseType) =>
+          currentLevelStack.append(length)
+          baseType match {
+            case ArrayType(_,_) => visitDeclarationRelatedToSimpleArrayDesignator(baseType, fieldStack, arrayLevel, currentLevelStack)
+            case _ => (Some(baseType), arrayLevel, currentLevelStack)
+          }
+        case PointerType(variableType) =>
+          visitDeclarationRelatedToSimpleArrayDesignator(variableType, fieldStack, arrayLevel, currentLevelStack)
+        case RecordType(variables) =>
+          val attribute = variables.find(v => v.name.equals(fieldStack.last))
+          if (attribute.isDefined) visitDeclarationRelatedToSimpleArrayDesignator(attribute.get.variableType, fieldStack.dropRightInPlace(1), arrayLevel, currentLevelStack)
+          else (None, arrayLevel, currentLevelStack)
+        case ReferenceToUserDefinedType(name) =>
+          val userDefinedTypeOpt: Option[UserDefinedType] = env.lookupUserDefinedType(name)
+          userDefinedTypeOpt match {
+            case None => (None, arrayLevel, currentLevelStack)
+            case Some(userDefinedType) =>
+              visitDeclarationRelatedToSimpleArrayDesignator(userDefinedType.baseType, fieldStack, arrayLevel, currentLevelStack)
+          }
+        case _ =>
+          (None, arrayLevel, currentLevelStack)
+    }
+  }
+    
   private def visitAssignmentAlternative(designator: Designator): Option[Type] = designator match {
     case PointerAssignment(pointerName) =>
       expVisitor.pointerAccessCheck(pointerName)

@@ -1,0 +1,18 @@
+MODULE ArrayInitializationStmt03;
+
+TYPE
+  Profile = RECORD
+    names : ARRAY 2 OF STRING;
+    age : INTEGER;
+    height : REAL;
+  END
+
+VAR
+  myProfileArray : Profile; 
+
+BEGIN
+  myProfileArray := [["Peter", "Parker"], 22, 1.80];
+  write(myProfileArray[2])
+END
+
+END ArrayInitialization.

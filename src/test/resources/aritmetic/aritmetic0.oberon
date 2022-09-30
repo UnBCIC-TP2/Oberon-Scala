@@ -3,28 +3,28 @@ MODULE SimpleModule;
 VAR
   a : REAL;
   b : INTEGER;
-  c : SHORTINT;
-  d : LONGREAL;
-  e : LONGINT;
+  c : INTEGER;
+  d : REAL;
+  e : INTEGER;
 
-  f : LONGINT;
+  f : INTEGER;
   g : REAL;
   h : INTEGER;
-  i : LONGREAL;
-  j : SHORTINT;
+  i : REAL;
+  j : INTEGER;
 
 
-  k : SHORTINT;
+  k : INTEGER;
   l : REAL;
-  m : LONGINT;
+  m : INTEGER;
   n : INTEGER;
-  o : LONGREAL;
+  o : REAL;
 
-  x : SHORTINT;
+  x : INTEGER;
   y : INTEGER;
-  z : LONGINT;
+  z : INTEGER;
   w : REAL;
-  t : LONGREAL;
+  t : REAL;
 
 BEGIN
     a := 1.5;
