@@ -1,0 +1,19 @@
+MODULE ListAssign;
+
+    TYPE
+      IntList = RECORD
+        value : INTEGER;
+        next : POINTER TO IntList;
+      END
+
+VAR
+    ListInt : POINTER TO IntList;
+    Tmp : POINTER TO IntList;
+
+BEGIN
+    NEW(ListInt);
+    NEW(Tmp);
+    ListInt.next := Tmp
+END
+
+END ListAssign.

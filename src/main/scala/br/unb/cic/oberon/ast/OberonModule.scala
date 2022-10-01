@@ -35,6 +35,7 @@ case class OberonModule(name: String,
 /* procedure declaration definition */
 case class Procedure(name: String,
                      args: List[FormalArg],
+                     referenceMap : Map[String, String],
                      returnType: Option[Type],
                      constants: List[Constant],
                      variables: List[VariableDeclaration],
@@ -158,10 +159,13 @@ case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
 
+trait AbsLocation extends Expression
+case class Location(loc: Int) extends AbsLocation
+case object NilValue extends AbsLocation
+
 case object NullValue extends Expression
-case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
-case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
+case class ArrayValue(value: ListBuffer[Expression]) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
@@ -210,6 +214,7 @@ case class ReadLongIntStmt(varName: String) extends Statement
 case class ReadIntStmt(varName: String) extends Statement
 case class ReadShortIntStmt(varName: String) extends Statement
 case class ReadCharStmt(varName: String) extends Statement
+case class NewStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
@@ -218,7 +223,6 @@ case class ElseIfStmt(condition: Expression, thenStmt: Statement) extends Statem
 case class WhileStmt(condition: Expression, stmt: Statement) extends Statement
 case class RepeatUntilStmt(condition: Expression, stmt: Statement) extends Statement
 case class ForStmt(init: Statement, condition: Expression, stmt: Statement) extends Statement
-case class ForEachStmt(varName: String, exp: Expression, stmt: Statement) extends Statement
 case class LoopStmt(stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
 case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) extends Statement
@@ -265,7 +269,7 @@ case object NullType extends Type
 case object LocationType extends Type
 
 case class RecordType(variables: List[VariableDeclaration]) extends Type
-case class ArrayType(length: Int, baseType: Type) extends Type
+case class ArrayType(length: Int, variableType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type

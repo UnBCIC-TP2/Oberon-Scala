@@ -91,6 +91,7 @@ statement
  | 'readLongInt'    '(' var = Id ')'                                                                                          #ReadLongIntStmt
  | 'readInt'        '(' var = Id ')'                                                                                          #ReadIntStmt
  | 'readShortInt'   '(' var = Id ')'                                                                                          #ReadShortIntStmt
+ | 'NEW'   '(' var = Id ')'                                                                                                   #NewStmt
  | 'readChar'   '(' var = Id ')'                                                                                              #ReadCharStmt
  | 'write' '(' expression ')'                                                                                                 #WriteStmt
  | name = Id '(' arguments? ')'                                                                                               #ProcedureCall
@@ -100,7 +101,6 @@ statement
  | 'REPEAT' stmt = statement 'UNTIL' cond = expression                                                                        #RepeatUntilStmt
  | 'FOR' init = statement 'TO' condition = expression 'DO' stmt = statement 'END'                                             #ForStmt
  | 'FOR' var = Id 'IN' min = expression '..' max = expression 'DO' stmt = statement 'END'                                     #ForRangeStmt
- | 'FOREACH'  varName = Id 'IN' arrayExp = expression stmt = statement 'END'                                                                     #ForEachStmt
  | 'LOOP' stmt = statement 'END'                                                                                              #LoopStmt
  | 'RETURN' exp = expression                                                                                                  #ReturnStmt
  | 'CASE' exp = expression 'OF' cases += caseAlternative ('|' cases += caseAlternative)* ('ELSE' elseStmt= statement)? 'END'  #CaseStmt

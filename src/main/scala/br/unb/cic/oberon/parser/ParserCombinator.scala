@@ -121,6 +121,7 @@ trait StatementParser extends ExpressionParser {
     |   "readReal" ~> ('(' ~> identifier <~ ')') ^^ ReadRealStmt
     |   "readInt" ~> ('(' ~> identifier <~ ')') ^^ ReadIntStmt
     |   "readChar" ~> ('(' ~> identifier <~ ')') ^^ ReadCharStmt
+    |   "NEW" ~> ('(' ~> identifier <~ ')') ^^ NewStmt
     |   "write" ~> ('(' ~> expressionParser <~ ')') ^^ WriteStmt
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
@@ -179,6 +180,7 @@ trait OberonParserFull extends StatementParser {
             Procedure(
               name,
               args,
+              Map(),
               procedureType,
               constants,
               variables,

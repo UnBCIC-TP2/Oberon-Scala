@@ -89,5 +89,4 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     assert(invalidAdd.accept(visitor) == None)
   }
 
-
 }

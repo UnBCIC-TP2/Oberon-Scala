@@ -32,4 +32,15 @@ class InterpreterVisitorTest extends AnyFunSuite{
     assert(interpreter.env.lookup("res").isDefined)
     assert(interpreter.env.lookup("res") == Some(IntValue(120)))
   }
+
+  test("Test interpreter on newPointer program") {
+    val module = ScalaParser.parseResource("Pointers/newPointer.oberon")
+    val interpreter = new Interpreter()
+    assert(module.name == "ListAssign")
+
+    interpreter.setTestEnvironment()
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("Value") == Some(IntValue(66)))
+  }
 }

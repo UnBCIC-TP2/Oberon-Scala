@@ -1,0 +1,51 @@
+MODULE ListAssign;
+    TYPE
+      IntList = RECORD
+        value : INT;
+        next : POINTER TO IntList;
+        before : POINTER TO IntList
+      END;
+
+VAR
+    ListInt : POINTER TO IntList;
+    Tmp : POINTER TO IntList;
+    last : POINTER TO IntList;
+    begin : POINTER TO IntList;
+
+BEGIN
+          NEW(ListInt);
+          ListInt.value := 1;
+          ListInt.next := NIL;
+          ListInt.before := NIL;
+          IF ListInt.next = NIL THEN
+              NEW(Tmp);
+              Tmp.value := 2;
+              Tmp.next := NIL;
+              Tmp.before := ListInt;
+              ListInt.next := Tmp
+          END
+          IF ListInt.before = NIL THEN
+              NEW(Tmp);
+              Tmp.value := 0;
+              Tmp.next := ListInt;
+              Tmp.before := NIL;
+              ListInt.before := Tmp
+          END
+          IF ListInt.next.next = NIL THEN
+              NEW(Tmp);
+              Tmp.value := 3;
+              Tmp.next := NIL;
+              Tmp.before := ListInt.next;
+              ListInt.next.next := Tmp
+          END
+          last := ListInt;
+          WHILE last.next # NIL DO
+              last := last.next;
+          END
+          WHILE begin.before # NIL DO
+              begin := begin.before;
+          END
+
+END
+
+END ListAssign.

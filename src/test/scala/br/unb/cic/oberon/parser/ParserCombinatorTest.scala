@@ -261,7 +261,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
     test("Testing Procedure parser"){
-        assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b"))))
+        assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Map(), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b"))))
         == parseAbs(parse(procedureParser, """
         PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
         BEGIN 
