@@ -1,0 +1,16 @@
+MODULE ListAssign;
+
+VAR
+    Value : POINTER TO INTEGER;
+
+BEGIN
+    NEW(Value);
+    NEW(Value);
+    Value := 22;
+    NEW(Value);
+    Value := 44;
+    NEW(Value);
+    Value := 66
+END
+
+END ListAssign.

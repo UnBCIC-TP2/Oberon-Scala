@@ -1,5 +1,6 @@
 package br.unb.cic.oberon.tc
 
+import br.unb.cic.oberon.ast
 import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
@@ -9,12 +10,9 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
 
   override def visit(t: Type): Option[Type] = t match {
     case UndefinedType => None
-    case _ => typeChecker.env.baseType(t)
+    case _ => Some(t)
   }
-  
-  override def visit(exp: Expression): Option[Type] = visitExpression(exp).flatMap(t => typeChecker.env.baseType(t))
-
-  def visitExpression(exp: Expression): Option[Type] = exp match {
+  override def visit(exp: Expression): Option[Type] = exp match {
     case Brackets(exp) => exp.accept(this)
     case IntValue(_) => Some(IntegerType)
     case RealValue(_) => Some(RealType)
@@ -23,7 +21,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case StringValue(_) => Some(StringType)
     case NullValue => Some(NullType)
     case Undef() => None
-    case VarExpression(name) => typeChecker.env.lookup(name)
+    case VarExpression(name) =>
+      typeChecker.env.lookup(name).flatMap(_.accept(this))
     case EQExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType, RealType, BooleanType), BooleanType)
     case NEQExpression(left, right) =>
@@ -74,12 +73,15 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case _ : NoSuchElementException => None
       }
     }
-    case ArrayValue(values, arrayType) =>
-      if(values.isEmpty || values.forall(v => v.accept(this).get == arrayType.baseType)) {
-        Some(arrayType)
-      }
-      else None
+    case ArrayValue(value) => {
+      val firstExpressionType = value.headOption.flatMap(_.accept(this))
 
+      if (!firstExpressionType.isDefined) {
+        Some(ArrayType(value.length, UndefinedType))
+      } else {
+        firstExpressionType.map(ArrayType(value.length, _))
+      }
+    }
     case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
 
     case FieldAccessExpression(exp, attributeName) =>
@@ -138,10 +140,10 @@ class TypeChecker extends OberonVisitorAdapter {
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {
-    module.constants.foreach(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
-    module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
-    module.procedures.foreach(env.declareProcedure)
-    module.userTypes.foreach(env.addUserDefinedType) //added G04
+    module.constants.map(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
+    module.variables.map(v => env.setGlobalVariable(v.name, v.variableType))
+    module.procedures.map(p => env.declareProcedure(p))
+    module.userTypes.map(u => env.addUserDefinedType(u)) //added G04
 
     // TODO: check if the procedures are well typed.
 
@@ -149,29 +151,12 @@ class TypeChecker extends OberonVisitorAdapter {
     else List()
   }
 
-  def visitForEachStmt(forEachStmt: ForEachStmt): List[(Statement, String)] = {
-    val expType = forEachStmt.exp.accept(expVisitor)
-    val varType = env.lookup(forEachStmt.varName)
-
-    val res = if(expType.isDefined && expType.get.isInstanceOf[ArrayType]) {
-      val arrayBaseType = expType.get.asInstanceOf[ArrayType].baseType.accept(expVisitor)
-      if(arrayBaseType != varType)
-        List((forEachStmt, "invalid types in the foreach statement"))
-      else
-        List()
-    }
-    else {
-      List((forEachStmt, "invalid types in the foreach statement"))
-    }
-    res ++ forEachStmt.stmt.accept(this)
-  }
-
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
     case WhileStmt(_, _) => visitWhileStmt(stmt)
-    case ForEachStmt(v, e, s) => visitForEachStmt(ForEachStmt(v, e, s))
     case ExitStmt() => visitExitStmt()
+    case NewStmt(v) => if(env.lookup(v).isDefined){ if(env.lookup(v).get.isInstanceOf[PointerType]) {List()}else{ List((stmt, s"Variable $v not type Pointer."))}}else List((stmt, s"Variable $v not declared."))
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
     case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
@@ -189,7 +174,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case AssignmentStmt(VarAssignment(v), exp) =>
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined){
-          if (env.lookup(v).get != exp.accept(expVisitor).get){
+          if (env.lookup(v).get.accept(expVisitor).get != exp.accept(expVisitor).get){
               if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[PointerType]) &&
                     (exp.accept(expVisitor).get == NullType)){
                     List()
@@ -201,7 +186,7 @@ class TypeChecker extends OberonVisitorAdapter {
               else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
                     (exp.accept(expVisitor).get == IntegerType)){
                     List()
-              }
+              }              
               else{
                  List((stmt, s"Assignment between different types: $v, $exp"))
               }
@@ -232,16 +217,16 @@ class TypeChecker extends OberonVisitorAdapter {
       expVisitor.fieldAccessCheck(record, atrib)
   }
 
-private def visitIfElseStmt(stmt: Statement) = stmt match {
-  case IfElseStmt(condition, thenStmt, elseStmt) =>
-    var errorList = thenStmt.accept(this)
+  private def visitIfElseStmt(stmt: Statement) = stmt match {
+    case IfElseStmt(condition, thenStmt, elseStmt) =>
+      var errorList = thenStmt.accept(this)
 
-    if(!condition.accept(expVisitor).contains(BooleanType)) {
-      errorList = (stmt, s"Expression $condition does not have a boolean type") :: errorList
-    }
-    
-    errorList ++ elseStmt.map(_.accept(this)).getOrElse(List())
-}
+      if (!condition.accept(expVisitor).contains(BooleanType)) {
+        errorList = (stmt, s"Expression $condition does not have a boolean type") :: errorList
+      }
+
+      errorList ++ elseStmt.map(_.accept(this)).getOrElse(List())
+  }
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
     case WhileStmt(condition, stmt) =>

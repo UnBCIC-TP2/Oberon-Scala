@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ast.{Location, Procedure, ReferenceToUserDefinedType, Type, UserDefinedType}
+import br.unb.cic.oberon.ast.{ArrayType, ArrayValue, Expression, Location, Procedure, Undef, UserDefinedType, AbsLocation, NilValue}
 
 import scala.collection.mutable.{ListBuffer, Map, Stack}
 
@@ -18,13 +18,14 @@ import scala.collection.mutable.{ListBuffer, Map, Stack}
  * return from a procedure, we pop the stack.
  */
 class Environment[T] {
-
   private var top_loc = 0
-  private val locations = Map.empty[Location, T]
-  private val global = Map.empty[String, Location]
-  private val stack = Stack.empty[Map[String, Location]]
+  private val locations = Map.empty[AbsLocation, T]
+  private val global = Map.empty[String, AbsLocation]
+  private val stack = Stack.empty[Map[String, AbsLocation]]
   private val procedures = Map.empty[String, Procedure]
   private val userDefinedTypes = Map.empty[String, UserDefinedType]
+
+
 
   def setGlobalVariable(name: String, value: T): Unit = {
     top_loc += 1
@@ -32,18 +33,18 @@ class Environment[T] {
     locations += Location(top_loc) -> value
   }
 
-  def addUserDefinedType(userType: UserDefinedType) : Unit = {
-    userDefinedTypes += userDefinedTypeName(userType) -> userType
+  def setPointerVariable(name: String): Unit = {
+    global += name -> NilValue
   }
 
-  def setParameterReference(name: String, loc: Location): Unit = {
-    stack.top += name -> loc
+  def addUserDefinedType(userType: UserDefinedType) : Unit = {
+    userDefinedTypes += userDefinedTypeName(userType) -> userType
   }
 
   def setLocalVariable(name: String, value: T) : Unit = {
     top_loc += 1
     if(stack.isEmpty) {
-      stack.push(Map.empty[String, Location])
+      stack.push(Map.empty[String, AbsLocation])
     }
     stack.top += name -> Location(top_loc)
     locations += Location(top_loc) -> value
@@ -59,10 +60,16 @@ class Environment[T] {
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def pointsTo(name: String): Option[Location] = {
-    if(stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
-    else if(global.contains(name)) Some(global(name))
-    else None
+  def setNewVariable(name: String, value: T): Unit = {
+    top_loc += 1
+    if (stack.nonEmpty && stack.top.contains(name)) {
+      locations(stack.top(name)) = value
+    }
+    else if (global.contains(name)) {
+      global(name) = Location(top_loc)
+      locations(global(name)) = value
+    }
+    else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
   def lookup(name: String) : Option[T] = {
@@ -71,9 +78,37 @@ class Environment[T] {
     else None
   }
 
-  def baseType(aType: Type) : Option[Type] = aType match {
-    case ReferenceToUserDefinedType(name) => lookupUserDefinedType(name).flatMap(udt => baseType(udt.baseType))
-    case _ => Some(aType)
+  def reassignArray(name: String, index: Int, value: Expression) : Unit = {
+    if(stack.nonEmpty && stack.top.contains(name)) {
+      locations(stack.top(name)).asInstanceOf[ArrayValue].value.update(index, value)
+    }
+    else if(global.contains(name)) {
+      locations(global(name)).asInstanceOf[ArrayValue].value.update(index, value)
+    }
+    else throw new RuntimeException("Variable " + name + " is not defined")
+  }
+
+  def lookupArrayIndex(name: String, index: Int) : Option[Expression] = {
+    var list = new ListBuffer[Expression]
+
+    if(stack.nonEmpty && stack.top.contains(name)){
+      list = locations(stack.top(name)).asInstanceOf[ArrayValue].value
+    }
+    else if(global.contains(name)){
+      list = locations(global(name)).asInstanceOf[ArrayValue].value
+    }
+    else throw new RuntimeException("Variable " + name + " is not defined")
+
+    if (list.length > index) {
+      if (index >= 0) {
+        Some(list(index))
+      }
+      else if (index >= -list.length) {
+        Some(list(list.length + index))
+      }
+      else None
+    }
+    else None
   }
 
   def lookupUserDefinedType(name: String) : Option[UserDefinedType] = userDefinedTypes.get(name)
@@ -82,7 +117,7 @@ class Environment[T] {
 
   def findProcedure(name: String): Procedure = procedures(name)
 
-  def push(): Unit = stack.push(Map.empty[String, Location])
+  def push(): Unit = stack.push(Map.empty[String, AbsLocation])
 
   def pop(): Unit = stack.pop()
 

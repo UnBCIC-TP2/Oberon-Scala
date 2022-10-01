@@ -1,0 +1,22 @@
+MODULE ListAssign;
+
+    TYPE
+      IntList = RECORD
+        value : INTEGER;
+        next : POINTER TO IntList;
+      END
+
+VAR
+    ListInt : POINTER TO IntList;
+
+BEGIN
+       IF ListInt = NIL THEN
+          NEW(ListInt);
+          ListInt.value := 15;
+          ListInt.next := NIL
+       END;
+       ListInt.value := 25;
+       ListInt.next := NIL
+END
+
+END ListAssign.

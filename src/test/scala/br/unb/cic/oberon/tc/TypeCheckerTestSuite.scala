@@ -9,7 +9,6 @@ import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
-import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
@@ -978,22 +977,22 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0)), ArrayType(1, IntegerType)), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(IntValue(0))), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
-    assert(typeCheckerErrors.isEmpty)
+    assert(typeCheckerErrors.length == 0)
   }
 
   test("Test array subscript, expression is empty ArrayValue") {
     val visitor = new TypeChecker()
 
     val stmt =
-      WriteStmt(ArraySubscript(ArrayValue(ListBuffer(), ArrayType(0, IntegerType)), IntValue(0)))
+      WriteStmt(ArraySubscript(ArrayValue(ListBuffer()), IntValue(0)))
 
     val typeCheckerErrors = stmt.accept(visitor)
 
-    assert(typeCheckerErrors.isEmpty)
+    assert(typeCheckerErrors.length == 1)
   }
 
   test("Test function call") {
@@ -1002,6 +1001,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = Nil,
+        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1026,6 +1026,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1053,6 +1054,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = List(ParameterByValue("x", IntegerType)),
+        Map(),
         returnType = None,
         constants = Nil,
         variables = Nil,
@@ -1076,6 +1078,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       Procedure(
         name = "proc",
         args = Nil,
+        Map(),
         returnType = Some(StringType),
         constants = Nil,
         variables = Nil,
@@ -1103,6 +1106,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1134,6 +1138,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1165,6 +1170,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
           ParameterByValue("x", IntegerType),
           ParameterByReference("y", BooleanType)
         ),
+        Map(),
         returnType = Some(IntegerType),
         constants = Nil,
         variables = Nil,
@@ -1360,32 +1366,40 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     assert(typeCheckerErrors.length == 1)
   }
-
-  test("Type checking foreach stmt") {
-    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
-    assert(module.name == "ForEachStmt")
-
+  test("Test NewStmt - Correct attribute type - NEW(POINTER TYPE)") {
     val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("IntList", RecordType(List(VariableDeclaration("next", PointerType(IntegerType)))))
+    visitor.env.setGlobalVariable("ListInt", PointerType(RecordType(List(VariableDeclaration("value", IntegerType)))))
+    val stmt01 = new NewStmt("ListInt")
 
-    assert(module.accept(visitor) == List())
+    val stmts = SequenceStmt(List(stmt01))
+
+    val typeCheckerErrors = stmts.accept(visitor)
+
+    assert(typeCheckerErrors.length == 0)
   }
-
-  test("Type checking expressions with user defined types") {
+  ignore("Test NewStmt - Record with Pointer to Same Record") {
     val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("IntList", RecordType(List(VariableDeclaration("value", IntegerType),VariableDeclaration("next", PointerType(RecordType.asInstanceOf[RecordType])))))
+    visitor.env.setGlobalVariable("ListInt",  PointerType(RecordType(List(VariableDeclaration("value", IntegerType),VariableDeclaration("next", PointerType(RecordType.asInstanceOf[RecordType]))))))
+    val stmt01 = new NewStmt("ListInt")
 
-    val as = br.unb.cic.oberon.ast.AssignmentStmt
-    val arrayType: ArrayType = ArrayType(5, IntegerType)
-    val udt : UserDefinedType = UserDefinedType("MediaArray", arrayType)
-    val simpleAssignment: Statement = AssignmentStmt("x", IntValue(5))
-    val arrayAssigment: Statement = as(ArrayAssignment(VarExpression("medias"), IntValue(0)), IntValue(5))
+    val stmts = SequenceStmt(List(stmt01))
 
-    visitor.env.addUserDefinedType(udt)
+    val typeCheckerErrors = stmts.accept(visitor)
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("medias", ReferenceToUserDefinedType("MediaArray"))
+    assert(typeCheckerErrors.length == 1)
+  }
+  test("Test NewStmt - Wrong attribute type - NEW(NOT POINTER TYPE)") {
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("IntList", RecordType(List(VariableDeclaration("next", PointerType(IntegerType)))))
+    visitor.env.setGlobalVariable("ListInt", IntegerType)
+    val stmt01 = new NewStmt("ListInt")
 
-    assert(simpleAssignment.accept(visitor) == List())
+    val stmts = SequenceStmt(List(stmt01))
 
-    assert(arrayAssigment.accept(visitor) == List())
+    val typeCheckerErrors = stmts.accept(visitor)
+
+    assert(typeCheckerErrors.length == 1)
   }
 }
