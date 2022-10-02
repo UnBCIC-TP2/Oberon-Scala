@@ -111,10 +111,9 @@ class FInterpreter {
           
         }
 
-      case SequenceStmt(stmts) => {
-        var newEnv = env
-        stmts.foreach(s => newEnv = interpret(s, newEnv))
-        return newEnv
+      case SequenceStmt(stmts) => stmts match {
+        case h::t => interpret(SequenceStmt(t), interpret(h, env))
+        case Nil => env
       }
 
       case ReadRealStmt(name) => env.setVariable(name, RealValue(StdIn.readLine().toFloat))
@@ -134,11 +133,21 @@ class FInterpreter {
         else env
 
       case WhileStmt(condition, whileStmt) => {
+       
         var newEnv = env
         while (evalCondition(condition, newEnv) && !exit)
           newEnv = interpret(whileStmt, newEnv)
         exit = false
         newEnv
+       
+        
+        //there was an attempt
+        // if(evalCondition(condition, env) && !exit){
+        //   interpret(WhileStmt(condition, whileStmt), interpret(whileStmt, env))
+        // }else{
+        //   exit = false
+        //   env
+        // }
       }
 
       case ForEachStmt(v, exp, stmt) => {
@@ -313,7 +322,7 @@ class FInterpreter {
     
     val leftOperand = evalExpression(left, env)
     val rightOperand = evalExpression(right, env)
-    if(!(division && rightOperand.asInstanceOf[Number].asInstanceOf[IntValue].value == 0))
+    if(!(division && rightOperand.asInstanceOf[Value].value == 0))
       Right(fn(leftOperand.asInstanceOf[Number], rightOperand.asInstanceOf[Number]))
     else
       Left("Division by zero.")
@@ -333,7 +342,7 @@ class FInterpreter {
     
     val dividend = evalExpression(left, env)
     val divider = evalExpression(right, env)
-    if(divider.asInstanceOf[Number].asInstanceOf[IntValue].value != 0)
+    if(divider.asInstanceOf[Value].value != 0)
       Right(fn(dividend.asInstanceOf[Modular], divider.asInstanceOf[Modular]))
     else
       Left("Division by zero.")
@@ -350,6 +359,7 @@ class FInterpreter {
    *              are using a high-order function.
    */
   def binExpression(left: Expression, right: Expression, env : FEnvironment, fn: (Value, Value) => Expression): Either[String, Expression] = {
+    //feval(left(), env) >>=(l)=>feval(right(), env) >>=(r)=> fn(l, r)
     val leftOperand = evalExpression(left, env)
     val rightOperand = evalExpression(right, env)
     Right(fn(leftOperand.asInstanceOf[Value], rightOperand.asInstanceOf[Value]))
