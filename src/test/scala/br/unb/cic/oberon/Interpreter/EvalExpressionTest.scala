@@ -228,5 +228,32 @@ class EvalExpressionTest extends AnyFunSuite {
     
     DAssert.deltaAssert(interpreter.evalExpression(exp, env), 14.26075, delta)
   }
+  test("Division by 0") {
+    val x = IntValue(8)
+    val y = IntValue(0)
+
+    val exp = DivExpression(x, y)
+
+    assert(interpreter.fEval(exp, env) == Left("Division by zero."))  
+    
+  }
+  test("Division by 0 with real values") {
+    val x = RealValue(0.0)
+    val y = RealValue(0.0)
+
+    val exp = DivExpression(x, y)
+
+    assert(interpreter.fEval(exp, env) == Left("Division by zero."))  
+    
+  }
+  test("Mod by 0") {
+    val x = IntValue(-42)
+    val y = IntValue(0)
+
+    val exp = ModExpression(x, y)
+
+    assert(interpreter.fEval(exp, env) == Left("Division by zero."))
+    
+  }
   // TODO: Write test cases  dealing with different scopes and name collision.
 }

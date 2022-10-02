@@ -389,12 +389,9 @@ class FInterpreterTest extends AnyFunSuite {
   test("Testing RepeatUntil stmt on RepeatUntilStmt02 program") {
     val module = ScalaParser.parseResource("stmts/RepeatUntilStmt02.oberon")
 
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.name == "RepeatUntilModule")
 
-    val (env, stmt) = interpreter.decomposer(coreModule)
+    val (env, stmt) = interpreter.decomposer(module)
     val executed = interpreter.interpret(stmt.get, env)
 
     assert(executed.lookup("sum") == Some(IntValue(330)));
@@ -404,6 +401,7 @@ class FInterpreterTest extends AnyFunSuite {
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt03 program") {
     val module = ScalaParser.parseResource("stmts/RepeatUntilStmt03.oberon")
+
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -714,6 +712,34 @@ class FInterpreterTest extends AnyFunSuite {
     assert(executed.lookup("a") == Some(IntValue(2)))
     assert(executed.lookup("b") == Some(IntValue(4)))
     assert(executed.lookup("c") == Some(IntValue(1)))
+
+  }
+
+  test("Testing procedure07"){
+    val module = ScalaParser.parseResource("procedures/procedure07.oberon")
+
+    assert(module.name == "Procedure07")
+    val (env, stmt) = interpreter.decomposer(module)
+    val executed = interpreter.interpret(stmt.get, env)
+
+    assert(executed.lookup("a") == Some(IntValue(2)))
+    assert(executed.lookup("b") == Some(IntValue(2)))
+    assert(executed.lookup("c") == Some(IntValue(1)))
+
+  }
+
+  test("Testing procedure08") {
+    val module = ScalaParser.parseResource("procedures/procedure08.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    assert(coreModule.name == "Factorial10")
+
+    val (env, stmt) = interpreter.decomposer(coreModule)
+    val executed = interpreter.interpret(stmt.get, env)
+
+    assert(executed.lookup("res") == Some(IntValue(3628800)))
 
   }
 
