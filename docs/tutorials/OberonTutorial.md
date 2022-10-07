@@ -218,10 +218,4 @@ Lista de testes unitários feitos e documentados em forma de tutorial da linguag
     <ul>
 	    <li>STRINGTOREAL</li>
     </ul>
-	<li><b><a href="./userInput.md">User Input</b></li>
-    <ul>
-	    <li>READFILE</li>
-	    <li>STRINGTOINT</li>
-	    <li>STRINGTOREAL</li>
-    </ul>
 </ul> 
