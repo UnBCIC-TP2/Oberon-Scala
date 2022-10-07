@@ -1,0 +1,15 @@
+MODULE STRINGTOINTTest;
+
+VAR
+  x : STRING;
+  y : INTEGER;
+  z : INTEGER;
+  w : STRING;
+
+BEGIN
+  w := "2";
+  x := "-8";
+  y := STRINGTOINT(x);
+  z := STRINGTOINT(w)
+END
+END STRINGTOINTTest.

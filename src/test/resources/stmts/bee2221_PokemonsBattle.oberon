@@ -1,0 +1,41 @@
+MODULE bee2221pok;
+
+VAR
+    a : ARRAY 3 OF INTEGER;
+    b : ARRAY 3 OF INTEGER;
+    anst, bonus, ansa, ansb : INTEGER;
+
+BEGIN
+    a[0] := 12;
+    a[1] := 24;
+    a[2] := 15;
+
+    b[0] := 42;
+    b[1] := 12;
+    b[2] := 20;
+
+    bonus := 5;
+    anst := 0;
+
+    ansa := (a[0] + a[1])/2;
+
+    IF(ODD(a[2])) THEN
+        ansa := ansa + bonus
+    END;
+
+    ansb := (b[0] + b[1])/2;
+
+    IF(ODD(b[2])) THEN
+        ansb := ansa + bonus
+    END;
+
+    IF(ansa > ansb) THEN
+        anst := anst + 1
+    END;
+
+    IF(ansb > ansa) THEN
+        anst := anst + 2
+    END
+END
+
+END bee2221pok.

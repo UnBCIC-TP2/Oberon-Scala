@@ -1,0 +1,24 @@
+MODULE bee2057;
+
+TYPE
+  A = ARRAY 3 OF INTEGER
+
+VAR
+  a : A;
+  answer : INTEGER;
+
+BEGIN
+  a[0] := 22;
+  a[1] := 6;
+  a[2] := -2;
+   
+  answer := 0;
+
+  FOREACH v IN a
+    answer := answer + v
+  END;
+
+  answer := answer MOD 24
+END
+
+END bee2057.
