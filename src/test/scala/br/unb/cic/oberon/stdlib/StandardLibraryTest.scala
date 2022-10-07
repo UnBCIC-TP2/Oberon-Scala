@@ -182,4 +182,27 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
+   test(testName = "Test for the STRINGTOINT function"){
+    val module = ScalaParser.parseResource("stdlib/STRINGTOINTTest.oberon")
+
+    assert(module.name == "STRINGTOINTTest")
+
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("y") == Some(IntValue(-8)))
+    assert(interpreter.env.lookup("z") == Some(IntValue(2)))
+  }
+
+  test(testName = "Test for the STRINGTOREAL function"){
+    val module = ScalaParser.parseResource("stdlib/STRINGTOREALTest.oberon")
+
+    assert(module.name == "STRINGTOREALTest")
+
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("y") == Some(RealValue(-8.0)))
+    assert(interpreter.env.lookup("z") == Some(RealValue(2.5)))
+  }
 }
