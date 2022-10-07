@@ -754,7 +754,6 @@ class InterpreterTest extends AnyFunSuite {
     assert(evalArraySubscript("banknotesNeeded", 8) == IntValue(0))
     assert(evalArraySubscript("banknotesNeeded", 9) == IntValue(2))
     assert(evalArraySubscript("banknotesNeeded", 10) == IntValue(0))
-    assert(evalArraySubscript("banknotesNeeded", 11) == IntValue(3))
 
   }
 
@@ -964,6 +963,19 @@ class InterpreterTest extends AnyFunSuite {
       assert(evalArraySubscript("ans", 2) == RealValue(9.3))
       
     }
+
+  test("BeeAnimal test of procedure") {
+    val module = ScalaParser.parseResource("stmts/bee1049_Animal.oberon")
+
+    assert(module.stmt.isDefined)
+
+    assert(module.name == "BeeAnimal")
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("classifiedAnimal") == Some(StringValue("homem")))
+
+  }
 
   def evalArraySubscript(name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
