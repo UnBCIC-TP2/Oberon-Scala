@@ -1,0 +1,40 @@
+MODULE Procedure07;
+
+VAR
+  a: Integer;
+  b: Integer;
+  c: Integer;
+
+PROCEDURE inc(VAR c: INTEGER);
+    BEGIN
+        c := c + 1
+    END inc
+
+PROCEDURE teste(b : INTEGER) : INTEGER;
+    BEGIN
+        b := 0;
+        inc(b);
+        RETURN b
+    END teste
+
+PROCEDURE dec(a : INTEGER) : INTEGER;
+    VAR
+        c: Integer;
+    BEGIN
+        c := 2;
+        a := a - c; 
+        RETURN a
+    END teste
+
+BEGIN
+    a := 2;
+    b := 3;
+    c := teste(a);
+    b := dec(b); 
+    inc(b);
+    write(c);
+    write(a);
+    write(b)
+END
+
+END Procedure07.
