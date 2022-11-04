@@ -1,0 +1,18 @@
+MODULE SimpleModule;
+
+TYPE
+   rec = RECORD
+      x: REAL;
+      y: REAL;
+   END
+
+VAR
+    r : rec;
+BEGIN
+    r.x := 5.0;
+    r.y := 10.5;
+    r.x := r.x + r.y
+    
+END
+
+END SimpleModule.

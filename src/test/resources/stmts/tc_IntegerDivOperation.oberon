@@ -1,0 +1,15 @@
+MODULE DivOperation;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  div : INTEGER;
+
+BEGIN
+    x := 20;
+    y := 10;
+    div := x / y
+    
+END
+
+END DivOperation.

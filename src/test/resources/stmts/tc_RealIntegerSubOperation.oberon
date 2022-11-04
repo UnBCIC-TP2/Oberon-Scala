@@ -1,0 +1,15 @@
+MODULE SubOperation;
+
+VAR
+  x : REAL;
+  y : INTEGER;
+  sub : REAL;
+
+BEGIN
+    x := 10.5;
+    y := 20;
+    sub := x - y
+    
+END
+
+END SubOperation.

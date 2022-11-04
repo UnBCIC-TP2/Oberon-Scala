@@ -1,0 +1,15 @@
+MODULE pointer;
+
+VAR
+  p : POINTER TO REAL;
+  x : REAL;
+
+BEGIN
+    x := 10.5;
+    p^ := 20.5;
+    x := p^;
+    p^ := x
+    
+END
+
+END pointer.

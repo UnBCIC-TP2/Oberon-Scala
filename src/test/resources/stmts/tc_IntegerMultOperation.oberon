@@ -1,0 +1,15 @@
+MODULE MultOperation;
+
+VAR
+  x : INTEGER;
+  y : INTEGER;
+  mult : INTEGER;
+
+BEGIN
+    x := 10;
+    y := 10;
+    mult := x * y
+    
+END
+
+END MultOperation.
