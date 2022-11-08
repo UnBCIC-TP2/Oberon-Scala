@@ -1,0 +1,45 @@
+MODULE bee1042Sort;
+
+VAR
+    input : ARRAY 3 OF INTEGER;
+    input2 : ARRAY 3 OF INTEGER;
+    ans : ARRAY 6 OF INTEGER;
+    x, y, Z : INTEGER;
+
+BEGIN
+    x := 0;
+    y := 0;
+
+
+    input[0] := 7;
+    input[1] := 21;
+    input[2] := -14;
+    input2[0] := 7;
+    input2[1] := 21;
+    input2[2] := -14;
+    
+    REPEAT
+        x := 0;
+        REPEAT
+            IF input[x] > input[x + 1] THEN
+                Z := input[x];
+                input[x] := input[x + 1];
+                input[x + 1] := Z
+            END;
+            x:= x + 1
+        UNTIL (x = 2);
+
+        y:= y + 1
+    UNTIL (y = 2);
+    
+
+    ans[0] := input[0];
+    ans[1] := input[1];
+    ans[2] := input[2];
+    ans[3] := input2[0];
+    ans[4] := input2[1];
+    ans[5] := input2[2]
+
+END
+
+END bee1042Sort.compile

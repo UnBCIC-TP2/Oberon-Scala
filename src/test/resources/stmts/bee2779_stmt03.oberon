@@ -1,0 +1,33 @@
+MODULE bee2779;
+
+VAR
+  a : ARRAY 4 OF INTEGER;
+  cnt : ARRAY 4 OF INTEGER;
+  answer, n, m : INTEGER;
+
+BEGIN
+  a[0] := 2;
+  a[1] := 1;
+  a[2] := 3;
+  a[3] := 3;
+
+  cnt[0] := 0;
+  cnt[1] := 0;
+  cnt[2] := 0;
+  cnt[3] := 0;
+  
+  n := 3;
+  m := 4;
+
+  answer := n;
+
+  FOREACH v IN a
+    cnt[v] := cnt[v] + 1;
+
+    IF (cnt[v] = 1) THEN
+      answer := answer - 1
+    END
+  END
+END
+
+END bee2779.

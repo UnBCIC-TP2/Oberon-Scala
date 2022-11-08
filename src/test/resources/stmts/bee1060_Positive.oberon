@@ -1,0 +1,26 @@
+MODULE bee1060Positive;
+
+VAR
+    a : ARRAY 6 OF REAL;
+    
+    ans : REAL;
+
+BEGIN
+    a[0] := 7;
+    a[1] := -5;
+    a[2] := 6;
+    a[3] := -3.4;
+    a[4] := 4.6;
+    a[5] := 12;
+    
+    ans := 0;
+
+    FOREACH v IN a
+        IF v >= 0 THEN
+            ans := ans + 1
+        END    
+    END
+
+END
+
+END bee1060Positive.compile

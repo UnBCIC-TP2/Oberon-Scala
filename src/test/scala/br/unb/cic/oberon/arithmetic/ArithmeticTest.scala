@@ -1,7 +1,10 @@
 package br.unb.cic.oberon.arithmetic
 
-import br.unb.cic.oberon.ast.{IntValue, RealValue}
+import br.unb.cic.oberon.ast.{IntValue, RealValue, MultExpression}
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.interpreter.{Interpreter, EvalExpressionVisitor}
+import br.unb.cic.oberon._
+import br.unb.cic.oberon.ast._
 
 class ArithmeticTestSuite extends AnyFunSuite {
   test("Test sum between two integers") {
@@ -32,5 +35,22 @@ class ArithmeticTestSuite extends AnyFunSuite {
     expected = IntValue(4)
 
     assert(expected == (i09 / i02))
+  }
+
+  test("Test a multiplication between two real"){
+
+    val r10 = RealValue(10.0)
+    val r2 = RealValue(2.0)
+    val m = MultExpression(r10, r2)
+
+    val expected = RealValue(20.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
   }
 }
