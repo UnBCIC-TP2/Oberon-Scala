@@ -1,0 +1,38 @@
+MODULE BeeBanknoteReal;
+
+TYPE
+	realArray = ARRAY 12 OF REAL
+	intArray = ARRAY 12 OF INTEGER
+
+VAR
+	banknotesValues: realArray;
+	banknotesNeeded: intArray;
+	value: REAL;
+	i: INTEGER;
+	v: REAL;
+
+BEGIN
+	value := 576.73;
+	i := 0;
+
+	banknotesValues[0] := 100.0;
+	banknotesValues[1] := 50.0;
+	banknotesValues[2] := 20.0;
+	banknotesValues[3] := 10.0;
+	banknotesValues[4] := 5.0;
+	banknotesValues[5] := 2.0;
+	banknotesValues[6] := 1.0;
+	banknotesValues[7] := 0.5;
+	banknotesValues[8] := 0.25;
+	banknotesValues[9] := 0.1;
+	banknotesValues[10] := 0.05;
+	banknotesValues[11] := 0.01;
+
+	FOREACH v IN banknotesValues
+		banknotesNeeded[i] := FLOOR(value/v);
+		value := value - v*banknotesNeeded[i];
+		INC(i)
+	END
+END
+
+END BeeBanknoteReal.

@@ -1,0 +1,43 @@
+MODULE BeeAnimal;
+
+VAR
+	classifiedAnimal : INTEGER;
+
+PROCEDURE getAnimal(hint1, hint2, hint3: STRING) : STRING;
+	BEGIN
+	    IF (hint1 = "vertebrado") THEN
+	        IF (hint2 = "ave") THEN
+	        	IF (hint3 = "carnivoro") THEN
+	        		RETURN "aguia"
+	        	ELSE
+	        		RETURN "pomba"
+	        	END
+	        ELSE
+	        	IF (hint3 = "onivoro") THEN
+	        		RETURN "homem"
+	        	ELSE
+	        		RETURN "vaca"
+	        	END
+	        END
+	    ELSE
+	        IF (hint2 = "inseto") THEN
+	        	IF (hint3 = "hematofago") THEN
+	        		RETURN "pulga"
+	        	ELSE
+	        		RETURN "lagarta"
+	        	END
+	        ELSE
+	        	IF (hint3 = "hematofago") THEN
+	        		RETURN "sanguessuga"
+	        	ELSE
+	        		RETURN "minhoca"
+	        	END
+	        END
+	    END
+	END getAnimal
+
+BEGIN
+	classifiedAnimal := getAnimal("vertebrado", "mamifero", "onivoro")
+END
+
+END BeeAnimal.

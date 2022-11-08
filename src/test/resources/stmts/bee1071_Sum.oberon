@@ -1,0 +1,33 @@
+MODULE bee1071Sum;
+
+
+VAR
+    input1, input2, ans , x, y, aux: INTEGER;
+    
+
+BEGIN
+    input1 := 15;
+    input2 := 12;
+    ans := 0;
+    
+    x := input1;
+    y := input2 + 1;
+
+    IF input2 > input1 THEN
+        x := input2;
+        y := input1
+    END;
+
+    REPEAT
+        x := x - 1;
+        aux := x - (x / 2) * 2;
+        IF aux = 1 THEN
+            ans := ans + x
+        END
+           
+    UNTIL (x = y)
+    
+
+END
+
+END bee1071Sum.compile

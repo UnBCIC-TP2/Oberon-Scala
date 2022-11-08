@@ -1,0 +1,33 @@
+MODULE bee1061EventTime;
+
+VAR
+    di, df, hi, hf, mi, mf, si, sf, dt, ht, mt, st : INTEGER;
+  
+BEGIN
+    di := 5;
+    df := 9;
+    hi := 2;
+    hf := 5;
+    mi := 3;
+    mf := 1;
+    si := 10;
+    sf := 37;
+    dt := df - di;
+    ht := hf - hi;
+    mt := mf - mi;
+    st := sf - si;
+    IF(ht < 0) THEN
+        ht := hi - hf;
+        dt := dt - 1
+    END;
+    IF(mt < 0) THEN
+        mt := 60 - mi + mf;
+        ht := ht - 1
+    END;
+    IF(st < 0) THEN
+        st := 60 - si + sf;
+        mt := mt - 1
+    END
+END
+
+END bee1061EventTime.

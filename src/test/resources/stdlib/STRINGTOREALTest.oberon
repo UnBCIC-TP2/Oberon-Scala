@@ -1,0 +1,15 @@
+MODULE STRINGTOREALTest;
+
+VAR
+  x : STRING;
+  y : REAL;
+  z : REAL;
+  w : STRING;
+
+BEGIN
+  w := "2.5";
+  x := "-8.0";
+  y := STRINGTOREAL(x);
+  z := STRINGTOREAL(w)
+END
+END STRINGTOREALTest.
