@@ -223,6 +223,7 @@ case class LoopStmt(stmt: Statement) extends Statement
 case class ReturnStmt(exp: Expression) extends Statement
 case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]) extends Statement
 case class ExitStmt() extends Statement
+case class NewStmt(varName: String) extends Statement
 case class MetaStmt(f: () => Statement) extends Statement
 
 trait CaseAlternative {
