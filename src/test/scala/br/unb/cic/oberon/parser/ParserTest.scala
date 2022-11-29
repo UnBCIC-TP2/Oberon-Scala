@@ -2277,5 +2277,20 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }
 
+  test(testName = "Testing the module PointerNewStatement"){
+    val module = ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+    assert(module.name == "PointerNewStatement")
+
+    assert(module.stmt.isDefined)
+
+    module.stmt.get match {
+      case SequenceStmt(stmts) =>
+        assert(6 == stmts.length)
+        assert(stmts(0).isInstanceOf[NewStmt])
+      case _ => assert(false)
+    }
+
+  }
+
 }
 

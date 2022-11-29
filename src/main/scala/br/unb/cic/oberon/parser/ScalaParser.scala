@@ -549,6 +549,11 @@ class ParserVisitor {
       stmt = ExitStmt()
     }
 
+
+    override def visitNewStmt(ctx: OberonParser.NewStmtContext): Unit = {
+      stmt = NewStmt(ctx.Id().getText)
+    }
+
     override def visitIfElseIfStmt(ctx: OberonParser.IfElseIfStmtContext): Unit = {
       val visitor = new ExpressionVisitor()
 
