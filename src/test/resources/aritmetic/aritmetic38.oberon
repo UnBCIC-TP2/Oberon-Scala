@@ -1,0 +1,6 @@
+MODULE Aritmetic38;
+
+CONST
+  x = 6 + 5 MOD 4;
+
+END Aritmetic38.
