@@ -74,8 +74,8 @@ expression
  | name = Id '^'                                                                          #PointerAccess
  | '~' exp = expression                                                                   #NotExpression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
- | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                          #MultExpression
- | left = expression opr = ('+' | '-' | '||') right = expression                  #AddExpression
+ | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                  #MultExpression
+ | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
  ;
 
 qualifiedName
