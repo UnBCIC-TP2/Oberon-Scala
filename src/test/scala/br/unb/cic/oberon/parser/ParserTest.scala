@@ -1815,6 +1815,15 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
+  test("Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD") {
+    val module = ScalaParser.parseResource("aritmetic/aritmetic38.oberon")
+
+    assert(module.name == "Aritmetic38")
+    assert(module.constants.size == 1)
+    assert(module.constants.head == 
+      Constant("x", AddExpression(IntValue(6), ModExpression(IntValue(5), IntValue(4)))))
+  }
+
   test("Testing module B oberon import module feature. Import one module") {
     val moduleB = ScalaParser.parseResource("imports/B.oberon")
 
