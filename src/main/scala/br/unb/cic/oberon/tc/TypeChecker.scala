@@ -143,10 +143,20 @@ class TypeChecker extends OberonVisitorAdapter {
     module.procedures.foreach(env.declareProcedure)
     module.userTypes.foreach(env.addUserDefinedType) //added G04
 
-    // TODO: check if the procedures are well typed.
+    var errors = module.procedures.flatMap(p => checkProcedure(p))
 
-    if(module.stmt.isDefined) module.stmt.get.accept(this)
-    else List()
+    if(module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
+    else errors
+  }
+
+  def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
+    env.push()
+    procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
+    procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
+    procedure.variables.foreach(v => env.setLocalVariable(v.name, v.variableType))
+    val errors = procedure.stmt.accept(this)
+    env.pop()
+    errors
   }
 
   def visitForEachStmt(forEachStmt: ForEachStmt): List[(Statement, String)] = {
@@ -182,6 +192,11 @@ class TypeChecker extends OberonVisitorAdapter {
     case ReadShortIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadCharStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case NewStmt(varName) =>
+      env.lookup(varName) match {
+        case Some(PointerType(_)) => List()
+        case _ => List((stmt, s"Expression $varName is ill typed"))
+      }
     case _ => throw new RuntimeException("Statement not part of Oberon-Core")
   }
 

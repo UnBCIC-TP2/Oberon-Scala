@@ -2285,7 +2285,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.get match {
       case SequenceStmt(stmts) =>
-        assert(6 == stmts.length)
+        assert(4 == stmts.length)
         assert(stmts(0).isInstanceOf[NewStmt])
       case _ => assert(false)
     }

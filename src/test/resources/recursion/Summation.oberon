@@ -1,0 +1,25 @@
+MODULE SUMMATION;
+
+VAR
+   x : INTEGER;
+
+PROCEDURE summation(v: INTEGER) : INTEGER;
+ VAR
+   x, y: INTEGER;
+
+ BEGIN
+   IF v = 0 THEN
+      RETURN v
+   ELSE
+      y := v - 1;
+      x := v + summation(y);
+      RETURN x
+   END
+ END summation
+
+
+BEGIN
+   x := summation(3);
+   write(x)
+END
+END SUMMATION.

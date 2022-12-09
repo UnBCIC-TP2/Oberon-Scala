@@ -1388,4 +1388,31 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     assert(arrayAssigment.accept(visitor) == List())
   }
+
+  test("Type checker for the new stmt") {
+    val module = ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+    assert(module.name == "PointerNewStatement")
+
+    assert(module.stmt.isDefined)
+
+    val visitor = new TypeChecker()
+
+    val res = module.accept(visitor)
+
+    assert(res.isEmpty)
+
+  }
+
+  test("Type checker for the SUMMATION module") {
+    val module = ScalaParser.parseResource("recursion/Summation.oberon")
+    assert(module.name == "SUMMATION")
+
+    assert(module.stmt.isDefined)
+
+    val visitor = new TypeChecker()
+
+    val res = module.accept(visitor)
+
+    assert(res.isEmpty)
+  }
 }
