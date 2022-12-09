@@ -689,6 +689,17 @@ class InterpreterTest extends AnyFunSuite {
     assert(interpreter.env.lookup("s") == Some(IntValue(6)))
   }
 
+  test(testName = "Testing the module SUMMATION"){
+    val module = ScalaParser.parseResource("recursion/Summation.oberon")
+    assert(module.name == "SUMMATION")
+
+    assert(module.stmt.isDefined)
+
+    module.accept(interpreter)
+
+    assert(interpreter.env.lookup("x") == Some(IntValue(6)))
+  }
+
   test(testName = "Testing bee1013: Sample Test 1"){
     val module = ScalaParser.parseResource("stmts/bee1013_stmt01.oberon")
     assert(module.name == "bee1013")
