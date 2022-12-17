@@ -178,5 +178,24 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/recordUsage.oberon")
   }
 
+  test("C generator for BeeCrowd 1013 stmt01") {
+    testGenerator("stmts/bee1013_stmt01.oberon")
+  }
+
+  test("C generator for BeeCrowd 1013 stmt02") {
+    testGenerator("stmts/bee1013_stmt02.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1018 Cedulas") {
+    testGenerator("stmts/bee1018_Cedulas.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1018 Cedulas User") {
+    testGenerator("stmts/bee1018_CedulasUser.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1021 Notas Moedas") {
+    testGenerator("stmts/bee1021_NotasMoedas.oberon")
+  }
 
 }
