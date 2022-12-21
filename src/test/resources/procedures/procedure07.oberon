@@ -1,0 +1,17 @@
+MODULE Recursion_limit_test;
+
+VAR
+  a: Integer;
+  c: Integer;
+
+PROCEDURE teste(y : INTEGER) : INTEGER;
+    BEGIN
+        RETURN teste(y) 
+    END teste
+
+BEGIN
+    a := 2;
+    c := teste(a)
+END
+
+END Procedure07.

@@ -712,6 +712,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
    * the following test cases read an oberon module with the
    * factorial procedure.
    */
+
   test("Test invalid procedure declaration") {
     val module = ScalaParser.parseResource("procedures/procedure04.oberon")
 
@@ -720,6 +721,55 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(module.procedures.size == 2)
     assert(module.stmt.isDefined)
 
+  }
+    test("Test function with return type different from procedure") {
+    val visitor = new TypeChecker()
+    
+    val proc = Procedure(
+        name = "proceduretest",
+        args = Nil,
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(StringValue("test"))
+      )
+    
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0)
+  }
+
+
+    // amostra
+    test("Test to evaluate if procedure has valid break condition") {
+    val module = ScalaParser.parseResource("procedures/procedure07.oberon")
+
+    assert(module.name == "Recursion_limit_test")
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+  }
+
+   test("Procedure body type-checking (args)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", BooleanType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("y"),
+            ReturnStmt(VarExpression("x")),
+             Some(ReturnStmt(AddExpression(VarExpression("x"),
+              VarExpression("y")))))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) // era pra ta 1 pq o else tem um erro de tipo: x(int) + y(bool)
   }
 
   test("Test the type checker of a valid Repeat statement") {
