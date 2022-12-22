@@ -44,7 +44,7 @@ case class Procedure(name: String,
 }
 
 /* formal argument definition */
-trait FormalArg{
+sealed trait FormalArg{
   def accept(v: OberonVisitor): v.T = v.visit(this)
   def argumentType: Type
   def name: String

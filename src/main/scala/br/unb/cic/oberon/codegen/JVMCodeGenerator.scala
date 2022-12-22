@@ -41,6 +41,7 @@ object JVMCodeGenerator extends CodeGenerator {
       v.variableType match {
         case IntegerType =>  cw.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
         case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
+		case _ => throw new Exception("Non-exhaustive match in case statement.")
       }
     )
   }

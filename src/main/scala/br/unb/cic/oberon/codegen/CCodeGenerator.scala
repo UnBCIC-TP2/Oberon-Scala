@@ -115,6 +115,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             declareVars(variables, userTypes, indentSize) +
             textln("};") +
           textln(s"typedef struct ${structName}_struct $structName;")
+		case _ => throw new Exception("Non-exhaustive match in case statement.")
       })
     }
     generatedDoc
@@ -140,7 +141,9 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         val userType = stringToType(name, userTypes)
         userType match {
           case RecordType(_) => s"struct $name"
+		  case _ => throw new Exception("Non-exhaustive match in case statement.")
         }
+	case _ => throw new Exception("Non-exhaustive match in case statement.")
     }
   }
 
@@ -221,6 +224,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
             val structName = genExp(record)
             val value = genExp(exp)
             textln(indent, s"$structName.$atrib = $value;")
+		  case _ => throw new Exception("Non-exhaustive match in case statement.")
         }
 
       case ExitStmt() =>
