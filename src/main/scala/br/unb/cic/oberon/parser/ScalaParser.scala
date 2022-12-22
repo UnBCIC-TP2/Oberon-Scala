@@ -43,7 +43,7 @@ object ScalaParser {
   }
 
   private def createOberonParser(input: String) = {
-    val lexer = new OberonLexer(new ANTLRInputStream(input))
+    val lexer = new OberonLexer(CharStreams.fromString(input))
     lexer.removeErrorListeners
     lexer.addErrorListener(OberonErrorListener)
 
@@ -429,12 +429,13 @@ class ParserVisitor {
     /*
      * The "ugly", though necessary code for visiting binary expressions.
      */
-    private def visitBinExpression(left: OberonParser.ExpressionContext, right: OberonParser.ExpressionContext, constructor: (Expression, Expression) => Expression) {
+    private def visitBinExpression(left: OberonParser.ExpressionContext, right: OberonParser.ExpressionContext, constructor: (Expression, Expression) => Expression): Unit = {
       left.accept(this) // first visit the left hand side of an expression.
       val lhs = exp // assign the result to the value lhs
       right.accept(this) // second, visit the right hand side of an expression
       val rhs = exp // assign the result to the value rhs
       exp = constructor(lhs, rhs) // assign the result to exp, using the 'constructor' to set the actual expression
+	  ()
     }
   }
 
