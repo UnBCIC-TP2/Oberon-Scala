@@ -54,7 +54,7 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
 object Main extends App {
 
   /* main block of code */
-  val conf = new Conf(args)
+  val conf = new Conf(args.toIndexedSeq)
 
   try {
     if (conf.tc.isSupplied) {

@@ -101,7 +101,7 @@ class OberonEngine extends ScriptEngine {
       case i: Integer => i.toString
       case b: lang.Boolean => b.toString
       case v: Value => v.value.toString
-      case m: util.Map[Object, Object] => "{}"
+      case m: util.Map[_, _] => "{}"
       case _ =>
         if (obj == null) "null"
         else s"toString not implemented for $obj (${obj.getClass})"
