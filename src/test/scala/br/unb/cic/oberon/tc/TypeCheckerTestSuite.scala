@@ -735,7 +735,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
     
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 0)
+    assert(typeCheckerErrors.length == 0) // era pra ter 1 erro, pois retorna string quando deveria ser int
   }
 
 
@@ -769,7 +769,48 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 0) // era pra ta 1 pq o else tem um erro de tipo: x(int) + y(bool)
+    assert(typeCheckerErrors.length == 1) // era pra ta 1 pq o else tem um erro de tipo: x(int) + y(bool)
+  }
+
+  test("Procedure body type-checking (integer + real)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", RealType),
+          ParameterByReference("flag", BooleanType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = IfElseStmt(
+          VarExpression("flag"),
+            ReturnStmt(VarExpression("y")),
+             Some(ReturnStmt(AddExpression(VarExpression("x"),
+              VarExpression("y")))))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 1) //  não pode somar x(int) + y(real) -> TODO: permitir somar int com real
+  }
+
+  test("Procedure body with variable declarations mapped in env correctly"){
+
+    val visitor = new TypeChecker()
+      val proc = Procedure(
+        name = "proc",
+        args = Nil,
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = List(VariableDeclaration("a", IntegerType), VariableDeclaration("b", IntegerType)),
+        stmt = ReturnStmt(AddExpression(VarExpression("a"), VarExpression("b")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) //  Não deve ter erro pois é retornada uma variável declarada dentro do corpo da função
   }
 
   test("Test the type checker of a valid Repeat statement") {
