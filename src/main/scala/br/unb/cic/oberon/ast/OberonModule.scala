@@ -157,8 +157,11 @@ case class RealValue(value: Double) extends Value with Number {
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
+case object NullValue extends Value {
+	type T = Unit
+	def value: T = ()
+}
 
-case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
