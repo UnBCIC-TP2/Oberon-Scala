@@ -47,10 +47,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     }
 
     val args = procedure.args.map {
-      case parameterByValue =>
-        text(convertVariable(parameterByValue.name, parameterByValue.argumentType, userTypes, isArgument = true))
-      case parameterByReference =>
-        text(convertVariable(parameterByReference.name, parameterByReference.argumentType, userTypes, isArgument = true))
+      case ParameterByValue(name, argumentType) =>
+        text(convertVariable(name, argumentType, userTypes, isArgument = true))
+      case ParameterByReference(name, argumentType) =>
+        text(convertVariable(name, argumentType, userTypes, isArgument = true))
     }
 
     val procedureDeclarations = declareVars(procedure.variables, List(), indentSize)
