@@ -213,7 +213,7 @@ class StandardLibrary[T](env: Environment[T]) {
   }*/
 
   def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-    try { f(param) } finally { param.close() }
+    try { f(param) } finally { import scala.language.reflectiveCalls; param.close() }
 
   def appendF(path:String, content:String) =
     using (new FileWriter(path, true)){

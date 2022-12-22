@@ -283,6 +283,6 @@ case class REPLConstant(constants: Constant) extends REPL
 case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
 
 object ValueConversion {
-  implicit def intValue2RealValue(intValue: IntValue): RealValue = RealValue(intValue.value)
-  implicit def charValue2IntValue(charValue: CharValue): IntValue = IntValue(charValue.value)
+  def intValue2RealValue(intValue: IntValue): RealValue = RealValue(intValue.value.toDouble)
+  def charValue2IntValue(charValue: CharValue): IntValue = IntValue(charValue.value.toInt)
 }
