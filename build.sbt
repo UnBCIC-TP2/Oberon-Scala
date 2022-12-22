@@ -5,6 +5,7 @@ organization := "br.unb.cic"
 version := "0.1.1"
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 // githubOwner := "UnBCIC-TP2"
 // githubRepository := "Oberon-Scala"

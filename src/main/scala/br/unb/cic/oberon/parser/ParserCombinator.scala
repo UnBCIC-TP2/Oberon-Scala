@@ -145,6 +145,7 @@ trait StatementParser extends ExpressionParser {
         { case a ~ b => List(a) ++ b } ^^ {
             case a :: Nil => a
             case a :: b => SequenceStmt(a :: b)
+			case Nil => SequenceStmt(Nil)
         }
     );
 }
