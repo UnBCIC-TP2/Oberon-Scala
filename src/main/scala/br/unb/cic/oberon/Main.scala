@@ -92,7 +92,7 @@ object Main extends App {
    * @param generator Either the CCodeGenerator or the JVMCodeGenerator
    * @param config the paths to the Oberon input and output files
    */
-  private def compile(generator: CodeGenerator, config: List[String]) = {
+  private def compile(generator: CodeGenerator[String], config: List[String]) = {
     if(config.size != 2) {
       throw new RuntimeException("Wrong number of program arguments.")
     }
