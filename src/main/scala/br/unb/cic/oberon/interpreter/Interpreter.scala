@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.stdlib.StandardLibrary
 import br.unb.cic.oberon.util.Values

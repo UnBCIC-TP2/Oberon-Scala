@@ -4,7 +4,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 
 import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 
 class ModuleLoaderTestSuite extends AbstractTestSuite {
 

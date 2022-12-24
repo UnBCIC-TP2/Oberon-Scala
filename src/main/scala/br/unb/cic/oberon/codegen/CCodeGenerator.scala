@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.transformations.CoreChecker
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc._

@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.graph
 
 import br.unb.cic.oberon.AbstractTestSuite
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.cfg.{EndNode, GraphNode, IntraProceduralGraphBuilder, SimpleNode, StartNode}
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge

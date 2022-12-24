@@ -1,4 +1,4 @@
-package br.unb.cic.oberon.ast
+package br.unb.cic.oberon.ir.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment

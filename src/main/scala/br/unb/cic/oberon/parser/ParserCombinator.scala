@@ -3,7 +3,7 @@ import scala.util.parsing.combinator._
 import scala.reflect.runtime.universe.TypeTag
 import scala.reflect.runtime.universe.typeOf
 import br.unb.cic.oberon.util.Resources
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import scala.collection.mutable.Map
 
 trait ParsersUtil extends JavaTokenParsers {

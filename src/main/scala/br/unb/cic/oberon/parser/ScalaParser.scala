@@ -2,7 +2,7 @@ package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.util.Resources
 import org.antlr.v4.runtime._
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import scala.collection.mutable.Map
 import org.antlr.stringtemplate.language.FormalArgument
 
@@ -65,7 +65,7 @@ object ScalaParser {
 
 class ParserVisitor {
   var module: OberonModule = _
-  var variables : List[br.unb.cic.oberon.ast.VariableDeclaration] = List()
+  var variables : List[br.unb.cic.oberon.ir.ast.VariableDeclaration] = List()
   var imptAliases = scala.collection.mutable.Map.empty[String, String] // Map[Module Alias, Module Name]
 
 
