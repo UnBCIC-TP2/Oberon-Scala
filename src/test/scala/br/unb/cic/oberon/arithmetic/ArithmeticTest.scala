@@ -1,10 +1,10 @@
 package br.unb.cic.oberon.arithmetic
 
-import br.unb.cic.oberon.ast.{IntValue, RealValue, MultExpression}
+import br.unb.cic.oberon.ir.ast.{IntValue, RealValue, MultExpression}
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.interpreter.{Interpreter, EvalExpressionVisitor}
 import br.unb.cic.oberon._
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 
 class ArithmeticTestSuite extends AnyFunSuite {
   test("Test sum between two integers") {

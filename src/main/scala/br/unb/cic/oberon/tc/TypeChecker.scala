@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -269,7 +269,7 @@ private def visitIfElseStmt(stmt: Statement) = stmt match {
       }
   }
 
-  private def visitExitStmt() = List[(br.unb.cic.oberon.ast.Statement, String)]()
+  private def visitExitStmt() = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
 
   /*
    * Type checker for a procedure call. This is the "toughest" implementation

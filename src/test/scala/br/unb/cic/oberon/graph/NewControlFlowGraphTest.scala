@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.graph
 
 import br.unb.cic.oberon.AbstractTestSuite
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.cfg.NewControlFlowGraph
 import org.scalactic.source.Position
 import org.scalatest.BeforeAndAfter

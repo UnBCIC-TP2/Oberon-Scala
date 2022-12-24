@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.visitor
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 
 /**
  * The abstract definition of an Oberon Visitor.

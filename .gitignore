@@ -35,6 +35,7 @@ build
 .scala_dependencies
 .cache
 .cache-main
+*.swp
 
 **/.antlr/
 

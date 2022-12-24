@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.AbstractTestSuite
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalactic.TolerantNumerics
 
