@@ -44,7 +44,7 @@ case class Procedure(name: String,
 }
 
 /* formal argument definition */
-trait FormalArg{
+sealed trait FormalArg{
   def accept(v: OberonVisitor): v.T = v.visit(this)
   def argumentType: Type
   def name: String
@@ -157,8 +157,11 @@ case class RealValue(value: Double) extends Value with Number {
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
+case object NullValue extends Value {
+	type T = Unit
+	def value: T = ()
+}
 
-case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
@@ -281,6 +284,6 @@ case class REPLConstant(constants: Constant) extends REPL
 case class REPLUserTypeDeclaration(userTypes: UserDefinedType) extends REPL
 
 object ValueConversion {
-  implicit def intValue2RealValue(intValue: IntValue): RealValue = RealValue(intValue.value)
-  implicit def charValue2IntValue(charValue: CharValue): IntValue = IntValue(charValue.value)
+  def intValue2RealValue(intValue: IntValue): RealValue = RealValue(intValue.value.toDouble)
+  def charValue2IntValue(charValue: CharValue): IntValue = IntValue(charValue.value.toInt)
 }

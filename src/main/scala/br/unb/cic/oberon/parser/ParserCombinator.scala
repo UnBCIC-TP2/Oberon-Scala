@@ -8,7 +8,7 @@ import scala.collection.mutable.Map
 
 trait ParsersUtil extends JavaTokenParsers {
     // Encapsulator aggregator function
-    def aggregator[T](r: T ~ List[T => T]): T = { r match { case a ~ b => (a /: b)((acc,f) => f(acc)) } }
+    def aggregator[T](r: T ~ List[T => T]): T = { r match { case a ~ b => (b.foldLeft(a))((acc,f) => f(acc)) } }
 
     // List Helper Function
     def listOpt[T](parser: Parser[List[T]]): Parser[List[T]] = opt(parser) ^^ {
@@ -145,6 +145,7 @@ trait StatementParser extends ExpressionParser {
         { case a ~ b => List(a) ++ b } ^^ {
             case a :: Nil => a
             case a :: b => SequenceStmt(a :: b)
+			case Nil => SequenceStmt(Nil)
         }
     );
 }

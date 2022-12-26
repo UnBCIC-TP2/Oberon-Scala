@@ -209,6 +209,7 @@ class Interpreter extends OberonVisitorAdapter {
       case (ParameterByReference(name, _), Some(location: Location)) => env.setParameterReference(name, location)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
       case (ParameterByValue(name, _), exp: Expression) => env.setLocalVariable(name, exp)
+	  case _ => throw new RuntimeException
     })
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, Undef()))
@@ -362,5 +363,5 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
 class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}
 
 class NullByteArrayOutputStream extends ByteArrayOutputStream {
-  override def writeTo(o: OutputStream) {}
+  override def writeTo(o: OutputStream): Unit = ()
 }
