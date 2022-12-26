@@ -118,7 +118,6 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/arrayAssignmentExpressions.oberon")
   }
 
-
   test("C generator for recordAssignmentStmt01") {
     testGenerator("stmts/recordAssignmentStmt01.oberon")
   }
@@ -167,7 +166,6 @@ class CCodeGenTest extends AnyFunSuite {
 
   test("C generator for Procedure with local var array"){
     testGenerator("procedures/procedure_with_local_var_array.oberon")
-
   }
 
   test("C generator for Type Int"){
@@ -178,5 +176,89 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/recordUsage.oberon")
   }
 
+  test("C generator for BeeCrowd 1013 stmt01") {
+    testGenerator("stmts/bee1013_stmt01.oberon")
+  }
+
+  test("C generator for BeeCrowd 1013 stmt02") {
+    testGenerator("stmts/bee1013_stmt02.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1018 Cedulas") {
+    testGenerator("stmts/bee1018_Cedulas.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1018 Cedulas User") {
+    testGenerator("stmts/bee1018_CedulasUser.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1021 Notas Moedas") {
+    testGenerator("stmts/bee1021_NotasMoedas.oberon")
+  }
+
+  test("C generator for BeeCrowd 1038 Snack Int") {
+    testGenerator("stmts/bee1038_Snack_int.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1038 Snack Real") {
+    testGenerator("stmts/bee1038_Snack_real.oberon")
+  }
+
+  test("C generator for BeeCrowd 1042 SimpleSort") {
+    testGenerator("stmts/bee1042_SimpleSort.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1049 Animal") {
+    testGenerator("stmts/bee1049_Animal.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1060 Positive") {
+    testGenerator("stmts/bee1060_Positive.oberon")
+  }
+
+  test("C generator for BeeCrowd 1061 EventTime") {
+    testGenerator("stmts/bee1061_EventTime.oberon")
+  }
+
+  test("C generator for BeeCrowd 1071 Sum") {
+    testGenerator("stmts/bee1071_Sum.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 1079 Average") {
+    testGenerator("stmts/bee1079_Average.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 2057 stmt01") {
+    testGenerator("stmts/bee2057_stmt01.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 2057 stmt02") {
+    testGenerator("stmts/bee2057_stmt02.oberon")
+  }
+
+  ignore("C generator for BeeCrowd 2057 stmt03") {
+    testGenerator("stmts/bee2057_stmt03.oberon")
+  }
+
+  // code was generated with compile error
+  ignore("C generator for BeeCrowd 2221 Pokemons Battle") {
+    testGenerator("stmts/bee2221_PokemonsBattle.oberon")
+  }
+
+  test("C generator for BeeCrowd 2779 stmt01") {
+    testGenerator("stmts/bee2779_stmt01.oberon")
+  }
+
+  test("C generator for BeeCrowd 2779 stmt02") {
+    testGenerator("stmts/bee2779_stmt02.oberon")
+  }
+
+  test("C generator for BeeCrowd 2779 stmt03") {
+    testGenerator("stmts/bee2779_stmt03.oberon")
+  }
+
+  test("C generator for BeeCrowd 3205 Nasty Hacks") {
+    testGenerator("stmts/bee3205_NastyHacks_v_alt.oberon")
+  }
 
 }
