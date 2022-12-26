@@ -4,7 +4,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 
 import java.nio.file.{Files, Paths}
 

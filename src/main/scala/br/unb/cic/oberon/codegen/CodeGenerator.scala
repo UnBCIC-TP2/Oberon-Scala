@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ast.OberonModule
+import br.unb.cic.oberon.ir.ast.OberonModule
 
 /**
  * The base interface for code generation.

@@ -1,9 +1,9 @@
 package br.unb.cic.oberon.transformations
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
-import br.unb.cic.oberon.ast.Procedure
+import br.unb.cic.oberon.ir.ast.Procedure
 
 class CoreVisitor() extends OberonVisitorAdapter {
   override type T = Statement

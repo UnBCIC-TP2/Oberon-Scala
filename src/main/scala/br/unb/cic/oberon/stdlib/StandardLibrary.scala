@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.stdlib
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 
 import scala.io.Source

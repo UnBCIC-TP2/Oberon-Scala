@@ -1,6 +1,6 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.ast.{AssignmentStmt, Expression, VarAssignment}
+import br.unb.cic.oberon.ir.ast.{AssignmentStmt, Expression, VarAssignment}
 import org.scalatest.funsuite.AnyFunSuite
 
 abstract class AbstractTestSuite extends AnyFunSuite {

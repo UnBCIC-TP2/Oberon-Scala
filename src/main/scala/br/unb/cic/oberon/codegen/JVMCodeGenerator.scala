@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.interpreter._
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
 

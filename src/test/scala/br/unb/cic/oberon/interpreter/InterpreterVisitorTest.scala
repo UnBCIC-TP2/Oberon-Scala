@@ -2,7 +2,7 @@ package br.unb.cic.oberon.interpreter
 
 import java.nio.file.{Files, Paths}
 
-import br.unb.cic.oberon.ast.{IntValue, OberonModule}
+import br.unb.cic.oberon.ir.ast.{IntValue, OberonModule}
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.parser
 
-import br.unb.cic.oberon.ast.{OberonModule, SequenceStmt, Statement}
+import br.unb.cic.oberon.ir.ast.{OberonModule, SequenceStmt, Statement}
 import br.unb.cic.oberon.util.Resources
 
 import scala.io.Source

@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.cfg
 
-import br.unb.cic.oberon.ast._
+import br.unb.cic.oberon.ir.ast._
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc

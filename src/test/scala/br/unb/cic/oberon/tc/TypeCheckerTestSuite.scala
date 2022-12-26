@@ -3,12 +3,12 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.AbstractTestSuite
 
 import java.nio.file.{Files, Paths}
-import br.unb.cic.oberon.ast._
-import br.unb.cic.oberon.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
+import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
-import br.unb.cic.oberon.ast.{OberonModule, VariableDeclaration}
+import br.unb.cic.oberon.ir.ast.{OberonModule, VariableDeclaration}
 import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.Map
@@ -1373,7 +1373,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   test("Type checking expressions with user defined types") {
     val visitor = new TypeChecker()
 
-    val as = br.unb.cic.oberon.ast.AssignmentStmt
+    val as = br.unb.cic.oberon.ir.ast.AssignmentStmt
     val arrayType: ArrayType = ArrayType(5, IntegerType)
     val udt : UserDefinedType = UserDefinedType("MediaArray", arrayType)
     val simpleAssignment: Statement = AssignmentStmt("x", IntValue(5))
