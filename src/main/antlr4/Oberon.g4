@@ -29,7 +29,12 @@ userType
 : ('ARRAY' length = INT 'OF' baseType = oberonType)     #ArrayTypeDeclaration
 | ('RECORD' (vars += varDeclaration)+ 'END')            #RecordTypeDeclaration
 | ('POINTER' 'TO' baseType = oberonType)                #PointerTypeDeclaration
+| ('LAMBDA' '->' '(' lambdaTypes? ')' ':' returnType = oberonType)               #LambdaTypeDeclaration
 ;
+
+//lambda declaration format: VAR x:LAMBDA->(type, type, ...):type
+
+lambdaTypes : oberonType (',' lambdaTypes)?; //support for indetermined number of arguments for lambda expression
 
 constant
   : constName = Id '=' exp = expression ';'
@@ -76,7 +81,13 @@ expression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
  | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                  #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ | '(' formals? ')' '=>' expression                                                       #LambdaExpression
+ | left = expression '(' arguments? ')'                                                   #LambdaApp
  ;
+
+//Lambda Expression and application formats:
+//x = (a, b) => a + b
+//x (10, 20)
 
 qualifiedName
   : (module = Id '::')? name = Id
@@ -115,6 +126,7 @@ designator
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
   | record = expression '.' name = Id                                 #RecordAssignment
   | pointer = Id '^'                                                  #PointerAssignment
+  | lambda = expression                                               #LambdaAssignment
   ;
 
 caseAlternative
