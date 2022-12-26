@@ -1,4 +1,4 @@
-package br.unb.cic.oberon.codegen
+package br.unb.cic.oberon.ir.jimple
 
 sealed trait Value
 
