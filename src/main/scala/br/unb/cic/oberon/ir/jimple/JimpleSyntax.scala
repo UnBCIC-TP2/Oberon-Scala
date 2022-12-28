@@ -45,9 +45,7 @@ case class Method(modifiers: List[Modifier],
 
 sealed trait MethodBody
 
-case class StandardMethodBody(localVariableDecls: List[LocalVariableDeclaration],
-                              stmts: List[Statement],
-                              catchClauses: List[CatchClause]) extends MethodBody
+case class DefaultMethodBody(localVariableDecls: List[LocalVariableDeclaration], stmts: List[Statement], catchClauses: List[CatchClause]) extends MethodBody
 
 case object SignatureOnly extends MethodBody
 
@@ -102,7 +100,7 @@ case class FieldRefExpression(className: String, fieldType: Type, fieldName: Str
 case class AndExpression(lhs: Immediate, rhs: Immediate) extends Expression
 case class OrExpression(lhs: Immediate, rhs: Immediate) extends Expression
 case class XorExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class ReminderExpression(lhs: Immediate, rhs: Immediate) extends Expression
+case class ReminderExpression(lhs: Immediate, rhs: Immediate) extends Expression    // Remainder?
 case class IsNullExpression(immediate: Immediate) extends Expression
 case class IsNotNullExpression(immediate: Immediate) extends Expression
 case class CmpExpression(lhs: Immediate, rhs: Immediate) extends Expression
