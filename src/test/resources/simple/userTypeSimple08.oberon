@@ -1,0 +1,6 @@
+MODULE Lambda01;
+
+TYPE
+  x = LAMBDA -> (INTEGER, INTEGER): INTEGER
+
+END Lambda01.

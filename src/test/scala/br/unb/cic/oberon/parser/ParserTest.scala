@@ -1815,6 +1815,15 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
+  test("test userTypeSimple08 code. This module declares a lambda expression type") {
+    val module = ScalaParser.parseResource("simple/userTypeSimple08.oberon")
+
+    assert(module.name == "Lambda01")
+    assert(module.userTypes.length == 1)
+    //assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].returnType == IntegerType)
+  }
+
+
   test("Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD") {
     val module = ScalaParser.parseResource("aritmetic/aritmetic38.oberon")
 
