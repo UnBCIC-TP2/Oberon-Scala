@@ -1820,7 +1820,8 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.name == "Lambda01")
     assert(module.userTypes.length == 1)
-    //assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].returnType == IntegerType)
+    assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].argsTypes.length == 3)
+    assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].returnType == IntegerType)
   }
 
 

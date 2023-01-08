@@ -258,9 +258,9 @@ class ParserVisitor {
 
     override def visitLambdaTypeDeclaration(ctx: OberonParser.LambdaTypeDeclarationContext): Unit = {
       val returnType = visitOberonType(ctx.returnType) 
-      //val args = ctx.lambdaTypes().toList().flatMap(t => print(t))
-      //print(args(0), args(1), "\n")
-      baseType = LambdaType(List(), returnType)
+      val args = 
+        ctx.lambdaTypes().oberonType().asScala.toList.map(t => visitOberonType(t))
+      baseType = LambdaType(args, returnType)
     }
 
     override def visitArrayTypeDeclaration(ctx: OberonParser.ArrayTypeDeclarationContext): Unit = {

@@ -34,7 +34,7 @@ userType
 
 //lambda declaration format: VAR x:LAMBDA->(type, type, ...):type
 
-lambdaTypes : oberonType (',' lambdaTypes)?; //support for indetermined number of arguments for lambda expression
+lambdaTypes : oberonType (',' oberonType)*; //support for indetermined number of arguments for lambda expression
 
 constant
   : constName = Id '=' exp = expression ';'
