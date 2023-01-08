@@ -775,26 +775,80 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   test("Procedure body type-checking (integer + real)"){
 
     val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", RealType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", RealType),
+          ParameterByReference("y", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(AddExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 1) //  não pode somar x(int) com y(real) -> TODO: permitir somar int com real
+  }
+
+  test("Procedure body type-checking (integer - real)"){
+
+    val visitor = new TypeChecker()
     visitor.env.setGlobalVariable("x", IntegerType)
       val proc = Procedure(
         name = "proc",
         args = List(
           ParameterByValue("x", IntegerType),
-          ParameterByReference("y", RealType),
-          ParameterByReference("flag", BooleanType)
+          ParameterByReference("y", RealType)
         ),
         returnType = Some(RealType),
         constants = Nil,
         variables = Nil,
-        stmt = IfElseStmt(
-          VarExpression("flag"),
-            ReturnStmt(VarExpression("y")),
-             Some(ReturnStmt(AddExpression(VarExpression("x"),
-              VarExpression("y")))))
+        stmt = ReturnStmt(SubExpression(VarExpression("x"), VarExpression("y")))
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) //  não pode somar x(int) + y(real) -> TODO: permitir somar int com real
+    assert(typeCheckerErrors.length == 1) //  não pode subtrair x(int) - y(real) -> TODO: permitir subtrair int com real
+  }
+  test("Procedure body type-checking (integer * real)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(MultExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 1) //  não pode multiplicar x(int) por y(real) -> TODO: permitir multiplicar int com real
+  }
+
+  test("Procedure body type-checking (integer / real)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(DivExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 1) //  não pode dividir x(int) por y(real) -> TODO: permitir dividir int com real
   }
 
   test("Procedure body with variable declarations mapped in env correctly"){
