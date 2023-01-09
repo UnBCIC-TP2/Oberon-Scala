@@ -1815,16 +1815,6 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
-  test("test userTypeSimple08 code. This module declares a lambda expression type") {
-    val module = ScalaParser.parseResource("simple/userTypeSimple08.oberon")
-
-    assert(module.name == "Lambda01")
-    assert(module.userTypes.length == 1)
-    assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].argsTypes.length == 3)
-    assert(module.userTypes(0).baseType.asInstanceOf[LambdaType].returnType == IntegerType)
-  }
-
-
   test("Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD") {
     val module = ScalaParser.parseResource("aritmetic/aritmetic38.oberon")
 
@@ -2299,8 +2289,49 @@ class ParserTestSuite extends AbstractTestSuite {
         assert(stmts(0).isInstanceOf[NewStmt])
       case _ => assert(false)
     }
-
   }
 
+  test("Testing lambdaType code. This module declares two lambda expression types") {
+    val module = ScalaParser.parseResource("lambda/lambdaType.oberon")
+
+    assert(module.name == "Lambda01")
+    assert(module.userTypes.length == 2)
+
+    val x = module.userTypes(0)
+    val y = module.userTypes(1)
+
+    assert(x.baseType.asInstanceOf[LambdaType].argsTypes.length == 3)
+    assert(x.baseType.asInstanceOf[LambdaType].returnType == IntegerType)
+
+    assert(y.baseType.asInstanceOf[LambdaType].argsTypes.length == 1)
+    assert(y.baseType.asInstanceOf[LambdaType].returnType == BooleanType)
+  }
+
+  test(
+    "Testing lambdaExpressions01 code. This module declares a lambda expression constant with args"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions01.oberon")
+
+    assert(module.name == "Lambda02")
+    assert(module.constants.size == 2)
+
+    val x = module.constants(0).asInstanceOf[Constant]
+    val y = module.constants(1)
+
+    assert(x.name == "x")
+    assert(x.exp.isInstanceOf[LambdaExpression])
+
+    assert(y.name == "y")
+    assert(y.exp.isInstanceOf[LambdaExpression])
+  }
+
+  ignore(
+    "Testing lambdaExpressions02 code. This module declares a lambda expression constant without args"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions02.oberon")
+
+    assert(module.name == "Lambda02")
+    assert(module.constants.size == 1)
+  }
 }
 

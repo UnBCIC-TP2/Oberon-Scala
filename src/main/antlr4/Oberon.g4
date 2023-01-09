@@ -81,6 +81,7 @@ expression
  | left = expression opr = ('=' | '#' | '<' | '<=' | '>' | '>=')  right = expression      #RelExpression
  | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                  #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
+ | '(' formals? ')' '=>' expression                                                       #LambdaExpression
  ;
 
 qualifiedName

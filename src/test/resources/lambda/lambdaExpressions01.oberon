@@ -1,0 +1,7 @@
+MODULE Lambda02;
+
+CONST
+  x = (a: INTEGER) => a + 10;
+  y = (a: INTEGER, b: INTEGER) => a + b;
+
+END Lambda02.

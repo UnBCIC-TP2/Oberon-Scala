@@ -1,0 +1,6 @@
+MODULE Lambda03;
+
+CONST
+  x = () => 1 * 2;
+
+END Lambda03.
