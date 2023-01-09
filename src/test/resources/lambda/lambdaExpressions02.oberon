@@ -1,6 +1,6 @@
-MODULE Lambda03;
+MODULE LambdaExpressions02;
 
 CONST
   x = () => 1 * 2;
 
-END Lambda03.
+END LambdaExpressions02.

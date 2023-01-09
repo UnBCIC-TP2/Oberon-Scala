@@ -2312,7 +2312,7 @@ class ParserTestSuite extends AbstractTestSuite {
   ) {
     val module = ScalaParser.parseResource("lambda/lambdaExpressions01.oberon")
 
-    assert(module.name == "Lambda02")
+    assert(module.name == "LambdaExpressions01")
     assert(module.constants.size == 2)
 
     val x = module.constants(0).asInstanceOf[Constant]
@@ -2325,13 +2325,17 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(y.exp.isInstanceOf[LambdaExpression])
   }
 
-  ignore(
+  test(
     "Testing lambdaExpressions02 code. This module declares a lambda expression constant without args"
   ) {
     val module = ScalaParser.parseResource("lambda/lambdaExpressions02.oberon")
 
-    assert(module.name == "Lambda02")
+    assert(module.name == "LambdaExpressions02")
     assert(module.constants.size == 1)
+
+    val x = module.constants(0).asInstanceOf[Constant]
+    assert(x.name == "x")
+    assert(x.exp.isInstanceOf[LambdaExpression])
   }
 }
 

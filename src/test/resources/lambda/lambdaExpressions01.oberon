@@ -1,7 +1,7 @@
-MODULE Lambda02;
+MODULE LambdaExpressions01;
 
 CONST
   x = (a: INTEGER) => a + 10;
   y = (a: INTEGER, b: INTEGER) => a + b;
 
-END Lambda02.
+END LambdaExpressions01.
