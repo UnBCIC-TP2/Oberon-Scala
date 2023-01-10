@@ -2337,5 +2337,17 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(x.name == "x")
     assert(x.exp.isInstanceOf[LambdaExpression])
   }
+  
+  test(
+    "Testing lambdaExpressions03 code. This module declares and assignes a lambda expression variable"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions03.oberon")
+
+    assert(module.name == "LambdaExpressions03")
+
+    val x = module.variables(0).asInstanceOf[VariableDeclaration]
+    assert(x == VariableDeclaration("x", ReferenceToUserDefinedType("ld")))
+  }
+
 }
 

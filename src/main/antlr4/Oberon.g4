@@ -121,6 +121,7 @@ designator
   | array = expression '[' elem = expression ']'                      #ArrayAssignment
   | record = expression '.' name = Id                                 #RecordAssignment
   | pointer = Id '^'                                                  #PointerAssignment
+  | lambda = expression                                               #LambdaAssignment
   ;
 
 caseAlternative
