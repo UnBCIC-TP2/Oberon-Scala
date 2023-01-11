@@ -1,0 +1,14 @@
+MODULE LambdaApplication01;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+VAR
+    x : ld;
+    y : INTEGER;
+
+BEGIN
+    x := (a: INTEGER) => a + 10;
+    y := x.apply()
+END
+
+END LambdaApplication01.
