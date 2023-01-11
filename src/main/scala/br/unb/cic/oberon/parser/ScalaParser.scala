@@ -428,6 +428,21 @@ class ParserVisitor {
       exp = LambdaExpression(args, visitor.exp)
     }
 
+    override def visitLambdaApp(ctx: OberonParser.LambdaAppContext): Unit = {
+      val args = new ListBuffer[Expression]
+      val visitor = new ExpressionVisitor()
+
+      ctx.left.accept(visitor)
+      val left = visitor.exp
+
+      ctx.arguments().expression().asScala.map(e => {
+        e.accept(visitor)
+        args += visitor.exp
+      })
+
+      exp = LambdaApp(left, args.toList)
+    }
+
     private def expression(opr: String): (Expression, Expression) => Expression =
       opr match {
         case "=" => EQExpression
