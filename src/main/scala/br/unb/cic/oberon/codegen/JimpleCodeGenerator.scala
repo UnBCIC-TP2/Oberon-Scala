@@ -26,12 +26,21 @@ object JimpleCodeGenerator extends CodeGenerator[ClassOrInterfaceDeclaration] {
         ))
     }
 
-    def generateVariables(module: OberonModule): List[Field] = ???
+    def generateVariables(module: OberonModule): List[Field] = module.variables.map(variable => Field(
+        modifiers = List(PublicModifer),
+        fieldType = jimpleType(variable.variableType, module),
+        name = variable.name
+    ))
 
     def generateUserDefinedTypes(module: OberonModule): List[Type] =
         module.userTypes.map(userType => jimpleUserDefinedType(userType.name, module))
 
-    def generateMethodSignatures(module: OberonModule): List[MethodSignature] = ???
+    def generateMethodSignatures(module: OberonModule): List[MethodSignature] = module.procedures.map(procedure => MethodSignature(
+        className = module.name,
+        returnType = jimpleType(procedure.returnType, module),
+        methodName = procedure.name,
+        formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
+    ))
 
     def jimpleType(oberonType: Option[OberonType], module: OberonModule): Type = oberonType match {
         case Some(someType) => jimpleType(someType, module)
