@@ -2356,12 +2356,12 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.name == "LambdaApplication01")
 
-    val lastStmt = module.stmt.get.asInstanceOf[SequenceStmt].stmts.last
-    assert(lastStmt.isInstanceOf[AssignmentStmt])
+    val stmt = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+    assert(stmt(1).isInstanceOf[AssignmentStmt])
 
-    val lambdaApp = lastStmt.asInstanceOf[AssignmentStmt].exp
+    val lambdaApp = stmt(1).asInstanceOf[AssignmentStmt].exp
     assert(lambdaApp.isInstanceOf[LambdaApp])
-    assert(lambdaApp.asInstanceOf[LambdaApp].args.length == 2)
+    assert(lambdaApp.asInstanceOf[LambdaApp].args.length == stmt(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[LambdaExpression].args.size)
   }
 
 }
