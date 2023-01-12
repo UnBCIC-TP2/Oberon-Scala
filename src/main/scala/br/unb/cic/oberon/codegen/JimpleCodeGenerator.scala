@@ -4,70 +4,70 @@ import br.unb.cic.oberon.ir.ast.{Type => OberonType, _}
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
 
-object JimpleCodeGenerator extends CodeGenerator[ClassOrInterfaceDeclaration] {
-    override def generateCode(module: OberonModule): ClassOrInterfaceDeclaration = {
-        ClassDecl(
-            modifiers = List(PublicModifer),
-            classType = TObject(module.name),
-            superClass = TObject("java.lang.Object"),
-            interfaces = List.empty[Type],
-            fields = List.empty[Field],
-            methods = List.empty[Method]
-        )
-    }
+object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
+  override def generateCode(module: OberonModule): ClassDecl = {
+    ClassDecl(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[Type],
+      fields = List.empty[Field],
+      methods = List.empty[Method]
+    )
+  }
 
-    def generateConstants(module: OberonModule): List[Field] = {
-        val visitor = new ExpressionTypeVisitor(new TypeChecker())
+  def generateConstants(module: OberonModule): List[Field] = {
+    val visitor = new ExpressionTypeVisitor(new TypeChecker())
 
-        module.constants.map(constant => Field(
-            modifiers = List(PublicModifer, FinalModifier),
-            fieldType = jimpleType(visitor.visitExpression(constant.exp), module),
-            name = constant.name
-        ))
-    }
-
-    def generateVariables(module: OberonModule): List[Field] = module.variables.map(variable => Field(
-        modifiers = List(PublicModifer),
-        fieldType = jimpleType(variable.variableType, module),
-        name = variable.name
+    module.constants.map(constant => Field(
+      modifiers = List(PublicModifer, FinalModifier),
+      fieldType = jimpleType(visitor.visitExpression(constant.exp), module),
+      name = constant.name
     ))
+  }
 
-    def generateUserDefinedTypes(module: OberonModule): List[Type] =
-        module.userTypes.map(userType => jimpleUserDefinedType(userType.name, module))
+  def generateVariables(module: OberonModule): List[Field] = module.variables.map(variable => Field(
+    modifiers = List(PublicModifer),
+    fieldType = jimpleType(variable.variableType, module),
+    name = variable.name
+  ))
 
-    def generateMethodSignatures(module: OberonModule): List[MethodSignature] = module.procedures.map(procedure => MethodSignature(
-        className = module.name,
-        returnType = jimpleType(procedure.returnType, module),
-        methodName = procedure.name,
-        formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
-    ))
+  def generateUserDefinedTypes(module: OberonModule): List[Type] =
+    module.userTypes.map(userType => jimpleUserDefinedType(userType.name, module))
 
-    def jimpleType(oberonType: Option[OberonType], module: OberonModule): Type = oberonType match {
-        case Some(someType) => jimpleType(someType, module)
-        case None => TVoid
-    }
+  def generateMethodSignatures(module: OberonModule): List[MethodSignature] = module.procedures.map(procedure => MethodSignature(
+    className = module.name,
+    returnType = jimpleType(procedure.returnType, module),
+    methodName = procedure.name,
+    formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
+  ))
 
-    def jimpleType(oberonType: OberonType, module: OberonModule): Type = oberonType match {
-        case IntegerType => TInteger
-        case RealType => TFloat
-        case BooleanType => TBoolean
-        case CharacterType => TCharacter
-        case StringType => TString
-        case UndefinedType => TUnknown
-        case NullType => TNull
+  def jimpleType(oberonType: Option[OberonType], module: OberonModule): Type = oberonType match {
+    case Some(someType) => jimpleType(someType, module)
+    case None => TVoid
+  }
 
-        case ReferenceToUserDefinedType(name) => jimpleUserDefinedType(name, module)
+  def jimpleType(oberonType: OberonType, module: OberonModule): Type = oberonType match {
+    case IntegerType => TInteger
+    case RealType => TFloat
+    case BooleanType => TBoolean
+    case CharacterType => TCharacter
+    case StringType => TString
+    case UndefinedType => TUnknown
+    case NullType => TNull
 
-        case _ => throw new Exception("Non-exhaustive match in case statement.")
-    }
+    case ReferenceToUserDefinedType(name) => jimpleUserDefinedType(name, module)
 
-    def jimpleUserDefinedType(name: String, module: OberonModule): Type =
-        jimpleUserDefinedType(module.userTypes.find(userType => userType.name == name).get, module)
+    case _ => throw new Exception("Non-exhaustive match in case statement.")
+  }
 
-    def jimpleUserDefinedType(userType: UserDefinedType, module: OberonModule): Type = userType.baseType match {
-        case RecordType(_) => TObject(userType.name)
-        case ArrayType(_, baseType) => TArray(jimpleType(baseType, module))
+  def jimpleUserDefinedType(name: String, module: OberonModule): Type =
+    jimpleUserDefinedType(module.userTypes.find(userType => userType.name == name).get, module)
 
-        case _ => throw new Exception("Non-exhaustive match in case statement.")
-    }
+  def jimpleUserDefinedType(userType: UserDefinedType, module: OberonModule): Type = userType.baseType match {
+    case RecordType(_) => TObject(userType.name)
+    case ArrayType(_, baseType) => TArray(jimpleType(baseType, module))
+
+    case _ => throw new Exception("Non-exhaustive match in case statement.")
+  }
 }
