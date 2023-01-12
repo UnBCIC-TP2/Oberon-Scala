@@ -2349,20 +2349,5 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(x == VariableDeclaration("x", ReferenceToUserDefinedType("ld")))
   }
 
-  test(
-    "Testing LambdaApplication01 code. This module applies a lambda expression"
-  ) {
-    val module = ScalaParser.parseResource("lambda/lambdaApplication01.oberon")
-
-    assert(module.name == "LambdaApplication01")
-
-    val stmt = module.stmt.get.asInstanceOf[SequenceStmt].stmts
-    assert(stmt(1).isInstanceOf[AssignmentStmt])
-
-    val lambdaApp = stmt(1).asInstanceOf[AssignmentStmt].exp
-    assert(lambdaApp.isInstanceOf[LambdaApp])
-    assert(lambdaApp.asInstanceOf[LambdaApp].args.length == stmt(0).asInstanceOf[AssignmentStmt].exp.asInstanceOf[LambdaExpression].args.size)
-  }
-
 }
 

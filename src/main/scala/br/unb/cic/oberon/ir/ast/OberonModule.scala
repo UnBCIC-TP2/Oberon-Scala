@@ -186,7 +186,6 @@ case class AndExpression(left: Expression, right: Expression) extends Expression
 case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
 case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Expression
-case class LambdaApp(left: Expression, args: List[Expression]) extends Expression
 
 /* Statements */
 trait Statement {
