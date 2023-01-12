@@ -417,11 +417,14 @@ class ParserVisitor {
     }
 
     override def visitLambdaExpression(ctx: OberonParser.LambdaExpressionContext): Unit = {
-      val args = List()
+
+      val argsB = new ListBuffer[FormalArg]
+
       if (ctx.formals() != null) {
-        val args = ctx.formals().formalArg().asScala.toList.flatMap(formal => visitFormalArg(formal))
-      } else {
+        argsB.addAll(ctx.formals().formalArg().asScala.toList.flatMap(formal => visitFormalArg(formal)))
       }
+      val args = argsB.toList
+
       val visitor = new ExpressionVisitor()
       ctx.expression.accept(visitor)
 
