@@ -20,18 +20,33 @@ object JimpleCodeGenerator extends CodeGenerator[ClassOrInterfaceDeclaration] {
         val visitor = new ExpressionTypeVisitor(new TypeChecker())
 
         module.constants.map(constant => Field(
-            modifiers = List(PublicModifer, FinalModifier),
+            modifiers = List(PublicModifier, FinalModifier),
             fieldType = jimpleType(visitor.visitExpression(constant.exp), module),
             name = constant.name
         ))
     }
 
-    def generateVariables(module: OberonModule): List[Field] = ???
+    def generateVariables(module: OberonModule): List[Field] = {
+        val visitor = new ExpressionTypeVisitor(new TypeChecker())
+
+        module.variables.map(variable => Field(
+            modifiers = List(PublicModifier, FinalModifier),
+            fieldType = jimpleUserDefinedType(visitor.visitExpression(variable.exp),module),
+            name = variable.name
+        ))
+    }
 
     def generateUserDefinedTypes(module: OberonModule): List[Type] =
         module.userTypes.map(userType => jimpleUserDefinedType(userType.name, module))
 
-    def generateMethodSignatures(module: OberonModule): List[MethodSignature] = ???
+    def generateMethodSignatures(module: OberonModule): List[MethodSignature] = {
+        val visitor = new ExpressionTypeVisitor(new TypeChecker())
+        module.procedures.map(procedure => MethodSignature(
+            className = procedure.name,
+            returnType = procedure.returnType,
+            ???
+        ))
+    }
 
     def jimpleType(oberonType: Option[OberonType], module: OberonModule): Type = oberonType match {
         case Some(someType) => jimpleType(someType, module)
