@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TACTestSuite extends AnyFunSuite {
   test("Test temporary counter") {
-    Temporary.reset()
+    Temporary.reset
     val t0 = new Temporary(IntegerType)
     val t1 = new Temporary(IntegerType)
     
