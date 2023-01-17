@@ -255,8 +255,12 @@ sealed trait Type {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-case object IntegerType extends Type
-case object RealType extends Type
+//
+class NumberType extends Type
+
+case object IntegerType extends NumberType
+case object RealType extends NumberType
+
 case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type
