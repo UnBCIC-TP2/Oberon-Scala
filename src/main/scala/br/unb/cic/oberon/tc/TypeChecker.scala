@@ -143,17 +143,19 @@ class TypeChecker extends OberonVisitorAdapter {
     module.procedures.foreach(env.declareProcedure)
     module.userTypes.foreach(env.addUserDefinedType) //added G04
 
-    var errors = module.procedures.flatMap(p => checkProcedure(p))
+    var errors = module.procedures.flatMap(p => p.accept(this))
 
     if(module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
     else errors
   }
 
-  def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
+  override def visit(procedure: Procedure): List[(Statement, String)] = {
+    // case ProcedureStmt
     env.push()
     procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, v.variableType))
+    
     val errors = procedure.stmt.accept(this)
     env.pop()
     errors
