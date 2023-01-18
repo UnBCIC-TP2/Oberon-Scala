@@ -110,4 +110,30 @@ class TACodeTest extends AnyFunSuite {
 
     assert(list == ops)
   }
+
+  test("Testing complex operation 3") {
+    
+    Temporary.reset
+    val expr = OrExpression(AndExpression(BoolValue(true), BoolValue(false)), OrExpression(BoolValue(true), AndExpression(BoolValue(true), BoolValue(false))))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // (True and False) or (True or (True and False))
+
+    Temporary.reset
+    val t0 = new Temporary(BooleanType, 0, true)
+    val t1 = new Temporary(BooleanType, 1, true)
+    val t2 = new Temporary(BooleanType, 2, true)
+    val t3 = new Temporary(BooleanType, 3, true)
+    val ops = List(
+      AndOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, ""),
+      AndOp(Constant("true", BooleanType), Constant("false", BooleanType), t1, ""),
+      OrOp(Constant("true", BooleanType), t1, t2, ""),
+      OrOp(t0, t2, t3, "")
+    )
+    // t0 = true and false
+    // t1 = true and false
+    // t2 = true or t1
+    // t3 = t0 or t2
+
+    assert(list == ops)
+  }
 }
