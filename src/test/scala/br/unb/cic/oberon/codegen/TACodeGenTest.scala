@@ -13,7 +13,7 @@ class TACodeTest extends AnyFunSuite {
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // 1 + 2
 
-    Temporary.reset()
+    Temporary.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
     // t0 = 1 + 2
@@ -109,7 +109,5 @@ class TACodeTest extends AnyFunSuite {
     // t2 = t1 - 6
 
     assert(list == ops)
-
-
   }
 }
