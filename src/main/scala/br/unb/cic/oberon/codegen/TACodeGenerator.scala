@@ -76,6 +76,10 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (r, insts2) = generateExpression(right, insts1)
         val t = new Temporary(expr.accept(visitor).get)
         return (t, insts2 :+ OrOp(l, r, t, ""))
+
+      //case FunctionCallExpression(name, args) =>
+        //exp.args.foldLeft((List[Address](),insts)) {(acc, expr) => 
+          //val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2); (acc._1 :+ address, ops) }
     }
   }
 
