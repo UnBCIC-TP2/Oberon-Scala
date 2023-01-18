@@ -18,6 +18,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case Brackets(exp) => exp.accept(this)
     case IntValue(_) => Some(IntegerType)
     case RealValue(_) => Some(RealType)
+    //teste
+    // case NumberValue(_) => Some(NumberType)
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
     case StringValue(_) => Some(StringType)
@@ -36,14 +38,18 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       computeBinExpressionType(left, right, List(IntegerType), BooleanType)
     case LTEExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+
+    // teste
     case AddExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
     case SubExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
     case MultExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
     case DivExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
+    //
+
     case AndExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
@@ -127,7 +133,20 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
-    if(t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result) else None
+    if ((t1 == t2) && expected.contains(result))
+        Some(result) 
+    else
+        None
+  }
+    def computeArithmeticExpressionType[A](left: Expression, right: Expression, expected: List[Type]) : Option[Type] = {
+    val t1 = left.accept(this)
+    val t2 = right.accept(this)
+    if (t1 == t2)
+        t1
+    else if (CType.subType(t1.get, t2.get) || CType.subType(t2.get, t1.get))
+        Some(CType.promote(t1.get, t2.get))
+    else
+        None
   }
 }
 

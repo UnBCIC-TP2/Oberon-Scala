@@ -157,13 +157,16 @@ case class RealValue(value: Double) extends Value with Number {
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
-
+// teste
+//case class NumberValue(value: Double) extends Value { type T = Double  } // <------------------
+//
 case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
+
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class PointerAccessExpression(name: String) extends Expression
 case class VarExpression(name: String) extends Expression
@@ -255,8 +258,25 @@ sealed trait Type {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-case object IntegerType extends Type
-case object RealType extends Type
+object CType {
+  def subType(t1: Type, t2: Type): Boolean = (t1, t2) match { 
+    case (IntegerType, RealType) => true
+    case _ => false 
+  }
+  def promote(t1: Type, t2: Type): Type = (t1, t2) match {
+    case (IntegerType, RealType) => RealType
+    case (RealType, IntegerType) => RealType
+    // todo
+    case _ => UndefinedType
+  }
+}
+
+//teste
+class NumberType extends Type // <----
+//teste
+case object IntegerType extends NumberType // <----
+case object RealType extends NumberType // <----
+//
 case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type
