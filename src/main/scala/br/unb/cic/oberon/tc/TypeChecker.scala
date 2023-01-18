@@ -133,7 +133,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
-    if ((t1 == t2) && expected.contains(result))
+    if ((t1 == t2) && expected.contains(t1.getOrElse(None)))
         Some(result) 
     else
         None

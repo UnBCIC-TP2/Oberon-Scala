@@ -271,12 +271,10 @@ object CType {
   }
 }
 
-//teste
-class NumberType extends Type // <----
-//teste
-case object IntegerType extends NumberType // <----
-case object RealType extends NumberType // <----
-//
+
+
+case object IntegerType extends Type 
+case object RealType extends Type 
 case object BooleanType extends Type
 case object CharacterType extends Type
 case object StringType extends Type

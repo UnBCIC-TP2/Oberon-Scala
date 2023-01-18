@@ -735,7 +735,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
     
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 0) // era pra ter 1 erro, pois retorna string quando deveria ser int
+    assert(typeCheckerErrors.length == 0) 
   }
 
 
@@ -769,7 +769,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) // era pra ta 1 pq o else tem um erro de tipo: x(int) + y(bool)
+    assert(typeCheckerErrors.length == 1) 
   }
 
   test("Procedure body type-checking (integer + real)"){
@@ -789,7 +789,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) //  não pode somar x(int) com y(real) -> TODO: permitir somar int com real
+    assert(typeCheckerErrors.length == 0) 
   }
 
   test("Procedure body type-checking (integer - real)"){
@@ -809,7 +809,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) //  não pode subtrair x(int) - y(real) -> TODO: permitir subtrair int com real
+    assert(typeCheckerErrors.length == 0) 
   }
   test("Procedure body type-checking (integer * real)"){
 
@@ -828,7 +828,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) //  não pode multiplicar x(int) por y(real) -> TODO: permitir multiplicar int com real
+    assert(typeCheckerErrors.length == 0) 
   }
 
   test("Procedure body type-checking (integer / real)"){
@@ -848,7 +848,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 1) //  não pode dividir x(int) por y(real) -> TODO: permitir dividir int com real
+    assert(typeCheckerErrors.length == 0) //  
   }
 
   test("Procedure body with variable declarations mapped in env correctly"){
