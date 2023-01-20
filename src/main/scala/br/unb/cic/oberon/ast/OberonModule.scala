@@ -258,14 +258,32 @@ sealed trait Type {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-object CType {
-  def subType(t1: Type, t2: Type): Boolean = (t1, t2) match { 
+object CastType {
+  
+  def subType(t1: Type, t2: Type): Boolean = (t1, t2) match {
     case (IntegerType, RealType) => true
+    case (CharacterType, IntegerType) => true
+    case (CharacterType, RealType) => true
     case _ => false 
   }
+
   def promote(t1: Type, t2: Type): Type = (t1, t2) match {
+    // base cases (not allowing promotion of CurrentType to CurrentType)
+    case (IntegerType, IntegerType) => NullType
+    case (RealType, RealType) => NullType
+    case (BooleanType, BooleanType) => NullType
+    case (CharacterType, CharacterType) => NullType
+    case (StringType, StringType) => NullType
+    case (UndefinedType, UndefinedType) => NullType
+    case (NullType, NullType) => NullType
+    case (LocationType, LocationType) => NullType
+    
     case (IntegerType, RealType) => RealType
     case (RealType, IntegerType) => RealType
+    case (CharacterType, IntegerType) => IntegerType
+    case (IntegerType, CharacterType) => IntegerType
+    case (CharacterType, RealType) => RealType
+    case (RealType, CharacterType) => RealType
     // todo
     case _ => UndefinedType
   }

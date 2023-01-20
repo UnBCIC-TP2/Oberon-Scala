@@ -850,6 +850,207 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val typeCheckerErrors = proc.accept(visitor)
     assert(typeCheckerErrors.length == 0) //  
   }
+    test("Procedure body type-checking (integer * char * real)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", CharacterType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", CharacterType),
+          ParameterByReference("y", IntegerType),
+          ParameterByReference("z", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(MultExpression(MultExpression(VarExpression("x"), VarExpression("y")), VarExpression("z")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+
+    test("Procedure body type-checking (integer + char + real)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", CharacterType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", CharacterType),
+          ParameterByReference("y", IntegerType),
+          ParameterByReference("z", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(AddExpression(AddExpression(VarExpression("x"), VarExpression("y")), VarExpression("z")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+  test("Procedure body type-checking (integer + char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", CharacterType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", CharacterType),
+          ParameterByReference("y", IntegerType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(AddExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+  test("Procedure body type-checking (integer - char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(SubExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+  test("Procedure body type-checking (integer * char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(MultExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+  test("Procedure body type-checking (integer / char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", IntegerType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", IntegerType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(IntegerType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(DivExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) //  
+  }
+
+  // oi
+    test("Procedure body type-checking (real + char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", CharacterType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", CharacterType),
+          ParameterByReference("y", RealType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(AddExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+  test("Procedure body type-checking (real - char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", RealType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", RealType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(SubExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+  test("Procedure body type-checking (real * char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", RealType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", RealType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(MultExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) 
+  }
+
+  test("Procedure body type-checking (real / char)"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", RealType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", RealType),
+          ParameterByReference("y", CharacterType)
+        ),
+        returnType = Some(RealType),
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(DivExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 0) //  
+  }
 
   test("Procedure body with variable declarations mapped in env correctly"){
 
@@ -864,7 +1065,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
 
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 0) //  Não deve ter erro pois é retornada uma variável declarada dentro do corpo da função
+    assert(typeCheckerErrors.length == 0) 
   }
 
   test("Test the type checker of a valid Repeat statement") {

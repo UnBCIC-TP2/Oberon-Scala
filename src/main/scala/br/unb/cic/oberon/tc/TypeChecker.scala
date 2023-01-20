@@ -39,7 +39,6 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case LTEExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType), BooleanType)
 
-    // teste
     case AddExpression(left, right) =>
       computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
     case SubExpression(left, right) =>
@@ -47,8 +46,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case MultExpression(left, right) =>
       computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
     case DivExpression(left, right) =>
-      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))
-    //
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType))   
 
     case AndExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
@@ -129,7 +127,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case _ => None
       })
   }
-
+  
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
@@ -138,17 +136,19 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     else
         None
   }
+
     def computeArithmeticExpressionType[A](left: Expression, right: Expression, expected: List[Type]) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
     if (t1 == t2)
         t1
-    else if (CType.subType(t1.get, t2.get) || CType.subType(t2.get, t1.get))
-        Some(CType.promote(t1.get, t2.get))
+    else if (CastType.subType(t1.get, t2.get) || CastType.subType(t2.get, t1.get))
+        Some(CastType.promote(t1.get, t2.get))
     else
         None
   }
 }
+
 
 class TypeChecker extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
