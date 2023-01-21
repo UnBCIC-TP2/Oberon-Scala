@@ -21,6 +21,10 @@ case class AndOp(s1: Address, s2: Address, dest: Address, label: String) extends
 
 case class OrOp(s1: Address, s2: Address, dest: Address, label: String) extends BinOp(s1, s2, dest, label) {}
 
+case class SLTOp(s1: Address, s2: Address, dest: Address, label: String) extends BinOp(s1, s2, dest, label) {}
+
+case class SLTUOp(s1: Address, s2: Address, dest: Address, label: String) extends BinOp(s1, s2, dest, label) {}
+
 
 
 class UniOp(s1: Address, dest: Address, label: String) extends TAC(label) {}
