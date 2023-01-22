@@ -68,7 +68,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def declareVars(variables: List[VariableDeclaration], userTypes: List[UserDefinedType], localIndent:Int): Doc = {
 
     var basicVariablesDoc = empty
-    for (varType <- List(IntegerType, BooleanType)) {
+    for (varType <- List(IntegerType, RealType, BooleanType)) {
       val variablesOfType = variables.filter(_.variableType == varType).map(variable => variable.name)
       if (variablesOfType.nonEmpty) {
         val CVarType = getCType(varType, userTypes)
@@ -233,6 +233,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def genExp(exp: Expression): String = {
     exp match {
       case IntValue(v) => v.toString
+      case RealValue(v) => v.toString
       case Brackets(exp) => s"( ${genExp(exp)} )"
       case BoolValue(v) => if (v) "true" else "false"
       case Undef() => "undefined"
