@@ -200,7 +200,7 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee1038_Snack_int.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1038 Snack Real") {
+  test("C generator for BeeCrowd 1038 Snack Real") {
     testGenerator("stmts/bee1038_Snack_real.oberon")
   }
 
