@@ -224,7 +224,7 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee1071_Sum.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1079 Average") {
+  test("C generator for BeeCrowd 1079 Average") {
     testGenerator("stmts/bee1079_Average.oberon")
   }
 
