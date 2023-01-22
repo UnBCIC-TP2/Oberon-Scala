@@ -258,6 +258,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case DivExpression(left, right) => s"${genExp(left)} / ${genExp(right)}"
       case OrExpression(left, right) => s"${genExp(left)} || ${genExp(right)}"
       case AndExpression(left, right) => s"${genExp(left)} && ${genExp(right)}"
+      case ModExpression(left, right) => s"${genExp(left)} % ${genExp(right)}"
       case FieldAccessExpression(exp, name) => s"${genExp(exp)}.$name"
       case ArraySubscript(arrayBase, index) =>
         val arrayName = genExp(arrayBase)
