@@ -71,24 +71,24 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case AndExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(BooleanType)
         return (t, insts2 :+ AndOp(l, r, t, ""))
 
       case OrExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(BooleanType)
         return (t, insts2 :+ OrOp(l, r, t, ""))
 
       case ModExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(IntegerType)
         return (t, insts2 :+ RemOp(l, r, t, ""))
 
       case NotExpression(exp) =>
         val (a, insts1) = generateExpression(exp, insts)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(BooleanType)
         return (t, insts1 :+ NotOp(a, t, ""))
 
       case EQExpression(left, right) =>
