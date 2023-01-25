@@ -86,6 +86,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       fieldAccessCheck(exp, attributeName)
 
     case PointerAccessExpression(name) => pointerAccessCheck(name)
+
+    case LambdaExpression(args, exp) => lambdaExpressionCheck(args, exp)
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
@@ -122,6 +124,19 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case PointerType(varType) => Some(varType)
         case _ => None
       })
+  }
+
+  def lambdaExpressionCheck(args: List[FormalArg], exp: Expression): T = {
+    typeChecker.env.push()
+    args.foreach(a => typeChecker.env.setLocalVariable(a.name, a.argumentType))
+    val argTypes = args.map(a => a.argumentType)
+    val expType = exp.accept(this)
+    typeChecker.env.pop()
+
+    expType match {
+      case None => None
+      case _ => Some(LambdaType(argTypes, expType.get))
+    }
   }
 
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
@@ -215,6 +230,12 @@ class TypeChecker extends OberonVisitorAdapter {
               }
               else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
                     (exp.accept(expVisitor).get == IntegerType)){
+                    List()
+              }
+              else if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[LambdaType]) &&
+                // TODO: checar se os argumentos e o tipo de retorno da expressao lambda sao os mesmos
+                // do tipo definido
+                    (exp.accept(expVisitor).get.isInstanceOf[LambdaType])) {
                     List()
               }
               else{
