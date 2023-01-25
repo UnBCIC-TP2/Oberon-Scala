@@ -1420,7 +1420,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val module = ScalaParser.parseResource("lambda/lambdaExpressions03.oberon")
     val res = module.accept(visitor)
-    print(module)
+    print(res)
     assert(true)
   }
 

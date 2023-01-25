@@ -232,11 +232,23 @@ class TypeChecker extends OberonVisitorAdapter {
                     (exp.accept(expVisitor).get == IntegerType)){
                     List()
               }
-              else if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[LambdaType]) &&
-                // TODO: checar se os argumentos e o tipo de retorno da expressao lambda sao os mesmos
-                // do tipo definido
-                    (exp.accept(expVisitor).get.isInstanceOf[LambdaType])) {
+              else if (env.lookup(v).get.accept(expVisitor).get.isInstanceOf[LambdaType]) {
+                val expectedArgs = env.lookup(v).get.accept(expVisitor).get.asInstanceOf[LambdaType].argsTypes
+                val passedArgs = exp.accept(expVisitor).get.asInstanceOf[LambdaType].argsTypes
+
+                if (expectedArgs.size != passedArgs.size) {
+                  List((stmt, s"Wrong number of arguments. Expected ${expectedArgs.size}, got ${passedArgs.size}."))
+                } else {
+                  val allTypesMatch = expectedArgs.zip(passedArgs)
+                    .map(pair => pair._1 == pair._2)
+                    .forall(v => v)
+
+                  if(!allTypesMatch) {
+                    List((stmt, "Arguments types do not match type definition."))
+                  } else {
                     List()
+                  }
+                }
               }
               else{
                  List((stmt, s"Assignment between different types: $v, $exp"))
