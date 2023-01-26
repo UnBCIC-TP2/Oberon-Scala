@@ -1452,4 +1452,11 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(msg.contains("is ill typed"))
   }
 
+  test("Test lambda expression assignment to a constant") {
+    val visitor = new TypeChecker()
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC05.oberon")
+    val res = module.accept(visitor)
+    assert(res.isEmpty)
+  }
+
 }
