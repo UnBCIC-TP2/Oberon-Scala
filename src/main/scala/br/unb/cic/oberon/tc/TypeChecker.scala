@@ -220,21 +220,24 @@ class TypeChecker extends OberonVisitorAdapter {
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined){
           if (env.lookup(v).get != exp.accept(expVisitor).get){
-              if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[PointerType]) &&
-                    (exp.accept(expVisitor).get == NullType)){
+              val varType = env.lookup(v).get.accept(expVisitor).get
+              val expType = exp.accept(expVisitor).get
+
+              if ((varType.isInstanceOf[PointerType]) &&
+                    (expType == NullType)){
                     List()
               }
-              else if ((env.lookup(v).get.accept(expVisitor).get == IntegerType) &&
-                    (exp.accept(expVisitor).get == BooleanType)){
+              else if ((varType == IntegerType) &&
+                    (expType == BooleanType)){
                     List()
               }
-              else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
-                    (exp.accept(expVisitor).get == IntegerType)){
+              else if ((varType == BooleanType) &&
+                    (expType == IntegerType)){
                     List()
               }
-              else if (env.lookup(v).get.accept(expVisitor).get.isInstanceOf[LambdaType]) {
-                val expectedType = env.lookup(v).get.accept(expVisitor).get.asInstanceOf[LambdaType]
-                val passedType = exp.accept(expVisitor).get.asInstanceOf[LambdaType]
+              else if (varType.isInstanceOf[LambdaType]) {
+                val expectedType = varType.asInstanceOf[LambdaType]
+                val passedType = expType.asInstanceOf[LambdaType]
 
                 val expectedArgs = expectedType.argsTypes
                 val passedArgs = passedType.argsTypes
