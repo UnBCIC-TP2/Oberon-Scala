@@ -1,0 +1,12 @@
+MODULE LambdaExpressionsTC06;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+VAR
+    x : ld;
+
+BEGIN
+    x := (a: INTEGER) => a >= 10
+END
+
+END LambdaExpressionsTC06.
