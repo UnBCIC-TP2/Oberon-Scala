@@ -723,6 +723,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   }
     test("Test function with return type different from procedure") {
+      //TODO
     val visitor = new TypeChecker()
     
     val proc = Procedure(
@@ -1051,6 +1052,28 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val typeCheckerErrors = proc.accept(visitor)
     assert(typeCheckerErrors.length == 0) //  
   }
+
+  //
+  test("Procedure body type-checking with equal args that can't be added"){
+
+    val visitor = new TypeChecker()
+    visitor.env.setGlobalVariable("x", NullType)
+      val proc = Procedure(
+        name = "proc",
+        args = List(
+          ParameterByValue("x", NullType),
+          ParameterByReference("y", NullType)
+        ),
+        returnType = Some(RealType), 
+        constants = Nil,
+        variables = Nil,
+        stmt = ReturnStmt(AddExpression(VarExpression("x"), VarExpression("y")))
+      )
+
+    val typeCheckerErrors = proc.accept(visitor)
+    assert(typeCheckerErrors.length == 1) 
+  }
+  //
 
   test("Procedure body with variable declarations mapped in env correctly"){
 
