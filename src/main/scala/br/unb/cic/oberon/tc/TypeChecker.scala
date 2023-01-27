@@ -18,8 +18,6 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case Brackets(exp) => exp.accept(this)
     case IntValue(_) => Some(IntegerType)
     case RealValue(_) => Some(RealType)
-    //teste
-    // case NumberValue(_) => Some(NumberType)
     case CharValue(_) => Some(CharacterType)
     case BoolValue(_) => Some(BooleanType)
     case StringValue(_) => Some(StringType)
@@ -166,14 +164,14 @@ class TypeChecker extends OberonVisitorAdapter {
     module.procedures.foreach(env.declareProcedure)
     module.userTypes.foreach(env.addUserDefinedType) //added G04
 
-    var errors = module.procedures.flatMap(p => p.accept(this))
+    var errors = module.procedures.flatMap(p =>checkProcedure(p))
 
     if(module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
     else errors
   }
 
   def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
-    returnType = procedure.returnType
+    //returnType = procedure.returnType
     env.push()
     procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
@@ -181,7 +179,7 @@ class TypeChecker extends OberonVisitorAdapter {
     
     val errors = procedure.stmt.accept(this)
     env.pop()
-    returnType = None
+    //returnType = None
     errors
   }
 

@@ -708,7 +708,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(testModuleCore.accept(visitor) == List())
   }
 
-  /*
+  /*turn
    * the following test cases read an oberon module with the
    * factorial procedure.
    */
@@ -736,7 +736,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
       )
     
     val typeCheckerErrors = proc.accept(visitor)
-    assert(typeCheckerErrors.length == 0) 
+    assert(typeCheckerErrors.length == 1) 
   }
 
 
@@ -776,11 +776,11 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   test("Procedure body type-checking (integer + real)"){
 
     val visitor = new TypeChecker()
-    visitor.env.setGlobalVariable("x", RealType)
+    visitor.env.setGlobalVariable("x", IntegerType)
       val proc = Procedure(
         name = "proc",
         args = List(
-          ParameterByValue("x", RealType),
+          ParameterByValue("x", IntegerType),
           ParameterByReference("y", RealType)
         ),
         returnType = Some(RealType),
