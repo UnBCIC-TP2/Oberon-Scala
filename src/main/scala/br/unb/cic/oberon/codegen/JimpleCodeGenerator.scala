@@ -1,19 +1,10 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{
-  Type => OberonType,
-  Statement => OberonStmt,
-  Expression => OberonExpression,
-  IntValue => OberonIntValue,
-  BoolValue => OberonBoolValue,
-  RealValue => OberonRealValue,
-  CharValue => OberonCharValue,
-  StringValue => OberonStringValue,
-  NullValue => OberonNullValue,
-  _
-}
+import br.unb.cic.oberon.ir.ast.{BoolValue => OberonBoolValue, CharValue => OberonCharValue, Expression => OberonExpression, IntValue => OberonIntValue, NullValue => OberonNullValue, RealValue => OberonRealValue, Statement => OberonStmt, StringValue => OberonStringValue, Type => OberonType, Value => OberonValue, _}
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
+
+import scala.collection.mutable.ListBuffer
 
 object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
   override def generateCode(module: OberonModule): ClassDecl = {
@@ -38,19 +29,59 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
 
   def generateMainMethodBody(module: OberonModule): MethodBody = DefaultMethodBody(
     localVariableDecls = List.empty[LocalVariableDeclaration],
-    stmts = generateStmts(module.stmt),
+    stmts = generateStmt(module.stmt),
     catchClauses = List.empty[CatchClause],
   )
 
-  def generateStmts(oberonStmt: Option[OberonStmt]): List[Statement] = oberonStmt match {
+  def generateStmt(oberonStmt: Option[OberonStmt]): List[Statement] = oberonStmt match {
     case Some(someStmt) => someStmt match {
-      case SequenceStmt(stmts) => stmts.flatMap(stmt => generateStmts(Some(stmt)))
+      case SequenceStmt(stmts) => stmts.flatMap(stmt => generateStmt(Some(stmt)))
       case AssignmentStmt(designator, exp) => designator match {
-        case VarAssignment(varName) => List(AssignStmt(LocalVariable(varName), jimpleExpression(exp)))
+        case VarAssignment(varName) => List(AssignStmt(LocalVariable(varName), generateExpression(exp)))
       }
-
+      case IfElseStmt(condition, thenStmt, elseStmt) => generateIfStmt(generateExpression(condition), generateStmt(Some(thenStmt)), generateStmt(elseStmt))
+      case WhileStmt(condition, stmt) => generateWhileStmt(generateExpression(condition), generateStmt(Some(stmt)))
+      case ForStmt(init, condition, stmt) => generateForStmt(generateStmt(Some(init)), generateExpression(condition), generateStmt(Some(stmt)))
     }
     case None => List.empty[Statement]
+  }
+
+  def generateIfStmt(condition: Expression, thenStmts: List[Statement], elseStmts: List[Statement]): List[Statement] = {
+    val buffer = ListBuffer[Statement]()
+
+    buffer += IfStmt(condition, "THEN")
+    buffer ++= elseStmts
+    buffer += GotoStmt("ENDIF")
+    buffer += LabelStmt("THEN")
+    buffer ++= thenStmts
+    buffer += LabelStmt("ENDIF")
+
+    buffer.result()
+  }
+
+  def generateWhileStmt(condition: Expression, stmts: List[Statement]): List[Statement] = {
+    val buffer = ListBuffer[Statement]()
+
+    buffer += LabelStmt("WHILE")
+    buffer += IfStmt(condition, "ENDWHILE")
+    buffer ++= stmts
+    buffer += GotoStmt("WHILE")
+    buffer += LabelStmt("ENDWHILE")
+
+    buffer.result()
+  }
+
+  // FIXME: currently behaves like a WHILE statement
+  def generateForStmt(init: List[Statement], condition: Expression, stmts: List[Statement]) = {
+    val buffer = ListBuffer[Statement]()
+
+    buffer ++= init
+    buffer += LabelStmt("FOR")
+    buffer += IfStmt(condition, "ENDFOR")
+    buffer += GotoStmt("FOR")
+    buffer += LabelStmt("ENDFOR")
+
+    buffer.result()
   }
 
   def generateFields(module: OberonModule) = generateConstants(module) ::: generateVariables(module)
@@ -81,16 +112,21 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
     formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
   ))
 
-  def jimpleExpression(oberonExpression: OberonExpression): Expression = oberonExpression match {
-    case OberonIntValue(value) => ImmediateExpression(ImmediateValue(IntValue(value)))
-    case OberonBoolValue(value) => ImmediateExpression(ImmediateValue(BooleanValue(value)))
-    case OberonRealValue(value) => ImmediateExpression(ImmediateValue(DoubleValue(value)))
-    case OberonCharValue(value) => ImmediateExpression(ImmediateValue(StringValue(value.toString)))
-    case OberonStringValue(value) => ImmediateExpression(ImmediateValue(StringValue(value)))
-    case OberonNullValue => ImmediateExpression(ImmediateValue(NullValue))
-
-    case Brackets(exp) => jimpleExpression(exp)
+  def generateExpression(oberonExpression: OberonExpression): Expression = oberonExpression match {
+    case value: OberonValue => ImmediateExpression(ImmediateValue(jimpleValue(value)))
+    case Brackets(exp) => generateExpression(exp)
     case PointerAccessExpression(_) => throw new Exception("Pointers are not yet supported by Jimple code generation.")
+
+    case _ => throw new Exception("Non-exhaustive match in case statement.")
+  }
+
+  def jimpleValue(oberonValue: OberonValue): Value = oberonValue match {
+    case OberonIntValue(int) => IntValue(int)
+    case OberonBoolValue(bool) => BooleanValue(bool)
+    case OberonRealValue(real) => DoubleValue(real)
+    case OberonCharValue(char) => StringValue(char.toString)
+    case OberonStringValue(string) => StringValue(string)
+    case OberonNullValue => NullValue
 
     case _ => throw new Exception("Non-exhaustive match in case statement.")
   }

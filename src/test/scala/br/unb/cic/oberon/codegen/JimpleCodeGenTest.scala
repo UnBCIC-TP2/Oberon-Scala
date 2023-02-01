@@ -1,7 +1,6 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{AssignmentStmt, BoolValue, Constant, IntValue, OberonModule, Procedure, SequenceStmt, UserDefinedType, VarAssignment, VariableDeclaration}
-import br.unb.cic.oberon.ir.jimple.{BooleanValue, ClassDecl, Field, FinalModifier, MethodSignature, PublicModifer, TArray, TBoolean, TInteger, TObject}
+import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
