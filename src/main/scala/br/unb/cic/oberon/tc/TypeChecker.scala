@@ -171,13 +171,12 @@ class TypeChecker extends OberonVisitorAdapter {
 
   override def visit(procedure: Procedure): List[(Statement, String)] = {
     // case ProcedureStmt
-    env.push()
+    returnType = procedure.returnType
     procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, v.variableType))
     
     val errors = procedure.stmt.accept(this)
-    env.pop()
     errors
   }
 
@@ -198,7 +197,7 @@ class TypeChecker extends OberonVisitorAdapter {
     res ++ forEachStmt.stmt.accept(this)
   }
   
-
+  var returnType: Option[Type] = None
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
@@ -207,7 +206,9 @@ class TypeChecker extends OberonVisitorAdapter {
     case ExitStmt() => visitExitStmt()
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
-    case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case ReturnStmt(exp) =>
+      val expType = exp.accept(expVisitor)
+      if(expType.isDefined && expType == returnType ) List() else List((stmt, s"Expression $exp is ill typed."))
     case ReadLongRealStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadRealStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadLongIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
