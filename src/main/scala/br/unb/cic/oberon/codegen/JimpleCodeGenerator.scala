@@ -33,28 +33,31 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
     catchClauses = List.empty[CatchClause],
   )
 
+  def generateStmt(oberonStmt: OberonStmt): List[Statement] = generateStmt(Some(oberonStmt))
+
   def generateStmt(oberonStmt: Option[OberonStmt]): List[Statement] = oberonStmt match {
     case Some(someStmt) => someStmt match {
       case SequenceStmt(stmts) => stmts.flatMap(stmt => generateStmt(Some(stmt)))
       case AssignmentStmt(designator, exp) => designator match {
         case VarAssignment(varName) => List(AssignStmt(LocalVariable(varName), generateExpression(exp)))
       }
-      case IfElseStmt(condition, thenStmt, elseStmt) => generateIfStmt(generateExpression(condition), generateStmt(Some(thenStmt)), generateStmt(elseStmt))
-      case WhileStmt(condition, stmt) => generateWhileStmt(generateExpression(condition), generateStmt(Some(stmt)))
-      case ForStmt(init, condition, stmt) => generateForStmt(generateStmt(Some(init)), generateExpression(condition), generateStmt(Some(stmt)))
+      case IfElseStmt(condition, thenStmt, elseStmt) => generateIfStmt(generateExpression(condition), generateStmt(thenStmt), generateStmt(elseStmt))
+      case WhileStmt(condition, stmt) => generateWhileStmt(generateExpression(condition), generateStmt(stmt))
+      case ForStmt(init, condition, stmt) => generateForStmt(generateStmt(init), generateExpression(condition), generateStmt(stmt))
     }
     case None => List.empty[Statement]
   }
 
+  // FIXME: current label generation doesn't allow for multiple statements of the same kind
   def generateIfStmt(condition: Expression, thenStmts: List[Statement], elseStmts: List[Statement]): List[Statement] = {
     val buffer = ListBuffer[Statement]()
 
-    buffer += IfStmt(condition, "THEN")
+    buffer += IfStmt(condition, "then")
     buffer ++= elseStmts
-    buffer += GotoStmt("ENDIF")
-    buffer += LabelStmt("THEN")
+    buffer += GotoStmt("endIf")
+    buffer += LabelStmt("then")
     buffer ++= thenStmts
-    buffer += LabelStmt("ENDIF")
+    buffer += LabelStmt("endIf")
 
     buffer.result()
   }
@@ -62,11 +65,11 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
   def generateWhileStmt(condition: Expression, stmts: List[Statement]): List[Statement] = {
     val buffer = ListBuffer[Statement]()
 
-    buffer += LabelStmt("WHILE")
-    buffer += IfStmt(condition, "ENDWHILE")
+    buffer += LabelStmt("while")
+    buffer += IfStmt(condition, "endWhile")
     buffer ++= stmts
-    buffer += GotoStmt("WHILE")
-    buffer += LabelStmt("ENDWHILE")
+    buffer += GotoStmt("while")
+    buffer += LabelStmt("endWhile")
 
     buffer.result()
   }
@@ -76,10 +79,11 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
     val buffer = ListBuffer[Statement]()
 
     buffer ++= init
-    buffer += LabelStmt("FOR")
-    buffer += IfStmt(condition, "ENDFOR")
-    buffer += GotoStmt("FOR")
-    buffer += LabelStmt("ENDFOR")
+    buffer += LabelStmt("for")
+    buffer += IfStmt(condition, "endFor")
+    buffer ++= stmts
+    buffer += GotoStmt("for")
+    buffer += LabelStmt("endFor")
 
     buffer.result()
   }
