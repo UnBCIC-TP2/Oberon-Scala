@@ -17,7 +17,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   def generateBody() {}
 
   def generateExpression(expr: Expression, insts: List[TAC]): (Address, List[TAC]) = {
-    expr match {//usar visitExpression do tc para ver as expressoes
+    expr match {
 
       case Brackets(exp) =>
         return generateExpression(exp, insts)
@@ -40,9 +40,8 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case NullValue =>
         return (Constant("Null", NullType), insts)
 
-      //TODO PROCURAR TIPO DA VARIAVEL
-      //case VarExpression(name) =>
-      //  return (Name(name, tipo), insts)
+      case VarExpression(name) =>
+        return (Name(name, expr.accept(vistor).get), insts)
 
       case AddExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
@@ -142,15 +141,19 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 //        //talvez mudar o funcs.get(name) para stack
 //        return (funcs.get(name), argInsts ++ params :+ Call(name, args.length))
 
-//TODO
-//      case ArraySubscript(a, i) =>
-//        return ()
-//
-//      case FieldAccessExpression(exp, name) =>
-//        return ()
-//
-//      case PointerAccessExpression(name) =>
-//        return ()
+      case ArraySubscript(array, index) =>
+        val (a, insts1) = generateExpression(array, insts)
+        val (i, insts2) = generateExpression(index, insts1)
+        val t = new Temporary(expr.accept(visitor).get)
+        return (t, insts2 :+ ListGet(a, i, t, ""))
+
+      case PointerAccessExpression(name) =>
+        val p = Name(name, LocationType)
+        val t = new Temporary(expr.accept(visitor).get)
+        return (t, insts :+ GetValue(p, t, ""))
+
+      case FieldAccessExpression(exp, name) =>
+        throw new Exception("FieldAccessExpression não foi implementada!")
     }
   }
 
