@@ -41,49 +41,37 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDecl] {
       case AssignmentStmt(designator, exp) => designator match {
         case VarAssignment(varName) => List(AssignStmt(LocalVariable(varName), generateExpression(exp)))
       }
-      case IfElseStmt(condition, thenStmt, elseStmt) => generateIfStmt(generateExpression(condition), generateStmt(thenStmt), generateStmt(elseStmt))
-      case WhileStmt(condition, stmt) => generateWhileStmt(generateExpression(condition), generateStmt(stmt))
-      case ForStmt(init, condition, stmt) => generateForStmt(generateStmt(init), generateExpression(condition), generateStmt(stmt))
+//      case IfElseStmt(condition, thenStmt, elseStmt) => generateIfStmt(generateExpression(condition), generateStmt(thenStmt), generateStmt(elseStmt))
+//      case WhileStmt(condition, stmt) => generateWhileStmt(generateExpression(condition), generateStmt(stmt))
     }
     case None => List.empty[Statement]
   }
 
-  // FIXME: current label generation doesn't allow for multiple statements of the same kind
-  def generateIfStmt(condition: Expression, thenStmts: List[Statement], elseStmts: List[Statement]): List[Statement] = {
+  def generateIfStmt(condition: Expression, thenStmts: List[Statement], elseStmts: List[Statement], labelIndex: Int): List[Statement] = {
     val buffer = ListBuffer[Statement]()
+    val ifLabel = s"label${labelIndex}"
+    val endIfLabel = s"label${labelIndex + 1}"
 
-    buffer += IfStmt(condition, "then")
+    buffer += IfStmt(condition, ifLabel)
     buffer ++= elseStmts
-    buffer += GotoStmt("endIf")
-    buffer += LabelStmt("then")
+    buffer += GotoStmt(endIfLabel)
+    buffer += LabelStmt(ifLabel)
     buffer ++= thenStmts
-    buffer += LabelStmt("endIf")
+    buffer += LabelStmt(endIfLabel)
 
     buffer.result()
   }
 
-  def generateWhileStmt(condition: Expression, stmts: List[Statement]): List[Statement] = {
+  def generateWhileStmt(condition: Expression, stmts: List[Statement], labelIndex: Int): List[Statement] = {
     val buffer = ListBuffer[Statement]()
+    val whileLabel = s"label${labelIndex}"
+    val endWhileLabel = s"label${labelIndex + 1}"
 
-    buffer += LabelStmt("while")
-    buffer += IfStmt(condition, "endWhile")
+    buffer += LabelStmt(whileLabel)
+    buffer += IfStmt(condition, endWhileLabel)
     buffer ++= stmts
-    buffer += GotoStmt("while")
-    buffer += LabelStmt("endWhile")
-
-    buffer.result()
-  }
-
-  // FIXME: currently behaves like a WHILE statement
-  def generateForStmt(init: List[Statement], condition: Expression, stmts: List[Statement]) = {
-    val buffer = ListBuffer[Statement]()
-
-    buffer ++= init
-    buffer += LabelStmt("for")
-    buffer += IfStmt(condition, "endFor")
-    buffer ++= stmts
-    buffer += GotoStmt("for")
-    buffer += LabelStmt("endFor")
+    buffer += GotoStmt(whileLabel)
+    buffer += LabelStmt(endWhileLabel)
 
     buffer.result()
   }
