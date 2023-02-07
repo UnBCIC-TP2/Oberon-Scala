@@ -271,4 +271,10 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // TO DO
+  // ArraySubscript
+  // PointerAccessExpression
+  // FieldAccessExpression
+
+  
 }

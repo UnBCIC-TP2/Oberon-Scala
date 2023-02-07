@@ -41,7 +41,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         return (Constant("Null", NullType), insts)
 
       case VarExpression(name) =>
-        return (Name(name, expr.accept(vistor).get), insts)
+        return (Name(name, expr.accept(visitor).get), insts)
 
       case AddExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
