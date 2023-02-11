@@ -160,10 +160,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
   def generateStatement() {}
 
+  // somente para testes
   def load_vars(vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
     OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc);
   }
-
+  // somente para testes
   def reset(): Unit = {
     tc = new TypeChecker()
     expVisitor = new ExpressionTypeVisitor(tc)
