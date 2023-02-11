@@ -292,12 +292,17 @@ case class UserDefinedType(name: String, baseType: Type) {
 }
 
 /** The hierarchy for the Oberon supported types */
-sealed trait Type {
+abstract class Type(st : Option[Type]) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
+/**
+object Type {
+  def is subType() {}
+}
+**/
+
 object CastType {
-  
   def subType(t1: Type, t2: Type): Boolean = (t1, t2) match {
     case (IntegerType, RealType) => true
     case (CharacterType, IntegerType) => true
@@ -327,22 +332,26 @@ object CastType {
   }
 }
 
+case object Any extends Type(None)
+case object UndefinedType extends Type(Some(Any))
 
+case object NumberType extends Type(Some(Any))
 
-case object IntegerType extends Type 
-case object RealType extends Type 
-case object BooleanType extends Type
-case object CharacterType extends Type
-case object StringType extends Type
-case object UndefinedType extends Type
-case object NullType extends Type
-case object LocationType extends Type
+case object IntegerType extends Type(Some(NumberType))
+case object RealType extends Type(Some(NumberType))
+case object BooleanType extends Type(Some(NumberType))
+case object CharacterType extends Type(Some(NumberType))
 
-case class RecordType(variables: List[VariableDeclaration]) extends Type
-case class ArrayType(length: Int, baseType: Type) extends Type
-case class PointerType(variableType: Type) extends Type
+case object RefType extends Type(Some(Any))
 
-case class ReferenceToUserDefinedType(name: String) extends Type
+case object StringType extends Type(Some(RefType))
+case object NullType extends Type(Some(RefType))
+case object LocationType extends Type(Some(RefType))
+case class RecordType(variables: List[VariableDeclaration]) extends Type(Some(RefType))
+case class ArrayType(length: Int, baseType: Type) extends Type(Some(RefType))
+case class PointerType(variableType: Type) extends Type(Some(RefType))
+
+case class ReferenceToUserDefinedType(name: String) extends Type(Some(RefType))
 
 /* useful for implementing the REPL feature */
 trait REPL

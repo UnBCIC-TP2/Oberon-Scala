@@ -144,8 +144,7 @@ trait StatementParser extends ExpressionParser {
     def multStatementParser: Parser[Statement] = (statementParser ~ rep(";" ~> statementParser) ^^ 
         { case a ~ b => List(a) ++ b } ^^ {
             case a :: Nil => a
-            case a :: b => SequenceStmt(a :: b)
-        }
+            case a :: b => SequenceStmt(a :: b)        }
     );
 }
 
