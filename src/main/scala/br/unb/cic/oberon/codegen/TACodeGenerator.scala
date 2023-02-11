@@ -6,7 +6,8 @@ import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
 
 object TACodeGenerator extends CodeGenerator[List[TAC]] {
   
-  val visitor = new ExpressionTypeVisitor(new TypeChecker())
+  private var tc = new TypeChecker()
+  private var expVisitor = new ExpressionTypeVisitor(tc)
 
   override def generateCode(module: OberonModule): List[TAC] = {
     List()
@@ -41,30 +42,30 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         return (Constant("Null", NullType), insts)
 
       case VarExpression(name) =>
-        return (Name(name, expr.accept(visitor).get), insts)
+        return (Name(name, expr.accept(expVisitor).get), insts)
 
       case AddExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ AddOp(l, r, t, ""))
 
       case SubExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ SubOp(l, r, t, ""))
 
       case MultExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ MulOp(l, r, t, ""))
 
       case DivExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ DivOp(l, r, t, ""))
         
       case AndExpression(left, right) =>
@@ -93,41 +94,41 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case EQExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t0 = new Temporary(expr.accept(visitor).get)
-        val t1 = new Temporary(expr.accept(visitor).get)
+        val t0 = new Temporary(expr.accept(expVisitor).get)
+        val t1 = new Temporary(expr.accept(expVisitor).get)
         return (t1, insts2 :+ SubOp(l, r, t0, "") :+ SLTUOp(t0, Constant("1", IntegerType), t1, ""))
 
       case NEQExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t0 = new Temporary(expr.accept(visitor).get)
-        val t1 = new Temporary(expr.accept(visitor).get)
+        val t0 = new Temporary(expr.accept(expVisitor).get)
+        val t1 = new Temporary(expr.accept(expVisitor).get)
         return (t1, insts2 :+ SubOp(l, r, t0, "") :+ SLTUOp(Constant("0", IntegerType), t0, t1, ""))
 
       case GTExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ SLTOp(r, l, t, ""))
 
       case LTExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ SLTOp(l, r, t, ""))
 
       case GTEExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t0 = new Temporary(expr.accept(visitor).get)
-        val t1 = new Temporary(expr.accept(visitor).get)
+        val t0 = new Temporary(expr.accept(expVisitor).get)
+        val t1 = new Temporary(expr.accept(expVisitor).get)
         return (t1, insts2 :+ SLTOp(l, r, t0, "") :+ NotOp(t0, t1, ""))
 
       case LTEExpression(left, right) =>
         val (l, insts1) = generateExpression(left, insts)
         val (r, insts2) = generateExpression(right, insts1)
-        val t0 = new Temporary(expr.accept(visitor).get)
-        val t1 = new Temporary(expr.accept(visitor).get)
+        val t0 = new Temporary(expr.accept(expVisitor).get)
+        val t1 = new Temporary(expr.accept(expVisitor).get)
         return (t1, insts2 :+ SLTOp(r, l, t0, "") :+ NotOp(t0, t1, ""))
 
 //TODO generateProcedure e gerar o Map funcs
@@ -144,12 +145,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts2 :+ ListGet(a, i, t, ""))
 
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expr.accept(visitor).get)
+        val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(exp, name) =>
@@ -158,4 +159,14 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   }
 
   def generateStatement() {}
+
+  def load_vars(vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
+    OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc);
+  }
+
+  def reset(): Unit = {
+    tc = new TypeChecker()
+    expVisitor = new ExpressionTypeVisitor(tc)
+    Temporary.reset
+  }
 }

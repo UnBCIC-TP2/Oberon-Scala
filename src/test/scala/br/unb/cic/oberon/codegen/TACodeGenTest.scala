@@ -8,7 +8,7 @@ class TACodeTest extends AnyFunSuite {
 
   test("Generate add between constants") {
 
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = AddExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // 1 + 2
@@ -27,11 +27,11 @@ class TACodeTest extends AnyFunSuite {
 
   test("Generate add between add and constant") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = AddExpression(AddExpression(IntValue(1), IntValue(2)), IntValue(3))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
@@ -44,11 +44,11 @@ class TACodeTest extends AnyFunSuite {
 
   test("Generate add between adds") {
 
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = AddExpression(AddExpression(IntValue(1), IntValue(2)), AddExpression(IntValue(3), IntValue(4)))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val t2 = new Temporary(IntegerType, 2, true)
@@ -63,12 +63,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing complex operation 2") {
 
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = SubExpression(DivExpression(MultExpression(IntValue(2), IntValue(2)), IntValue(3)), IntValue(6))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // ((2 * 2) / 3) - 6
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val t2 = new Temporary(IntegerType, 2, true)
@@ -86,12 +86,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing complex operation 3") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = OrExpression(AndExpression(BoolValue(true), BoolValue(false)), OrExpression(BoolValue(true), AndExpression(BoolValue(true), NotExpression(BoolValue(true)))))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (True and False) or (True or (True and False))
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(BooleanType, 0, true)
     val t1 = new Temporary(BooleanType, 1, true)
     val t2 = new Temporary(BooleanType, 2, true)
@@ -115,12 +115,12 @@ class TACodeTest extends AnyFunSuite {
 
   test ("TAC NotExpression") {
 
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = NotExpression(BoolValue(true))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // not(true)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(BooleanType, 0, true)
     val ops = List(
       NotOp(Constant("true", BooleanType), t0, "")
@@ -142,12 +142,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing EQ") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = EQExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 == 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
@@ -162,12 +162,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing NEQ") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = NEQExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 != 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
@@ -182,12 +182,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing GT") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = GTExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 > 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
       SLTOp(Constant("2", IntegerType), Constant("1", IntegerType), t0, "")
@@ -199,12 +199,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing LT") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = LTExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 < 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
       SLTOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, "")
@@ -216,12 +216,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("TAC Testing GT") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = GTExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 > 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
       SLTOp(Constant("2", IntegerType), Constant("1", IntegerType), t0, "")
@@ -233,12 +233,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing GTE") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = GTEExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 >= 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
@@ -253,12 +253,12 @@ class TACodeTest extends AnyFunSuite {
 
   test("Testing LTE") {
     
-    Temporary.reset
+    TACodeGenerator.reset
     val expr = LTEExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // (1 <= 2)
 
-    Temporary.reset
+    TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
@@ -271,9 +271,30 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // TO DO
-  // ArraySubscript
+
+  test("Testing ArraySubscript"){
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    // lista[2]
+    val expr = ArraySubscript(VarExpression("lista"), IntValue(2))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      ListGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t0, "")
+    )    
+
+    assert(list == ops)
+  }
   // PointerAccessExpression
+
+  test("Testing PointerAccessExpression"){
+    
+  }
+
+
   // FieldAccessExpression
 
   
