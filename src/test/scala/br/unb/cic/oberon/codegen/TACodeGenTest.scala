@@ -255,6 +255,18 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  test("Testing VarExpression"){
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+
+    val expr = VarExpression("var")
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    val ops = Name("var", IntegerType)
+    
+    assert(t == ops)
+  }
 
   test("Testing ArraySubscript"){
     TACodeGenerator.reset
