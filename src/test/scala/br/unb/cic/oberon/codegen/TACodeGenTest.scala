@@ -113,7 +113,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test ("TAC NotExpression") {
+  test ("Testing NotExpression") {
 
     TACodeGenerator.reset
     val expr = NotExpression(BoolValue(true))
@@ -180,23 +180,6 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing GT") {
-    
-    TACodeGenerator.reset
-    val expr = GTExpression(IntValue(1), IntValue(2))
-    val (t, list) = TACodeGenerator.generateExpression(expr, List())
-    // (1 > 2)
-
-    TACodeGenerator.reset
-    val t0 = new Temporary(IntegerType, 0, true)
-    val ops = List(
-      SLTOp(Constant("2", IntegerType), Constant("1", IntegerType), t0, "")
-    )    
-    // t0 = 1 > 2
-
-    assert(list == ops)
-  }
-
   test("Testing LT") {
     
     TACodeGenerator.reset
@@ -214,7 +197,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("TAC Testing GT") {
+  test("Testing GT") {
     
     TACodeGenerator.reset
     val expr = GTExpression(IntValue(1), IntValue(2))
@@ -226,10 +209,11 @@ class TACodeTest extends AnyFunSuite {
     val ops = List(
       SLTOp(Constant("2", IntegerType), Constant("1", IntegerType), t0, "")
     )    
-    // t0 = slt 2 1
+    // t0 = 1 > 2
 
     assert(list == ops)
   }
+
 
   test("Testing GTE") {
     
@@ -288,12 +272,22 @@ class TACodeTest extends AnyFunSuite {
 
     assert(list == ops)
   }
-  // PointerAccessExpression
-
   test("Testing PointerAccessExpression"){
-    
-  }
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("pointer", PointerType(IntegerType)))
+    TACodeGenerator.load_vars(list_var)
 
+    val expr = PointerAccessExpression("pointer")
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      GetValue(Name("pointer", LocationType), t0, "")
+    )    
+    // t0 = *pointer;
+
+    assert(list == ops)
+  }
 
   // FieldAccessExpression
 
