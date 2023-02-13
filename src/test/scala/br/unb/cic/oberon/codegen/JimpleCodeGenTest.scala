@@ -33,12 +33,12 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(module.name == "SimpleModule3")
 
     val targetVariables = List(
-      Field(
+      JimpleField(
         modifiers = List(PublicModifer),
         fieldType = TInteger,
         name = "abc"
       ),
-      Field(
+      JimpleField(
         modifiers = List(PublicModifer),
         fieldType = TBoolean,
         name = "def"
@@ -60,12 +60,12 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(module.name == "SimpleModule7")
 
     val targetConstants = List(
-      Field(
+      JimpleField(
         modifiers = List(PublicModifer, FinalModifier),
         fieldType = TInteger,
         name = "x"
       ),
-      Field(
+      JimpleField(
         modifiers = List(PublicModifer, FinalModifier),
         fieldType = TInteger,
         name = "y"
@@ -86,7 +86,7 @@ class JimpleCodeGenTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    val targetSignatures = List(MethodSignature(
+    val targetSignatures = List(JimpleMethodSignature(
       className = module.name,
       returnType = TInteger,
       methodName = "sum",
