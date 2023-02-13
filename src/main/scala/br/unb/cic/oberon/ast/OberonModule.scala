@@ -299,6 +299,24 @@ abstract class Type(st : Option[Type]) {
 object Type {
   def is subType() {}
 }
+
+
+object Type {
+
+  def isSubType(t1: Type, t2: Type): Boolean = (t1, t2) match {
+    case (IntegerType, RealType) => true
+    case (CharacterType, RealType) => true
+    /**case (CharacterType, IntegerType) => true**/
+    case _ => false 
+  }
+
+  def isSuperType(t1: Type, t2: Type): Boolean = {
+    if !isSubType(t1, t2):
+      if t1.st == t2.st:
+        return true
+      return false
+  }
+}
 **/
 
 object CastType {
@@ -338,7 +356,8 @@ case object NumberType extends Type(Some(Any))
 
 case object IntegerType extends Type(Some(NumberType))
 case object RealType extends Type(Some(NumberType))
-case object BooleanType extends Type(Some(NumberType))
+/*case object BooleanType extends Type(Some(NumberType))    TODO: se permitir operacoes, precisa de um case class com Modular na linha ~199 e passar Bollean no TypeChecker*/
+case object BooleanType extends Type(Some(Any))
 case object CharacterType extends Type(Some(NumberType))
 
 case object RefType extends Type(Some(Any))
