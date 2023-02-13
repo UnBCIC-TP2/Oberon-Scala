@@ -195,7 +195,6 @@ case class CharValue(value: Char) extends Value with Modular {
   }
 }
 
-case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
 case object NullValue extends Expression
