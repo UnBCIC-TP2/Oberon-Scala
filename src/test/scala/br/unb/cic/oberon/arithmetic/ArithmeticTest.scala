@@ -58,7 +58,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
 
     val c = CharValue('a') // 97
     val r1 = RealValue(1.0)
-    val m = MultExpression(c, r1)
+    val m = AddExpression(c, r1)
 
     val expected = RealValue(98.0)
 
@@ -75,7 +75,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
 
     val c = CharValue('a') // 97
     val r1 = RealValue(1.0)
-    val m = MultExpression(c, r1)
+    val m = SubExpression(c, r1)
 
     val expected = RealValue(96.0)
 
@@ -109,7 +109,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
 
     val c = CharValue('a') // 97
     val r1 = RealValue(97.0)
-    val m = MultExpression(c, r1)
+    val m = DivExpression(c, r1)
 
     val expected = RealValue(1.0)
 
