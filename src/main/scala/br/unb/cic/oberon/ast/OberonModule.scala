@@ -166,32 +166,32 @@ case class CharValue(value: Char) extends Value with Modular {
   type T = Char
   def +(that: Number): Number = that match {
     case other: IntValue => IntValue(value + other.value)
-    case other: IntValue => IntValue(value + other.value)
+    case other: CharValue => IntValue(value + other.value)
     case other: RealValue => RealValue(value + other.value)
   }
 
   def -(that: Number): Number = that match {
     case other: IntValue => IntValue(value - other.value)
-    case other: IntValue => IntValue(value - other.value)
+    case other: CharValue => IntValue(value - other.value)
     case other: RealValue => RealValue(value - other.value)
   }
 
   def *(that: Number): Number = that match {
     case other: IntValue => IntValue(value * other.value)
-    case other: IntValue => IntValue(value * other.value)
+    case other: CharValue => IntValue(value * other.value)
     case other: RealValue => RealValue(value * other.value)
   }
 
   def /(that: Number): Number = that match {
     case other: IntValue => IntValue(value / other.value)
-    case other: IntValue => IntValue(value / other.value)
+    case other: CharValue => IntValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
   }
 
   val positiveMod = (x:Char, y:Int) => {val res = x % y; if (x < 0) res + y else res}
 
-  def mod(that: Modular): Modular = that match{
-    case other: IntValue => IntValue(positiveMod(value, other.value))
+  def mod(that: Modular): Modular = that match {
+    case other: CharValue => IntValue(positiveMod(value, other.value))
   }
 }
 
