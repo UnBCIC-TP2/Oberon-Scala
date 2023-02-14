@@ -53,4 +53,72 @@ class ArithmeticTestSuite extends AnyFunSuite {
     assert(expected == res)
 
   }
+
+  test("Test a sum between char and real"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = MultExpression(c, r1)
+
+    val expected = RealValue(98.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a subtraction between char and real"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = MultExpression(c, r1)
+
+    val expected = RealValue(96.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a multiplication between char and real"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = MultExpression(c, r1)
+
+    val expected = RealValue(97.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a division between char and real"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(97.0)
+    val m = MultExpression(c, r1)
+
+    val expected = RealValue(1.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
 }
