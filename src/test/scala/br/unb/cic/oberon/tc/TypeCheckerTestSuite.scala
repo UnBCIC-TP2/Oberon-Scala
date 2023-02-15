@@ -1465,7 +1465,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val res = module.accept(visitor)
 
     assert(res.size == 1)
-    print(res, "\n")
     val msg = res.head._2
     assert(msg.contains("Wrong return type"))
   }
