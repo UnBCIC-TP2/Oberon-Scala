@@ -2,10 +2,13 @@ MODULE bee1060Positive;
 
 VAR
     a : ARRAY 6 OF REAL;
-    
-    ans : REAL;
+    i : INTEGER;
+    ans, v : REAL;
 
 BEGIN
+    i := 0;
+    ans := 0;
+
     a[0] := 7;
     a[1] := -5;
     a[2] := 6;
@@ -13,13 +16,13 @@ BEGIN
     a[4] := 4.6;
     a[5] := 12;
     
-    ans := 0;
-
-    FOREACH v IN a
-        IF v >= 0 THEN
-            ans := ans + 1
-        END    
-    END
+    REPEAT
+        IF(a[i] >= 0) THEN
+            INC(ans)
+        END;
+        
+        INC(i)
+    UNTIL (i = 6)
 
 END
 
