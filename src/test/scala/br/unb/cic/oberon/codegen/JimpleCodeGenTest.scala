@@ -7,77 +7,52 @@ import org.scalatest.funsuite.AnyFunSuite
 import java.nio.file.{Files, Paths}
 
 class JimpleCodeGenTest extends AnyFunSuite {
-  test("Generate class declaration from simple01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
+  test("generate class declaration from simple04.oberon") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "SimpleModule1")
+    assert(module.name == "SimpleModule4")
 
-    val classDecl = JimpleCodeGenerator.generateCode(module)
-
-    assert(classDecl.classType == TObject("SimpleModule1"))
-  }
-
-  test("Generate variables from simple03.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule3")
-
-    val targetVariables = List(
-      JimpleField(
-        modifiers = List(PublicModifer),
-        fieldType = TInteger,
-        name = "abc"
+    val targetClass = ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = List(
+        Field(modifiers = List(PublicModifer, StaticModifier, FinalModifier), fieldType = TInteger, name = "x"),
+        Field(modifiers = List(PublicModifer, StaticModifier, FinalModifier), fieldType = TInteger, name = "y"),
+        Field(modifiers = List(PublicModifer, StaticModifier, FinalModifier), fieldType = TInteger, name = "z"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TInteger, name = "abc"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TBoolean, name = "def")
       ),
-      JimpleField(
-        modifiers = List(PublicModifer),
-        fieldType = TBoolean,
-        name = "def"
-      ),
+      methods = List(Method(
+        modifiers = List(PublicModifer, StaticModifier),
+        returnType = TVoid,
+        name = "main",
+        formals = List(TArray(TString)),
+        exceptions = List.empty[JimpleType],
+        body = DefaultMethodBody(
+          localVariableDecls = List(LocalVariableDeclaration(TArray(TString), "args")),
+          stmts = List(
+            AssignStmt(StaticField(FieldSignature(module.name, TInteger, "x")), ImmediateExpression(ImmediateValue(IntValue(5)))),
+            AssignStmt(StaticField(FieldSignature(module.name, TInteger, "y")), ImmediateExpression(ImmediateValue(IntValue(10)))),
+            AssignStmt(StaticField(FieldSignature(module.name, TInteger, "z")), PlusExpression(ImmediateValue(IntValue(5)), ImmediateValue(IntValue(10))))
+          ),
+          catchClauses = List.empty[CatchClause]
+        )
+      ))
     )
-    val variables = JimpleCodeGenerator.generateVariables(module)
+    val jimpleClass = JimpleCodeGenerator.generateCode(module)
 
-    assert(variables == targetVariables)
+    assert(jimpleClass == targetClass)
   }
 
-  test("Generate constants from simple07.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
-
-    assert(path != null)
-
-    val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
-
-    assert(module.name == "SimpleModule7")
-
-    val targetConstants = List(
-      JimpleField(
-        modifiers = List(PublicModifer, FinalModifier),
-        fieldType = TInteger,
-        name = "x"
-      ),
-      JimpleField(
-        modifiers = List(PublicModifer, FinalModifier),
-        fieldType = TInteger,
-        name = "y"
-      ),
-    )
-    val constants = JimpleCodeGenerator.generateConstants(module)
-
-    assert(constants == targetConstants)
-  }
-
-  test("Generate method signature from procedure01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("procedures/procedure01.oberon").toURI)
+  test("generate class declaration from boolean5.oberon") {
+    val path = Paths.get(getClass.getClassLoader.getResource("boolean/boolean5.oberon").toURI)
 
     assert(path != null)
 
@@ -86,33 +61,152 @@ class JimpleCodeGenTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    val targetSignatures = List(JimpleMethodSignature(
-      className = module.name,
-      returnType = TInteger,
-      methodName = "sum",
-      formals = List(TInteger, TInteger)
-    ))
-    val signatures = JimpleCodeGenerator.generateMethodSignatures(module)
+    val targetClass = ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = List(
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TFloat, name = "x"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TFloat, name = "y"),
+      ),
+      methods = List(Method(
+        modifiers = List(PublicModifer, StaticModifier),
+        returnType = TVoid,
+        name = "main",
+        formals = List(TArray(TString)),
+        exceptions = List.empty[JimpleType],
+        body = DefaultMethodBody(
+          localVariableDecls = List(LocalVariableDeclaration(TArray(TString), "args")),
+          stmts = List(
+            AssignStmt(StaticField(FieldSignature(module.name, TFloat, "x")), ImmediateExpression(ImmediateValue(FloatValue(3.0f)))),
+            AssignStmt(StaticField(FieldSignature(module.name, TFloat, "y")), ImmediateExpression(ImmediateValue(FloatValue(3.0f)))),
+            IfStmt(CmpEqExpression(Local("x"), Local("y")), "label0"),
+            GotoStmt("label1"),
+            LabelStmt("label0"),
+            AssignStmt(StaticField(FieldSignature(module.name, TFloat, "x")), ImmediateExpression(ImmediateValue(FloatValue(2.0f)))),
+            LabelStmt("label1"),
+          ),
+          catchClauses = List.empty[CatchClause],
+        ),
+      )),
+    )
+    val jimpleClass = JimpleCodeGenerator.generateCode(module)
 
-    assert(signatures == targetSignatures)
+    assert(jimpleClass == targetClass)
   }
 
-  test("Generate user defined types from userTypeSimple02.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple02.oberon").toURI)
+  test("generate class declaration from userTypeSimple05.oberon") {
+    val path = Paths.get(getClass.getClassLoader.getResource("simple/userTypeSimple05.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
     val module = ScalaParser.parse(content)
 
-    assert(module.name == "test")
+    assert(module.name == "UserTypeModule")
 
-    val targetUserTypes = List(
-      TObject("HALLS"),
-      TArray(TObject("HALLS"))
+    val targetClass = ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = List(
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TArray(TInteger), name = "x"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TArray(TInteger), name = "y"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TObject("complicated"), name = "z")
+      ),
+      methods = List(Method(
+        modifiers = List(PublicModifer, StaticModifier),
+        returnType = TVoid,
+        name = "main",
+        formals = List(TArray(TString)),
+        exceptions = List.empty[JimpleType],
+        body = DefaultMethodBody(
+          localVariableDecls = List(LocalVariableDeclaration(TArray(TString), "args")),
+          stmts = List.empty[JimpleStatement],
+          catchClauses = List.empty[CatchClause],
+        ),
+      ))
     )
-    val userTypes = JimpleCodeGenerator.generateUserDefinedTypes(module)
+    val jimpleClass = JimpleCodeGenerator.generateCode(module)
 
-    assert(userTypes == targetUserTypes)
+    assert(jimpleClass == targetClass)
+  }
+
+  test("generate class declaration from ArrayAssignmentStmt03.oberon") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/ArrayAssignmentStmt03.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "ArrayAssignmentStmt03")
+
+    val targetClass = ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = List(
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TArray(TInteger), name = "array"),
+        Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TArray(TInteger), name = "outroarray"),
+      ),
+      methods = List(Method(
+        modifiers = List(PublicModifer, StaticModifier),
+        returnType = TVoid,
+        name = "main",
+        formals = List(TArray(TString)),
+        exceptions = List.empty[JimpleType],
+        body = DefaultMethodBody(
+          localVariableDecls = List(LocalVariableDeclaration(TArray(TString), "args")),
+          stmts = List(
+            AssignStmt(ArrayRef("array", ImmediateValue(IntValue(0))), ImmediateExpression(ImmediateValue(IntValue(10)))),
+            AssignStmt(ArrayRef("array", ImmediateValue(IntValue(1))), ImmediateExpression(ImmediateValue(IntValue(20)))),
+            AssignStmt(ArrayRef("array", ImmediateValue(IntValue(2))), ImmediateExpression(ImmediateValue(IntValue(30)))),
+            AssignStmt(ArrayRef("outroarray", ImmediateValue(IntValue(0))), ImmediateExpression(ImmediateValue(IntValue(1)))),
+            AssignStmt(ArrayRef("outroarray", ImmediateValue(IntValue(1))), ImmediateExpression(ImmediateValue(IntValue(5)))),
+          ),
+          catchClauses = List.empty[CatchClause],
+        )
+      )),
+    )
+    val jimpleClass = JimpleCodeGenerator.generateCode(module)
+
+    assert(jimpleClass == targetClass)
+  }
+
+  test("generate class declaration from recordAssignmentStmt01.oberon") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/recordAssignmentStmt01.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = ScalaParser.parse(content)
+
+    assert(module.name == "SimpleModule")
+
+    val targetClass = ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = List(Field(modifiers = List(PublicModifer, StaticModifier), fieldType = TObject("date"), name = "d1")),
+      methods = List(Method(
+        modifiers = List(PublicModifer, StaticModifier),
+        returnType = TVoid, name = "main",
+        formals = List(TArray(TString)),
+        exceptions = List.empty[JimpleType],
+        body = DefaultMethodBody(
+          localVariableDecls = List(LocalVariableDeclaration(TArray(TString), "args")),
+          stmts = List(AssignStmt(FieldRef("d1", FieldSignature("date", TObject("date"), "day")), ImmediateExpression(ImmediateValue(IntValue(5))))),
+          catchClauses = List.empty[CatchClause],
+        )
+      )),
+    )
+    val jimpleClass = JimpleCodeGenerator.generateCode(module)
+
+    assert(jimpleClass == targetClass)
   }
 }
