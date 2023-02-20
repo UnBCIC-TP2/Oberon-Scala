@@ -33,10 +33,9 @@ case class NegOp(s1: Address, dest: Address, label: String) extends UniOp(s1, de
 
 case class NotOp(s1: Address, dest: Address, label: String) extends UniOp(s1, dest, label) {}
 
-
-
 case class CopyOp(s1: Address, dest: Address, label: String) extends TAC(label) {}
 
+case class NOp(label: String) extends TAC(label) {}
 
 
 case class Jump(destLabel: String, label: String) extends TAC(label) {}
