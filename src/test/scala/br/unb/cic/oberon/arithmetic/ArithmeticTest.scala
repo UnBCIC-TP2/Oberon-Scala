@@ -145,7 +145,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val r1 = RealValue(1.0)
     val m = SubExpression(r1, c)
 
-    val expected = RealValue(96.0)
+    val expected = RealValue(-96.0)
 
     val interpreter = new Interpreter()
     val expVisitor = new EvalExpressionVisitor(interpreter)
@@ -281,7 +281,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val r1 = IntValue(1)
     val m = SubExpression(r1, c)
 
-    val expected = IntValue(96)
+    val expected = IntValue(-96)
 
     val interpreter = new Interpreter()
     val expVisitor = new EvalExpressionVisitor(interpreter)
@@ -349,7 +349,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val c2 = CharValue('a')
     val m = SubExpression(c2, c)
 
-    val expected = IntValue(194)
+    val expected = IntValue(0)
 
     val interpreter = new Interpreter()
     val expVisitor = new EvalExpressionVisitor(interpreter)
@@ -366,7 +366,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val c2 = CharValue('a')
     val m = MultExpression(c2, c)
 
-    val expected = IntValue(194)
+    val expected = IntValue(9409)
 
     val interpreter = new Interpreter()
     val expVisitor = new EvalExpressionVisitor(interpreter)
@@ -383,7 +383,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val c2 = CharValue('a') 
     val m = DivExpression(c2, c)
 
-    val expected = IntValue(194)
+    val expected = IntValue(1)
 
     val interpreter = new Interpreter()
     val expVisitor = new EvalExpressionVisitor(interpreter)

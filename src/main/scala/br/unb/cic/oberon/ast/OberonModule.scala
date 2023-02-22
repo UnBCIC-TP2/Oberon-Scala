@@ -295,29 +295,6 @@ abstract class Type(st : Option[Type]) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-/**
-object Type {
-  def is subType() {}
-}
-
-
-object Type {
-
-  def isSubType(t1: Type, t2: Type): Boolean = (t1, t2) match {
-    case (IntegerType, RealType) => true
-    case (CharacterType, RealType) => true
-    /**case (CharacterType, IntegerType) => true**/
-    case _ => false 
-  }
-
-  def isSuperType(t1: Type, t2: Type): Boolean = {
-    if !isSubType(t1, t2):
-      if t1.st == t2.st:
-        return true
-      return false
-  }
-}
-**/
 
 object CastType {
   def subType(t1: Type, t2: Type): Boolean = (t1, t2) match {
