@@ -91,10 +91,29 @@ $ sbt assembly
 
 ```
 
-This command generates the `oberon-lang-assembly-0.1.1.jar` artifact into the `target/scala-2.13/` folder. You can execute thisartifact using the following command, which prints some usage help of our implementation. 
+This command generates the `oberon-lang-assembly-0.1.1.jar` artifact into the `target/scala-2.13/` folder. You can execute this artifact using the following command, which prints some usage help of our implementation.
 
 ```shell
 $ cd target/scala-2.13
 $ java -jar oberon-lang-assembly-0.1.1.jar --help
 ```
 
+### Using the Oberon JAR executable
+
+After you have the `oberon-lang-assembly-0.1.1.jar` executable, you should be able to run various commands. Some of the commands are exemplified below:
+
+```
+$ java -jar oberon-lang-assembly-0.1.1.jar --help
+```
+Displays a help message with all possible commands ans options
+
+
+```
+$ java -jar typeChecker -i <filename>.oberon
+```
+Runs the type checker on an Oberon file.
+
+```
+$ java -jar compile -b c -i <filename>.oberon -o <filename>.c
+```
+Compiles an oberon file into a c file.
