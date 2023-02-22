@@ -21,9 +21,6 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-//  ca}
-// se class SLTOp
-// case class SLTUOp}
 
   test("Generate add between add and constant") {
     
