@@ -3,10 +3,13 @@ package br.unb.cic.oberon
 import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.ast._
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
 
 import java.nio.file.{Files, Paths, Path}
 import java.util.Base64
@@ -30,7 +33,7 @@ object Main extends App {
       val outputPath = opt[Path](name = "out", descr = "Path of the output file", argName = "path", required=true)
       validatePathExists(inputPath)
 
-      val backend = choice(name="backend", choices=Seq("llvm", "c", "jvm"), default=Some("c"), descr="Which backend to compile to", argName="backend")
+      val backend = choice(name="backend", choices=Seq("json", "c", "jvm"), default=Some("c"), descr="Which backend to compile to", argName="backend")
     }
     object repl extends Subcommand("repl") {}
 
@@ -63,8 +66,26 @@ object Main extends App {
         val generatedCode = JVMCodeGenerator.generateCode(module)
         Files.write(conf.compile.outputPath.get.get, Base64.getDecoder.decode(generatedCode))
       }
-      case "llvm" => {
-        Files.writeString(conf.compile.outputPath.get.get, "LLVM :)")
+      case "json" => {
+        implicit val formats = new DefaultFormats {
+          override val typeHints = new ShortTypeHints(List(classOf[Statement],
+                                                           classOf[Expression],
+                                                           classOf[Procedure],
+                                                           classOf[OberonModule],
+                                                           classOf[Import],
+                                                           classOf[Value],
+                                                           classOf[Constant],
+                                                           classOf[CaseAlternative],
+                                                           classOf[Designator],
+                                                           classOf[UserDefinedType],
+                                                           classOf[Type],
+                                                           classOf[VariableDeclaration],
+                                                           classOf[FormalArg]))
+          override val typeHintFieldName = "type"
+        }
+
+        val jsonString = write(module)
+        Files.writeString(conf.compile.outputPath.get.get, jsonString)
       }
     }
   }

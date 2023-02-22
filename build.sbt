@@ -28,7 +28,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "org.scalatest" %% "scalatest-featurespec" % "3.2.0" % "test"
 libraryDependencies += "org.typelevel" %% "paiges-core" % "0.3.0"
 
-
 libraryDependencies += "org.scala-graph" %% "graph-core" % "1.13.2"
 libraryDependencies += "org.scala-graph" %% "graph-dot" % "1.13.0"
 
@@ -39,6 +38,7 @@ libraryDependencies += "org.ow2.asm" % "asm" % "9.1"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1"
 
 libraryDependencies += "org.jline" % "jline" % "3.21.0"
+libraryDependencies += "net.liftweb" %% "lift-json" % "3.5.0"
 
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
 assemblyMergeStrategy in assembly := {
