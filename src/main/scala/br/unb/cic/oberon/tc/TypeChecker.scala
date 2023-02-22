@@ -37,13 +37,13 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case LTEExpression(left, right) =>
       computeBinExpressionType(left, right, List(IntegerType), BooleanType)
     case AddExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType, CharacterType))
     case SubExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType, CharacterType))
     case MultExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType, CharacterType))
     case DivExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      computeArithmeticExpressionType(left, right, List(IntegerType, RealType, CharacterType))   
     case AndExpression(left, right) =>
       computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
@@ -123,13 +123,32 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case _ => None
       })
   }
-
+  
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
     val t1 = left.accept(this)
     val t2 = right.accept(this)
-    if(t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result) else None
+    if ((t1 == t2) && expected.contains(t1.getOrElse(None)))
+        Some(result) 
+    else
+        None
+  }
+
+    def computeArithmeticExpressionType[A](left: Expression, right: Expression, expected: List[Type]) : Option[Type] = {
+    val t1 = left.accept(this)
+    val t2 = right.accept(this)
+    if (expected.contains(t1.getOrElse(None)) && expected.contains(t2.getOrElse(None))) {
+      if (t1 == t2)
+          t1
+      else if (CastType.subType(t1.get, t2.get) || CastType.subType(t2.get, t1.get))
+          Some(CastType.promote(t1.get, t2.get))
+      else
+          None
+    }
+    else 
+      None
   }
 }
+
 
 class TypeChecker extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
@@ -138,24 +157,26 @@ class TypeChecker extends OberonVisitorAdapter {
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {
+    env.push()
     module.constants.foreach(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
     module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
     module.procedures.foreach(env.declareProcedure)
     module.userTypes.foreach(env.addUserDefinedType) //added G04
 
-    var errors = module.procedures.flatMap(p => checkProcedure(p))
-
+    var errors = module.procedures.flatMap(p => p.accept(this))
+    env.pop()
     if(module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
     else errors
   }
 
-  def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
-    env.push()
+  override def visit(procedure: Procedure): List[(Statement, String)] = {
+    // case ProcedureStmt
+    returnType = procedure.returnType
     procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
     procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
     procedure.variables.foreach(v => env.setLocalVariable(v.name, v.variableType))
+    
     val errors = procedure.stmt.accept(this)
-    env.pop()
     errors
   }
 
@@ -175,7 +196,8 @@ class TypeChecker extends OberonVisitorAdapter {
     }
     res ++ forEachStmt.stmt.accept(this)
   }
-
+  
+  var returnType: Option[Type] = None
   override def visit(stmt: Statement) = stmt match {
     case AssignmentStmt(_, _) => visitAssignment(stmt)
     case IfElseStmt(_, _, _) => visitIfElseStmt(stmt)
@@ -184,7 +206,9 @@ class TypeChecker extends OberonVisitorAdapter {
     case ExitStmt() => visitExitStmt()
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts) => stmts.flatMap(s => s.accept(this))
-    case ReturnStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case ReturnStmt(exp) =>
+      val expType = exp.accept(expVisitor)
+      if(expType.isDefined && expType == returnType ) List() else List((stmt, s"Expression $exp is ill typed."))
     case ReadLongRealStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadRealStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadLongIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))

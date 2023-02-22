@@ -105,21 +105,25 @@ case class IntValue(value: Int) extends Value with Modular {
   type T = Int
   def +(that: Number): Number = that match {
     case other: IntValue => IntValue(value + other.value)
+    case other: CharValue => IntValue(value + other.value)
     case other: RealValue => RealValue(value + other.value)
   }
 
   def -(that: Number): Number = that match {
     case other: IntValue => IntValue(value - other.value)
+    case other: CharValue => IntValue(value - other.value)
     case other: RealValue => RealValue(value - other.value)
   }
 
   def *(that: Number): Number = that match {
     case other: IntValue => IntValue(value * other.value)
+    case other: CharValue => IntValue(value * other.value)
     case other: RealValue => RealValue(value * other.value)
   }
 
   def /(that: Number): Number = that match {
     case other: IntValue => IntValue(value / other.value)
+    case other: CharValue => IntValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
   }
 
@@ -135,35 +139,71 @@ case class RealValue(value: Double) extends Value with Number {
 
   def +(that: Number): Number = that match {
     case other: IntValue => RealValue(value + other.value)
+    case other: CharValue => RealValue(value + other.value)
     case other: RealValue => RealValue(value + other.value)
   }
 
   def -(that: Number): Number = that match {
     case other: IntValue => RealValue(value - other.value)
+    case other: CharValue => RealValue(value - other.value)
     case other: RealValue => RealValue(value - other.value)
   }
 
   def *(that: Number): Number = that match {
     case other: IntValue => RealValue(value * other.value)
+    case other: CharValue => RealValue(value * other.value)
     case other: RealValue => RealValue(value * other.value)
   }
 
   def /(that: Number): Number = that match {
     case other: IntValue => RealValue(value / other.value)
+    case other: CharValue => RealValue(value / other.value)
     case other: RealValue => RealValue(value / other.value)
   }
 }
 
-case class CharValue(value: Char) extends Value { type T = Char }
+case class CharValue(value: Char) extends Value with Modular {
+  type T = Char
+  def +(that: Number): Number = that match {
+    case other: IntValue => IntValue(value + other.value)
+    case other: CharValue => IntValue(value + other.value)
+    case other: RealValue => RealValue(value + other.value)
+  }
+
+  def -(that: Number): Number = that match {
+    case other: IntValue => IntValue(value - other.value)
+    case other: CharValue => IntValue(value - other.value)
+    case other: RealValue => RealValue(value - other.value)
+  }
+
+  def *(that: Number): Number = that match {
+    case other: IntValue => IntValue(value * other.value)
+    case other: CharValue => IntValue(value * other.value)
+    case other: RealValue => RealValue(value * other.value)
+  }
+
+  def /(that: Number): Number = that match {
+    case other: IntValue => IntValue(value / other.value)
+    case other: CharValue => IntValue(value / other.value)
+    case other: RealValue => RealValue(value / other.value)
+  }
+
+  val positiveMod = (x:Char, y:Int) => {val res = x % y; if (x < 0) res + y else res}
+
+  def mod(that: Modular): Modular = that match {
+    case other: CharValue => IntValue(positiveMod(value, other.value))
+  }
+}
+
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
-
 case object NullValue extends Expression
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
 case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
+
 case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class PointerAccessExpression(name: String) extends Expression
 case class VarExpression(name: String) extends Expression
@@ -225,7 +265,6 @@ case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Opt
 case class ExitStmt() extends Statement
 case class NewStmt(varName: String) extends Statement
 case class MetaStmt(f: () => Statement) extends Statement
-
 trait CaseAlternative {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
@@ -252,24 +291,62 @@ case class UserDefinedType(name: String, baseType: Type) {
 }
 
 /** The hierarchy for the Oberon supported types */
-sealed trait Type {
+abstract class Type(st : Option[Type]) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-case object IntegerType extends Type
-case object RealType extends Type
-case object BooleanType extends Type
-case object CharacterType extends Type
-case object StringType extends Type
-case object UndefinedType extends Type
-case object NullType extends Type
-case object LocationType extends Type
 
-case class RecordType(variables: List[VariableDeclaration]) extends Type
-case class ArrayType(length: Int, baseType: Type) extends Type
-case class PointerType(variableType: Type) extends Type
+object CastType {
+  def subType(t1: Type, t2: Type): Boolean = (t1, t2) match {
+    case (IntegerType, RealType) => true
+    case (CharacterType, IntegerType) => true
+    case (CharacterType, RealType) => true
+    case _ => false 
+  }
 
-case class ReferenceToUserDefinedType(name: String) extends Type
+  def promote(t1: Type, t2: Type): Type = (t1, t2) match {
+    // base cases (not allowing promotion of CurrentType to CurrentType)
+    case (IntegerType, IntegerType) => NullType
+    case (RealType, RealType) => NullType
+    case (BooleanType, BooleanType) => NullType
+    case (CharacterType, CharacterType) => NullType
+    case (StringType, StringType) => NullType
+    case (UndefinedType, UndefinedType) => NullType
+    case (NullType, NullType) => NullType
+    case (LocationType, LocationType) => NullType
+    
+    case (IntegerType, RealType) => RealType
+    case (RealType, IntegerType) => RealType
+    case (CharacterType, IntegerType) => IntegerType
+    case (IntegerType, CharacterType) => IntegerType
+    case (CharacterType, RealType) => RealType
+    case (RealType, CharacterType) => RealType
+    // todo
+    case _ => UndefinedType
+  }
+}
+
+case object Any extends Type(None)
+case object UndefinedType extends Type(Some(Any))
+
+case object NumberType extends Type(Some(Any))
+
+case object IntegerType extends Type(Some(NumberType))
+case object RealType extends Type(Some(NumberType))
+/*case object BooleanType extends Type(Some(NumberType))    TODO: se permitir operacoes, precisa de um case class com Modular na linha ~199 e passar Bollean no TypeChecker*/
+case object BooleanType extends Type(Some(Any))
+case object CharacterType extends Type(Some(NumberType))
+
+case object RefType extends Type(Some(Any))
+
+case object StringType extends Type(Some(RefType))
+case object NullType extends Type(Some(RefType))
+case object LocationType extends Type(Some(RefType))
+case class RecordType(variables: List[VariableDeclaration]) extends Type(Some(RefType))
+case class ArrayType(length: Int, baseType: Type) extends Type(Some(RefType))
+case class PointerType(variableType: Type) extends Type(Some(RefType))
+
+case class ReferenceToUserDefinedType(name: String) extends Type(Some(RefType))
 
 /* useful for implementing the REPL feature */
 trait REPL
