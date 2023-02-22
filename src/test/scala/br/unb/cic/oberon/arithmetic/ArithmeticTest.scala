@@ -121,4 +121,276 @@ class ArithmeticTestSuite extends AnyFunSuite {
     assert(expected == res)
 
   }
+
+  test("Test a sum between real and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = AddExpression(r1, c)
+
+    val expected = RealValue(98.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a subtraction between real and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = SubExpression(r1, c)
+
+    val expected = RealValue(96.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a multiplication between real and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(1.0)
+    val m = MultExpression(r1, c)
+
+    val expected = RealValue(97.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a division between real and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = RealValue(97.0)
+    val m = DivExpression(r1, c)
+
+    val expected = RealValue(1.0)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a sum between char and int"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = AddExpression(c, r1)
+
+    val expected = IntValue(98)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a subtraction between char and int"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = SubExpression(c, r1)
+
+    val expected = IntValue(96)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a multiplication between char and int"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = MultExpression(c, r1)
+
+    val expected = IntValue(97)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a division between char and int"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(97)
+    val m = DivExpression(c, r1)
+
+    val expected = IntValue(1)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a sum between int and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = AddExpression(r1, c)
+
+    val expected = IntValue(98)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a subtraction between int and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = SubExpression(r1, c)
+
+    val expected = IntValue(96)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a multiplication between int and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(1)
+    val m = MultExpression(r1, c)
+
+    val expected = IntValue(97)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a division between int and char"){
+
+    val c = CharValue('a') // 97
+    val r1 = IntValue(97)
+    val m = DivExpression(r1, c)
+
+    val expected = IntValue(1)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a sum between char and char"){
+
+    val c = CharValue('a') // 97
+    val c2 = CharValue('a')
+    val m = AddExpression(c2, c)
+
+    val expected = IntValue(194)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a subtraction between char and char"){
+
+    val c = CharValue('a') // 97
+    val c2 = CharValue('a')
+    val m = SubExpression(c2, c)
+
+    val expected = IntValue(194)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a multiplication between char and char"){
+
+    val c = CharValue('a') // 97
+    val c2 = CharValue('a')
+    val m = MultExpression(c2, c)
+
+    val expected = IntValue(194)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
+
+  test("Test a division between char and char"){
+
+    val c = CharValue('a') // 97
+    val c2 = CharValue('a') 
+    val m = DivExpression(c2, c)
+
+    val expected = IntValue(194)
+
+    val interpreter = new Interpreter()
+    val expVisitor = new EvalExpressionVisitor(interpreter)
+
+    val res = m.accept(expVisitor)
+
+    assert(expected == res)
+
+  }
 }
