@@ -28,12 +28,13 @@ BEGIN
     temp := 0;
     answer := 0;
 
-    FOREACH v IN a
+    REPEAT
         temp := b[i] - c[i];
-        temp2 := temp - v;
-        answer := answer + temp2;
+        temp2 := temp - a[i];
+        INC(answer,temp2);
         INC(i)
-    END
+    UNTIL (i = 3)
+
 END
 
 END bee3205valt.

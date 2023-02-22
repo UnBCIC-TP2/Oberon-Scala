@@ -5,18 +5,20 @@ TYPE
 
 VAR
   a : A;
-  answer : INTEGER;
+  answer, i : INTEGER;
 
 BEGIN
   a[0] := 10;
   a[1] := 7;
   a[2] := 3;
-   
+  
+  i := 0;
   answer := 0;
 
-  FOREACH v IN a
-    answer := answer + v
-  END;
+  REPEAT
+      INC(answer, a[i]);
+      INC(i)
+  UNTIL (i = 3);
 
   answer := answer MOD 24
 END
