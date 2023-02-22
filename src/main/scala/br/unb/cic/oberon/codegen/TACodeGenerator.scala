@@ -60,6 +60,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           case EQExpression(left, right) =>
             val (l, insts1) = generateExpression(left, insts)
             val (r, insts2) = generateExpression(right, insts1)
+            List()
 
           case NEQExpression(left, right) =>
             List()
