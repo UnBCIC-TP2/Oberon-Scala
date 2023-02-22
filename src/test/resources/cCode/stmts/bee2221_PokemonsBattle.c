@@ -17,11 +17,11 @@ int main() {
     bonus = 5;
     anst = 0;
     ansa = a[0] + a[1] / 2;
-    if (ODD(a[2])) {
+    if (a[2] % 2 == 1) {
         ansa = ansa + bonus;
     }
     ansb = b[0] + b[1] / 2;
-    if (ODD(b[2])) {
+    if (b[2] % 2 == 1) {
         ansb = ansa + bonus;
     }
     if (ansa > ansb) {
