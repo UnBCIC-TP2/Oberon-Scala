@@ -55,34 +55,50 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val l1 = LabelGenerator.generateLabel
-        val l2 = LabelGenerator.generateLabel
+        val l2 = if (elseStmt.isDefined) LabelGenerator.generateLabel else ""
         condition match {
           case EQExpression(left, right) =>
             val (l, insts1) = generateExpression(left, insts)
             val (r, insts2) = generateExpression(right, insts1)
-            List()
+            generateIfStatement(l1, l2, NeqJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
 
           case NEQExpression(left, right) =>
-            List()
+            val (l, insts1) = generateExpression(left, insts)
+            val (r, insts2) = generateExpression(right, insts1)
+            generateIfStatement(l1, l2, EqJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
+            
 
           case GTExpression(left, right) =>
-            List()
+            val (l, insts1) = generateExpression(left, insts)
+            val (r, insts2) = generateExpression(right, insts1)
+            generateIfStatement(l1, l2, LTEJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
 
           case LTExpression(left, right) =>
-            List()
+            val (l, insts1) = generateExpression(left, insts)
+            val (r, insts2) = generateExpression(right, insts1)
+            generateIfStatement(l1, l2, GTEJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
 
           case GTEExpression(left, right) =>
-            List()
+            val (l, insts1) = generateExpression(left, insts)
+            val (r, insts2) = generateExpression(right, insts1)
+            generateIfStatement(l1, l2, LTJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
 
           case LTEExpression(left, right) =>
-            List()
+            val (l, insts1) = generateExpression(left, insts)
+            val (r, insts2) = generateExpression(right, insts1)
+            generateIfStatement(l1, l2, GTJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
 
           case NotExpression(exp) =>
-            List()
+            val (t, insts1) = generateExpression(exp, insts)
+            generateIfStatement(l1, l2, JumpFalse(t, l1, ""), thenStmt, elseStmt, insts2)
 
           case _ =>
-            List()
+            val (t, insts1) = generateExpression(condition, insts)
+            generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts2)
         }
+
+          case ForEachStmt(varName, exp, stmt) =>
+            List()
     }
   }
 
@@ -220,8 +236,13 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     (temps, l, r, insts2)
   }
 
-  private def generateIfStatement(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement], insts: List[TAC]): List[TAC] = {
-    List()
+  private def generateIfStatement(l1: String, l2: String, condition: TAC, thenStmt: Statement, elseStmt: Option[Statement], insts: List[TAC]): List[TAC] = {
+    val insts1 = generateStatement(thenStmt, insts :+ condition) :+ if (elseStmt.isDefined) Jump(l2, "") :+ NOp(l1) else NOp(l1)
+    elseStmt match {
+      case Some(stm) => generateStatement(stm, insts1) :+ NOp(l2)
+
+      case None => insts3
+    }
   } 
 
 
@@ -242,7 +263,7 @@ object LabelGenerator {
   var counter = 0
 
   def generateLabel(): String = {
-    val label = "L" + counter.toString
+    val label = ".L" + counter.toString + ":"
     counter += 1
     label
   }
