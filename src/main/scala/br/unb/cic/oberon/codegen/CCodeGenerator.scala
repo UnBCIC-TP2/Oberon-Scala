@@ -182,17 +182,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case WriteStmt(expression) =>
         textln(indent, s"""printf("%d\\n", ${genExp(expression)});""")
       case ProcedureCallStmt(name, args) =>
-        name match {
-          case "INC" => 
-            genInc(args, indent)
-          case _ =>
-            val expressions = args.map(arg => text(genExp(arg)))
-            val functionArgs = intercalate(Doc.char(',') + space, expressions)
-            functionArgs.tightBracketBy(
-              indentation(indent) + text(name + '('),
-              text(");")
-            ) + line
-        }        
+        genProcedureCallStmt(name, args, indent)
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val ifCond =
           textln(indent, s"if (${genExp(condition)}) {") + 
@@ -280,12 +270,28 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
     }
   }
 
-  def genInc(args: List[Expression], indent: Int): Doc = {
+  def genProcedureCallStmt(name: String, args: List[Expression], indent: Int): Doc = {
+    name match {
+      case "INC" => 
+        genInc(args, "+", indent)
+      case "DEC" =>
+        genInc(args, "-", indent)
+      case _ =>
+        val expressions = args.map(arg => text(genExp(arg)))
+        val functionArgs = intercalate(Doc.char(',') + space, expressions)
+        functionArgs.tightBracketBy(
+          indentation(indent) + text(name + '('),
+          text(");")
+        ) + line
+    }
+  }
+
+  def genInc(args: List[Expression], signal: String, indent: Int): Doc = {
     if (args.length == 1) {
-      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} + 1;")
+      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} ${signal} 1;")
     }
     else {
-      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} + ${genExp(args(1))};")
+      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} ${signal} ${genExp(args(1))};")
     }
   }
 
