@@ -298,7 +298,60 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // FieldAccessExpression
+
+  // Assignment Statements
+  test("Var Assignment"){
+    TACodeGenerator.reset
+
+    // var = 1+2
+    val stmt = AssignmentStmt(VarAssignment("var"), AddExpression(IntValue(1), IntValue(2)))
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), "")
+    )    
+    assert(list == ops)
+  }
+
+  test("Array Assignment"){
+    TACodeGenerator.reset
+    // lista[1] = 2+3
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(ArrayAssignment(VarExpression("lista"), IntValue(1)),
+              AddExpression(IntValue(2), IntValue(3))
+            )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      AddOp(Constant("2", IntegerType), Constant("3", IntegerType), t0, ""),
+      ListSet(t0, Constant("1", IntegerType), Name("lista", ArrayType(4,IntegerType)), "")
+    )    
+    assert(list == ops)
+  }
+
+  test("Pointer Assignment"){
+    TACodeGenerator.reset
+    // *pointer = 2+3
+    val list_var = List(VariableDeclaration("pointer", PointerType(IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(PointerAssignment("pointer"),
+              AddExpression(IntValue(2), IntValue(3))
+            )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      AddOp(Constant("2", IntegerType), Constant("3", IntegerType), t0, ""),
+      SetPointer(t0, Name("pointer", LocationType), "")
+    )    
+    assert(list == ops)
+  }
 
   
 }
