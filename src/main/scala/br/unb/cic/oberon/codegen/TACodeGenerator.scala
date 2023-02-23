@@ -146,6 +146,28 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
       case ForEachStmt(varName, exp, stmt) =>
         List()
+      
+      case ReadLongRealStmt(varName: String) =>
+        return insts :+ ReadLongReal(Name(varName, RealType), "")
+      
+      case ReadRealStmt(varName: String) =>
+        return insts :+ ReadReal(Name(varName, RealType), "")
+      
+      case ReadLongIntStmt(varName: String) =>
+        return insts :+ ReadLongInt(Name(varName, IntegerType), "")
+
+      case ReadIntStmt(varName: String) =>
+        return insts :+ ReadInt(Name(varName, IntegerType), "")
+      
+      case ReadShortIntStmt(varName: String) =>
+        return insts :+ ReadShortInt(Name(varName, IntegerType), "")
+      
+      case ReadCharStmt(varName: String) =>
+        return insts :+ ReadChar(Name(varName, StringType), "")
+      
+      case WriteStmt(expression: Expression) =>
+        val (t, insts1) = generateExpression(expression, insts)
+        return insts1 :+ Write(t, "")
     }
   }
 

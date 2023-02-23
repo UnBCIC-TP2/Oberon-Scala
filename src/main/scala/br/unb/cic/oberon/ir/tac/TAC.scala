@@ -83,3 +83,21 @@ case class SetPointer(s1: Address, destPointer: Address, label: String) extends 
 case class GetValue(sPointer: Address, dest: Address, label: String) extends TAC(label) {}
 
 case class SetValue(s1: Address, destPointer: Address, label: String) extends TAC(label) {}
+
+
+
+class SysCall(s1: Address, label: String) extends TAC(label) {}
+
+case class ReadLongReal(s1: Address, label: String) extends SysCall(s1, label)
+
+case class ReadReal(s1: Address, label: String) extends SysCall(s1, label)
+
+case class ReadLongInt(s1: Address, label: String) extends SysCall(s1, label)
+
+case class ReadInt(s1: Address, label: String) extends SysCall(s1, label)
+
+case class ReadShortInt(s1: Address, label: String) extends SysCall(s1, label)
+
+case class ReadChar(s1: Address, label: String) extends SysCall(s1, label)
+
+case class Write(s1: Address, label: String) extends SysCall(s1, label)
