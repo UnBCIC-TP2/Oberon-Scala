@@ -406,4 +406,56 @@ class TACodeTest extends AnyFunSuite {
 
     assert(list == ops)
   }
+
+  test("Testing WhileStmt-NEQExpression"){
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    // while(var < 5){var = var + 1}
+    
+    val condition = LTExpression(VarExpression("var"), IntValue(5))
+    val thenStmt = AssignmentStmt(VarAssignment("var"), AddExpression(VarExpression("var"), IntValue(1)))
+    val whileStmt = WhileStmt(condition, thenStmt)
+    val list = TACodeGenerator.generateStatement(whileStmt, List())
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val l2 = LabelGenerator.generateLabel
+    val ops = List(
+      Jump(l1, ""),
+      NOp(l2),
+      AddOp(Name("var", IntegerType), Constant("1", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),  
+      NOp(l1),
+      LTEJump(Name("var", IntegerType), Constant("5", IntegerType), l2, ""),  
+    )
+    assert(list == ops)
+  }
+
+  test("Testing WhileStmt-NEQExpression"){
+    TACodeGenerator.reset
+    // while(var < 5){var = var + 1}
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    
+    val condition = LTExpression(VarExpression("var"), IntValue(5))
+    val thenStmt = AssignmentStmt(VarAssignment("var"), AddExpression(VarExpression("var"), IntValue(1)))
+    val whileStmt = WhileStmt(condition, thenStmt)
+    val list = TACodeGenerator.generateStatement(whileStmt, List())
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val l2 = LabelGenerator.generateLabel
+    val ops = List(
+      Jump(l1, ""),
+      NOp(l2),
+      AddOp(Name("var", IntegerType), Constant("1", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),  
+      NOp(l1),
+      LTEJump(Name("var", IntegerType), Constant("5", IntegerType), l2, ""),  
+    )
+    assert(list == ops)
+  }
 }
