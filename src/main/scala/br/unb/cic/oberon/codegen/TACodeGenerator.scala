@@ -90,11 +90,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
           case NotExpression(exp) =>
             val (t, insts1) = generateExpression(exp, insts)
-            generateIfStatement(l1, l2, JumpFalse(t, l1, ""), thenStmt, elseStmt, insts2)
+            generateIfStatement(l1, l2, JumpFalse(t, l1, ""), thenStmt, elseStmt, insts1)
 
           case _ =>
             val (t, insts1) = generateExpression(condition, insts)
-            generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts2)
+            generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts1)
         }
 
           case ForEachStmt(varName, exp, stmt) =>
@@ -238,11 +238,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   }
 
   private def generateIfStatement(l1: String, l2: String, condition: TAC, thenStmt: Statement, elseStmt: Option[Statement], insts: List[TAC]): List[TAC] = {
-    val insts1 = generateStatement(thenStmt, insts :+ condition) :+ if (elseStmt.isDefined) Jump(l2, "") :+ NOp(l1) else NOp(l1)
+    val ops = if (elseStmt.isDefined) List(Jump(l2, ""), NOp(l1)) else List(NOp(l1))
+    val insts1 = generateStatement(thenStmt, insts :+ condition) ++ ops
     elseStmt match {
       case Some(stm) => generateStatement(stm, insts1) :+ NOp(l2)
 
-      case None => insts3
+      case None => insts1
     }
   } 
 
