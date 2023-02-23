@@ -89,11 +89,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
           case NotExpression(exp) =>
             val (t, insts1) = generateExpression(exp, insts)
-            generateIfStatement(l1, l2, JumpFalse(t, l1, ""), thenStmt, elseStmt, insts1)
+            generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts1)
 
           case _ =>
             val (t, insts1) = generateExpression(condition, insts)
-            generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts1)
+            generateIfStatement(l1, l2, JumpFalse(t, l1, ""), thenStmt, elseStmt, insts1)
         }
 
       case WhileStmt(condition, stmt) => 
