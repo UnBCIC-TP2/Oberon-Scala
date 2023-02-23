@@ -166,6 +166,10 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case WriteStmt(expression: Expression) =>
         val (t, insts1) = generateExpression(expression, insts)
         return insts1 :+ Write(t, "")
+
+      case ExitStmt() =>
+        return insts :+ Exit("")
+
     }
   }
 
