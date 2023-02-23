@@ -325,6 +325,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     tc = new TypeChecker()
     expVisitor = new ExpressionTypeVisitor(tc)
     Temporary.reset
+    LabelGenerator.reset
   }
 }
 
