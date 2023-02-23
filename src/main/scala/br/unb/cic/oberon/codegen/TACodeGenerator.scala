@@ -97,8 +97,55 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts1)
         }
 
-          case ForEachStmt(varName, exp, stmt) =>
-            List()
+      
+      case WhileStmt(condition, stmt) => 
+        val l1 = LabelGenerator.generateLabel
+        val l2 = LabelGenerator.generateLabel
+        val insts1 = insts :+ Jump(l1, "") :+ NOp(l2, "")
+        val insts2 = generateStatement(stmt, insts1) :+ NOp(l1, "")
+
+        condition match {
+          case EQExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ EqJump(l, r, l2, "")
+          
+          case NEQExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ NeqJump(l, r, l2, "")
+
+          case GTExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ GTEJump(l, r, l2, "")
+
+          case LTExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ LTEJump(l, r, l2, "")
+
+          case GTEExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ GTEJump(l, r, l2, "")
+
+          case LTEExpression(left, right) =>
+            val (l, insts3) = generateExpression(left, insts2)
+            val (r, insts4) = generateExpression(right, insts3)
+            return insts4 :+ LTEJump(l, r, l2, "")
+
+          case NotExpression(exp) =>
+            val (t, insts3) = generateExpression(exp, insts2)
+            return insts3 :+ JumpFalse(t, l2, "")
+
+          case _ =>
+            val (t, insts3) = generateExpression(condition, insts2)
+            return insts3 :+ JumpTrue(t, l2, "")
+        }
+
+      case ForEachStmt(varName, exp, stmt) =>
+        List()
     }
   }
 
