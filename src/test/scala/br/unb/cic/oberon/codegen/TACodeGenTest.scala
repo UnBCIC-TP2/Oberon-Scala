@@ -355,7 +355,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing If Else"){
+  test("Testing IfElse-EQExpression"){
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -363,21 +363,53 @@ class TACodeTest extends AnyFunSuite {
     val condition = EQExpression(IntValue(0), IntValue(0))
     val thenStmt = AssignmentStmt(VarAssignment("var"), AddExpression(IntValue(1), IntValue(2)))
     val elseStmt = None
-    // if(1==1){var = 1 + 2}
     val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
     val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+    // if(1==1){var = 1 + 2}
 
     TACodeGenerator.reset
 
     val t0 = new Temporary(IntegerType, 0, true)
     val l1 = LabelGenerator.generateLabel
     val ops = List(
-      NeqJump(Constant("0", IntegerType), Constant("0", IntegerType),
-      l1, ""),
+      NeqJump(Constant("0", IntegerType), Constant("0", IntegerType), l1, ""),
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
       CopyOp(t0, Name("var", IntegerType), ""),
       NOp(l1)
       )
+
+    assert(list == ops)
+  }
+
+  test("Testing IfElse-BooleanExpression"){
+    TACodeGenerator.reset
+
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    val condition = OrExpression(BoolValue(true), BoolValue(false))
+    val thenStmt = AssignmentStmt(VarAssignment("var"), AddExpression(IntValue(1), IntValue(2)))
+    val elseStmt = Some(AssignmentStmt(VarAssignment("var"), SubExpression(IntValue(3), IntValue(2))))
+    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
+    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+    // if(1|0){var = 1 + 2} else {var = 3 - 2}
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val t1 = new Temporary(IntegerType, 1, true)
+    val t2 = new Temporary(IntegerType, 2, true)
+    val l1 = LabelGenerator.generateLabel
+    val l2 = LabelGenerator.generateLabel
+    val ops = List(
+      OrOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, ""),
+      JumpFalse(t0, l1, ""),
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t1, ""),
+      CopyOp(t1, Name("var", IntegerType), ""),
+      Jump(l2, ""),
+      NOp(l1),
+      SubOp(Constant("3", IntegerType), Constant("2", IntegerType), t2, ""),
+      CopyOp(t2, Name("var", IntegerType), ""),
+      NOp(l2)
+    )
 
     assert(list == ops)
   }
