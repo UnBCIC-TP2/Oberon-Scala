@@ -101,8 +101,8 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case WhileStmt(condition, stmt) => 
         val l1 = LabelGenerator.generateLabel
         val l2 = LabelGenerator.generateLabel
-        val insts1 = insts :+ Jump(l1, "") :+ NOp(l2, "")
-        val insts2 = generateStatement(stmt, insts1) :+ NOp(l1, "")
+        val insts1 = insts :+ Jump(l1, "") :+ NOp(l2)
+        val insts2 = generateStatement(stmt, insts1) :+ NOp(l1)
 
         condition match {
           case EQExpression(left, right) =>
