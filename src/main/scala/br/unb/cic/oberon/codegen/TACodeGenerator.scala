@@ -67,7 +67,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             val (r, insts2) = generateExpression(right, insts1)
             generateIfStatement(l1, l2, EqJump(l, r, l1, ""), thenStmt, elseStmt, insts2)
             
-
           case GTExpression(left, right) =>
             val (l, insts1) = generateExpression(left, insts)
             val (r, insts2) = generateExpression(right, insts1)
@@ -97,7 +96,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             generateIfStatement(l1, l2, JumpTrue(t, l1, ""), thenStmt, elseStmt, insts1)
         }
 
-      
       case WhileStmt(condition, stmt) => 
         val l1 = LabelGenerator.generateLabel
         val l2 = LabelGenerator.generateLabel
