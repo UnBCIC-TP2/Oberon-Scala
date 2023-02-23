@@ -429,7 +429,7 @@ class TACodeTest extends AnyFunSuite {
     val t0 = new Temporary(IntegerType, 0, true)
     val l1 = LabelGenerator.generateLabel
     val ops = List(
-      JumpFalse(Constant("false", BooleanType), l1, ""),
+      JumpTrue(Constant("false", BooleanType), l1, ""),
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
       CopyOp(t0, Name("var", IntegerType), ""),
       NOp(l1),
