@@ -414,4 +414,28 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  test("Testing IfElse-NotExpression"){
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    val condition = NotExpression(BoolValue(false))
+    val thenStmt = AssignmentStmt(VarAssignment("var"), AddExpression(IntValue(1), IntValue(2)))
+    val elseStmt = None
+    
+    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
+    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+    TACodeGenerator.reset
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val ops = List(
+      JumpFalse(Constant("false", BooleanType), l1, ""),
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+      NOp(l1),
+      )
+    // if(!(false)){var = 1 + 2}
+
+    assert(list == ops)
+  }
 }

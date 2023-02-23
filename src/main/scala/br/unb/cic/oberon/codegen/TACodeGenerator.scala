@@ -10,12 +10,16 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   private var expVisitor = new ExpressionTypeVisitor(tc)
 
   override def generateCode(module: OberonModule): List[TAC] = {
-    List()
+    load_vars(module.variables, module.constants)
+    module.stmt match {
+      case Some(stm) => generateStatement(stm, List())
+
+      case None => List()
+    }
   }
 
-  def generateProcedure() {}
-
-  def generateBody() {}
+// A geração de código de procedure foi mais difícil do que imaginamos, tivemos algumas dúvidas que não conseguimos resolver pesquisando.
+//  def generateProcedure(proc: Procedure, insts: List[TAC]): (Address, List[TAC]) = {}
 
   def generateStatement(stmt: Statement, insts: List[TAC]): List[TAC] = {
     stmt match {
@@ -44,14 +48,15 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           (acc, stm) => generateStatement(stm, acc)
         }
 
-      case ProcedureCallStmt(name, argsExps) =>
-        val (args, argInsts) = argsExps.foldLeft((List[Address](),insts)) {
-          (acc, expr) => 
-            val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2)
-            (acc._1 :+ address, ops)
-        }
-        val params = args.map(x => Param(x, ""))
-        return argInsts ++ params :+ Call(name, args.length, "")
+// No final não conseguimos implementar a geração de procedures
+//      case ProcedureCallStmt(name, argsExps) =>
+//        val (args, argInsts) = argsExps.foldLeft((List[Address](),insts)) {
+//          (acc, expr) => 
+//            val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2)
+//            (acc._1 :+ address, ops)
+//        }
+//        val params = args.map(x => Param(x, ""))
+//        return argInsts ++ params :+ Call(name, args.length, "")
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val l1 = LabelGenerator.generateLabel
@@ -141,35 +146,47 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             val (t, insts3) = generateExpression(condition, insts2)
             return insts3 :+ JumpTrue(t, l2, "")
         }
-
-      case ForEachStmt(varName, exp, stmt) =>
-        List()
       
-      case ReadLongRealStmt(varName: String) =>
+      case ReadLongRealStmt(varName) =>
         return insts :+ ReadLongReal(Name(varName, RealType), "")
       
-      case ReadRealStmt(varName: String) =>
+      case ReadRealStmt(varName) =>
         return insts :+ ReadReal(Name(varName, RealType), "")
       
-      case ReadLongIntStmt(varName: String) =>
+      case ReadLongIntStmt(varName) =>
         return insts :+ ReadLongInt(Name(varName, IntegerType), "")
 
-      case ReadIntStmt(varName: String) =>
+      case ReadIntStmt(varName) =>
         return insts :+ ReadInt(Name(varName, IntegerType), "")
       
-      case ReadShortIntStmt(varName: String) =>
+      case ReadShortIntStmt(varName) =>
         return insts :+ ReadShortInt(Name(varName, IntegerType), "")
       
-      case ReadCharStmt(varName: String) =>
+      case ReadCharStmt(varName) =>
         return insts :+ ReadChar(Name(varName, StringType), "")
       
-      case WriteStmt(expression: Expression) =>
+      case WriteStmt(expression) =>
         val (t, insts1) = generateExpression(expression, insts)
         return insts1 :+ Write(t, "")
+
+      case ReturnStmt(expr) =>
+        val (t, insts1) = generateExpression(expr, insts)
+        return insts1 :+ Return(t, "")
 
       case ExitStmt() =>
         return insts :+ Exit("")
 
+      case ForEachStmt(_,_,_) =>
+        throw new Exception("ForEachStmt não foi implementado")
+
+      case ElseIfStmt(_,_) =>
+        throw new Exception("ElseIfStmt não foi implementado")
+
+      case NewStmt(_) =>
+        throw new Exception("NewStmt não foi implementado")
+
+      case MetaStmt(_) =>
+        throw new Exception("MetaStmt não foi implementado")
     }
   }
 
@@ -264,16 +281,15 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t0, t1) = (temps(0), temps(1))
         return (t1, insts2 :+ SLTOp(r, l, t0, "") :+ NotOp(t0, t1, ""))
 
-//TODO generateProcedure e gerar o Map funcs
+// No final não conseguimos implementar a geração de procedures.
 //      case FunctionCallExpression(name, args) =>
-//        val (args, argInsts) = exp.args.foldLeft((List[Address](),insts)) {
+//        val (args, argInsts) = argsExps.foldLeft((List[Address](),insts)) {
 //          (acc, expr) => 
 //            val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2)
 //            (acc._1 :+ address, ops)
 //        }
 //        val params = args.map(x => Param(x, ""))
-//        //talvez mudar o funcs.get(name) para stack
-//        return (funcs.get(name), argInsts ++ params :+ Call(name, args.length))
+//        return (funcs.get(name), argInsts ++ params :+ Call(name, args.length), "")
 
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
@@ -319,7 +335,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   } 
 
 
-  //somente para testes
   def load_vars(vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
     OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc)
   }
