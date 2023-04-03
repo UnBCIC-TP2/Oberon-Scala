@@ -1,0 +1,18 @@
+MODULE Read;
+
+PROCEDURE func(x,y,soma:INTEGER) : INTEGER;
+BEGIN
+  readInt(x);
+  readInt(y);
+
+  soma := x + y;
+  write(soma);
+
+  RETURN soma
+END func
+
+BEGIN
+  write(func(0,0,0))
+END
+
+END Read.

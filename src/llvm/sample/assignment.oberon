@@ -1,0 +1,14 @@
+MODULE Assignment;
+
+PROCEDURE func(a,x:INTEGER) : INTEGER;
+BEGIN
+  IF (a>4) THEN
+    x:=4;
+    RETURN x
+  ELSE
+    x:=2;
+    RETURN x
+  END
+END func
+
+END Assignment.
