@@ -185,6 +185,7 @@ case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
 case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
+case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Expression
 
 /* Statements */
 trait Statement {
@@ -271,6 +272,7 @@ case object LocationType extends Type
 case class RecordType(variables: List[VariableDeclaration]) extends Type
 case class ArrayType(length: Int, baseType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
+case class LambdaType(argsTypes: List[Type], returnType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type
 

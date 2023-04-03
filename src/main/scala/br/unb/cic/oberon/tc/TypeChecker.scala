@@ -86,6 +86,8 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
       fieldAccessCheck(exp, attributeName)
 
     case PointerAccessExpression(name) => pointerAccessCheck(name)
+
+    case LambdaExpression(args, exp) => lambdaExpressionCheck(args, exp)
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
@@ -122,6 +124,19 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
         case PointerType(varType) => Some(varType)
         case _ => None
       })
+  }
+
+  def lambdaExpressionCheck(args: List[FormalArg], exp: Expression): T = {
+    typeChecker.env.push()
+    args.foreach(a => typeChecker.env.setLocalVariable(a.name, a.argumentType))
+    val argTypes = args.map(a => a.argumentType)
+    val expType = exp.accept(this)
+    typeChecker.env.pop()
+
+    expType match {
+      case None => None
+      case _ => Some(LambdaType(argTypes, expType.get))
+    }
   }
 
   def computeBinExpressionType[A](left: Expression, right: Expression, expected: List[Type], result: Type) : Option[Type] = {
@@ -205,17 +220,44 @@ class TypeChecker extends OberonVisitorAdapter {
       if (env.lookup(v).isDefined) {
         if (exp.accept(expVisitor).isDefined){
           if (env.lookup(v).get != exp.accept(expVisitor).get){
-              if ((env.lookup(v).get.accept(expVisitor).get.isInstanceOf[PointerType]) &&
-                    (exp.accept(expVisitor).get == NullType)){
+              val varType = env.lookup(v).get.accept(expVisitor).get
+              val expType = exp.accept(expVisitor).get
+
+              if ((varType.isInstanceOf[PointerType]) &&
+                    (expType == NullType)){
                     List()
               }
-              else if ((env.lookup(v).get.accept(expVisitor).get == IntegerType) &&
-                    (exp.accept(expVisitor).get == BooleanType)){
+              else if ((varType == IntegerType) &&
+                    (expType == BooleanType)){
                     List()
               }
-              else if ((env.lookup(v).get.accept(expVisitor).get == BooleanType) &&
-                    (exp.accept(expVisitor).get == IntegerType)){
+              else if ((varType == BooleanType) &&
+                    (expType == IntegerType)){
                     List()
+              }
+              else if (varType.isInstanceOf[LambdaType]) {
+                val expectedType = varType.asInstanceOf[LambdaType]
+                val passedType = expType.asInstanceOf[LambdaType]
+
+                val expectedArgs = expectedType.argsTypes
+                val passedArgs = passedType.argsTypes
+
+                if (expectedArgs.size != passedArgs.size) {
+                  List((stmt, s"Wrong number of arguments. Expected ${expectedArgs.size}, got ${passedArgs.size}."))
+                } else if (expectedType.returnType != passedType.returnType) {
+                  List((stmt, s"Wrong return type. Expected ${expectedType.returnType}, got ${passedType.returnType}."))
+                } else {
+                  val allTypesMatch = expectedArgs.zip(passedArgs)
+                    .map(pair => pair._1 == pair._2)
+                    .forall(v => v)
+
+                  if(!allTypesMatch) {
+                    List((stmt, "Arguments types do not match type definition."))
+                  } 
+                  else {
+                    List()
+                  }
+                }
               }
               else{
                  List((stmt, s"Assignment between different types: $v, $exp"))

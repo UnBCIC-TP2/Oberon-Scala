@@ -1,0 +1,12 @@
+MODULE LambdaExpressions04;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+VAR
+    x : ld;
+
+BEGIN
+    x := (a: INTEGER) => a + True
+END
+
+END LambdaExpressions04.
