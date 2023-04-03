@@ -256,6 +256,13 @@ class ParserVisitor {
   class UserTypeVisitor extends OberonBaseVisitor[Unit]{
     var baseType: Type = _
 
+    override def visitLambdaTypeDeclaration(ctx: OberonParser.LambdaTypeDeclarationContext): Unit = {
+      val returnType = visitOberonType(ctx.returnType) 
+      val args = 
+        ctx.lambdaTypes().oberonType().asScala.toList.map(t => visitOberonType(t))
+      baseType = LambdaType(args, returnType)
+    }
+
     override def visitArrayTypeDeclaration(ctx: OberonParser.ArrayTypeDeclarationContext): Unit = {
       val typeVisitor = new ParserVisitor()
 
@@ -407,6 +414,21 @@ class ParserVisitor {
     override def visitNotExpression(ctx: OberonParser.NotExpressionContext): Unit = {
       ctx.exp.accept(this)
       exp = NotExpression(exp)
+    }
+
+    override def visitLambdaExpression(ctx: OberonParser.LambdaExpressionContext): Unit = {
+
+      val argsB = new ListBuffer[FormalArg]
+
+      if (ctx.formals() != null) {
+        argsB.addAll(ctx.formals().formalArg().asScala.toList.flatMap(formal => visitFormalArg(formal)))
+      }
+      val args = argsB.toList
+
+      val visitor = new ExpressionVisitor()
+      ctx.expression.accept(visitor)
+
+      exp = LambdaExpression(args, visitor.exp)
     }
 
     private def expression(opr: String): (Expression, Expression) => Expression =

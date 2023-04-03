@@ -1,0 +1,12 @@
+MODULE LambdaExpressionsTC01;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER): INTEGER
+VAR
+    x : ld;
+
+BEGIN
+    x := (a: INTEGER, b: INTEGER) => a + b
+END
+
+END LambdaExpressionsTC01.

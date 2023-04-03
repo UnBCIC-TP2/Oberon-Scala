@@ -2289,7 +2289,64 @@ class ParserTestSuite extends AbstractTestSuite {
         assert(stmts(0).isInstanceOf[NewStmt])
       case _ => assert(false)
     }
+  }
 
+  test("Testing lambdaType code. This module declares two lambda expression types") {
+    val module = ScalaParser.parseResource("lambda/lambdaType.oberon")
+
+    assert(module.name == "Lambda01")
+    assert(module.userTypes.length == 2)
+
+    val x = module.userTypes(0)
+    val y = module.userTypes(1)
+
+    assert(x.baseType.asInstanceOf[LambdaType].argsTypes.length == 3)
+    assert(x.baseType.asInstanceOf[LambdaType].returnType == IntegerType)
+
+    assert(y.baseType.asInstanceOf[LambdaType].argsTypes.length == 1)
+    assert(y.baseType.asInstanceOf[LambdaType].returnType == BooleanType)
+  }
+
+  test(
+    "Testing lambdaExpressions01 code. This module declares a lambda expression constant with args"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions01.oberon")
+
+    assert(module.name == "LambdaExpressions01")
+    assert(module.constants.size == 2)
+
+    val x = module.constants(0).asInstanceOf[Constant]
+    val y = module.constants(1)
+
+    assert(x.name == "x")
+    assert(x.exp.isInstanceOf[LambdaExpression])
+
+    assert(y.name == "y")
+    assert(y.exp.isInstanceOf[LambdaExpression])
+  }
+
+  test(
+    "Testing lambdaExpressions02 code. This module declares a lambda expression constant without args"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions02.oberon")
+
+    assert(module.name == "LambdaExpressions02")
+    assert(module.constants.size == 1)
+
+    val x = module.constants(0).asInstanceOf[Constant]
+    assert(x.name == "x")
+    assert(x.exp.isInstanceOf[LambdaExpression])
+  }
+  
+  test(
+    "Testing lambdaExpressions03 code. This module declares and assignes a lambda expression variable"
+  ) {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressions03.oberon")
+
+    assert(module.name == "LambdaExpressions03")
+
+    val x = module.variables(0).asInstanceOf[VariableDeclaration]
+    assert(x == VariableDeclaration("x", ReferenceToUserDefinedType("ld")))
   }
 
 }

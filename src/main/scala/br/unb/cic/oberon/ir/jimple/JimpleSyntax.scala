@@ -1,188 +1,284 @@
 package br.unb.cic.oberon.ir.jimple
 
-sealed trait Value
+sealed trait JimpleValue
 
-case class IntValue(iv: Int) extends Value
-case class LongValue(lv: Long) extends Value
-case class FloatValue(fv: Float) extends Value
-case class DoubleValue(fv: Double) extends Value
-case class StringValue(sv: String) extends Value
-case class BooleanValue(bl: Boolean) extends Value
-case class MethodValue(returnType: Type, formals: List[Type]) extends Value
-case class ClassValue(name: String) extends Value
-case class MethodHandle(methodSig: MethodSignature) extends Value
-case class FieldHandle(fieldSig: FieldSignature) extends Value
-case object NullValue extends Value
+case class IntValue(iv: Int) extends JimpleValue
 
-sealed trait Immediate
+case class LongValue(lv: Long) extends JimpleValue
 
-case class Local(localName: String) extends Immediate
-case class ImmediateValue(v: Value) extends Immediate
-case object CaughtException extends Immediate
+case class FloatValue(fv: Float) extends JimpleValue
 
-sealed trait ClassOrInterfaceDeclaration
+case class DoubleValue(fv: Double) extends JimpleValue
 
-case class ClassDecl(modifiers: List[Modifier],
-                     classType: Type,
-                     superClass: Type,
-                     interfaces: List[Type],
-                     fields: List[Field],
-                     methods: List[Method]) extends ClassOrInterfaceDeclaration
+case class StringValue(sv: String) extends JimpleValue
 
-case class InterfaceDecl(modifiers: List[Modifier],
-                         interfaceType: Type,
-                         interfaces: List[Type],
-                         fields: List[Field],
-                         methods: List[Method]) extends ClassOrInterfaceDeclaration
+case class BooleanValue(bl: Boolean) extends JimpleValue
 
-case class Field(modifiers: List[Modifier], fieldType: Type, name: String)
+case class MethodValue(returnType: JimpleType, formals: List[JimpleType]) extends JimpleValue
 
-case class Method(modifiers: List[Modifier],
-                  returnType: Type, name: String,
-                  formals: List[Type],
-                  exceptions: List[Type],
-                  body: MethodBody)
+case class ClassValue(name: String) extends JimpleValue
 
-sealed trait MethodBody
+case class MethodHandle(methodSig: MethodSignature) extends JimpleValue
 
-case class StandardMethodBody(localVariableDecls: List[LocalVariableDeclaration],
-                              stmts: List[Statement],
-                              catchClauses: List[CatchClause]) extends MethodBody
+case class FieldHandle(fieldSig: FieldSignature) extends JimpleValue
 
-case object SignatureOnly extends MethodBody
+case object NullValue extends JimpleValue
 
-case class LocalVariableDeclaration(varType: Type, local: String)
+sealed trait JimpleImmediate
 
-case class CatchClause(exception: Type, from: String, to: String, _with: String)
+case class Local(localName: String) extends JimpleImmediate
 
-sealed trait Variable
+case class ImmediateValue(v: JimpleValue) extends JimpleImmediate
 
-case class LocalVariable(local: String) extends Variable
-case class ArrayRef(reference: String, idx: Immediate) extends Variable
-case class FieldRef(reference: String, field: FieldSignature) extends Variable
-case class StaticField(field: FieldSignature) extends Variable
+case object CaughtException extends JimpleImmediate
 
-sealed trait Statement
+sealed trait JimpleClassOrInterface
 
-case class LabelStmt(label: String) extends Statement
-case object BreakpointStmt extends Statement
-case class EnterMonitorStmt(immediate: Immediate) extends Statement
-case class ExitMonitorStmt(immediate: Immediate) extends Statement
-case class TableSwitchStmt(immediate: Immediate, min: Int, max: Int, stmts: List[CaseStmt]) extends Statement
-case class LookupSwitchStmt(immediate: Immediate, stmts: List[CaseStmt]) extends Statement
-case class IdentityStmt(local: String, identifier: String, idType: Type) extends Statement
-case class IdentityNoTypeStmt(local: String, identifier: String) extends Statement
-case class AssignStmt(variable: Variable, expression: Expression) extends Statement
-case class IfStmt(exp: Expression, target: String) extends Statement
-case object RetEmptyStmt extends Statement
-case class RetStmt(immediate: Immediate) extends Statement
-case object ReturnEmptyStmt extends Statement
-case class ReturnStmt(immediate: Immediate) extends Statement
-case class ThrowStmt(immediate: Immediate) extends Statement
-case class InvokeStmt(invokeExp: Invoke) extends Statement
-case class GotoStmt(target: String) extends Statement
-case object NopStmt extends Statement
+case class ClassDeclaration(modifiers: List[JimpleModifier],
+                            classType: JimpleType,
+                            superClass: JimpleType,
+                            interfaces: List[JimpleType],
+                            fields: List[Field],
+                            methods: List[Method]) extends JimpleClassOrInterface
 
-sealed trait CaseStmt
+case class InterfaceDeclaration(modifiers: List[JimpleModifier],
+                                interfaceType: JimpleType,
+                                interfaces: List[JimpleType],
+                                fields: List[Field],
+                                methods: List[Method]) extends JimpleClassOrInterface
 
-case class CaseOption(option: Int, targetStmt: String) extends CaseStmt
-case class DefaultOption(targetStmt: String) extends CaseStmt
+case class Field(modifiers: List[JimpleModifier], fieldType: JimpleType, name: String)
 
-sealed trait Expression
+case class Method(modifiers: List[JimpleModifier],
+                  returnType: JimpleType, name: String,
+                  formals: List[JimpleType],
+                  exceptions: List[JimpleType],
+                  body: JimpleMethodBody)
 
-case class NewInstanceExpression(instanceType: Type) extends Expression
-case class NewArrayExpression(baseType: Type, dims: List[ArrayDescriptor]) extends Expression
-case class CastExpression(toType: Type, immediate: Immediate) extends Expression
-case class InstanceOfExpression(baseType: Type, immediate: Immediate) extends Expression
-case class InvokeExpression(invokeExp: Invoke) extends Expression
-case class ArraySubscriptExpression(name: String, immediate: Immediate) extends Expression
-case class StringSubscriptExpression(string: String, immediate: Immediate) extends Expression
-case class LocalFieldRefExpression(local: String, className: String, fieldType: Type, fieldName: String) extends Expression
-case class FieldRefExpression(className: String, fieldType: Type, fieldName: String) extends Expression
-case class AndExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class OrExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class XorExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class ReminderExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class IsNullExpression(immediate: Immediate) extends Expression
-case class IsNotNullExpression(immediate: Immediate) extends Expression
-case class CmpExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpGExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpLExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpEqExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpNeExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpGtExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpGeExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpLtExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class CmpLeExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class ShlExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class ShrExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class UShrExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class PlusExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class MinusExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class MultExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class DivExpression(lhs: Immediate, rhs: Immediate) extends Expression
-case class LengthOfExpression(immediate: Immediate) extends Expression
-case class NegExpression(immediate: Immediate) extends Expression
-case class ImmediateExpression(immediate: Immediate) extends Expression
+sealed trait JimpleMethodBody
 
-sealed trait ArrayDescriptor
+case class DefaultMethodBody(localVariableDecls: List[LocalVariableDeclaration], stmts: List[JimpleStatement], catchClauses: List[CatchClause]) extends JimpleMethodBody
 
-case class FixedSize(size: Int) extends ArrayDescriptor
-case object VariableSize extends ArrayDescriptor
+case object SignatureOnlyMethodBody extends JimpleMethodBody
 
-sealed trait Invoke
+case class LocalVariableDeclaration(varType: JimpleType, local: String)
 
-case class SpecialInvoke(local: String, sig: MethodSignature, args: List[Immediate]) extends Invoke
-case class VirtualInvoke(local: String, sig: MethodSignature, args: List[Immediate]) extends Invoke
-case class InterfaceInvoke(local: String, sig: MethodSignature, args: List[Immediate]) extends Invoke
-case class StaticMethodInvoke(sig: MethodSignature, args: List[Immediate]) extends Invoke
-case class DynamicInvoke(bsmSig: MethodSignature, bsmArgs: List[Immediate], sig: MethodSignature, args: List[Immediate]) extends Invoke
+case class CatchClause(exception: JimpleType, from: String, to: String, _with: String)
 
-case class FieldSignature(className: String, fieldType: Type, fieldName: String)
+sealed trait JimpleVariable
 
-case class MethodSignature(className: String, returnType: Type, methodName: String, formals: List[Type])
+case class LocalVariable(local: String) extends JimpleVariable
 
-case class UnnamedMethodSignature(returnType: Type, formals: List[Type])
+case class ArrayRef(reference: String, idx: JimpleImmediate) extends JimpleVariable
 
-sealed trait Modifier
+case class FieldRef(reference: String, field: FieldSignature) extends JimpleVariable
 
-case object PublicModifer extends Modifier
-case object ProtectedModifier extends Modifier
-case object PrivateModifier extends Modifier
-case object AbstractModifier extends Modifier
-case object StaticModifier extends Modifier
-case object FinalModifier extends Modifier
-case object SynchronizedModifier extends Modifier
-case object NativeModifier extends Modifier
-case object StrictfpModifier extends Modifier
-case object TransientModifier extends Modifier
-case object VolatileModifier extends Modifier
-case object EnumModifier extends Modifier
-case object AnnotationModifier extends Modifier
-case object SyntheticModifier extends Modifier
+case class StaticField(field: FieldSignature) extends JimpleVariable
 
-sealed trait Type
+sealed trait JimpleStatement
 
-case object TByte extends Type
-case object TBoolean extends Type
-case object TShort extends Type
-case object TCharacter extends Type
-case object TInteger extends Type
-case object TFloat extends Type
-case object TDouble extends Type
-case object TLong extends Type
-case class TObject(name: String) extends Type
-case class TArray(baseType: Type) extends Type
-case object TVoid extends Type
-case object TString extends Type
-case object TMethodValue extends Type
-case object TClassValue extends Type
-case object TMethodHandle extends Type
-case object TFieldHandle extends Type
-case object TNull extends Type
-case object TUnknown extends Type
+case class LabelStmt(label: String) extends JimpleStatement
 
-sealed trait StmtContext
+case object BreakpointStmt extends JimpleStatement
 
-case object NoContext extends StmtContext
-case class DefaultStmtContext(stmtId: Int, methodSignature: String, sourceCodeLine: Int) extends StmtContext
+case class EnterMonitorStmt(immediate: JimpleImmediate) extends JimpleStatement
+
+case class ExitMonitorStmt(immediate: JimpleImmediate) extends JimpleStatement
+
+case class TableSwitchStmt(immediate: JimpleImmediate, min: Int, max: Int, stmts: List[JimpleCaseStmt]) extends JimpleStatement
+
+case class LookupSwitchStmt(immediate: JimpleImmediate, stmts: List[JimpleCaseStmt]) extends JimpleStatement
+
+case class IdentityStmt(local: String, identifier: String, idType: JimpleType) extends JimpleStatement
+
+case class IdentityNoTypeStmt(local: String, identifier: String) extends JimpleStatement
+
+case class AssignStmt(variable: JimpleVariable, expression: JimpleExpression) extends JimpleStatement
+
+case class IfStmt(exp: JimpleExpression, target: String) extends JimpleStatement
+
+case object ReturnEmptyStmt extends JimpleStatement
+
+case class ReturnStmt(immediate: JimpleImmediate) extends JimpleStatement
+
+case class ThrowStmt(immediate: JimpleImmediate) extends JimpleStatement
+
+case class InvokeStmt(invokeExp: JimpleInvoke) extends JimpleStatement
+
+case class GotoStmt(target: String) extends JimpleStatement
+
+case object NopStmt extends JimpleStatement
+
+sealed trait JimpleCaseStmt
+
+case class CaseOption(option: Int, targetStmt: String) extends JimpleCaseStmt
+
+case class DefaultOption(targetStmt: String) extends JimpleCaseStmt
+
+sealed trait JimpleExpression
+
+case class NewInstanceExpression(instanceType: JimpleType) extends JimpleExpression
+
+case class NewArrayExpression(baseType: JimpleType, dims: List[JimpleArrayDescriptor]) extends JimpleExpression
+
+case class CastExpression(toType: JimpleType, immediate: JimpleImmediate) extends JimpleExpression
+
+case class InstanceOfExpression(baseType: JimpleType, immediate: JimpleImmediate) extends JimpleExpression
+
+case class InvokeExpression(invokeExp: JimpleInvoke) extends JimpleExpression
+
+case class ArraySubscriptExpression(name: String, immediate: JimpleImmediate) extends JimpleExpression
+
+case class StringSubscriptExpression(string: String, immediate: JimpleImmediate) extends JimpleExpression
+
+case class LocalFieldRefExpression(local: String, className: String, fieldType: JimpleType, fieldName: String) extends JimpleExpression
+
+case class FieldRefExpression(className: String, fieldType: JimpleType, fieldName: String) extends JimpleExpression
+
+case class AndExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class OrExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class XorExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class RemainderExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class IsNullExpression(immediate: JimpleImmediate) extends JimpleExpression
+
+case class IsNotNullExpression(immediate: JimpleImmediate) extends JimpleExpression
+
+case class CmpExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpGExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpLExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpEqExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpNeExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpGtExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpGeExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpLtExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class CmpLeExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class ShlExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class ShrExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class UShrExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class PlusExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class MinusExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class MultExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class DivExpression(lhs: JimpleImmediate, rhs: JimpleImmediate) extends JimpleExpression
+
+case class LengthOfExpression(immediate: JimpleImmediate) extends JimpleExpression
+
+case class NegExpression(immediate: JimpleImmediate) extends JimpleExpression
+
+case class ImmediateExpression(immediate: JimpleImmediate) extends JimpleExpression
+
+sealed trait JimpleArrayDescriptor
+
+case class FixedSize(size: Int) extends JimpleArrayDescriptor
+
+case object VariableSize extends JimpleArrayDescriptor
+
+sealed trait JimpleInvoke
+
+case class SpecialInvoke(local: String, sig: MethodSignature, args: List[JimpleImmediate]) extends JimpleInvoke
+
+case class VirtualInvoke(local: String, sig: MethodSignature, args: List[JimpleImmediate]) extends JimpleInvoke
+
+case class InterfaceInvoke(local: String, sig: MethodSignature, args: List[JimpleImmediate]) extends JimpleInvoke
+
+case class StaticMethodInvoke(sig: MethodSignature, args: List[JimpleImmediate]) extends JimpleInvoke
+
+case class DynamicInvoke(bsmSig: MethodSignature, bsmArgs: List[JimpleImmediate], sig: MethodSignature, args: List[JimpleImmediate]) extends JimpleInvoke
+
+case class FieldSignature(className: String, fieldType: JimpleType, fieldName: String)
+
+case class MethodSignature(className: String, returnType: JimpleType, methodName: String, formals: List[JimpleType])
+
+case class UnnamedMethodSignature(returnType: JimpleType, formals: List[JimpleType])
+
+sealed trait JimpleModifier
+
+case object PublicModifer extends JimpleModifier
+
+case object ProtectedModifier extends JimpleModifier
+
+case object PrivateModifier extends JimpleModifier
+
+case object AbstractModifier extends JimpleModifier
+
+case object StaticModifier extends JimpleModifier
+
+case object FinalModifier extends JimpleModifier
+
+case object SynchronizedModifier extends JimpleModifier
+
+case object NativeModifier extends JimpleModifier
+
+case object StrictfpModifier extends JimpleModifier
+
+case object TransientModifier extends JimpleModifier
+
+case object VolatileModifier extends JimpleModifier
+
+case object EnumModifier extends JimpleModifier
+
+case object AnnotationModifier extends JimpleModifier
+
+case object SyntheticModifier extends JimpleModifier
+
+sealed trait JimpleType
+
+case object TByte extends JimpleType
+
+case object TBoolean extends JimpleType
+
+case object TShort extends JimpleType
+
+case object TCharacter extends JimpleType
+
+case object TInteger extends JimpleType
+
+case object TFloat extends JimpleType
+
+case object TDouble extends JimpleType
+
+case object TLong extends JimpleType
+
+case class TObject(name: String) extends JimpleType
+
+case class TArray(baseType: JimpleType) extends JimpleType
+
+case object TVoid extends JimpleType
+
+case object TString extends JimpleType
+
+case object TMethodValue extends JimpleType
+
+case object TClassValue extends JimpleType
+
+case object TMethodHandle extends JimpleType
+
+case object TFieldHandle extends JimpleType
+
+case object TNull extends JimpleType
+
+case object TUnknown extends JimpleType
+
+sealed trait JimpleStmtContext
+
+case object NoContext extends JimpleStmtContext
+
+case class DefaultStmtContext(stmtId: Int, methodSignature: String, sourceCodeLine: Int) extends JimpleStmtContext

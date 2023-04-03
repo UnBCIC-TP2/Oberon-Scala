@@ -1,0 +1,6 @@
+MODULE LambdaExpressionsTC05;
+
+CONST
+  x = (a: INTEGER) => a + 10;
+
+END LambdaExpressionsTC05.
