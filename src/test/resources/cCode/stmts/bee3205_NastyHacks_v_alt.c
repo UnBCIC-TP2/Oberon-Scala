@@ -25,4 +25,13 @@ int main() {
     i = 0;
     temp = 0;
     answer = 0;
+    while (true) {
+        temp = b[i] - c[i];
+        temp2 = temp - a[i];
+        answer = answer + temp2;
+        i = i + 1;
+        if (i == 3) {
+            break; 
+        }
+    }
 }

@@ -3,7 +3,8 @@ MODULE bee1079Average;
 VAR
     a : ARRAY 9 OF REAL;
     ans : ARRAY 3 OF REAL;
-    i, aux: INTEGER;
+    aux : REAL;
+    i: INTEGER;
 
 BEGIN
     i := 0;

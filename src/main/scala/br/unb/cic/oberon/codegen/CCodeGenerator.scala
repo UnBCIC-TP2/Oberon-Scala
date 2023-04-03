@@ -31,14 +31,14 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         text("int main() {") / generateStmt(
           stmt,
           indentSize
-        ) + Doc.char('}')
+          ) + Doc.char('}')
       case None => text("int main() {}")
     }
     val CCode = mainHeader + userDefinedTypes / globalVars / mainDefines + mainProcedures / mainBody
     CCode.render(60)
-  }
+  }  
 
-
+  
 
   def generateProcedure(procedure: Procedure, userTypes: List[UserDefinedType]): Doc = {
     val returnType = procedure.returnType match {
@@ -68,7 +68,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def declareVars(variables: List[VariableDeclaration], userTypes: List[UserDefinedType], localIndent:Int): Doc = {
 
     var basicVariablesDoc = empty
-    for (varType <- List(IntegerType, BooleanType)) {
+    for (varType <- List(IntegerType, RealType, BooleanType, StringType)) {
       val variablesOfType = variables.filter(_.variableType == varType).map(variable => variable.name)
       if (variablesOfType.nonEmpty) {
         val CVarType = getCType(varType, userTypes)
@@ -136,6 +136,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case BooleanType => "bool"
       case CharacterType => "char"
       case RealType => "float"
+      case StringType => "char*"
 
       case ReferenceToUserDefinedType(name) =>
         val userType = stringToType(name, userTypes)
@@ -184,15 +185,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case WriteStmt(expression) =>
         textln(indent, s"""printf("%d\\n", ${genExp(expression)});""")
       case ProcedureCallStmt(name, args) =>
-        val expressions = args.map(arg => text(genExp(arg)))
-        val functionArgs = intercalate(Doc.char(',') + space, expressions)
-        functionArgs.tightBracketBy(
-          indentation(indent) + text(name + '('),
-          text(");")
-        ) + line
+        genProcedureCallStmt(name, args, indent)
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val ifCond =
-          textln(indent, s"if (${genExp(condition)}) {") +
+          textln(indent, s"if (${genExp(condition)}) {") + 
             generateStmt(thenStmt, indent + indentSize) +
             indentation(indent) + text("}")
         val elseCond = elseStmt match {
@@ -237,18 +233,25 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def genExp(exp: Expression): String = {
     exp match {
       case IntValue(v) => v.toString
+      case RealValue(v) => v.toString
       case Brackets(exp) => s"( ${genExp(exp)} )"
       case BoolValue(v) => if (v) "true" else "false"
+      case StringValue(v) => s""""${v}""""
       case Undef() => "undefined"
 
       case VarExpression(name) => name
       case FunctionCallExpression(name, args) =>
-        val expressions = args.map(arg => text(genExp(arg)))
-        val functionArgs = intercalate(Doc.char(',') + space, expressions)
-        functionArgs.tightBracketBy(
-          text(name + '('),
-          Doc.char(')')
-        ).render(10000)
+        name match {
+          case "ODD" =>
+            s"${genExp(args(0))} % 2 == 1"
+          case _ =>
+            val expressions = args.map(arg => text(genExp(arg)))
+            val functionArgs = intercalate(Doc.char(',') + space, expressions)
+            functionArgs.tightBracketBy(
+              text(name + '('),
+              Doc.char(')')
+              ).render(10000)
+        }
       case EQExpression(left, right) => s"${genExp(left)} == ${genExp(right)}"
       case NEQExpression(left, right) => s"${genExp(left)} != ${genExp(right)}"
       case GTExpression(left, right) => s"${genExp(left)} > ${genExp(right)}"
@@ -261,12 +264,38 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case DivExpression(left, right) => s"${genExp(left)} / ${genExp(right)}"
       case OrExpression(left, right) => s"${genExp(left)} || ${genExp(right)}"
       case AndExpression(left, right) => s"${genExp(left)} && ${genExp(right)}"
+      case ModExpression(left, right) => s"${genExp(left)} % ${genExp(right)}"
       case FieldAccessExpression(exp, name) => s"${genExp(exp)}.$name"
       case ArraySubscript(arrayBase, index) =>
         val arrayName = genExp(arrayBase)
         val arrayIndex = genExp(index)
         s"$arrayName[$arrayIndex]"
       case _ => throw new Exception("expression not found")
+    }
+  }
+
+  def genProcedureCallStmt(name: String, args: List[Expression], indent: Int): Doc = {
+    name match {
+      case "INC" => 
+        genInc(args, "+", indent)
+      case "DEC" =>
+        genInc(args, "-", indent)
+      case _ =>
+        val expressions = args.map(arg => text(genExp(arg)))
+        val functionArgs = intercalate(Doc.char(',') + space, expressions)
+        functionArgs.tightBracketBy(
+          indentation(indent) + text(name + '('),
+          text(");")
+        ) + line
+    }
+  }
+
+  def genInc(args: List[Expression], signal: String, indent: Int): Doc = {
+    if (args.length == 1) {
+      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} ${signal} 1;")
+    }
+    else {
+      indentation(indent) + textln(s"${genExp(args(0))} = ${genExp(args(0))} ${signal} ${genExp(args(1))};")
     }
   }
 

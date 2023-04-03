@@ -1,11 +1,11 @@
 MODULE bee1038real;
 
 TYPE
-    intArray = ARRAY 5 OF INTEGER
+    realArray = ARRAY 5 OF REAL
 
 VAR
-    banknotesValues: intArray;
-    value: INTEGER;
+    banknotesValues: realArray;
+    value: REAL;
     x, y: INTEGER;
 
 BEGIN

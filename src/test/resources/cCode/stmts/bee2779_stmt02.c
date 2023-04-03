@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 
-int answer, n, m;
+int i, answer, n, m;
 int a[6];
 int cnt[5];
 
@@ -19,7 +19,18 @@ int main() {
     cnt[2] = 0;
     cnt[3] = 0;
     cnt[4] = 0;
+    i = 0;
     n = 5;
     m = 6;
     answer = n;
+    while (true) {
+        cnt[a[i]] = cnt[a[i]] + 1;
+        if (cnt[a[i]] == 1) {
+            answer = answer - 1;
+        }
+        i = i + 1;
+        if (i == 6) {
+            break; 
+        }
+    }
 }

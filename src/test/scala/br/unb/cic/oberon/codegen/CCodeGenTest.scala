@@ -200,7 +200,7 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee1038_Snack_int.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1038 Snack Real") {
+  test("C generator for BeeCrowd 1038 Snack Real") {
     testGenerator("stmts/bee1038_Snack_real.oberon")
   }
 
@@ -208,11 +208,11 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee1042_SimpleSort.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1049 Animal") {
+  test("C generator for BeeCrowd 1049 Animal") {
     testGenerator("stmts/bee1049_Animal.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1060 Positive") {
+  test("C generator for BeeCrowd 1060 Positive") {
     testGenerator("stmts/bee1060_Positive.oberon")
   }
 
@@ -224,24 +224,23 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee1071_Sum.oberon")
   }
 
-  ignore("C generator for BeeCrowd 1079 Average") {
+  test("C generator for BeeCrowd 1079 Average") {
     testGenerator("stmts/bee1079_Average.oberon")
   }
 
-  ignore("C generator for BeeCrowd 2057 stmt01") {
+  test("C generator for BeeCrowd 2057 stmt01") {
     testGenerator("stmts/bee2057_stmt01.oberon")
   }
 
-  ignore("C generator for BeeCrowd 2057 stmt02") {
+  test("C generator for BeeCrowd 2057 stmt02") {
     testGenerator("stmts/bee2057_stmt02.oberon")
   }
 
-  ignore("C generator for BeeCrowd 2057 stmt03") {
+  test("C generator for BeeCrowd 2057 stmt03") {
     testGenerator("stmts/bee2057_stmt03.oberon")
   }
 
-  // code was generated with compile error
-  ignore("C generator for BeeCrowd 2221 Pokemons Battle") {
+  test("C generator for BeeCrowd 2221 Pokemons Battle") {
     testGenerator("stmts/bee2221_PokemonsBattle.oberon")
   }
 

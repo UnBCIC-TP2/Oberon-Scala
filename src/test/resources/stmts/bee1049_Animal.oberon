@@ -1,7 +1,7 @@
 MODULE BeeAnimal;
 
 VAR
-	classifiedAnimal : INTEGER;
+	classifiedAnimal : STRING;
 
 PROCEDURE getAnimal(hint1, hint2, hint3: STRING) : STRING;
 	BEGIN

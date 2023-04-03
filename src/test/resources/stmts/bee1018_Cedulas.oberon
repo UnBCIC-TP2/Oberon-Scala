@@ -21,11 +21,12 @@ BEGIN
 	banknotesValues[5] := 2;
 	banknotesValues[6] := 1;
 
-	FOREACH v IN banknotesValues
-		banknotesNeeded[i] := FLOOR(value/v);
-		value := value - v*banknotesNeeded[i];
-		INC(i)
-	END
+	REPEAT
+		banknotesNeeded[i] := FLOOR(value/banknotesValues[i]);
+    	DEC(value, banknotesValues[i]*banknotesNeeded[i]);
+    	INC(i)
+  	UNTIL (i = 7)
+
 END
 
 END BeeBanknoteInt.

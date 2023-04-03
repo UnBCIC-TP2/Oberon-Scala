@@ -21,17 +21,20 @@ object Main extends App {
       val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
       validatePathExists(inputPath)
     }
+
     object interpreter extends Subcommand("interpreter") {
       val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
       validatePathExists(inputPath)
     }
+
     object compile extends Subcommand("compile") {
       val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
       val outputPath = opt[Path](name = "out", descr = "Path of the output file", argName = "path", required=true)
-      validatePathExists(inputPath)
-
       val backend = choice(name="backend", choices=Seq("llvm", "c", "jvm"), default=Some("c"), descr="Which backend to compile to", argName="backend")
+
+      validatePathExists(inputPath)
     }
+
     object repl extends Subcommand("repl") {}
 
     addSubcommand(tc)

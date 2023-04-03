@@ -3,7 +3,7 @@ MODULE bee2779;
 VAR
   a : ARRAY 6 OF INTEGER;
   cnt : ARRAY 5 OF INTEGER;
-  answer, n, m : INTEGER;
+  i, answer, n, m : INTEGER;
 
 BEGIN
   a[0] := 3;
@@ -19,18 +19,22 @@ BEGIN
   cnt[3] := 0;
   cnt[4] := 0;
   
+  i := 0;
   n := 5;
   m := 6;
 
   answer := n;
 
-  FOREACH v IN a
-    cnt[v] := cnt[v] + 1;
+  REPEAT
+    INC(cnt[a[i]]);
 
-    IF (cnt[v] = 1) THEN
-      answer := answer - 1
-    END
-  END
+    IF (cnt[a[i]] = 1) THEN
+      DEC(answer)
+    END;
+        
+    INC(i)
+  UNTIL (i = 6)
+
 END
 
 END bee2779.
