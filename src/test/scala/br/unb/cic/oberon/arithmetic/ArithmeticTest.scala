@@ -53,4 +53,16 @@ class ArithmeticTestSuite extends AnyFunSuite {
     assert(expected == res)
 
   }
+
+  test("Test a division by zero") {
+
+    val i0 = IntValue(0)
+    val i06 = IntValue(6)
+
+    assertThrows[ArithmeticException] {
+      i06./(i0)
+    }
+
+  }
+
 }
