@@ -557,6 +557,18 @@ class InterpreterTest extends AnyFunSuite {
     assert(evalArraySubscript("a", 2) == IntValue(25))
   }
 
+  test("stmt38") {
+    val module = ScalaParser.parseResource("stmts/stmt38.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    assert(coreModule.name == "UserTypeModule")
+
+    coreModule.accept(interpreter)
+    assert(evalArraySubscript("c", 0) == IntValue(15))
+  }
+
   test("Module A has no imports"){
     val module = ScalaParser.parseResource("imports/A.oberon")
 
