@@ -162,60 +162,57 @@ class CoreVisitor() extends OberonVisitorAdapter {
 }
 
 object CoreChecker extends OberonVisitorAdapter {
-  private var isCore = true
-
   override type T = Unit
-
-  override def visit(stmt: Statement): Unit = {
-
-    if (!isCore) {
-      return
-    }
+  override def stmtCheker(stmt: Statement): Boolean = {
 
     stmt match {
-      case SequenceStmt(stmts) => transformListStmts(stmts)
-      case LoopStmt(stmt) => isCore = false
-      case RepeatUntilStmt(condition, stmt) => isCore = false
-      case ForStmt(initStmt, condition, block) => isCore = false
+      // Analisar se todos os stmts sao do tipo core
+      case SequenceStmt(_) => true // TODO: remover "true" e descomentar transformListStmts(stmts) END TODO 
+      case LoopStmt(_) => false
+      case RepeatUntilStmt(_, _) =>  false
+      case ForStmt(_, _, _) => false
 
       // Condicionais
-      case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => isCore = false
-      case CaseStmt(exp, cases, elseStmt) => isCore = false
+      case IfElseIfStmt (_, _, _, _) => false
+      case CaseStmt(_, _, _) => false
 
       // Outros casos com SequenceStmt
-      case WhileStmt(condition, whileStmt) => whileStmt.accept(this)
+      case WhileStmt(condition, whileStmt) => true // TODO: remover "true" e descomentar whileStmt.accept(this)
       case IfElseStmt(condition, thenStmt, elseStmt) => thenStmt.accept(this);
-        elseStmt match {
-          case Some(f) => Some(elseStmt.get.accept((this)))
-          case None => ()
-        }
+      // O que esta acontecendo aqui???
+      elseStmt match {
+        case Some(f) => Some(elseStmt.get.accept((this)))
+        case None => false
+      }
 
-      case _ => ()
+      case _ => true // Caso base, existem varios false... Podemos usar o match somente dos casos que sao possivelmente true, restante cai no base.
     }
   }
 
-  private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): Unit = {
-    if (stmtsList.nonEmpty){
-      stmtsList.head.accept(this);
-      transformListStmts(stmtsList.tail)
-    }
-  }
+  // TODO: Apagar depois que resolver os cases ali em cima
+  // private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): Unit = {
+  //   if (stmtsList.nonEmpty){
+  //     stmtsList.head.accept(this);
+  //     transformListStmts(stmtsList.tail)
+  //   }
+  // }
 
+  // Nao faco ideia do que esta acontecendo aqui
   private def checkProcedureStmts(listProcedures: List[Procedure]): Unit = {
     for (procedure <- listProcedures){
       procedure.stmt.accept(this)
     }
   }
 
-  def isModuleCore(module: OberonModule): Boolean = {
-    isCore = true
-    module.stmt.get.accept(this)
-    if (!isCore){
-      isCore
-    }
-    else{
-      module.procedures.foreach{x : Procedure => x.stmt.accept(this)}
-      isCore
-    }
-  }
+  // TODO: Apagar depois que resolver os testes de se alguma coisa for core
+  // def isModuleCore(module: OberonModule): Boolean = {
+  //   module.stmt.get.accept(this)
+  //   if (!isCore){
+  //     true
+  //   }
+  //   else{
+  //     module.procedures.foreach{x : Procedure => x.stmt.accept(this)}
+  //     true
+  //   }
+  // }
 }
