@@ -161,13 +161,12 @@ class CoreVisitor() extends OberonVisitorAdapter {
 
 }
 
-object CoreChecker extends OberonVisitorAdapter {
-  override type T = Unit
-  override def stmtCheker(stmt: Statement): Boolean = {
+object CoreChecker {
+  
+  def stmtCheker(stmt: Statement): Boolean = {
 
     stmt match {
-      // Analisar se todos os stmts sao do tipo core
-      case SequenceStmt(_) => true // TODO: remover "true" e descomentar transformListStmts(stmts) END TODO 
+      case SequenceStmt(stmts) => stmts.map(s => stmtCheker(s)).foldLeft(true)(_ && _)
       case LoopStmt(_) => false
       case RepeatUntilStmt(_, _) =>  false
       case ForStmt(_, _, _) => false
@@ -178,7 +177,7 @@ object CoreChecker extends OberonVisitorAdapter {
 
       // Outros casos com SequenceStmt
       case WhileStmt(condition, whileStmt) => true // TODO: remover "true" e descomentar whileStmt.accept(this)
-      case IfElseStmt(condition, thenStmt, elseStmt) => thenStmt.accept(this);
+      case IfElseStmt(condition, thenStmt, elseStmt) => true // thenStmt.accept(this);
       // O que esta acontecendo aqui???
       elseStmt match {
         case Some(f) => Some(elseStmt.get.accept((this)))
