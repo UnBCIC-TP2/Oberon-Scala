@@ -164,54 +164,21 @@ class CoreVisitor() extends OberonVisitorAdapter {
 object CoreChecker {
   
   def stmtCheker(stmt: Statement): Boolean = {
-
     stmt match {
       case SequenceStmt(stmts) => stmts.map(s => stmtCheker(s)).foldLeft(true)(_ && _)
-      case LoopStmt(_) => false
-      case RepeatUntilStmt(_, _) =>  false
-      case ForStmt(_, _, _) => false
-
-      // Condicionais
-      case IfElseIfStmt (_, _, _, _) => false
-      case CaseStmt(_, _, _) => false
-
-      // Outros casos com SequenceStmt
-      case WhileStmt(condition, whileStmt) => true // TODO: remover "true" e descomentar whileStmt.accept(this)
-      case IfElseStmt(condition, thenStmt, elseStmt) => true // thenStmt.accept(this);
-      // O que esta acontecendo aqui???
+      case WhileStmt(_, whileStmt) => this.stmtCheker(whileStmt)
+      case IfElseStmt(_, thenStmt, elseStmt) => this.stmtCheker(thenStmt)
       elseStmt match {
-        case Some(f) => Some(elseStmt.get.accept((this)))
+        case Some(f) => this.stmtCheker(f)
         case None => false
       }
 
-      case _ => true // Caso base, existem varios false... Podemos usar o match somente dos casos que sao possivelmente true, restante cai no base.
+      case _ => false
     }
   }
 
-  // TODO: Apagar depois que resolver os cases ali em cima
-  // private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): Unit = {
-  //   if (stmtsList.nonEmpty){
-  //     stmtsList.head.accept(this);
-  //     transformListStmts(stmtsList.tail)
-  //   }
-  // }
-
-  // Nao faco ideia do que esta acontecendo aqui
-  private def checkProcedureStmts(listProcedures: List[Procedure]): Unit = {
-    for (procedure <- listProcedures){
-      procedure.stmt.accept(this)
-    }
+  def isModuleCore(module: OberonModule): Boolean = {
+    //TODO: checar se o module do tipo OberonModule é core
+    true
   }
-
-  // TODO: Apagar depois que resolver os testes de se alguma coisa for core
-  // def isModuleCore(module: OberonModule): Boolean = {
-  //   module.stmt.get.accept(this)
-  //   if (!isCore){
-  //     true
-  //   }
-  //   else{
-  //     module.procedures.foreach{x : Procedure => x.stmt.accept(this)}
-  //     true
-  //   }
-  // }
 }
