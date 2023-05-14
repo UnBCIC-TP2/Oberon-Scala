@@ -17,19 +17,20 @@ import scala.collection.mutable.{Map, Stack}
  * area (a hash map) into the stack. Whenever we
  * return from a procedure, we pop the stack.
  */
-class Environment[T] {
+class Environment[T](private var top_loc:Int = 0,
+                     private val locations: Map[Location, T] = Map.empty[Location, T],
+                     private val global: Map[String, Location] = Map.empty[String, Location],
+                     private val stack: Stack[Map[String, Location]] = Stack.empty[Map[String, Location]],
+                     private val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
+                     private val userDefinedTypes: Map[String, UserDefinedType] = Map.empty[String, UserDefinedType]) {
 
-  private var top_loc = 0
-  private val locations = Map.empty[Location, T]
-  private val global = Map.empty[String, Location]
-  private val stack = Stack.empty[Map[String, Location]]
-  private val procedures = Map.empty[String, Procedure]
-  private val userDefinedTypes = Map.empty[String, UserDefinedType]
+
 
   def setGlobalVariable(name: String, value: T): Unit = {
     top_loc += 1
     global += name -> Location(top_loc)
     locations += Location(top_loc) -> value
+
   }
 
   def addUserDefinedType(userType: UserDefinedType) : Unit = {
