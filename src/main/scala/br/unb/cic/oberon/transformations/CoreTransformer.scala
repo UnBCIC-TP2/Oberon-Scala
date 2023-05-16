@@ -163,13 +163,13 @@ class CoreVisitor() extends OberonVisitorAdapter {
 
 object CoreChecker {
   
-  def stmtCheker(stmt: Statement): Boolean = {
+  def stmtCheck(stmt: Statement): Boolean = {
     stmt match {
-      case SequenceStmt(stmts) => stmts.map(s => stmtCheker(s)).foldLeft(true)(_ && _)
-      case WhileStmt(_, whileStmt) => this.stmtCheker(whileStmt)
-      case IfElseStmt(_, thenStmt, elseStmt) => this.stmtCheker(thenStmt)
+      case SequenceStmt(stmts) => stmts.map(s => stmtCheck(s)).foldLeft(true)(_ && _)
+      case WhileStmt(_, whileStmt) => this.stmtCheck(whileStmt)
+      case IfElseStmt(_, thenStmt, elseStmt) => this.stmtCheck(thenStmt)
       elseStmt match {
-        case Some(f) => this.stmtCheker(f)
+        case Some(f) => this.stmtCheck(f)
         case None => false
       }
 
