@@ -166,19 +166,23 @@ object CoreChecker {
   def stmtCheck(stmt: Statement): Boolean = {
     stmt match {
       case SequenceStmt(stmts) => stmts.map(s => stmtCheck(s)).foldLeft(true)(_ && _)
-      case WhileStmt(_, whileStmt) => this.stmtCheck(whileStmt)
-      case IfElseStmt(_, thenStmt, elseStmt) => this.stmtCheck(thenStmt)
-      elseStmt match {
-        case Some(f) => this.stmtCheck(f)
-        case None => false
-      }
 
-      case _ => false
+      // Laços
+      case LoopStmt(stmt) => false
+      case RepeatUntilStmt(condition, stmt) => false
+      case ForStmt(initStmt, condition, block) => false
+      case WhileStmt(_, whileStmt) => stmtCheck(whileStmt)
+      
+      // Condicionais
+      case CaseStmt(exp, cases, elseStmt) => false  
+      case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) => false
+      case IfElseStmt(_, thenStmt, Some(elseStmt)) => stmtCheck(thenStmt) && stmtCheck(elseStmt)
+      
+      case _ => true
     }
   }
 
   def isModuleCore(module: OberonModule): Boolean = {
-    //TODO: checar se o module do tipo OberonModule é core
-    true
+    stmtCheck(module.stmt.get) && module.procedures.map(p => stmtCheck(p.stmt)).foldLeft(true)(_ && _)
   }
 }
