@@ -49,7 +49,7 @@ class OberonEngine extends ScriptEngine {
 
   override def put(name: String, value: Object): Unit = {
     //println(f"put call ($name = $value)")
-    interpreter.env.setGlobalVariable(name, objectToExpression(value))
+    interpreter.env = interpreter.env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
@@ -79,7 +79,7 @@ class OberonEngine extends ScriptEngine {
       return
     }
     if (hasVariable(variable)) {
-      interpreter.env.delVariable(variable)
+      interpreter.env=interpreter.env.delVariable(variable)
     }
   }
 

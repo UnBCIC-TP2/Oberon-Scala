@@ -31,8 +31,8 @@ class Environment[T](private val top_loc:Int = 0,
     //global += name -> Location(top_loc)
     //val loc = locations + (Location(top_loc), value)
     return new Environment[T](top_loc = this.top_loc+1,
-      locations = this.locations+(Location(top_loc), value),
-      global = this.global+(name , Location(top_loc)) ,
+      locations = this.locations+(Location(top_loc)-> value),
+      global = this.global+(name -> Location(top_loc)) ,
      procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
@@ -46,7 +46,7 @@ class Environment[T](private val top_loc:Int = 0,
     locations = this.locations,
       global = this.global,
       procedures = this.procedures,
-      userDefinedTypes = this.userDefinedTypes+(this.userDefinedTypeName(userType) , userType),
+      userDefinedTypes = this.userDefinedTypes+(this.userDefinedTypeName(userType)-> userType),
       stack = this.stack)
   }
 
