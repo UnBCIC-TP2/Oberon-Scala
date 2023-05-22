@@ -69,8 +69,8 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val visitor = new EvalExpressionVisitor(interpreter)
 
     val exp = AddExpression(VarExpression("x"), VarExpression("y"))
-
-    assert(exp.accept(visitor) == IntValue(40))
+    val x = exp.accept(visitor)
+    assert(x == IntValue(40))
   }
 
   // TODO: Write test cases  dealing with different scopes and name collision.

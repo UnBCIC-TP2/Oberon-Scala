@@ -80,7 +80,7 @@ class Environment[T](private val top_loc:Int = 0,
         global = this.global,
         procedures = this.procedures,
         userDefinedTypes = this.userDefinedTypes,
-        stack = this.stack)
+        stack = copyStack)
   }
 
   def setVariable(name: String, value: T) : Environment[T] = {
