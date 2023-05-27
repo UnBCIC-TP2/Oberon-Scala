@@ -34,6 +34,11 @@ trait BasicParsers extends ParsersUtil {
     def digit: String = "[0-9]"
     def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r
 
+    def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
+        case mod ~ Some(a) => mod + ":=" + a
+        case mod ~ None => mod
+    }
+
     def typeParser: Parser[Type] = (
         "INTEGER" ^^ (_ => IntegerType)
     |   "REAL" ^^ (_ => RealType)
@@ -47,7 +52,10 @@ trait BasicParsers extends ParsersUtil {
 
 trait ExpressionParser extends BasicParsers {
     def pointerParser: Parser[Expression] = identifier <~ "^" ^^ PointerAccessExpression
-    def qualifiedName: Parser[String] = identifier // TODO
+    def qualifiedName: Parser[String] = opt(identifier <~ "::") ~ identifier ^^ {
+        case Some(id1) ~ id2 => id1 + "::" + id2
+        case None ~ id2 =>  id2
+    }
     def variableParser: Parser[Expression] = qualifiedName ^^ VarExpression
     def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep("," ~> expressionParser) ^^ { case a ~ b => List(a) ++ b }
     def functionParser: Parser[Expression] = qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
@@ -233,7 +241,15 @@ trait OberonParserFull extends StatementParser {
 
     // Final Parsers
 
-    def importParser: Parser[Set[String]] = listOpt("IMPORT" ~> rep(identifier <~ ";")) ^^ { a => a.toSet }
+    def importsParser: Parser[Set[String]] = opt(importParser ~ rep("," ~> importParser)) ^^ { //a => a.toSet
+        case Some(a ~ b) => (a ::: b.flatten).toSet
+        case None => Set[String]()
+    }
+    def importParser: Parser[List[String]] = (
+      "IMPORT" ~> module ~ rep("," ~> module) <~ ";" ^^ {
+          case head ~ tail => List(head) ++ tail
+      }
+    )
     
     class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
     def declarationsParser: Parser[DeclarationProps] =
@@ -242,7 +258,7 @@ trait OberonParserFull extends StatementParser {
     
     def blockParser: Parser[Option[Statement]] = optSolver("BEGIN" ~> multStatementParser <~ "END")
 
-    def oberonParser: Parser[OberonModule] = ("MODULE" ~> identifier <~ ";") ~ importParser ~ declarationsParser ~ blockParser <~ ("END" ~ identifier ~ ".") ^^ {
+    def oberonParser: Parser[OberonModule] = ("MODULE" ~> identifier <~ ";") ~ importsParser ~ declarationsParser ~ blockParser <~ ("END" ~ identifier ~ ".") ^^ {
         case name ~ imports ~ declarations ~ statements => 
             OberonModule(
                 name, imports,

@@ -1038,4 +1038,75 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
 
   }
 
+  test("Testing the import parser") {
+    assert(Set("A") == parseAbs(parse(importsParser, "IMPORT A;")))
+    assert(Set("A","B") == parseAbs(parse(importsParser, "IMPORT A, B;")))
+    assert(Set() == parseAbs(parse(importsParser, "IMPORT;")))
+    assert(Set("A:=alias") == parseAbs(parse(importsParser, "IMPORT A := alias;")))
+
+    assert(
+      OberonModule(
+        "importTest", Set("A"),
+        List(),
+        List(),
+        List(),
+        List(),
+        None
+      )
+      == parseAbs(parse(oberonParser,"""
+           MODULE importTest;
+           IMPORT A;
+           END importTest.
+          """))
+
+    )
+  }
+
+  test("Testing imports parser with existing modules"){
+
+    assert(parseResource("imports/B.oberon") ==
+      OberonModule(
+        "B",
+        Set("A"),
+        List(),
+        List(),
+        List(),
+        List(),
+        Some(WriteStmt(VarExpression("A::x")))
+      )
+    )
+
+    assert(parseResource("imports/D.oberon") ==
+      OberonModule(
+        "D", Set("A","C"),
+        List(),
+        List(),
+        List(),
+        List(),
+        Some(SequenceStmt(List(WriteStmt(VarExpression("A::x")),WriteStmt(VarExpression("C::x")))))
+      )
+    )
+
+    assert(parseResource("imports/F.oberon") ==
+      OberonModule(
+        "F", Set("A:=alias"),
+        List(),
+        List(),
+        List(),
+        List(),
+        Some(WriteStmt(VarExpression("alias::x")))
+      )
+    )
+
+    assert(parseResource("imports/H.oberon") ==
+      OberonModule(
+        "H", Set("A:=aliasA","C:=aliasC","D"),
+        List(),
+        List(),
+        List(),
+        List(),
+        Some(SequenceStmt(List(WriteStmt(VarExpression("aliasA::x")),WriteStmt(VarExpression("aliasC::x")))))
+      )
+    )
+  }
 }
