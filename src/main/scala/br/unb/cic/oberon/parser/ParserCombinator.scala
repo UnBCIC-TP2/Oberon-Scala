@@ -214,12 +214,24 @@ trait OberonParserFull extends StatementParser {
                 )
             } 
         }
+    def ignoreParser: Parser[Ignore] =
+        "IGNORE" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
+            case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
+                if (name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
+                Ignore(
+                    name,
+                    description,
+                    constants,
+                    variables,
+                    statements
+                )
+            }
+        }
 
     def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
         case mod ~ Some(a) => mod + ":=" + a
         case mod ~ None => mod
     }
-
 
     def formalArgs: Parser[List[FormalArg]] = opt(formalArg ~ rep("," ~> formalArg)) ^^ {
         case Some(a ~ b) => a ::: b.flatten

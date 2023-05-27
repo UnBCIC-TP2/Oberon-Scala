@@ -268,6 +268,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
 
     test("Testing assertError Statement parse"){
       assert(AssertError("") == parseAbs(parse(multStatementParser, "assert_error()")))
+
     }
 
       test("Testing assert_eq Statement parse") {
@@ -294,19 +295,19 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     test("Testing Procedure parser"){
         assert(Procedure("addFunc",List(ParameterByValue("a",IntegerType), ParameterByValue("b",IntegerType)), Option(IntegerType),List[Constant](),List[VariableDeclaration](), ReturnStmt(AddExpression(VarExpression("a"),VarExpression("b"))))
         == parseAbs(parse(procedureParser, """
-        PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
-        BEGIN 
-            RETURN a + b 
-        END 
+        PROCEDURE addFunc (a, b: INTEGER): INTEGER;
+        BEGIN
+            RETURN a + b
+        END
         addFunc
         """)))
 
         val thrown = intercept[Exception] {
             parseAbs(parse(procedureParser, """
-            PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
-            BEGIN 
-                RETURN a + b 
-            END 
+            PROCEDURE addFunc (a, b: INTEGER): INTEGER;
+            BEGIN
+                RETURN a + b
+            END
             addFun
             """))
         }
@@ -328,6 +329,27 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
           TEST firstTest ("The first test suite");
           BEGIN
               assert(x = 10)
+          END firstTestSuite
+          """))
+      }
+      assert(thrown.getMessage == "Procedure name (firstTest) doesn't match the end identifier (firstTestSuite)")
+    }
+
+      test("Testing Ignore parser") {
+      assert(Ignore("firstTest",StringValue("The first test suite"),List[Constant](),List[VariableDeclaration](),AssertTrueStmt(EQExpression(VarExpression("x"),IntValue(20))))
+      == parseAbs(parse(ignoreParser,"""
+      IGNORE firstTest ("The first test suite");
+      BEGIN
+          assert(x = 20)
+      END firstTest
+      """))
+      )
+
+      val thrown = intercept[Exception] {
+          parseAbs(parse(ignoreParser,"""
+          IGNORE firstTest ("The first test suite");
+          BEGIN
+              assert(x = 20)
           END firstTestSuite
           """))
       }
