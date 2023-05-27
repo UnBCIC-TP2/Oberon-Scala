@@ -44,12 +44,12 @@ case class Procedure(name: String,
 }
 
 case class Test(name: String,
-                description: String,
+                description: StringValue,
                 constants: List[Constant],
                 variables: List[VariableDeclaration],
                 stmt: Statement
                 ) {
-  def accept(v: OberonVisitor): v.T = v.visit(this)
+  //def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
 /* formal argument definition */

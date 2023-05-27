@@ -5,6 +5,7 @@ import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.Map
+import java.beans.Expression
 
 
 class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParser {
@@ -254,6 +255,24 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
         )
         // EXIT
         assert(ExitStmt() == parseAbs(parse(multStatementParser, "EXIT")))
+    }
+
+    test("Testing assert Statement parse") {
+      // Testing the assert true parse
+      assert(AssertTrueStmt(EQExpression(IntValue(2),IntValue(2))) == parseAbs(parse(multStatementParser, "assert(2=2);")))
+      assert(AssertTrueStmt(IntValue(2)) == parseAbs(parse(multStatementParser, "assert(2)")))
+      assert(AssertTrueStmt(BoolValue(true)) == parseAbs(parse(multStatementParser, "assert(True)")))
+      assert(AssertTrueStmt(AddExpression(IntValue(2), IntValue(3))) == parseAbs(parse(multStatementParser, "assert(2+3)")))
+      assert(AssertTrueStmt(AddExpression(AddExpression(IntValue(2),IntValue(3)),IntValue(1))) == parseAbs(parse(multStatementParser, "assert(2+3+1)")))
+      assert(AssertTrueStmt(AndExpression(BoolValue(true),BoolValue(false))) == parseAbs(parse(multStatementParser,"assert(True && False)")))
+      assert(AssertTrueStmt(AndExpression(IntValue(2),RealValue(-50.5))) == parseAbs(parse(multStatementParser,"assert(2 && -50.5)")))
+      assert(AssertTrueStmt(AndExpression(Brackets(EQExpression(IntValue(2), IntValue(2))),Brackets(EQExpression(IntValue(3),IntValue(5))))) == parseAbs(parse(multStatementParser,"assert((2=2) && (3=5))")))
+
+      // Testing the assert_eq parse
+      assert(AssertEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser,"assert_eq(True,False)")))
+
+      // Testing the assert_ne parse
+      assert(AssertNotEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_ne(True,     False)")))
     }
 
     test("Testing Statement sequence parser") {

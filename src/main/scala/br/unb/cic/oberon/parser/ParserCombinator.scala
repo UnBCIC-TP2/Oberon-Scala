@@ -197,7 +197,7 @@ trait OberonParserFull extends StatementParser {
     }
 
     def testParser: Parser[Test] = 
-        "TEST" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantparser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
+        "TEST" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
             case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
                 if(name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
                 Test(
