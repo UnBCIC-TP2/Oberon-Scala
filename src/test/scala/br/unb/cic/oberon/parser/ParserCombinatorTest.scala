@@ -259,26 +259,32 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
 
     test("Testing assert Statement parse") {
       // Testing the assert true parse
-      assert(AssertTrueStmt(AndExpression(BoolValue(true),BoolValue(false))) == parseAbs(parse(multStatementParser,"assert(True && False)")))
+      assert(AssertTrueStmt(AndExpression(BoolValue(true), BoolValue(false))) == parseAbs(parse(multStatementParser, "assert(True && False)")))
       assert(AssertTrueStmt(AddExpression(IntValue(2), IntValue(3))) == parseAbs(parse(multStatementParser, "assert(2+3)")))
-      assert(AssertTrueStmt(EQExpression(AddExpression(AddExpression(IntValue(2),IntValue(3)),IntValue(1)),IntValue(6))) == parseAbs(parse(multStatementParser, "assert(2+3+1 = 6)")))
-      assert(AssertTrueStmt(AndExpression(IntValue(2),RealValue(-50.5))) == parseAbs(parse(multStatementParser,"assert(2 && -50.5)")))
-      assert(AssertTrueStmt(AndExpression(Brackets(EQExpression(IntValue(2), IntValue(2))),Brackets(EQExpression(IntValue(3),IntValue(5))))) == parseAbs(parse(multStatementParser,"assert((2=2) && (3=5))")))
+      assert(AssertTrueStmt(EQExpression(AddExpression(AddExpression(IntValue(2), IntValue(3)), IntValue(1)), IntValue(6))) == parseAbs(parse(multStatementParser, "assert(2+3+1 = 6)")))
+      assert(AssertTrueStmt(AndExpression(IntValue(2), RealValue(-50.5))) == parseAbs(parse(multStatementParser, "assert(2 && -50.5)")))
+      assert(AssertTrueStmt(AndExpression(Brackets(EQExpression(IntValue(2), IntValue(2))), Brackets(EQExpression(IntValue(3), IntValue(5))))) == parseAbs(parse(multStatementParser, "assert((2=2) && (3=5))")))
+    }
 
-      // Testing the assert_eq parse
-      assert(AssertEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser,"assert_eq(True,False)")))
-      assert(AssertEqualStmt(IntValue(2),RealValue(-40.4)) == parseAbs(parse(multStatementParser,"assert_eq(2,-40.4)")))
-      assert(AssertEqualStmt(VarExpression("x"),ArraySubscript(VarExpression("arr"), IntValue(4))) == parseAbs(parse(multStatementParser, "assert_eq(x,arr[4])")))
-      assert(AssertEqualStmt(AddExpression(IntValue(45),IntValue(5)),IntValue(40)) != parseAbs(parse(multStatementParser, "assert_eq(45-5, 40)")))
-      assert(AssertEqualStmt(AddExpression(IntValue(45),IntValue(-5)),IntValue(40)) == parseAbs(parse(multStatementParser, "assert_eq(45+-5, 40)")))
+    test("Testing assertError Statement parse"){
+      assert(AssertError("") == parseAbs(parse(multStatementParser, "assert_error()")))
+    }
 
+      test("Testing assert_eq Statement parse") {
+        assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False)")))
+        assert(AssertEqualStmt(BoolValue(false), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(False,False)")))
+        assert(AssertEqualStmt(BoolValue(true), BoolValue(true)) == parseAbs(parse(multStatementParser, "assert_eq(True,True)")))
+        assert(AssertEqualStmt(IntValue(2), RealValue(-40.4)) == parseAbs(parse(multStatementParser, "assert_eq(2,-40.4)")))
+        assert(AssertEqualStmt(VarExpression("x"), ArraySubscript(VarExpression("arr"), IntValue(4))) == parseAbs(parse(multStatementParser, "assert_eq(x,arr[4])")))
+        assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(5)), IntValue(50)) == parseAbs(parse(multStatementParser, "assert_eq(45+5, 50)")))
+        assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(-5)), IntValue(40)) == parseAbs(parse(multStatementParser, "assert_eq(45+-5, 40)")))
+      }
+      test("Testing assert_ne Statement parse") {
 
-      // Testing the assert_ne parse
-      assert(AssertNotEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_ne(True,     False)")))
+      assert(AssertNotEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_ne(True, False)")))
       assert(AssertNotEqualStmt(VarExpression("x"),VarExpression("y")) == parseAbs(parse(multStatementParser, "assert_ne(x,y)")))
       assert(AssertNotEqualStmt(IntValue(2),RealValue(-40.4)) == parseAbs(parse(multStatementParser,"assert_ne(2,-40.4)")))
       assert(AssertNotEqualStmt(VarExpression("x"),ArraySubscript(VarExpression("arr"), IntValue(4))) == parseAbs(parse(multStatementParser, "assert_ne(x,arr[4])")))
-
     }
 
     test("Testing Statement sequence parser") {

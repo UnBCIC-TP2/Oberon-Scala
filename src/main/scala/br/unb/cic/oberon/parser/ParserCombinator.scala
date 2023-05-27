@@ -129,6 +129,7 @@ trait StatementParser extends ExpressionParser {
     |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
     |   "assert_eq" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
     |   "assert_ne" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
+    |   "assert_error" ~>('('~>""<~')')  ^^ AssertError
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
@@ -142,7 +143,7 @@ trait StatementParser extends ExpressionParser {
         { case id ~ min ~ max ~ stmt => buildForRangeStmt(id, min, max, stmt) }
     |   "LOOP" ~> statementParser <~ "END" ^^ LoopStmt
     |   "RETURN" ~> expressionParser ^^ ReturnStmt
-    |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
+    |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^
         { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
     |   "EXIT" ^^ { _ => ExitStmt() }
     );
