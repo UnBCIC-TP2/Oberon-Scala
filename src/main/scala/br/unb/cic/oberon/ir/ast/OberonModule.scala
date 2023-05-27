@@ -43,6 +43,15 @@ case class Procedure(name: String,
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
+case class Test(name: String,
+                description: String,
+                constants: List[Constant],
+                variables: List[VariableDeclaration],
+                stmt: Statement
+                ) {
+  def accept(v: OberonVisitor): v.T = v.visit(this)
+}
+
 /* formal argument definition */
 sealed trait FormalArg{
   def accept(v: OberonVisitor): v.T = v.visit(this)

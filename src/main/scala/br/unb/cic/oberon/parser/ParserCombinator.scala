@@ -123,8 +123,8 @@ trait StatementParser extends ExpressionParser {
     |   "readChar" ~> ('(' ~> identifier <~ ')') ^^ ReadCharStmt
     |   "write" ~> ('(' ~> expressionParser <~ ')') ^^ WriteStmt
     |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
-    |   "assert_eq" ~> ('('~> expressionParser ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
-    |   "assert_ne" ~> ('('~> expressionParser ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
+    |   "assert_eq" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
+    |   "assert_ne" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
@@ -197,7 +197,19 @@ trait OberonParserFull extends StatementParser {
     }
 
     def testParser: Parser[Test] = 
-        "TEST" ~ identifier ~ ("(")
+        "TEST" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantparser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
+            case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
+                if(name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
+                Test(
+                    name,
+                    description,
+                    constants,
+                    variables,
+                    statements
+                )
+            } 
+        }
+
 
     def formalArgs: Parser[List[FormalArg]] = opt(formalArg ~ rep("," ~> formalArg)) ^^ {
         case Some(a ~ b) => a ::: b.flatten
