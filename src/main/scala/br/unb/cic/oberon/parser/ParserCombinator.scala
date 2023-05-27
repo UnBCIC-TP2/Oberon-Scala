@@ -122,6 +122,9 @@ trait StatementParser extends ExpressionParser {
     |   "readInt" ~> ('(' ~> identifier <~ ')') ^^ ReadIntStmt
     |   "readChar" ~> ('(' ~> identifier <~ ')') ^^ ReadCharStmt
     |   "write" ~> ('(' ~> expressionParser <~ ')') ^^ WriteStmt
+    |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
+    |   "assert_eq" ~> ('('~> expressionParser ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
+    |   "assert_ne" ~> ('('~> expressionParser ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
@@ -192,6 +195,9 @@ trait OberonParserFull extends StatementParser {
         case Some(procedureType) => Option(procedureType)
         case None => None: Option[Type]
     }
+
+    def testParser: Parser[Test] = 
+        "TEST" ~ identifier ~ ("(")
 
     def formalArgs: Parser[List[FormalArg]] = opt(formalArg ~ rep("," ~> formalArg)) ^^ {
         case Some(a ~ b) => a ::: b.flatten
