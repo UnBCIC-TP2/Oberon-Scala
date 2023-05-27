@@ -241,6 +241,7 @@ case class MetaStmt(f: () => Statement) extends Statement
 case class AssertTrueStmt(exp: Expression) extends Statement
 case class AssertEqualStmt(left: Expression, right: Expression) extends Statement
 case class AssertNotEqualStmt(left: Expression, right: Expression) extends Statement
+case class AssertError(string: String) extends Statement
 
 trait CaseAlternative {
   def accept(v: OberonVisitor): v.T = v.visit(this)
