@@ -34,10 +34,6 @@ trait BasicParsers extends ParsersUtil {
     def digit: String = "[0-9]"
     def identifier: Parser[String] = (alpha + "(" + alpha + "|" + digit + "|_)*").r
 
-    def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
-        case mod ~ Some(a) => mod + ":=" + a
-        case mod ~ None => mod
-    }
 
     def typeParser: Parser[Type] = (
         "INTEGER" ^^ (_ => IntegerType)
@@ -217,6 +213,11 @@ trait OberonParserFull extends StatementParser {
                 )
             } 
         }
+
+    def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
+        case mod ~ Some(a) => mod + ":=" + a
+        case mod ~ None => mod
+    }
 
 
     def formalArgs: Parser[List[FormalArg]] = opt(formalArg ~ rep("," ~> formalArg)) ^^ {
