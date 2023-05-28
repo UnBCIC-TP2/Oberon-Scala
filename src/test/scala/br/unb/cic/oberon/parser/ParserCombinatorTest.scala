@@ -267,7 +267,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
     test("Testing assertError Statement parse"){
-      assert(AssertError() == parseAbs(parse(multStatementParser, "assert_error()")))
+      assert(AssertError("") == parseAbs(parse(multStatementParser, "assert_error()")))
 
     }
 
