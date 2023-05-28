@@ -201,19 +201,23 @@ trait OberonParserFull extends StatementParser {
         case None => None: Option[Type]
     }
 
-    def testParser: Parser[Test] = 
-        "TEST" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
-            case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
-                if(name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
-                Test(
+    def testMod: Parser[String] = "TEST" | "IGNORE"
+
+    def testParser: Parser[Test] = {
+        testMod ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
+            case mod ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
+                if (name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
+                Test(mod,
                     name,
                     description,
                     constants,
                     variables,
                     statements
                 )
-            } 
+            }
         }
+    }
+    /*
     def ignoreParser: Parser[Ignore] =
         "IGNORE" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
             case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
@@ -226,7 +230,7 @@ trait OberonParserFull extends StatementParser {
                     statements
                 )
             }
-        }
+        }*/
 
     def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
         case mod ~ Some(a) => mod + ":=" + a

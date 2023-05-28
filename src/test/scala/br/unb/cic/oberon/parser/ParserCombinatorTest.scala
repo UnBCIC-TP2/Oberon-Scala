@@ -267,7 +267,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
     test("Testing assertError Statement parse"){
-      assert(AssertError() == parseAbs(parse(multStatementParser, "assert_error()")))
+      assert(AssertError() == parseAbs(parse(multStatementParser, "assert_error(write(x))")))
 
     }
 
@@ -315,7 +315,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
     test("Testing Test parser") {
-      assert(Test("firstTest",StringValue("The first test suite"),List[Constant](),List[VariableDeclaration](),AssertTrueStmt(EQExpression(VarExpression("x"),IntValue(10))))
+      assert(Test("TEST","firstTest",StringValue("The first test suite"),List[Constant](),List[VariableDeclaration](),AssertTrueStmt(EQExpression(VarExpression("x"),IntValue(10))))
       == parseAbs(parse(testParser,"""
       TEST firstTest ("The first test suite");
       BEGIN
@@ -336,8 +336,8 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
       test("Testing Ignore parser") {
-      assert(Ignore("firstTest",StringValue("The first test suite"),List[Constant](),List[VariableDeclaration](),AssertTrueStmt(EQExpression(VarExpression("x"),IntValue(20))))
-      == parseAbs(parse(ignoreParser,"""
+      assert(Test("IGNORE","firstTest",StringValue("The first test suite"),List[Constant](),List[VariableDeclaration](),AssertTrueStmt(EQExpression(VarExpression("x"),IntValue(20))))
+      == parseAbs(parse(testParser,"""
       IGNORE firstTest ("The first test suite");
       BEGIN
           assert(x = 20)
@@ -346,7 +346,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
       )
 
       val thrown = intercept[Exception] {
-          parseAbs(parse(ignoreParser,"""
+          parseAbs(parse(testParser,"""
           IGNORE firstTest ("The first test suite");
           BEGIN
               assert(x = 20)
