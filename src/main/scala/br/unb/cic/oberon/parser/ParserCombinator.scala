@@ -129,7 +129,7 @@ trait StatementParser extends ExpressionParser {
     |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
     |   "assert_eq" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
     |   "assert_ne" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
-    |   "assert_error" ~>('('~>""<~')')  ^^ AssertError
+    |   "assert_error" ^^ { _ => AssertError()}
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
