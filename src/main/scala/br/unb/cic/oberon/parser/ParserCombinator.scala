@@ -27,7 +27,7 @@ trait BasicParsers extends ParsersUtil {
     def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
     def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(False|True)".r ^^ (i => BoolValue(i=="True"))
-    def string: Parser[StringValue] = "\"[^\"]+\"".r ^^ (i => StringValue(i.substring(1, i.length()-1)))
+    def string: Parser[StringValue] = "\"[^\"]*\"".r ^^ (i => StringValue(i.substring(1, i.length()-1)))
     def char: Parser[CharValue] = ("\'[^\']\'".r) ^^ (i => CharValue(i.charAt(1)))
 
     def alpha: String = "[A-Za-z]"
@@ -129,7 +129,10 @@ trait StatementParser extends ExpressionParser {
     |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
     |   "assert_eq" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertEqualStmt(exp1,exp2)}
     |   "assert_ne" ~> (('('~> expressionParser) ~ (',' ~> expressionParser <~')')) ^^ {case exp1 ~ exp2 => AssertNotEqualStmt(exp1,exp2)}
-    |   "assert_error" ~>('('~>""<~')')  ^^ AssertError
+    |   "assert_error" ~>('('~>opt(multStatementParser|expressionParser)<~")")  ^^ {
+            case None => AssertError()
+            case Some(_) => throw new Exception("assert_error is a reserved word that receives no arguments")
+        }
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }

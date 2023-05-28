@@ -267,20 +267,26 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
     }
 
     test("Testing assertError Statement parse"){
-      assert(AssertError("") == parseAbs(parse(multStatementParser, "assert_error()")))
+      assert(AssertError() == parseAbs(parse(multStatementParser, "assert_error()")))
+
+      val thrown = intercept[Exception] {
+        parseAbs(parse(multStatementParser, "assert_error(\"\")"))
+      }
+      assert(thrown.getMessage == "assert_error is a reserved word that receives no arguments")
 
     }
 
-      test("Testing assert_eq Statement parse") {
-        assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False)")))
-        assert(AssertEqualStmt(BoolValue(false), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(False,False)")))
-        assert(AssertEqualStmt(BoolValue(true), BoolValue(true)) == parseAbs(parse(multStatementParser, "assert_eq(True,True)")))
-        assert(AssertEqualStmt(IntValue(2), RealValue(-40.4)) == parseAbs(parse(multStatementParser, "assert_eq(2,-40.4)")))
-        assert(AssertEqualStmt(VarExpression("x"), ArraySubscript(VarExpression("arr"), IntValue(4))) == parseAbs(parse(multStatementParser, "assert_eq(x,arr[4])")))
-        assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(5)), IntValue(50)) == parseAbs(parse(multStatementParser, "assert_eq(45+5, 50)")))
-        assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(-5)), IntValue(40)) == parseAbs(parse(multStatementParser, "assert_eq(45+-5, 40)")))
-      }
-      test("Testing assert_ne Statement parse") {
+    test("Testing assert_eq Statement parse") {
+      assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False)")))
+      assert(AssertEqualStmt(BoolValue(false), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(False,False)")))
+      assert(AssertEqualStmt(BoolValue(true), BoolValue(true)) == parseAbs(parse(multStatementParser, "assert_eq(True,True)")))
+      assert(AssertEqualStmt(IntValue(2), RealValue(-40.4)) == parseAbs(parse(multStatementParser, "assert_eq(2,-40.4)")))
+      assert(AssertEqualStmt(VarExpression("x"), ArraySubscript(VarExpression("arr"), IntValue(4))) == parseAbs(parse(multStatementParser, "assert_eq(x,arr[4])")))
+      assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(5)), IntValue(50)) == parseAbs(parse(multStatementParser, "assert_eq(45+5, 50)")))
+      assert(AssertEqualStmt(AddExpression(IntValue(45), IntValue(-5)), IntValue(40)) == parseAbs(parse(multStatementParser, "assert_eq(45+-5, 40)")))
+    }
+
+    test("Testing assert_ne Statement parse") {
 
       assert(AssertNotEqualStmt(BoolValue(true),BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_ne(True, False)")))
       assert(AssertNotEqualStmt(VarExpression("x"),VarExpression("y")) == parseAbs(parse(multStatementParser, "assert_ne(x,y)")))
@@ -290,6 +296,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
 
     test("Testing Statement sequence parser") {
         assert(SequenceStmt(List(ReadRealStmt("oi"), ReadRealStmt("oi"))) == parseAbs(parse(multStatementParser, "readReal(oi);readReal(oi)")))
+
     }
 
     test("Testing Procedure parser"){
