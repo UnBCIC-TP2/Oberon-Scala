@@ -96,40 +96,35 @@ class CoreVisitor() extends OberonVisitorAdapter {
         throw new IllegalArgumentException("elsifStmts cannot be empty.")
     }
 
-private def transformProcedureListStatement(listProcedures: List[Procedure], proceduresCore: ListBuffer[Procedure] = new ListBuffer[Procedure]): List[Procedure] = {
-    for (procedure <- listProcedures){
-      proceduresCore += Procedure(
-        name = procedure.name,
-        args = procedure.args,
-        returnType = procedure.returnType,
-        constants = procedure.constants,
-        variables = procedure.variables,
-        stmt = procedure.stmt.accept(this))
+  private def transformProcedureStatement(procedure: Procedure): Procedure = {
+      Procedure(
+      name = procedure.name,
+      args = procedure.args,
+      returnType = procedure.returnType,
+      constants = procedure.constants,
+      variables = procedure.variables,
+      stmt = procedure.stmt.accept(this))
     }
-    proceduresCore.toList
-  }
 
   def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] = stmts.flatMap {
     case SequenceStmt(ss) => flatSequenceOfStatements(ss)
     case s => List(s)
   }
 
-
   def transformModule(module: OberonModule): OberonModule = {
     // É possível remover essa val?
     val stmtcore = module.stmt.get.accept(this)
 
-    OberonModule(
+     OberonModule(
       name = module.name,
       submodules = module.submodules,
       userTypes = module.userTypes,
       constants = module.constants,
       variables = module.variables ++ addedVariables,
-      procedures = transformProcedureListStatement(module.procedures),
+      procedures = module.procedures.map(transformProcedureStatement(_)),
       stmt = Some(stmtcore)
     )
   }
-
 }
 
 object CoreChecker {
