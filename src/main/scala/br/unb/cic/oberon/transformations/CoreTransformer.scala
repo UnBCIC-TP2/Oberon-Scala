@@ -117,12 +117,11 @@ private def transformProcedureListStatement(listProcedures: List[Procedure], pro
     proceduresCore.toList
   }
 
-  def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] =
-    stmts match {
-      case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
-      case s :: rest => s :: flatSequenceOfStatements(rest)
-      case Nil => List()
-    }
+  def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] = stmts.flatMap {
+    case SequenceStmt(ss) => flatSequenceOfStatements(ss)
+    case s => List(s)
+  }
+
 
   def transformModule(module: OberonModule): OberonModule = {
     // É possível remover essa val?
