@@ -104,11 +104,11 @@ trait StatementParser extends ExpressionParser {
     |   identifier ^^ VarAssignment
     )
 
-    def elseIfStmtParser: Parser[ElseIfStmt] = (expressionParser <~ "THEN") ~ statementParser ^^ { case cond ~ stmt => ElseIfStmt(cond, stmt) }
+    def elseIfStmtParser: Parser[ElseIfStmt] = (expressionParser <~ "THEN") ~ multStatementParser ^^ { case cond ~ stmt => ElseIfStmt(cond, stmt) }
 
     def caseAlternativeParser: Parser[CaseAlternative] = (
-        (expressionParser <~ ':') ~ statementParser ^^ { case cond ~ stmt => SimpleCase(cond, stmt) }
-    |   (expressionParser <~ "..") ~ (expressionParser <~ ':') ~ statementParser ^^ { case min ~ max ~ stmt => RangeCase(min, max, stmt) }
+        (expressionParser <~ ':') ~ multStatementParser ^^ { case cond ~ stmt => SimpleCase(cond, stmt) }
+    |   (expressionParser <~ "..") ~ (expressionParser <~ ':') ~ multStatementParser ^^ { case min ~ max ~ stmt => RangeCase(min, max, stmt) }
     );
 
     def buildForRangeStmt(id: String, min: Expression, max: Expression, stmt: Statement): Statement = {
@@ -134,17 +134,17 @@ trait StatementParser extends ExpressionParser {
             case Some(_) => throw new Exception("assert_error is a reserved word that receives no arguments")
         }
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
-    |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
+    |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
-    |   ("IF" ~> expressionParser <~ "THEN") ~ statementParser ~ rep1("ELSIF" ~> elseIfStmtParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ 
+    |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ rep1("ELSIF" ~> elseIfStmtParser) ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseifs ~ elseStmt => IfElseIfStmt(cond, stmt, elseifs, elseStmt) }
-    |   "WHILE" ~> expressionParser ~ ("DO" ~> statementParser <~ "END") ^^ { case cond ~ stmt => WhileStmt(cond, stmt) }
-    |   "REPEAT" ~> (statementParser <~ "UNTIL") ~ expressionParser ^^ { case stmt ~ cond => RepeatUntilStmt(cond, stmt) }
-    |   "FOR" ~> statementParser ~ ("TO" ~> expressionParser <~ "DO") ~ statementParser <~ "END" ^^ 
+    |   "WHILE" ~> expressionParser ~ ("DO" ~> multStatementParser <~ "END") ^^ { case cond ~ stmt => WhileStmt(cond, stmt) }
+    |   "REPEAT" ~> (multStatementParser <~ "UNTIL") ~ expressionParser ^^ { case stmt ~ cond => RepeatUntilStmt(cond, stmt) }
+    |   "FOR" ~> statementParser ~ ("TO" ~> expressionParser <~ "DO") ~ multStatementParser <~ "END" ^^
         { case indexes ~ cond ~ stmt => ForStmt(indexes, cond, stmt) }
-    |   ("FOR" ~> identifier <~ "IN") ~ expressionParser ~ (".." ~> expressionParser <~ "DO") ~ statementParser <~ "END" ^^
+    |   ("FOR" ~> identifier <~ "IN") ~ expressionParser ~ (".." ~> expressionParser <~ "DO") ~ multStatementParser <~ "END" ^^
         { case id ~ min ~ max ~ stmt => buildForRangeStmt(id, min, max, stmt) }
-    |   "LOOP" ~> statementParser <~ "END" ^^ LoopStmt
+    |   "LOOP" ~> multStatementParser <~ "END" ^^ LoopStmt
     |   "RETURN" ~> expressionParser ^^ ReturnStmt
     |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^
         { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
@@ -274,7 +274,7 @@ trait OberonParserFull extends StatementParser {
     
     class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
     def declarationsParser: Parser[DeclarationProps] =
-        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ^^ 
+        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ^^
         { case userTypes ~ constants ~ vars ~ procedures => new DeclarationProps(userTypes, constants, vars, procedures) }
     
     def blockParser: Parser[Option[Statement]] = optSolver("BEGIN" ~> multStatementParser <~ "END")

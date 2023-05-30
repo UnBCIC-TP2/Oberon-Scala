@@ -24,6 +24,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
+                        //tests: List[Test],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)

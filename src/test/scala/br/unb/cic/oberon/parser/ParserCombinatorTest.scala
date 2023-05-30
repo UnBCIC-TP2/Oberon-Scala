@@ -1072,6 +1072,22 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
     assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
 
   }
+  test("Testing interpreter_stmt01 code.") {
+    val module = parseResource("stmts/interpreter_stmt01.oberon")
+
+    assert(module.name == "SimpleModule")
+    assert(module.variables.length == 3)
+  }
+
+  ignore("Testing array declaration") {
+    val props = parseAbs(parse(declarationsParser,
+      """
+        VAR
+          array : ARRAY 3 OF INTEGER;
+          outroarray : ARRAY 2 OF INTEGER;
+        """))
+    assert(props.userTypes == List(VariableDeclaration("array",ArrayType(3,IntegerType)), VariableDeclaration("outroarray",ArrayType(2,IntegerType))))
+  }
 
   test("Testing the import parser") {
     assert(Set("A") == parseAbs(parse(importsParser, "IMPORT A;")))
@@ -1086,6 +1102,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
+        //List(),
         None
       )
       == parseAbs(parse(oberonParser,"""
@@ -1107,6 +1124,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
+        //List(),
         Some(WriteStmt(VarExpression("A::x")))
       )
     )
@@ -1118,6 +1136,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
+        //List(),
         Some(SequenceStmt(List(WriteStmt(VarExpression("A::x")),WriteStmt(VarExpression("C::x")))))
       )
     )
@@ -1129,6 +1148,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
+        //List(),
         Some(WriteStmt(VarExpression("alias::x")))
       )
     )
@@ -1140,8 +1160,10 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
+        //List(),
         Some(SequenceStmt(List(WriteStmt(VarExpression("aliasA::x")),WriteStmt(VarExpression("aliasC::x")))))
       )
     )
   }
+
 }

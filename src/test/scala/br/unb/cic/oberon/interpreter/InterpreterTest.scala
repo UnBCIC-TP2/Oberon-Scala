@@ -3,18 +3,18 @@ package br.unb.cic.oberon.interpreter
 import java.nio.file.{Files, Paths}
 
 import br.unb.cic.oberon.ir.ast._
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.scalatest.funsuite.AnyFunSuite
 
-class InterpreterTest extends AnyFunSuite {
+class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
   val interpreter = new Interpreter()
 
   interpreter.setTestEnvironment()
 
   test("Testing interpreter on interpreter_stmt01 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt01.oberon")
+    val module = parseResource("stmts/interpreter_stmt01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -31,7 +31,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial01 program: factorial(5)") {
-    val module = ScalaParser.parseResource("procedures/interpreter_factorial01.oberon")
+    val module = parseResource("procedures/interpreter_factorial01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -46,7 +46,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial02 program: factorial(1)") {
-    val module = ScalaParser.parseResource("procedures/interpreter_factorial02.oberon")
+    val module = parseResource("procedures/interpreter_factorial02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -61,7 +61,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial03 program: factorial(0)") {
-    val module = ScalaParser.parseResource("procedures/interpreter_factorial03.oberon")
+    val module = parseResource("procedures/interpreter_factorial03.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -76,7 +76,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci program: Fibonacci index 7 = 13") {
-    val module = ScalaParser.parseResource("procedures/interpreter_fibonacci01.oberon")
+    val module = parseResource("procedures/interpreter_fibonacci01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -88,7 +88,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt02 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt02.oberon")
+    val module = parseResource("stmts/interpreter_stmt02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -103,7 +103,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt03 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt03.oberon")
+    val module = parseResource("stmts/interpreter_stmt03.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -118,7 +118,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt04 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt04.oberon")
+    val module = parseResource("stmts/interpreter_stmt04.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -133,7 +133,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt05 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt05.oberon")
+    val module = parseResource("stmts/interpreter_stmt05.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -148,7 +148,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt06 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt06.oberon")
+    val module = parseResource("stmts/interpreter_stmt06.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -163,7 +163,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt07 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt07.oberon")
+    val module = parseResource("stmts/interpreter_stmt07.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -178,7 +178,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
-    val module = ScalaParser.parseResource("procedures/interpreter_fibonacci02.oberon")
+    val module = parseResource("procedures/interpreter_fibonacci02.oberon")
     
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -191,7 +191,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
-    val module = ScalaParser.parseResource("procedures/interpreter_factorial04.oberon")
+    val module = parseResource("procedures/interpreter_factorial04.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -206,7 +206,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt08 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt08.oberon")
+    val module = parseResource("stmts/interpreter_stmt08.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -221,7 +221,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing interpreter on interpreter_stmt09 program") {
-    val module = ScalaParser.parseResource("stmts/interpreter_stmt09.oberon")
+    val module = parseResource("stmts/interpreter_stmt09.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -236,7 +236,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt01 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt01.oberon")
+    val module = parseResource("stmts/IfElseIfStmt01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -250,7 +250,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt02 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt02.oberon")
+    val module = parseResource("stmts/IfElseIfStmt02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -264,7 +264,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt03 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt03.oberon")
+    val module = parseResource("stmts/IfElseIfStmt03.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -278,7 +278,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt04 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt04.oberon")
+    val module = parseResource("stmts/IfElseIfStmt04.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -292,7 +292,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt05 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt05.oberon")
+    val module = parseResource("stmts/IfElseIfStmt05.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -306,7 +306,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt06 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt06.oberon")
+    val module = parseResource("stmts/IfElseIfStmt06.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -320,7 +320,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt07 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt07.oberon")
+    val module = parseResource("stmts/IfElseIfStmt07.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -334,7 +334,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing IFELSEIF stmt on IfElseIfStmt08 program") {
-    val module = ScalaParser.parseResource("stmts/IfElseIfStmt08.oberon")
+    val module = parseResource("stmts/IfElseIfStmt08.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -348,7 +348,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt01 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt01.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -363,7 +363,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt02 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt02.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -378,7 +378,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt03 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt03.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt03.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -392,7 +392,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt04 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt04.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt04.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -406,7 +406,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt05 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt05.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt05.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -420,7 +420,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt06 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt06.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt06.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -434,7 +434,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt07 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt07.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt07.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -448,7 +448,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt08.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt08.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -467,7 +467,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -484,7 +484,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -502,7 +502,7 @@ class InterpreterTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -516,7 +516,7 @@ class InterpreterTest extends AnyFunSuite {
 
 
   test("Testing array manipulation using the stmt35 oberon module") {
-    val module = ScalaParser.parseResource("stmts/stmt35.oberon")
+    val module = parseResource("stmts/stmt35.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -530,7 +530,7 @@ class InterpreterTest extends AnyFunSuite {
   }
   
   test("stmt36") {
-    val module = ScalaParser.parseResource("stmts/stmt36.oberon")
+    val module = parseResource("stmts/stmt36.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -545,7 +545,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("stmt37") {
-    val module = ScalaParser.parseResource("stmts/stmt37.oberon")
+    val module = parseResource("stmts/stmt37.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -558,7 +558,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Module A has no imports"){
-    val module = ScalaParser.parseResource("imports/A.oberon")
+    val module = parseResource("imports/A.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -571,7 +571,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   ignore("Module B imports A"){
-    val module = ScalaParser.parseResource("imports/B.oberon")
+    val module = parseResource("imports/B.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -585,7 +585,7 @@ class InterpreterTest extends AnyFunSuite {
 
 
   ignore("Module F imports A using alias"){
-    val module = ScalaParser.parseResource("imports/F.oberon")
+    val module = parseResource("imports/F.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -598,7 +598,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   ignore("Module D imports A and C (A and C hava a variable 'x')"){
-    val module = ScalaParser.parseResource("imports/D.oberon")
+    val module = parseResource("imports/D.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
@@ -612,7 +612,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing ArrayAssignmentStmt03"){
-    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt03.oberon")
+    val module = parseResource("stmts/ArrayAssignmentStmt03.oberon")
 
     assert(module.name == "ArrayAssignmentStmt03")
     module.accept(interpreter)
@@ -629,7 +629,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing ArrayAssignmentStmt06"){
-    val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt06.oberon")
+    val module = parseResource("stmts/ArrayAssignmentStmt06.oberon")
 
     assert(module.name == "ArrayAssignmentStmt06")
     module.accept(interpreter)
@@ -642,7 +642,7 @@ class InterpreterTest extends AnyFunSuite {
   }
   
   test("Testing aritmetic37"){
-    val module = ScalaParser.parseResource("aritmetic/aritmetic37.oberon")
+    val module = parseResource("aritmetic/aritmetic37.oberon")
 
     assert(module.name == "Aritmetic37")
     module.accept(interpreter)
@@ -655,7 +655,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test("Testing procedure06"){
-    val module = ScalaParser.parseResource("procedures/procedure06.oberon")
+    val module = parseResource("procedures/procedure06.oberon")
 
     assert(module.name == "Procedure06")
     module.accept(interpreter)
@@ -667,7 +667,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test(testName = "Testing boolean32"){
-    val module = ScalaParser.parseResource("boolean/boolean32.oberon")
+    val module = parseResource("boolean/boolean32.oberon")
 
     assert(module.name == "Boolean32")
 
@@ -679,7 +679,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test(testName = "Testing the module ForEachStmt"){
-    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
+    val module = parseResource("stmts/ForEachStmt.oberon")
     assert(module.name == "ForEachStmt")
 
     assert(module.stmt.isDefined)
@@ -690,7 +690,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test(testName = "Testing the module SUMMATION"){
-    val module = ScalaParser.parseResource("recursion/Summation.oberon")
+    val module = parseResource("recursion/Summation.oberon")
     assert(module.name == "SUMMATION")
 
     assert(module.stmt.isDefined)
@@ -701,7 +701,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test(testName = "Testing bee1013: Sample Test 1"){
-    val module = ScalaParser.parseResource("stmts/bee1013_stmt01.oberon")
+    val module = parseResource("stmts/bee1013_stmt01.oberon")
     assert(module.name == "bee1013")
 
     assert(module.stmt.isDefined)
@@ -712,7 +712,7 @@ class InterpreterTest extends AnyFunSuite {
   }
 
   test(testName = "Testing bee1013: Sample Test 2"){
-    val module = ScalaParser.parseResource("stmts/bee1013_stmt02.oberon")
+    val module = parseResource("stmts/bee1013_stmt02.oberon")
     assert(module.name == "bee1013")
 
     assert(module.stmt.isDefined)
