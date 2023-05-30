@@ -34,13 +34,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
     case _ => stmt
   }
 
-  private var nextCaseId = 0
-
-  private def getNextCaseId(): Int = {
-    val returnId = nextCaseId
-    nextCaseId += 1
-    returnId
-  }
+  private val caseIdGenerator: Iterator[Int] = Iterator.from(0)
 
   private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
     val coreElseStmt = elseStmt.map(_.accept(this))
@@ -49,7 +43,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
 
     val caseExpressionId = exp match {
       case VarExpression(name) => name
-      case _ => f"case_exp#${getNextCaseId}"
+      case _ => f"case_exp#${caseIdGenerator.next()}"
     }
     val caseExpressionEvaluation = AssignmentStmt(VarAssignment(caseExpressionId), exp)
 
