@@ -86,17 +86,15 @@ class CoreVisitor() extends OberonVisitorAdapter {
     }
   }
 
-  private def transformElsif (elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = {
-    val coreElseStmt = elseStmt.map(_.accept(this))
-    val currentElsif = elsifStmts.head
-
-    if (elsifStmts.tail.isEmpty) {
-      IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), coreElseStmt)
-    } else {
-      val nextElsif = Some(transformElsif(elsifStmts.tail, coreElseStmt))
-      IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), nextElsif)
+  private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement =
+    elsifStmts match {
+      case currentElsif :: Nil =>
+        IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), elseStmt.map(_.accept(this)))
+      case currentElsif :: tail =>
+        IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), Some(transformElsif(tail, elseStmt.map(_.accept(this)))))
+      case Nil =>
+        throw new IllegalArgumentException("elsifStmts cannot be empty.")
     }
-  }
 
 private def transformProcedureListStatement(listProcedures: List[Procedure], proceduresCore: ListBuffer[Procedure] = new ListBuffer[Procedure]): List[Procedure] = {
     for (procedure <- listProcedures){
