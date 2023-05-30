@@ -12,7 +12,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
 
   override def visit(stmt: Statement): Statement = stmt match {
     case SequenceStmt(stmts) =>
-      SequenceStmt(flatSequenceOfStatements(SequenceStmt(transformListStmts(stmts)).stmts))
+      SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map(_.accept(this))).stmts))
 
     case LoopStmt(stmt) =>
       WhileStmt(BoolValue(true), stmt.accept(this))
@@ -43,7 +43,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
   }
 
   private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
-    val coreElseStmt = if (elseStmt.isEmpty) None else Some(elseStmt.get.accept(this))
+    val coreElseStmt = elseStmt.map(_.accept(this))
 
     // TODO corrigir comportamento para outras expressões
 
@@ -93,7 +93,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
   }
 
   private def transformElsif (elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement = {
-    val coreElseStmt = if (elseStmt.isEmpty) None else Some(elseStmt.get.accept(this))
+    val coreElseStmt = elseStmt.map(_.accept(this))
     val currentElsif = elsifStmts.head
 
     if (elsifStmts.tail.isEmpty) {
@@ -104,34 +104,17 @@ class CoreVisitor() extends OberonVisitorAdapter {
     }
   }
 
-  private def transformListStmts(stmtsList: List[Statement], stmtsCore: ListBuffer[Statement] = new ListBuffer[Statement]): List[Statement] = {
-
-    if (!stmtsList.isEmpty){
-      stmtsCore += stmtsList.head.accept(this);
-      stmtsCore :: transformListStmts(stmtsList.tail, stmtsCore)
-    }
-    else {
-      return Nil
-    }
-
-    stmtsCore.toList
-  }
-
-  private def transformProcedureListStatement(listProcedures: List[Procedure]): List[Procedure] = {
-
-    var listProceduresCore = ListBuffer[Procedure]()
-
+private def transformProcedureListStatement(listProcedures: List[Procedure], proceduresCore: ListBuffer[Procedure] = new ListBuffer[Procedure]): List[Procedure] = {
     for (procedure <- listProcedures){
-      addedVariables = Nil
-      val coreStmt = procedure.stmt.accept(this)
-      listProceduresCore += Procedure(name = procedure.name,
+      proceduresCore += Procedure(
+        name = procedure.name,
         args = procedure.args,
         returnType = procedure.returnType,
         constants = procedure.constants,
-        variables = procedure.variables ++ addedVariables,
-        stmt = coreStmt)
+        variables = procedure.variables,
+        stmt = procedure.stmt.accept(this))
     }
-    listProceduresCore.toList
+    proceduresCore.toList
   }
 
   def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] =
@@ -142,21 +125,18 @@ class CoreVisitor() extends OberonVisitorAdapter {
     }
 
   def transformModule(module: OberonModule): OberonModule = {
-    
-    val stmtprocedureList = transformProcedureListStatement(module.procedures)
+    // É possível remover essa val?
     val stmtcore = module.stmt.get.accept(this)
 
-     val coreModule = OberonModule(
+    OberonModule(
       name = module.name,
       submodules = module.submodules,
       userTypes = module.userTypes,
       constants = module.constants,
       variables = module.variables ++ addedVariables,
-      procedures = stmtprocedureList,
+      procedures = transformProcedureListStatement(module.procedures),
       stmt = Some(stmtcore)
     )
-
-    coreModule
   }
 
 }
