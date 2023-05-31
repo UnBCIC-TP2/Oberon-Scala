@@ -1027,6 +1027,56 @@ test("Testing the oberon stmt22 code. This module implements a case statement in
 
   }
 
+
+  test("Testing the oberon stmt23 code. This module has a while with a case statement") {
+    val module = parseResource("stmts/stmt23.oberon")
+
+    assert(module.name == "WhileCaseModule")
+
+    assert(module.variables.length == 2)
+
+    module.stmt.getOrElse(None) match {
+      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case _ => fail("This module should have a sequence of 3 statements!")
+    }
+
+    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(sequenceStmts(0) == AssignmentStmt("x", IntValue(0)))
+
+    val myWhileStmt = sequenceStmts(1).asInstanceOf[WhileStmt];
+
+    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20)))
+
+    myWhileStmt.stmt match {
+      case SequenceStmt(stmts) => assert(stmts.length == 2)
+      case _ => fail("Expected a sequence of statements in the while statement!")
+    }
+
+    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[CaseStmt]
+
+    assert(innerCase.exp == VarExpression("x"))
+
+    assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+
+    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum",
+      AddExpression(VarExpression("sum"), VarExpression("x")))))
+
+    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")),
+      AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
+
+    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
+      VarExpression("sum"), MultExpression(IntValue(2), VarExpression("x"))))))
+
+    assert(innerCase.elseStmt == None)
+
+    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
+      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+
+    assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
+
+  }
+
   test("Testing the oberon stmt25 code. This module tests if a ForRange stmt is correctly converted to a For stmt") {
     val module = parseResource("stmts/stmt25.oberon")
 
