@@ -12,7 +12,7 @@ import java.beans.Expression
 class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaParser {
 
 
-  ignore("Testing the oberon stmt03 code. This module has IF-THEN statement") {
+  test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
     val module = parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
@@ -36,7 +36,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     stmts(2) match {
       case IfElseStmt(cond, s1, s2) =>
         assert(cond == GTExpression(VarExpression("x"), VarExpression("max")))
-        assert(s1 == AssignmentStmt("max", VarExpression("x")))
+        assert(s1 == SequenceStmt(List(AssignmentStmt("max", VarExpression("x")),AssignmentStmt("x",IntValue(0)))))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
@@ -74,7 +74,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
-  ignore("Testing the oberon stmt11 code. This module has a For statement") {
+  test("Testing the oberon stmt11 code. This module has a For statement") {
     val module = parseResource("stmts/stmt11.oberon")
 
     assert(module.name == "SimpleModule")

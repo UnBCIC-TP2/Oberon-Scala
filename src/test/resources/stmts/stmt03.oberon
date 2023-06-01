@@ -6,8 +6,9 @@ VAR
 BEGIN
  readInt(x);
  readInt(max);
- IF(x > max) THEN
-   max := x 
+ IF (x > max) THEN
+   max := x;
+   x := 0
  END; 
  write(max)
 END

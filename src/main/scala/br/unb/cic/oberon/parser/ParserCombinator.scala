@@ -53,6 +53,8 @@ trait ExpressionParser extends BasicParsers {
         case None ~ id2 =>  id2
     }
     def variableParser: Parser[Expression] = qualifiedName ^^ VarExpression
+
+    def notParser: Parser[Expression] = '~' ~> expressionParser ^^ NotExpression
     def argumentsParser: Parser[List[Expression]] = expressionParser ~ rep("," ~> expressionParser) ^^ { case a ~ b => List(a) ++ b }
     def functionParser: Parser[Expression] = qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
         case name ~ None => FunctionCallExpression(name, List())
@@ -60,18 +62,21 @@ trait ExpressionParser extends BasicParsers {
     }
     def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
-    def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | "(" ~> expressionParser <~ ")" ^^ Brackets
+    def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | "(" ~> expressionParser <~ ")"  ^^ Brackets
 
     def complexTerm: Parser[Expression] = (
-        factor ~ ("[" ~> expressionParser <~ ("]" ~ not(":="))) ^^ { case a ~ b => ArraySubscript(a, b)}
+        "~" ~> expressionParser ^^ NotExpression
+    |   factor ~ ("[" ~> expressionParser <~ ("]" ~ not(":="))) ^^ { case a ~ b => ArraySubscript(a, b)}
     |   factor ~ ("." ~> identifier) ^^ { case a ~ b => FieldAccessExpression(a, b)}
     |   factor
+
     )
 
     def mulExpParser: Parser[Expression => Expression] = (
         "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
     |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
     |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
+    |   "MOD" ~ complexTerm ^^ {case _ ~ b => ModExpression(_, b) }
     )
     def mulTerm: Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
 
@@ -135,7 +140,7 @@ trait StatementParser extends ExpressionParser {
         }
 
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
-    |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
+    |   ("IF" ~> expressionParser  <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ rep1("ELSIF" ~> elseIfStmtParser) ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseifs ~ elseStmt => IfElseIfStmt(cond, stmt, elseifs, elseStmt) }
@@ -145,6 +150,8 @@ trait StatementParser extends ExpressionParser {
         { case indexes ~ cond ~ stmt => ForStmt(indexes, cond, stmt) }
     |   ("FOR" ~> identifier <~ "IN") ~ expressionParser ~ (".." ~> expressionParser <~ "DO") ~ multStatementParser <~ "END" ^^
         { case id ~ min ~ max ~ stmt => buildForRangeStmt(id, min, max, stmt) }
+    |   ("FOREACH" ~> identifier <~ "IN") ~ expressionParser ~ multStatementParser <~ "END" ^^
+        {case id ~ exp ~ stmt => ForEachStmt(id,exp, stmt)}
     |   "LOOP" ~> multStatementParser <~ "END" ^^ LoopStmt
     |   "RETURN" ~> expressionParser ^^ ReturnStmt
     |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^
@@ -179,7 +186,7 @@ trait OberonParserFull extends StatementParser {
 
     // VariableDeclaration
     def varListParser: Parser[List[String]] = identifier ~ rep("," ~> identifier) ^^ { case a ~ b => List(a) ++ b }
-    def varDeclarationParserTerm: Parser[List[VariableDeclaration]] = (varListParser <~ ":") ~ (typeParser | userTypeParser) ^^ 
+    def varDeclarationParserTerm: Parser[List[VariableDeclaration]] = (varListParser <~ ":") ~ (userTypeParser | typeParser) ^^
         { case varList ~ varType => varList.map(VariableDeclaration(_, varType)) }
     def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> rep1(varDeclarationParserTerm <~ ";") ^^ { a => a.flatten }
 
