@@ -6,6 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.Map
 import java.beans.Expression
+import java.nio.file.{Files, Paths}
 
 
 class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParser {
@@ -1434,5 +1435,93 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
       )
     )
   }
+  test("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type") {
+    val module = parseResource("simple/userTypeSimple07.oberon")
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 1)
+
+    assert(module.procedures.length == 1)
+
+    val userProcedure = module.procedures.head
+
+    assert(userProcedure.name == "initialize_array")
+    assert(userProcedure.args.length == 1)
+    assert(userProcedure.returnType.get.asInstanceOf[ReferenceToUserDefinedType] == ReferenceToUserDefinedType("simple"))
+    assert(userProcedure.variables.length == 1)
+    assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
+  }
+
+  test("Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD") {
+    val module = parseResource("aritmetic/aritmetic38.oberon")
+
+    assert(module.name == "Aritmetic38")
+    assert(module.constants.size == 1)
+    assert(module.constants.head ==
+      Constant("x", AddExpression(IntValue(6), ModExpression(IntValue(5), IntValue(4)))))
+  }
+
+  test("Testing module B oberon import module feature. Import one module") {
+    val moduleB = parseResource("imports/B.oberon")
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleB.submodules)
+  }
+
+  test("Testing module D oberon import module feature. Import two modules") {
+    val moduleD = parseResource("imports/D.oberon")
+
+    val expectedSet = Set("A", "C")
+    assert(expectedSet == moduleD.submodules)
+  }
+
+  test("Testing LoopStmt stmt on loop_stmt01 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = parseAbs(parse(oberonParser, content))
+
+    assert(module.name == "LoopStmt")
+
+    assert(module.variables.size == 1)
+    assert(module.stmt.isDefined)
+  }
+  test("Testing LoopStmt stmt on loop_stmt02 program") {
+    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = parseAbs(parse(oberonParser, content))
+
+    assert(module.name == "LoopStmt")
+
+    assert(module.variables.size == 2)
+    assert(module.stmt.isDefined)
+  }
+  test("Printing new types on console") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = parseAbs(parse(oberonParser, content))
+
+    assert(module.name == "SimpleModule")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts(5) == WriteStmt(VarExpression("v")))
+    assert(stmts(6) == WriteStmt(VarExpression("w")))
+    assert(stmts(7) == WriteStmt(VarExpression("x")))
+    assert(stmts(8) == WriteStmt(VarExpression("y")))
+    assert(stmts(9) == WriteStmt(VarExpression("z")))
+  }
+
+
+
 
 }
