@@ -632,8 +632,6 @@ test("Testing the oberon arrayIndex02 code. This module has a ArrayIndex") {
     assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
     assert(stmts(3) == WriteStmt(VarExpression("z")))
   }
-
-
 test("Testing the oberon stmt06 code. This module has a simple case statement") {
     val module = parseResource("stmts/stmt06.oberon")
 
@@ -778,8 +776,6 @@ test("Testing the oberon stmt09 code. This module has a For statement") {
     assert(stmts(1) == WriteStmt(VarExpression("z")))
 
   }
-
-
   test("Testing the oberon stmt13 code. This module has a For statement") {
     val module = parseResource("stmts/stmt13.oberon")
 
@@ -1047,12 +1043,6 @@ test("Testing the oberon stmt22 code. This module implements a case statement in
     assert(stmts(1) == new AssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
 
   }
-
-
-
-
-
-
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val module = parseResource("procedures/procedure01.oberon")
 
@@ -1106,6 +1096,39 @@ test("Testing the oberon stmt22 code. This module implements a case statement in
     val stmt = module.stmt.get.asInstanceOf[SequenceStmt]
 
     assert(stmt.stmts.head == ReadIntStmt("base"))
+  }
+  test("Testing the oberon procedure03 code. This module implements a fatorial function") {
+    val module = ScalaParser.parseResource("procedures/procedure03.oberon")
+
+    assert(module.name == "Factorial")
+
+    assert(module.procedures.size == 1)
+    assert(module.stmt.isDefined)
+
+    val procedure = module.procedures.head
+
+    assert(procedure.name == "factorial")
+    assert(procedure.args.size == 1)
+    assert(procedure.returnType == Some(IntegerType))
+
+    procedure.stmt match {
+      case SequenceStmt(_) => succeed
+      case _ => fail("expecting a sequence of stmts")
+    }
+
+    val SequenceStmt(stmts) = procedure.stmt // pattern matching...
+    assert(stmts.size == 2)
+
+    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
+    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+
+    module.stmt.get match {
+      case SequenceStmt(ss) => {
+        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("factorial", List(IntValue(5)))))
+        assert(ss(1) == WriteStmt(VarExpression("res")))
+      }
+      case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
+    }
   }
 
   test("Testing the oberon stmt31 module. This module has a RepeatUntil") {
