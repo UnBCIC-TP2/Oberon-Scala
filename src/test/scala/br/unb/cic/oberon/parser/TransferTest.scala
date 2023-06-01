@@ -8,11 +8,10 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.Map
 import java.beans.Expression
 
-
 class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaParser {
 
 
-  ignore("Testing the oberon stmt03 code. This module has IF-THEN statement") {
+  test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
     val module = parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
@@ -44,7 +43,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
 
-  ignore("Testing the oberon stmt04 code. This module has a While statement") {
+  test("Testing the oberon stmt04 code. This module has a While statement") {
     val module = parseResource("stmts/stmt04.oberon")
 
     assert(module.name == "SimpleModule")
@@ -74,7 +73,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
-  ignore("Testing the oberon stmt11 code. This module has a For statement") {
+  test("Testing the oberon stmt11 code. This module has a For statement") {
     val module = parseResource("stmts/stmt11.oberon")
 
     assert(module.name == "SimpleModule")
@@ -108,7 +107,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     }
 
   }
-  ignore("Testing the oberon stmt12 code. This module has a For statement") {
+  test("Testing the oberon stmt12 code. This module has a For statement") {
     val module = parseResource("stmts/stmt12.oberon")
 
     assert(module.name == "SimpleModule")
@@ -159,7 +158,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(7) == WriteStmt(VarExpression("u")))
   }
 
-  ignore("Testing the oberon stmt15 code. This module has a For statement") {
+  test("Testing the oberon stmt15 code. This module has a For statement") {
     val module = parseResource("stmts/stmt15.oberon")
 
     assert(module.name == "SimpleModule")
@@ -195,7 +194,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
 
   }
 
-  ignore("Testing the oberon stmt16 code. This module has a For statement") {
+  test("Testing the oberon stmt16 code. This module has a For statement") {
     val module = parseResource("stmts/stmt16.oberon")
 
     assert(module.name == "SimpleModule")
@@ -230,7 +229,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
 
   }
 
-  ignore("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
+  test("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
     val module = parseResource("stmts/stmt21.oberon")
 
     assert(module.name == "SimpleRangeCaseModule")
@@ -276,7 +275,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
 
   }
 
-  ignore("Testing the oberon stmt24 code. This module has a while with a case statement") {
+  test("Testing the oberon stmt24 code. This module has a while with a case statement") {
     val module = parseResource("stmts/stmt24.oberon")
 
     assert(module.name == "WhileCaseModule")
@@ -319,28 +318,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
 
   }
 
-
-  ignore("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
-    val module = parseResource("stmts/stmt29.oberon")
-
-    assert("ForRangeModule" == module.name)
-    assert(1 == module.variables.length)
-
-    assert(None != module.stmt.getOrElse(None))
-    val forStmt = module.stmt.get.asInstanceOf[ForStmt]
-
-    val initStmt = AssignmentStmt("x", IntValue(0))
-    val condExpr = LTEExpression(VarExpression("x"), IntValue(10))
-    val stmts = forStmt.stmt.asInstanceOf[SequenceStmt].stmts
-
-    assert(initStmt == forStmt.init)
-    assert(condExpr == forStmt.condition)
-    assert(WriteStmt(FunctionCallExpression("squareOf", List(VarExpression("x")))) == stmts(0))
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
-  }
-
-
-  ignore("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
+  test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
     val module = parseResource("stmts/stmt30.oberon")
 
     assert(module.name == "SimpleModule")
@@ -374,7 +352,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  ignore("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
+  test("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
     val module = parseResource("stmts/IfElseIfStmt09.oberon")
 
     assert(module.name == "SimpleModule")
@@ -407,7 +385,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
   }
 
 
-  ignore("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
+  test("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
     val module = parseResource("stmts/IfElseIfStmt10.oberon")
 
     assert(module.name == "SimpleModule")
@@ -457,7 +435,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  ignore("Testing the oberon procedure03 code. This module implements a fatorial function") {
+  test("Testing the oberon procedure03 code. This module implements a fatorial function") {
     val module = parseResource("procedures/procedure03.oberon")
 
     assert(module.name == "Factorial")
@@ -492,7 +470,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
   }
 
 
-  ignore("Testing the oberon ArrayAssignmentStmt02 code. This module has an array assignment in IF-THEN") {
+  test("Testing the oberon ArrayAssignmentStmt02 code. This module has an array assignment in IF-THEN") {
     val module = parseResource("stmts/ArrayAssignmentStmt02.oberon")
 
     assert(module.name == "SimpleModule")
@@ -524,70 +502,50 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
 
-  ignore("Testing the oberon stmt32 code. This module has some user types declarations") {
+  test("Testing the oberon stmt32 code. This module has some user types declarations") {
     val module = parseResource("stmts/stmt32.oberon")
-
     assert(module.name == "UserTypeModule")
     assert(!module.stmt.isDefined)
-
     assert(module.userTypes.size == 4)
   }
 
-  ignore("Testing the oberon stmt34 code. This module has a record and array type declarations") {
+  test("Testing the oberon stmt34 code. This module has a record and array type declarations") {
     val module = parseResource("stmts/stmt34.oberon")
-
-
     assert(module.name == "UserTypeModule")
-
     assert(!module.stmt.isDefined)
-
     assert(module.userTypes.size == 5)
-
     assert(module.userTypes(0).baseType == ArrayType(15, IntegerType))
 
   }
 
-  ignore("Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name") {
+  test("Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name") {
     val module = parseResource("stmts/ExpressionNameParser2.oberon")
-
     assert(module.name == "ExpressionNameModule")
-
     assert(module.stmt.isDefined)
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.asInstanceOf[IntValue].value == 1)
 
   }
 
 
-  ignore("Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words") {
+  test("Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words") {
     val module = parseResource("stmts/ExpressionNameParser3.oberon")
 
     assert(module.name == "ExpressionNameModule")
-
     assert(module.stmt.isDefined)
-
     assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
-
     assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[FieldAccessExpression])
-
     assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
   }
   
-  ignore("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names") {
+  test("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names") {
     val module = parseResource("stmts/ExpressionNameParser4.oberon")
 
     assert(module.name == "ExpressionNameModule")
-
     assert(module.stmt.isDefined)
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
-
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
 
   }
