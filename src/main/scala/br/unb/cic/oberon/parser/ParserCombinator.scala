@@ -72,6 +72,7 @@ trait ExpressionParser extends BasicParsers {
         "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
     |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
     |   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
+    |   "MOD" ~ complexTerm ^^ {case _ ~ b => ModExpression(_, b)}
     )
     def mulTerm: Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
 
