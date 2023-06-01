@@ -134,6 +134,7 @@ trait StatementParser extends ExpressionParser {
             case None => AssertError()
             case Some(_) => throw new Exception("assert_error is a reserved word that receives no arguments")
         }
+
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
@@ -221,20 +222,6 @@ trait OberonParserFull extends StatementParser {
             }
         }
     }
-    /*
-    def ignoreParser: Parser[Ignore] =
-        "IGNORE" ~ identifier ~ ("(" ~> string <~ ")") ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
-            case _ ~ name ~ description ~ _ ~ constants ~ variables ~ statements ~ endName => {
-                if (name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
-                Ignore(
-                    name,
-                    description,
-                    constants,
-                    variables,
-                    statements
-                )
-            }
-        }*/
 
     def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
         case mod ~ Some(a) => mod + ":=" + a
