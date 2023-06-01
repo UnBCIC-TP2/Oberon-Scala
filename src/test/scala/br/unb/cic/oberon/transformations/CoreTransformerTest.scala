@@ -1,14 +1,14 @@
 package br.unb.cic.oberon.transformations
 
 import br.unb.cic.oberon.AbstractTestSuite
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ir.ast._
 
 import java.nio.file.{Files, Paths}
 
-class CoreTransformerTest extends AbstractTestSuite {
+class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
 
   test("Testing the loop_stmt01 expressions after conversion to While") {
     val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
@@ -16,7 +16,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -50,7 +50,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -68,7 +68,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -104,7 +104,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -123,7 +123,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -168,7 +168,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -188,7 +188,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -225,7 +225,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parseResource("stmts/RepeatUntilStmt02.oberon")
+    val module = parseResource("stmts/RepeatUntilStmt02.oberon")
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -247,7 +247,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -267,7 +267,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -305,7 +305,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -325,7 +325,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -358,7 +358,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -379,7 +379,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -421,7 +421,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -442,7 +442,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -472,7 +472,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -494,7 +494,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -527,7 +527,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -548,7 +548,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -587,7 +587,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -608,7 +608,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -640,7 +640,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -660,7 +660,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -681,7 +681,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -713,7 +713,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -734,7 +734,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -770,7 +770,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -791,7 +791,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -826,7 +826,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -845,7 +845,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -881,7 +881,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -900,7 +900,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -937,7 +937,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -956,7 +956,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -992,7 +992,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val interpreter = new Interpreter()
     val coreVisitor = new CoreVisitor()
 
@@ -1011,7 +1011,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val coreVisitor = new CoreVisitor()
 
     val coreModule = coreVisitor.transformModule(module)
@@ -1051,7 +1051,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreVisitor = new CoreVisitor()
     val content = String.join("\n", Files.readAllLines(path))
 
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val isCore = CoreChecker.isModuleCore(module)
 
     val coreModule = coreVisitor.transformModule(module)
@@ -1069,7 +1069,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreVisitor = new CoreVisitor()
     val content = String.join("\n", Files.readAllLines(path))
 
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val isCore = CoreChecker.isModuleCore(module)
 
     val coreModule = coreVisitor.transformModule(module)
@@ -1087,7 +1087,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreVisitor = new CoreVisitor()
     val content = String.join("\n", Files.readAllLines(path))
 
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val isCore = CoreChecker.isModuleCore(module)
 
     val coreModule = coreVisitor.transformModule(module)
@@ -1105,7 +1105,7 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreVisitor = new CoreVisitor()
     val content = String.join("\n", Files.readAllLines(path))
 
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
     val isCore = CoreChecker.isModuleCore(module)
 
     val coreModule = coreVisitor.transformModule(module)

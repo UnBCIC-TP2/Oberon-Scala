@@ -138,7 +138,7 @@ trait StatementParser extends ExpressionParser {
             case None => AssertError()
             case Some(_) => throw new Exception("assert_error is a reserved word that receives no arguments")
         }
-
+    |    "NEW" ~> ('(' ~> identifier <~ ')') ^^ NewStmt
     |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser  <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }

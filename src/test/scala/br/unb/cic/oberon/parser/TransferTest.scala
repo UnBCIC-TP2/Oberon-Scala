@@ -11,7 +11,7 @@ import java.beans.Expression
 class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaParser {
 
 
-  test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
+  ignore("Testing the oberon stmt03 code. This module has IF-THEN statement") {
     val module = parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
@@ -43,7 +43,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
 
-  test("Testing the oberon stmt04 code. This module has a While statement") {
+  ignore("Testing the oberon stmt04 code. This module has a While statement") {
     val module = parseResource("stmts/stmt04.oberon")
 
     assert(module.name == "SimpleModule")

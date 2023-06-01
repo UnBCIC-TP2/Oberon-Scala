@@ -5,7 +5,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.ir.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.ir.ast.{OberonModule, VariableDeclaration}
@@ -14,7 +14,7 @@ import br.unb.cic.oberon.environment.Environment
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
-class TypeCheckerTestSuite  extends AbstractTestSuite {
+class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
 
   test("Test read int statement type checker") {
     val visitor = new TypeChecker()
@@ -713,7 +713,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
    * factorial procedure.
    */
   test("Test invalid procedure declaration") {
-    val module = ScalaParser.parseResource("procedures/procedure04.oberon")
+    val module = parseResource("procedures/procedure04.oberon")
 
     assert(module.name == "SimpleModule")
 
@@ -879,7 +879,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "LoopStmt")
 
@@ -892,7 +892,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
 
   test("Test assignment to pointer value") {
-    val module = ScalaParser.parseResource("stmts/tc_PointerAccessStmt.oberon")
+    val module = parseResource("stmts/tc_PointerAccessStmt.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
@@ -900,7 +900,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   test("Test arithmetic operation with pointers") {
-    val module = ScalaParser.parseResource("stmts/tc_PointerOperation.oberon")
+    val module = parseResource("stmts/tc_PointerOperation.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
@@ -908,7 +908,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
    test("Test incorrect assignment between pointer and simple type variable") {
-    val module = ScalaParser.parseResource("stmts/tc_PointerAssignmentWrong.oberon")
+    val module = parseResource("stmts/tc_PointerAssignmentWrong.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
@@ -921,7 +921,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   test("Test incorrect assignment between pointer and arithmetic operation") {
-    val module = ScalaParser.parseResource("stmts/tc_PointerOperationWrong.oberon")
+    val module = parseResource("stmts/tc_PointerOperationWrong.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
@@ -933,7 +933,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
     test("Test assignment of NullValue to pointer") {
-    val module = ScalaParser.parseResource("stmts/tc_PointerNull.oberon")
+    val module = parseResource("stmts/tc_PointerNull.oberon")
     val visitor = new TypeChecker()
     val errors = visitor.visit(module)
 
@@ -1362,7 +1362,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   test("Type checking foreach stmt") {
-    val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
+    val module = parseResource("stmts/ForEachStmt.oberon")
     assert(module.name == "ForEachStmt")
 
     val visitor = new TypeChecker()
@@ -1390,7 +1390,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   test("Type checker for the new stmt") {
-    val module = ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+    val module = parseResource("Pointers/pointerNewStatement.oberon")
     assert(module.name == "PointerNewStatement")
 
     assert(module.stmt.isDefined)
@@ -1404,7 +1404,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   }
 
   test("Type checker for the SUMMATION module") {
-    val module = ScalaParser.parseResource("recursion/Summation.oberon")
+    val module = parseResource("recursion/Summation.oberon")
     assert(module.name == "SUMMATION")
 
     assert(module.stmt.isDefined)
@@ -1418,14 +1418,14 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   test("Test valid lambda expression assignment") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC01.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC01.oberon")
     val res = module.accept(visitor)
     assert(res.isEmpty)
   }
 
   test("Test lambda expression assignment with wrong number of arguments.") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC02.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC02.oberon")
     val res = module.accept(visitor)
 
     assert(res.size == 1)
@@ -1435,7 +1435,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   test("Test lambda expression assignment with argument of wrong type.") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC03.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC03.oberon")
     val res = module.accept(visitor)
 
     assert(res.size == 1)
@@ -1445,7 +1445,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   test("Test lambda expression assignment with ill typed expression.") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC04.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC04.oberon")
     val res = module.accept(visitor)
     assert(res.size == 1)
     val msg = res(0)._2
@@ -1454,14 +1454,14 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
   test("Test lambda expression assignment to a constant.") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC05.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC05.oberon")
     val res = module.accept(visitor)
     assert(res.isEmpty)
   }
 
   test("Test lambda expression assignment with wrong return type.") {
     val visitor = new TypeChecker()
-    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC06.oberon")
+    val module = parseResource("lambda/lambdaExpressionsTC06.oberon")
     val res = module.accept(visitor)
 
     assert(res.size == 1)

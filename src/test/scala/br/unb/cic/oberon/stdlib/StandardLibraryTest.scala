@@ -2,17 +2,17 @@ package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ir.ast.{BoolValue, IntValue, RealValue, StringValue}
 import br.unb.cic.oberon.interpreter.Interpreter
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
-class StandardLibraryTest extends AnyFunSuite {
+class StandardLibraryTest extends AnyFunSuite with Oberon2ScalaParser {
 
   val interpreter = new Interpreter()
 
   interpreter.setTestEnvironment()
 
   test(testName = "Test for the INC function"){
-    val module = ScalaParser.parseResource("stmts/INCTest.oberon")
+    val module = parseResource("stmts/INCTest.oberon")
 
     assert(module.name == "INCTest")
 
@@ -24,7 +24,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the DEC function"){
-    val module = ScalaParser.parseResource("stmts/DECTest.oberon")
+    val module = parseResource("stmts/DECTest.oberon")
 
     assert(module.name == "DECTest")
 
@@ -36,7 +36,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
 
   test("Test for the ABS function") {
-    val module = ScalaParser.parseResource("stdlib/ABSTest.oberon")
+    val module = parseResource("stdlib/ABSTest.oberon")
 
     assert(module.name == "ABSTest")
 
@@ -48,7 +48,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test("Test for the ODD function") {
-    val module = ScalaParser.parseResource("stdlib/ODDTest.oberon")
+    val module = parseResource("stdlib/ODDTest.oberon")
 
     assert(module.name == "ODDTest")
 
@@ -62,7 +62,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the FLOOR function") {
-    val module = ScalaParser.parseResource("stdlib/FLRTest.oberon")
+    val module = parseResource("stdlib/FLRTest.oberon")
 
     assert(module.name == "FLOORTest")
 
@@ -74,7 +74,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the RND function") {
-    val module = ScalaParser.parseResource("stdlib/RNDTest.oberon")
+    val module = parseResource("stdlib/RNDTest.oberon")
 
     assert(module.name == "RNDTest")
 
@@ -86,7 +86,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the FLT function"){
-    val module = ScalaParser.parseResource("stdlib/FLTTest.oberon")
+    val module = parseResource("stdlib/FLTTest.oberon")
 
     assert(module.name == "FLTTest")
 
@@ -98,7 +98,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the POW function") {
-    val module = ScalaParser.parseResource("stdlib/POWTest.oberon")
+    val module = parseResource("stdlib/POWTest.oberon")
 
     assert(module.name == "POWTest")
 
@@ -110,7 +110,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the SQR function") {
-    val module = ScalaParser.parseResource("stdlib/SQRTest.oberon")
+    val module = parseResource("stdlib/SQRTest.oberon")
 
     assert(module.name == "SQRTest")
 
@@ -122,7 +122,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test("Test for the CEIL function") {
-    val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
+    val module = parseResource("stdlib/CEILTest.oberon")
 
     assert(module.name == "CEILTest")
 
@@ -135,7 +135,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test("Test for the READFILE function") {
-    val module = ScalaParser.parseResource("stdlib/READFILETest.oberon")
+    val module = parseResource("stdlib/READFILETest.oberon")
 
     assert(module.name == "READFILETest")
 
@@ -147,7 +147,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   ignore("Test for the WRITEFILE function") {
-    val module = ScalaParser.parseResource("stdlib/WRITEFILETest.oberon")
+    val module = parseResource("stdlib/WRITEFILETest.oberon")
 
     assert(module.name == "WRITEFILETest")
 
@@ -165,7 +165,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test("Test for the APPENDFILE function") {
-    val module = ScalaParser.parseResource("stdlib/APPENDFILETest.oberon")
+    val module = parseResource("stdlib/APPENDFILETest.oberon")
 
     assert(module.name == "APPENDFILETest")
 
@@ -183,7 +183,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
    test(testName = "Test for the STRINGTOINT function"){
-    val module = ScalaParser.parseResource("stdlib/STRINGTOINTTest.oberon")
+    val module = parseResource("stdlib/STRINGTOINTTest.oberon")
 
     assert(module.name == "STRINGTOINTTest")
 
@@ -195,7 +195,7 @@ class StandardLibraryTest extends AnyFunSuite {
   }
 
   test(testName = "Test for the STRINGTOREAL function"){
-    val module = ScalaParser.parseResource("stdlib/STRINGTOREALTest.oberon")
+    val module = parseResource("stdlib/STRINGTOREALTest.oberon")
 
     assert(module.name == "STRINGTOREALTest")
 

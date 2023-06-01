@@ -3,10 +3,10 @@ package br.unb.cic.oberon.interpreter
 import java.nio.file.{Files, Paths}
 
 import br.unb.cic.oberon.ir.ast._
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
-class NewTypesTest extends AnyFunSuite{
+class NewTypesTest extends AnyFunSuite with Oberon2ScalaParser {
 
   val interpreter = new Interpreter()
 
@@ -18,7 +18,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule")
 
@@ -55,7 +55,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule")
 
@@ -69,7 +69,7 @@ class NewTypesTest extends AnyFunSuite{
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule")
 

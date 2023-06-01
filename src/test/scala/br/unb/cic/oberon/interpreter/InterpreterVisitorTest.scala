@@ -3,13 +3,13 @@ package br.unb.cic.oberon.interpreter
 import java.nio.file.{Files, Paths}
 
 import br.unb.cic.oberon.ir.ast.{IntValue, OberonModule}
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
-class InterpreterVisitorTest extends AnyFunSuite{
+class InterpreterVisitorTest extends AnyFunSuite with Oberon2ScalaParser {
 
   test("Test interpreter on stmt05 program") {
-    val module = ScalaParser.parseResource("stmts/stmt05.oberon")
+    val module = parseResource("stmts/stmt05.oberon")
     val interpreter = new Interpreter()
     assert(module.name == "SimpleModule")
 
@@ -22,7 +22,8 @@ class InterpreterVisitorTest extends AnyFunSuite{
   }
 
   test("Test eval on factorial module") {
-    val module = ScalaParser.parseResource("procedures/procedure03.oberon")
+    val module = parseResource("procedures/procedure03.oberon")
+
     val interpreter = new Interpreter()
     assert(module.name == "Factorial")
 
