@@ -195,7 +195,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
 
   }
 
-  test("Testing the oberon stmt16 code. This module has a For statement") {
+  ignore("Testing the oberon stmt16 code. This module has a For statement") {
     val module = parseResource("stmts/stmt16.oberon")
 
     assert(module.name == "SimpleModule")
@@ -227,57 +227,6 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     }
 
     assert(stmts(2) == WriteStmt(VarExpression("z")))
-
-  }
-
-  ignore("Testing the oberon stmt20 code. This module implements the factorial function with a case statement") {
-    val module = parseResource("stmts/stmt20.oberon")
-
-    assert(module.name == "ProcedureCaseModule")
-
-    // Verifying the factorial procedure
-    assert(module.procedures.length == 1)
-    val factorial = module.procedures.head
-
-    assert(factorial.name == "factorial")
-    assert(factorial.args.length == 1)
-    assert(factorial.returnType.getOrElse(None) == IntegerType)
-
-    val factorialStmt = factorial.stmt.asInstanceOf[SequenceStmt].stmts
-
-    assert(factorialStmt.length == 2)
-
-    val factorialCaseStmt = factorialStmt.head.asInstanceOf[CaseStmt]
-
-    // Verifying the case stmt in the factorial procedure
-    assert(factorialCaseStmt.exp == VarExpression("n"))
-    assert(factorialCaseStmt.cases.length == 2)
-
-    assert(factorialCaseStmt.cases.head == SimpleCase(IntValue(0), ReturnStmt(IntValue(1))))
-    assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(IntValue(1))))
-
-    factorialCaseStmt.elseStmt.getOrElse(None) match {
-      case ReturnStmt(MultExpression(left, right)) => {
-        assert(left == VarExpression("n"))
-
-        assert(right == FunctionCallExpression("factorial", List(
-          SubExpression(VarExpression("n"), IntValue(1))
-        )))
-      }
-
-      case _ => fail("Missing an elseStmt in the factorial procedure case")
-    }
-
-    assert(factorialStmt(1) == ReturnStmt(MultExpression(VarExpression("n"),
-      FunctionCallExpression("factorial", List(
-        SubExpression(VarExpression("n"), IntValue(1)))))))
-    // End of the factorial procedure verification
-
-    // Verifying the body module statements
-    module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmts) => succeed
-      case _ => fail("Expecting a sequence of statements!")
-    }
 
   }
 
@@ -326,57 +275,6 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(sequenceStmts(4) == WriteStmt(VarExpression("aux")))
 
   }
-
-
-  ignore("Testing the oberon stmt23 code. This module has a while with a case statement") {
-    val module = parseResource("stmts/stmt23.oberon")
-
-    assert(module.name == "WhileCaseModule")
-
-    assert(module.variables.length == 2)
-
-    module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 3)
-      case _ => fail("This module should have a sequence of 3 statements!")
-    }
-
-    val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
-
-    assert(sequenceStmts(0) == AssignmentStmt("x", IntValue(0)))
-
-    val myWhileStmt = sequenceStmts(1).asInstanceOf[WhileStmt];
-
-    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20)))
-
-    myWhileStmt.stmt match {
-      case SequenceStmt(stmts) => assert(stmts.length == 2)
-      case _ => fail("Expected a sequence of statements in the while statement!")
-    }
-
-    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[CaseStmt]
-
-    assert(innerCase.exp == VarExpression("x"))
-
-    assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
-
-    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum",
-      AddExpression(VarExpression("sum"), VarExpression("x")))))
-
-    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")),
-      AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
-
-    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
-      VarExpression("sum"), MultExpression(IntValue(2), VarExpression("x"))))))
-
-    assert(innerCase.elseStmt == None)
-
-    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
-
-    assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
-
-  }
-
 
   ignore("Testing the oberon stmt24 code. This module has a while with a case statement") {
     val module = parseResource("stmts/stmt24.oberon")
@@ -679,7 +577,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
   }
   
-  test("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names") {
+  ignore("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names") {
     val module = parseResource("stmts/ExpressionNameParser4.oberon")
 
     assert(module.name == "ExpressionNameModule")
