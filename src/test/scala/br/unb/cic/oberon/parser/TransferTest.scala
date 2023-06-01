@@ -7,6 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.Map
 import java.beans.Expression
+import java.nio.file.{Files, Paths}
 
 class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaParser {
 
@@ -548,5 +549,175 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
 
+  }
+  test("Testing the oberon ExpressionNameParser5 code. This module tests if the parser can translate different operations with type record declarations") {
+    val module = parseResource("stmts/ExpressionNameParser5.oberon")
+
+    assert(module.name == "ExpressionNameModule")
+
+    assert(module.stmt.isDefined)
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].left.isInstanceOf[FieldAccessExpression])
+
+    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[FieldAccessExpression])
+
+
+  }
+
+  test("Testing the oberon userTypeSimple01 code module. This module has a record type declaration, with invalid declarations") {
+    val module = parseResource("simple/userTypeSimple01.oberon")
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 2)
+  }
+
+  test("Testing the oberon userTypeSimple03 code module. This module has a record type declaration, with invalid declarations") {
+    val module = parseResource("simple/userTypeSimple03.oberon")
+
+    assert(module.name == "test")
+
+    assert(module.userTypes.length == 3)
+
+    val typeList = module.userTypes
+
+    val test_array = ArrayType(5, BooleanType)
+
+    val tipo1 = RecordType(List(
+      VariableDeclaration("num", IntegerType),
+      VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))))
+
+    val tipo2 = RecordType(List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
+
+    val typetoTest = List(test_array, tipo1, tipo2)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t.baseType == typetoTest(it))
+      it += 1
+    })
+
+  }
+  test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types") {
+    val module = parseResource("simple/userTypeSimple05.oberon")
+
+    assert(module.name == "UserTypeModule")
+
+    assert(module.userTypes.length == 2)
+
+    assert(module.variables.length == 3)
+
+    val varList = List(VariableDeclaration("x", ReferenceToUserDefinedType("simple")),
+      VariableDeclaration("y", ReferenceToUserDefinedType("simple")),
+      VariableDeclaration("z", ReferenceToUserDefinedType("complicated")))
+
+    var it: Int = 0
+    module.variables.foreach(v => {
+      assert(v == varList(it))
+      it += 1
+    })
+  }
+  test("Testing the oberon userTypeSimple06 code module. This module has a record and array type declaration") {
+    val module = parseResource("simple/userTypeSimple06.oberon")
+
+    assert(module.name == "test_ando")
+
+    assert(module.userTypes.length == 3)
+
+    val typeList = module.userTypes
+
+    val cheesewithbread = ArrayType(10, IntegerType)
+
+    val cheesewithoutbread = RecordType(List(
+      VariableDeclaration("var1", IntegerType),
+      VariableDeclaration("var2", ReferenceToUserDefinedType("cheesewithbread"))))
+
+    val cheesewithhalfabread = ArrayType(100000, ReferenceToUserDefinedType("cheesewithoutbread"))
+
+    val typetoTest = List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t.baseType == typetoTest(it))
+      it += 1
+    })
+
+  }
+  test("Testing the oberon userTypeSimple02 code module. This module has array and record type declarations") {
+    val module = parseResource("simple/userTypeSimple02.oberon")
+    // val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
+
+    assert(module.name == "test")
+    assert(module.stmt.get.asInstanceOf[ReadIntStmt] == ReadIntStmt("x"))
+
+    assert(module.userTypes.length == 2)
+
+    val typeList = module.userTypes
+
+    val halls = RecordType(List(VariableDeclaration("integrante", BooleanType),
+      VariableDeclaration("matricula", IntegerType)))
+
+    val halls_array = ArrayType(9, ReferenceToUserDefinedType("HALLS"))
+
+    val typetoTest = List(halls, halls_array)
+
+    var it: Int = 0
+
+    typeList.foreach(t => {
+      assert(t.baseType == typetoTest(it))
+      it += 1
+    })
+
+  }
+
+  test("Testing module F oberon import module feature. Alias and module name") {
+    val moduleF = parseResource("imports/F.oberon")
+
+    val expectedSet = Set("A")
+    assert(expectedSet == moduleF.submodules)
+  }
+
+  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D") {
+    val moduleH = parseResource("imports/H.oberon")
+
+    val expectedSet = Set("A", "C", "D")
+    assert(expectedSet == moduleH.submodules)
+  }
+
+  test("Reading new types") {
+    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").toURI)
+
+    assert(path != null)
+
+    val content = String.join("\n", Files.readAllLines(path))
+    val module = parseAbs( parse(oberonParser ,content))
+
+    assert(module.name == "SimpleModule")
+
+    val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
+    val stmts = sequence.stmts
+    assert(stmts.head == ReadLongRealStmt("v"))
+    assert(stmts(1) == ReadRealStmt("w"))
+    assert(stmts(2) == ReadLongIntStmt("x"))
+    assert(stmts(3) == ReadIntStmt("y"))
+    assert(stmts(4) == ReadShortIntStmt("z"))
+  }
+
+  test("Testing the parser for simple expressions") {
+    val intValue1 = "1"
+    val sum = "x + 4"
+
+    val exp1 = parseAbs(parse(int, intValue1))
+
+    assert(exp1 == REPLExpression(IntValue(1)))
+
+    val exp2 = ScalaParser.parserREPL(sum)
+    assert(exp2 == REPLExpression(AddExpression(VarExpression("x"), IntValue(4))))
   }
 }
