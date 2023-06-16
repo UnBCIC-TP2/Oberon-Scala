@@ -75,33 +75,37 @@ trait ExpressionParser extends BasicParsers {
     )
 
     def mulExpParser: Parser[Expression => Expression] = (
-        "*" ~ relTerm ^^ { case _ ~ b => MultExpression(_, b) }
-    |   "/" ~ relTerm ^^ { case _ ~ b => DivExpression(_, b) }
-    |   "&&" ~ relTerm ^^ { case _ ~ b => AndExpression(_, b) }
-    |   "MOD" ~ relTerm ^^ {case _ ~ b => ModExpression(_, b)}
+        "*" ~ complexTerm ^^ { case _ ~ b => MultExpression(_, b) }
+    |   "/" ~ complexTerm ^^ { case _ ~ b => DivExpression(_, b) }
+    //|   "&&" ~ complexTerm ^^ { case _ ~ b => AndExpression(_, b) }
+    |   "MOD" ~ complexTerm ^^ {case _ ~ b => ModExpression(_, b)}
     )
-    def relTerm: Parser[Expression] = complexTerm ~ rep(relExpParser) ^^ aggregator
+    def addTerm: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator
 
     def addExpParser: Parser[Expression => Expression] = (
         "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
     |   "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
-    |   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
+    //|   "||" ~ mulTerm ^^ { case _ ~ b => OrExpression(_, b) }
     )
-    def mulTerm: Parser[Expression] = relTerm ~ rep(mulExpParser) ^^ aggregator
+    def mulTerm: Parser[Expression] = complexTerm ~ rep(mulExpParser) ^^ aggregator
 
     def relExpParser: Parser[Expression => Expression] = (
-        "=" ~ complexTerm ^^ { case _ ~ b => EQExpression(_, b) }
-    |   "#" ~ complexTerm ^^ { case _ ~ b => NEQExpression(_, b) }
-    |   "<=" ~ complexTerm ^^ { case _ ~ b => LTEExpression(_, b) }
-    |   ">=" ~ complexTerm ^^ { case _ ~ b => GTEExpression(_, b) }
-    |   "<" ~ complexTerm ^^ { case _ ~ b => LTExpression(_, b) }
-    |   ">" ~ complexTerm ^^ { case _ ~ b => GTExpression(_, b) }
+        "=" ~ addTerm ^^ { case _ ~ b => EQExpression(_, b) }
+    |   "#" ~ addTerm ^^ { case _ ~ b => NEQExpression(_, b) }
+    |   "<=" ~ addTerm ^^ { case _ ~ b => LTEExpression(_, b) }
+    |   ">=" ~ addTerm ^^ { case _ ~ b => GTEExpression(_, b) }
+    |   "<" ~ addTerm ^^ { case _ ~ b => LTExpression(_, b) }
+    |   ">" ~ addTerm ^^ { case _ ~ b => GTExpression(_, b) }
     )
 
-    def logExpParser: Parser[Expression => Ex   ]
+    def relTerm: Parser[Expression] = addTerm ~ rep(relExpParser) ^^ aggregator
 
+    def logExpParser: Parser[Expression => Expression] = (
+        "&&" ~ relTerm ^^ { case _ ~ b => AndExpression(_, b)}
+    |   "||" ~ relTerm ^^ { case _ ~ b => OrExpression(_, b)}
+    )
     
-    def expressionParser: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator
+    def expressionParser: Parser[Expression] = relTerm ~ rep(logExpParser) ^^ aggregator
 }
 
 
