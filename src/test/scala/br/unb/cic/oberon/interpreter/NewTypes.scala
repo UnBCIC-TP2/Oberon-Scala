@@ -74,6 +74,6 @@ class NewTypesTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(module.name == "SimpleModule")
 
     module.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(RealValue(26.500000005.toFloat))) // FOR TO x
+    assert(interpreter.env.lookup("x") == Some(RealValue(26.500000005/*.toFloat*/))) // FOR TO x
   }
 }

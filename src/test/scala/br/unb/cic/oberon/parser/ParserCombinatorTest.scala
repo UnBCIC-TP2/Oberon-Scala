@@ -69,7 +69,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
         assert(BoolValue(true) == parseAbs(parse(expressionParser, "True")))
         assert(BoolValue(false) == parseAbs(parse(expressionParser, "False")))
         assert(NullValue == parseAbs(parse(expressionParser, "NIL")))
-        assert(Brackets(StringValue("testao")) == parseAbs(parse(expressionParser, "(\"testao\")")))
+        assert(StringValue("testao") == parseAbs(parse(expressionParser, "(\"testao\")")))
 
         var exp1 = IntValue(16)
         var exp2 = RealValue(-35.2)
@@ -77,8 +77,12 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
         assert(DivExpression(exp1, exp2) == parseAbs(parse(expressionParser, "16 / -35.2")))
         assert(AndExpression(exp1, exp2) == parseAbs(parse(expressionParser, "16 && -35.2")))
 
-        assert(AndExpression(DivExpression(DivExpression(MultExpression(Brackets(DivExpression(IntValue(16),IntValue(4))),RealValue(-35.2)),IntValue(-4)),IntValue(3)),IntValue(4)) == parseAbs(parse(expressionParser, "(16 / 4) * -35.2 / -4 / 3 && 4")))
-        assert(AndExpression(MultExpression(MultExpression(DivExpression(Brackets(IntValue(16)),IntValue(4)),Brackets(DivExpression(RealValue(-35.2),IntValue(-4)))),IntValue(3)),IntValue(-66)) == parseAbs(parse(expressionParser, "(16) / 4 * (-35.2 / -4) * 3 && -66")))
+        assert(AndExpression(DivExpression(DivExpression(MultExpression(DivExpression(IntValue(16),IntValue(4)),RealValue(-35.2)),IntValue(-4)),IntValue(3)),IntValue(4)) == parseAbs(parse(expressionParser, "(16 / 4) * -35.2 / -4 / 3 && 4")))
+        assert(AndExpression(MultExpression(MultExpression(DivExpression(IntValue(16),IntValue(4)),DivExpression(RealValue(-35.2),IntValue(-4))),IntValue(3)),IntValue(-66)) == parseAbs(parse(expressionParser, "(16) / 4 * (-35.2 / -4) * 3 && -66")))
+    }
+
+    test("Testing multiple expressions with expression parser") {
+      assert(OrExpression(LTExpression(VarExpression("b"),IntValue(0)),LTExpression(VarExpression("e"),IntValue(0))) == parseAbs(parse(expressionParser,"b<0 || e<0")))
     }
     test("Testing addExpParser"){
         assert(OrExpression(SubExpression(AddExpression(IntValue(2),IntValue(4)),IntValue(3)),IntValue(2)) == parseAbs(parse(expressionParser, "2 + 4 - 3 || 2")))
@@ -128,11 +132,10 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
         // IF THEN ELSE
         assert(
             IfElseStmt(
-                Brackets(
-                    GTExpression(
-                        MultExpression(IntValue(2),IntValue(5)),
-                        FunctionCallExpression("teste",List(IntValue(1))))
-                    ),
+              GTExpression(
+                MultExpression(IntValue(2),IntValue(5)),
+                FunctionCallExpression("teste",List(IntValue(1))))
+              ,
                 new AssignmentStmt(
                     ArrayAssignment(
                         FunctionCallExpression("functionTest",List()),
@@ -334,7 +337,7 @@ class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParse
       assert(AssertTrueStmt(AddExpression(IntValue(2), IntValue(3))) == parseAbs(parse(multStatementParser, "assert(2+3)")))
       assert(AssertTrueStmt(EQExpression(AddExpression(AddExpression(IntValue(2), IntValue(3)), IntValue(1)), IntValue(6))) == parseAbs(parse(multStatementParser, "assert(2+3+1 = 6)")))
       assert(AssertTrueStmt(AndExpression(IntValue(2), RealValue(-50.5))) == parseAbs(parse(multStatementParser, "assert(2 && -50.5)")))
-      assert(AssertTrueStmt(AndExpression(Brackets(EQExpression(IntValue(2), IntValue(2))), Brackets(EQExpression(IntValue(3), IntValue(5))))) == parseAbs(parse(multStatementParser, "assert((2=2) && (3=5))")))
+      assert(AssertTrueStmt(AndExpression(EQExpression(IntValue(2), IntValue(2)), EQExpression(IntValue(3), IntValue(5)))) == parseAbs(parse(multStatementParser, "assert((2=2) && (3=5))")))
     }
 
     test("Testing assertError Statement parse"){
@@ -1349,21 +1352,20 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
     assert(module.variables.length == 3)
   }
 
-  ignore("Testing array declaration") {
+  test("Testing array declaration") {
     val props = parseAbs(parse(declarationsParser,
       """
-        VAR
-          array : ARRAY 3 OF INTEGER;
-          outroarray : ARRAY 2 OF INTEGER;
+        VAR array, outroarray : ARRAY 3 OF INTEGER;
+            arr: ARRAY 2 OF REAL;
         """))
-    assert(props.userTypes == List(VariableDeclaration("array",ArrayType(3,IntegerType)), VariableDeclaration("outroarray",ArrayType(2,IntegerType))))
+    assert(props.variables == List(VariableDeclaration("array",ArrayType(3,IntegerType)), VariableDeclaration("outroarray",ArrayType(3,IntegerType)),VariableDeclaration("arr",ArrayType(2,RealType))))
   }
 
   test("Testing the import parser") {
     assert(Set("A") == parseAbs(parse(importsParser, "IMPORT A;")))
     assert(Set("A","B") == parseAbs(parse(importsParser, "IMPORT A, B;")))
     assert(Set() == parseAbs(parse(importsParser, "IMPORT;")))
-    assert(Set("A:=alias") == parseAbs(parse(importsParser, "IMPORT A := alias;")))
+    assert(Set("A") == parseAbs(parse(importsParser, "IMPORT A := alias;")))
 
     assert(
       OberonModule(
@@ -1413,7 +1415,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
 
     assert(parseResource("imports/F.oberon") ==
       OberonModule(
-        "F", Set("A:=alias"),
+        "F", Set("A"),
         List(),
         List(),
         List(),
@@ -1425,7 +1427,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
 
     assert(parseResource("imports/H.oberon") ==
       OberonModule(
-        "H", Set("A:=aliasA","C:=aliasC","D"),
+        "H", Set("A","C","D"),
         List(),
         List(),
         List(),
@@ -1521,7 +1523,9 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
     assert(stmts(9) == WriteStmt(VarExpression("z")))
   }
 
-
-
+  test("Testing comments") {
+    assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False) //Test comment")))
+    assert(StringValue("//olaf\n") == parseAbs(parse(string,"\"//olaf\n\"")))
+  }
 
 }

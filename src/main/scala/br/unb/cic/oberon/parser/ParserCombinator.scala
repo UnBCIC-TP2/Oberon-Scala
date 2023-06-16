@@ -24,6 +24,8 @@ trait ParsersUtil extends JavaTokenParsers {
 }
 
 trait BasicParsers extends ParsersUtil {
+
+    override protected val whiteSpace = """(\s|//[^\n]*(\n|\z))+""".r
     def int: Parser[IntValue] = "-?[0-9]+".r ^^ (i => IntValue(i.toInt))
     def real: Parser[RealValue] = "-?[0-9]+\\.[0-9]+".r ^^ (i => RealValue(i.toDouble))
     def bool: Parser[BoolValue] = "(False|True)".r ^^ (i => BoolValue(i=="True"))
@@ -62,7 +64,7 @@ trait ExpressionParser extends BasicParsers {
     }
     def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
-    def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | "(" ~> expressionParser <~ ")"  ^^ Brackets
+    def factor: Parser[Expression] =   expValueParser | pointerParser | functionParser | variableParser |"(" ~> expressionParser <~ ")"
 
     def complexTerm: Parser[Expression] = (
         "~" ~> expressionParser ^^ NotExpression
@@ -128,7 +130,10 @@ trait StatementParser extends ExpressionParser {
     def statementParser: Parser[Statement] = (
         designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => AssignmentStmt(des, expression) }
     |   "readReal" ~> ('(' ~> identifier <~ ')') ^^ ReadRealStmt
+    |   "readLongReal" ~> ('(' ~> identifier <~ ')') ^^ ReadLongRealStmt
+    |   "readLongInt" ~> ('(' ~> identifier <~ ')') ^^ ReadLongIntStmt
     |   "readInt" ~> ('(' ~> identifier <~ ')') ^^ ReadIntStmt
+    |   "readShortInt" ~> ('(' ~> identifier <~ ')') ^^ ReadShortIntStmt
     |   "readChar" ~> ('(' ~> identifier <~ ')') ^^ ReadCharStmt
     |   "write" ~> ('(' ~> expressionParser <~ ')') ^^ WriteStmt
     |   "assert" ~> ('(' ~> expressionParser <~ ')') ^^ AssertTrueStmt
@@ -139,7 +144,6 @@ trait StatementParser extends ExpressionParser {
             case Some(_) => throw new Exception("assert_error is a reserved word that receives no arguments")
         }
     |    "NEW" ~> ('(' ~> identifier <~ ')') ^^ NewStmt
-    |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   ("IF" ~> expressionParser  <~ "THEN") ~ multStatementParser ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
         { case cond ~ stmt ~ elseStmt => IfElseStmt(cond, stmt, elseStmt) }
     |   ("IF" ~> expressionParser <~ "THEN") ~ multStatementParser ~ rep1("ELSIF" ~> elseIfStmtParser) ~ optSolver("ELSE" ~> multStatementParser) <~ "END" ^^
@@ -156,6 +160,7 @@ trait StatementParser extends ExpressionParser {
     |   "RETURN" ~> expressionParser ^^ ReturnStmt
     |   "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^
         { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
+    |   identifier ~ ('(' ~> listOpt(argumentsParser) <~ ')') ^^ { case id ~ args => ProcedureCallStmt(id, args) }
     |   "EXIT" ^^ { _ => ExitStmt() }
     );
 
@@ -172,10 +177,16 @@ trait StatementParser extends ExpressionParser {
 trait OberonParserFull extends StatementParser {
     // UserDefinedType
     def userTypeParser: Parser[Type] = (
-        ("ARRAY" ~> int) ~ ("OF" ~> (typeParser | userTypeParser)) ^^ { case a ~ b => ArrayType(a.value, b)} 
-    |   "RECORD" ~> varDeclarationParser <~ "END" ^^ RecordType
+        ("ARRAY" ~> int) ~ ("OF" ~> (userTypeParser | typeParser)) ^^ { case a ~ b => ArrayType(a.value, b)}
+    |   "RECORD" ~> multDeclarationTermParser <~ "END" ^^ RecordType
     |   ("POINTER" ~ "TO") ~> (typeParser | userTypeParser) ^^ PointerType
+    |   ("LAMBDA" ~ "->") ~> ('(' ~> lambdaTypes <~ ')') ~ (':' ~> (typeParser|userTypeParser)) ^^ {case args ~ ret => LambdaType(args,ret)}
     )
+
+    def lambdaTypes: Parser[List[Type]] = opt((typeParser|userTypeParser) ~ rep(','~>(typeParser|userTypeParser))) ^^ {
+        case Some(a ~ b) => List(a):::b
+        case None => List[Type]()
+    }
     def userTypeDeclarationTerm: Parser[UserDefinedType] = (identifier <~ "=") ~ userTypeParser ^^ { case a ~ b => UserDefinedType(a, b) }
     def userTypeDeclarationParser: Parser[List[UserDefinedType]] = "TYPE" ~> rep1(userTypeDeclarationTerm)
 
@@ -186,9 +197,11 @@ trait OberonParserFull extends StatementParser {
 
     // VariableDeclaration
     def varListParser: Parser[List[String]] = identifier ~ rep("," ~> identifier) ^^ { case a ~ b => List(a) ++ b }
-    def varDeclarationParserTerm: Parser[List[VariableDeclaration]] = (varListParser <~ ":") ~ (userTypeParser | typeParser) ^^
+    def declarationTermParser: Parser[List[VariableDeclaration]] = (varListParser <~ ":") ~ (userTypeParser | typeParser) ^^
         { case varList ~ varType => varList.map(VariableDeclaration(_, varType)) }
-    def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> rep1(varDeclarationParserTerm <~ ";") ^^ { a => a.flatten }
+    def varDeclarationParser: Parser[List[VariableDeclaration]] = "VAR" ~> multDeclarationTermParser
+
+    def multDeclarationTermParser: Parser[List[VariableDeclaration]] = rep1(declarationTermParser <~ ";") ^^ {a => a.flatten}
 
     // Procedure 
 
@@ -230,7 +243,7 @@ trait OberonParserFull extends StatementParser {
     }
 
     def module: Parser[String] = identifier ~ opt(":=" ~> identifier) ^^ {
-        case mod ~ Some(a) => mod + ":=" + a
+        case mod ~ Some(a) => mod //+ ":=" + a
         case mod ~ None => mod
     }
 
@@ -246,7 +259,7 @@ trait OberonParserFull extends StatementParser {
                 args.map((x: String) => ParameterByValue(x, argType))
             }
         }
-    |   "VAR" ~ identifier ~ rep(("," ~ "VAR") ~> identifier) ~ ":" ~ (typeParser | userTypeParser) ^^ {
+    |   "VAR" ~ identifier ~ rep(("," ~ "VAR") ~> identifier) ~ ":" ~ (userTypeParser | typeParser) ^^ {
             case _ ~ head ~ tail ~ _ ~ argType => {
                 val args = List(head) ++ tail
                 args.map((x: String) => ParameterByReference(x, argType))

@@ -12,7 +12,7 @@ import java.nio.file.{Files, Paths}
 class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaParser {
 
 
-  ignore("Testing the oberon stmt03 code. This module has IF-THEN statement") {
+  test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
     val module = parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
@@ -44,7 +44,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
 
-  ignore("Testing the oberon stmt04 code. This module has a While statement") {
+  test("Testing the oberon stmt04 code. This module has a While statement") {
     val module = parseResource("stmts/stmt04.oberon")
 
     assert(module.name == "SimpleModule")
@@ -231,7 +231,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
   }
 
   test("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
-    val module = parseResource("stmts/stmt21.oberon")
+    val module = parseResource("stmts/stmt21.oberon") //erro de comentario
 
     assert(module.name == "SimpleRangeCaseModule")
 
@@ -680,7 +680,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     val moduleF = parseResource("imports/F.oberon")
 
     val expectedSet = Set("A")
-    assert(expectedSet == moduleF.submodules)
+    assert(moduleF.submodules == expectedSet)
   }
 
   test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D") {
