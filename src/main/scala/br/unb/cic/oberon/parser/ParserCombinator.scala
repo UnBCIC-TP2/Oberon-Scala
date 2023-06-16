@@ -98,6 +98,8 @@ trait ExpressionParser extends BasicParsers {
     |   ">" ~ complexTerm ^^ { case _ ~ b => GTExpression(_, b) }
     )
 
+    def logExpParser: Parser[Expression => Ex   ]
+
     
     def expressionParser: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator
 }
