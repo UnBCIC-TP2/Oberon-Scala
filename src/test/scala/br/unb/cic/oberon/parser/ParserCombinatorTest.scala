@@ -1525,7 +1525,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
 
   test("Testing comments") {
     assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False) //Test comment")))
-    assert(StringValue("//olaf\n") == parseAbs(parse(string,"\"//olaf\n\"")))
+    assert(StringValue("//test\n") == parseAbs(parse(string,"\"//test\n\"")))
   }
 
 }
