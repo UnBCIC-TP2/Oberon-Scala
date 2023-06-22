@@ -64,11 +64,10 @@ trait ExpressionParser extends BasicParsers {
     }
     def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
-    def factor: Parser[Expression] =   expValueParser | pointerParser | functionParser | variableParser |"(" ~> expressionParser <~ ")"
+    def factor: Parser[Expression] =   expValueParser | pointerParser | functionParser | variableParser | notParser |"(" ~> expressionParser <~ ")"
 
     def complexTerm: Parser[Expression] = (
-        "~" ~> expressionParser ^^ NotExpression
-    |   factor ~ ("[" ~> expressionParser <~ ("]" ~ not(":="))) ^^ { case a ~ b => ArraySubscript(a, b)}
+        factor ~ ("[" ~> expressionParser <~ ("]" ~ not(":="))) ^^ { case a ~ b => ArraySubscript(a, b)}
     |   factor ~ ("." ~> identifier) ^^ { case a ~ b => FieldAccessExpression(a, b)}
     |   factor
 
