@@ -8,7 +8,7 @@ case class Name(id: String, t:Type) extends Address(t){}
 
 case class Constant(value: String, t: Type) extends Address(t){}
 
-class Temporary(t: Type, num: Int = 0, manual: Boolean = false) extends Address(t){
+case class Temporary(t: Type, num: Int = 0, manual: Boolean = false) extends Address(t){
   //num e manual somente para testes
   import Temporary._
   var number = num
