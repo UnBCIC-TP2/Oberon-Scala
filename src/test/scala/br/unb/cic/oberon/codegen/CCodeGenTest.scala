@@ -1,17 +1,17 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import br.unb.cic.oberon.util.Resources
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-class CCodeGenTest extends AnyFunSuite {
+class CCodeGenTest extends AnyFunSuite with Oberon2ScalaParser{
 
   private def testGenerator(oberonFile: String) = {
 
-    val module = ScalaParser.parseResource(oberonFile)
+    val module = parseResource(oberonFile)
     val coreModule = if (module.stmt.isDefined) {
       val coreVisitor = new CoreVisitor()
       coreVisitor.transformModule(module)

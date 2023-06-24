@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.io.FileOutputStream
@@ -11,7 +11,7 @@ import jdk.internal.org.objectweb.asm.Opcodes._
 import jdk.internal.org.objectweb.asm._
 import java.io.File
 
-class JVMCodeGenTest extends AnyFunSuite {
+class JVMCodeGenTest extends AnyFunSuite with Oberon2ScalaParser{
 
   test("Generate code with fields of simple01.oberon") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
@@ -19,7 +19,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule1")
     assert(module.variables.size == 0)
@@ -52,7 +52,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule2")
     assert(module.variables.size == 2)
@@ -85,7 +85,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule3")
     assert(module.variables.size == 2)
@@ -118,7 +118,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule4")
     assert(module.variables.size == 2)
@@ -151,7 +151,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule5")
     assert(module.variables.size == 2)
@@ -184,7 +184,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule6")
     assert(module.variables.size == 2)
@@ -217,7 +217,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule7")
     assert(module.variables.size == 2)
@@ -250,7 +250,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule8")
     assert(module.variables.size == 2)
@@ -283,7 +283,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule9")
     assert(module.variables.size == 2)
@@ -316,7 +316,7 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule10")
     assert(module.variables.size == 1)

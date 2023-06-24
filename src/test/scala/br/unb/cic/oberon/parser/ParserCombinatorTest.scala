@@ -7,6 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.Map
 import java.beans.Expression
 import java.nio.file.{Files, Paths}
+import br.unb.cic.oberon.ir.ast
 
 
 class ParserCombinatorTestSuite extends AbstractTestSuite with Oberon2ScalaParser {
@@ -1526,6 +1527,38 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
   test("Testing comments") {
     assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False) //Test comment")))
     assert(StringValue("//test\n") == parseAbs(parse(string,"\"//test\n\"")))
+
+    assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False) /*Test comment*/")))
+    assert(AssertEqualStmt(BoolValue(true), BoolValue(false)) == parseAbs(parse(multStatementParser, "assert_eq(True,False) /*Test comment\nAdditionalline*/")))
+    assert(StringValue("/*test*/") == parseAbs(parse(string,"\"/*test*/\"")))
   }
+
+  test("Testing not parser") {
+    assert(NotExpression(VarExpression("x"))==parseAbs(parse(expressionParser,"~x")))
+    assert(AssignmentStmt("a",NotExpression(VarExpression("x")))==parseAbs(parse(statementParser,"a:= ~x")))
+  }
+
+  test("Testing lambda expression") {
+    assert(LambdaExpression(List[FormalArg](ParameterByValue("x",BooleanType)),NotExpression(VarExpression("x"))) == parseAbs(parse(expressionParser,"(x: BOOLEAN) => ~x")))
+  }
+
+  test("Testing lambda declaration") {
+    assert(LambdaType(List(BooleanType),BooleanType) == parseAbs(parse(userTypeParser, "LAMBDA -> (BOOLEAN) : BOOLEAN")))
+  }
+
+  test("Testing field accesses") {
+    assert(FieldAccessExpression(VarExpression("x"),"c1") == parseAbs(parse(expressionParser, "x.c1")))
+    assert(FieldAccessExpression(FieldAccessExpression(VarExpression("x"),"c1"),"c2") == parseAbs(parse(expressionParser,"x.c1.c2")))
+  }
+
+  test("Testing recordAssignmentStmt01") {
+
+    assert(AssignmentStmt(RecordAssignment(VarExpression("x"),"c1"),BoolValue(true)) == parseAbs(parse(statementParser, "x.c1 := True")))
+
+    // val module = parseResource("stmts/recordAssignmentStmt01.oberon")
+    // assert(module.name == "SimpleModule")
+
+  }
+
 
 }

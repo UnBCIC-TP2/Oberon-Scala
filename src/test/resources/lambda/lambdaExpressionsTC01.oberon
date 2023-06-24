@@ -1,7 +1,7 @@
 MODULE LambdaExpressionsTC01;
 
 TYPE
-   ld = LAMBDA -> (INTEGER): INTEGER
+   ld = LAMBDA -> (INTEGER, INTEGER): INTEGER
 VAR
     x : ld;
 

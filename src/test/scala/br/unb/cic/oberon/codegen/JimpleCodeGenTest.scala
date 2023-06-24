@@ -1,19 +1,19 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.ir.jimple._
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.nio.file.{Files, Paths}
 
-class JimpleCodeGenTest extends AnyFunSuite {
+class JimpleCodeGenTest extends AnyFunSuite with Oberon2ScalaParser {
   test("generate class declaration from simple04.oberon") {
     val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
 
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule4")
 
@@ -57,7 +57,7 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule")
 
@@ -102,7 +102,7 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "UserTypeModule")
 
@@ -140,7 +140,7 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "ArrayAssignmentStmt03")
 
@@ -183,7 +183,7 @@ class JimpleCodeGenTest extends AnyFunSuite {
     assert(path != null)
 
     val content = String.join("\n", Files.readAllLines(path))
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     assert(module.name == "SimpleModule")
 

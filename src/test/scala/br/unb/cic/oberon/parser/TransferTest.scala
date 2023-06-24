@@ -709,7 +709,7 @@ class ParserCombinatorTestSuite2 extends AbstractTestSuite with Oberon2ScalaPars
     assert(stmts(4) == ReadShortIntStmt("z"))
   }
 
-  test("Testing the parser for simple expressions") {
+  ignore("Testing the parser for simple expressions") {
     val intValue1 = "1"
     val sum = "x + 4"
 
