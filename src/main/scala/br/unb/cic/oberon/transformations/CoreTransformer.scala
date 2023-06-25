@@ -7,42 +7,42 @@ import br.unb.cic.oberon.ir.ast.Procedure
 
 class CoreVisitor() {
 
-  var addedVariables: List[VariableDeclaration] = Nil
+  //var addedVariables: List[VariableDeclaration] = Nil
 
-  def visit(stmt: Statement): Statement = stmt match {
+  def visit(stmt: Statement, caseIdGenerator: Int = 0, addedVariables: List[VariableDeclaration] = Nil): Statement = stmt match {
     case SequenceStmt(stmts) =>
-      SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map((stmt) => visit(stmt))).stmts))
+      SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map((stmt) => visit(stmt, caseIdGenerator, addedVariables))).stmts))
 
     case LoopStmt(stmt) =>
-      WhileStmt(BoolValue(true), visit(stmt))
+      WhileStmt(BoolValue(true), visit(stmt, caseIdGenerator, addedVariables))
 
     case RepeatUntilStmt(condition, stmt) =>
-      WhileStmt(BoolValue(true), SequenceStmt(List(visit(stmt), visit(IfElseStmt(condition, ExitStmt(), None)))))
+      WhileStmt(BoolValue(true), SequenceStmt(List(visit(stmt, caseIdGenerator, addedVariables), visit(IfElseStmt(condition, ExitStmt(), None), caseIdGenerator, addedVariables))))
 
     case ForStmt(initStmt, condition, block) =>
-      SequenceStmt(List(visit(initStmt), WhileStmt(condition, visit(block))))
+      SequenceStmt(List(visit(initStmt, caseIdGenerator, addedVariables), WhileStmt(condition, visit(block, caseIdGenerator, addedVariables))))
 
     case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) =>
-      IfElseStmt (condition, visit(thenStmt), Some(transformElsif(elsifStmt, elseStmt)))
+      IfElseStmt (condition, visit(thenStmt, caseIdGenerator, addedVariables), Some(transformElsif(elsifStmt, elseStmt, caseIdGenerator, addedVariables)))
 
-    case CaseStmt(exp, cases, elseStmt) => transformCase(exp, cases, elseStmt)
+    case CaseStmt(exp, cases, elseStmt) => transformCase(exp, cases, elseStmt, caseIdGenerator, addedVariables)
 
     case WhileStmt(condition, stmt) =>
-      WhileStmt(condition, visit(stmt))
+      WhileStmt(condition, visit(stmt, caseIdGenerator, addedVariables))
 
     case _ => stmt
   }
 
-  private val caseIdGenerator: Iterator[Int] = Iterator.from(0)
+  //private val caseIdGenerator: Iterator[Int] = Iterator.from(0)
 
-  private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
-    val coreElseStmt = elseStmt.map((stmt) => visit(stmt))
+  private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement], caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Statement = {
+    val coreElseStmt = elseStmt.map((stmt) => visit(stmt, caseIdGenerator, addedVariables))
 
     // TODO corrigir comportamento para outras expressões
 
     val caseExpressionId = exp match {
       case VarExpression(name) => name
-      case _ => f"case_exp#${caseIdGenerator.next()}"
+      case _ => f"case_exp#${caseIdGenerator + 1}"
     }
     val caseExpressionEvaluation = AssignmentStmt(VarAssignment(caseExpressionId), exp)
 
@@ -51,20 +51,20 @@ class CoreVisitor() {
         case SimpleCase(condition, stmt) :: Nil =>
           val newCondition =
             EQExpression(VarExpression(caseExpressionId), condition)
-          IfElseStmt(newCondition, visit(stmt), coreElseStmt)
+          IfElseStmt(newCondition, visit(stmt, caseIdGenerator, VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables), coreElseStmt)
 
         case SimpleCase(condition, stmt) :: tailCases =>
           val newCondition =
             EQExpression(VarExpression(caseExpressionId), condition)
           val newElse = Some(casesToIfElseStmt(tailCases))
-          IfElseStmt(newCondition, visit(stmt), newElse)
+          IfElseStmt(newCondition, visit(stmt, caseIdGenerator, VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables), newElse)
 
         case RangeCase(min, max, stmt) :: Nil =>
           val newCondition = AndExpression(
             LTEExpression(min, VarExpression(caseExpressionId)),
             LTEExpression(VarExpression(caseExpressionId), max)
           )
-          IfElseStmt(newCondition, visit(stmt), coreElseStmt)
+          IfElseStmt(newCondition, visit(stmt, caseIdGenerator, VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables), coreElseStmt)
 
         case RangeCase(min, max, stmt) :: tailCases =>
           val newCondition = AndExpression(
@@ -72,7 +72,7 @@ class CoreVisitor() {
             LTEExpression(VarExpression(caseExpressionId), max)
           )
           val newElse = Some(casesToIfElseStmt(tailCases))
-          IfElseStmt(newCondition, visit(stmt), newElse)
+          IfElseStmt(newCondition, visit(stmt, caseIdGenerator, VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables), newElse)
 
         case _ => throw new RuntimeException("Invalid CaseStmt without cases")
       }
@@ -80,29 +80,30 @@ class CoreVisitor() {
     exp match {
       case VarExpression(_) => casesToIfElseStmt(cases)
       case _ =>
-        addedVariables = VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables
+        //VariableDeclaration(caseExpressionId, IntegerType) +: addedVariables
+        //addedVariables = VariableDeclaration(caseExpressionId, IntegerType) :: addedVariables
         SequenceStmt(List(caseExpressionEvaluation, casesToIfElseStmt(cases)))
     }
   }
 
-  private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement =
+  private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement], caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Statement =
     elsifStmts match {
       case currentElsif :: Nil =>
-        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt), elseStmt.map((stmt) => visit(stmt)))
+        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt, caseIdGenerator, addedVariables), elseStmt.map((stmt) => visit(stmt, caseIdGenerator, addedVariables)))
       case currentElsif :: tail =>
-        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt), Some(transformElsif(tail, elseStmt.map((stmt) => visit(stmt)))))
+        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt, caseIdGenerator, addedVariables), Some(transformElsif(tail, elseStmt.map((stmt) => visit(stmt, caseIdGenerator, addedVariables)), caseIdGenerator, addedVariables)))
       case Nil =>
         throw new IllegalArgumentException("elsifStmts cannot be empty.")
     }
 
-  private def transformProcedureStatement(procedure: Procedure): Procedure = {
+  private def transformProcedureStatement(procedure: Procedure, caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Procedure = {
       Procedure(
       name = procedure.name,
       args = procedure.args,
       returnType = procedure.returnType,
       constants = procedure.constants,
       variables = procedure.variables,
-      stmt = visit(procedure.stmt))
+      stmt = visit(procedure.stmt, caseIdGenerator, addedVariables))
     }
 
   def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] = stmts.flatMap {
@@ -110,9 +111,9 @@ class CoreVisitor() {
     case s => List(s)
   }
 
-  def transformModule(module: OberonModule): OberonModule = {
+  def transformModule(module: OberonModule, caseIdGenerator: Int = 0, addedVariables: List[VariableDeclaration] = Nil): OberonModule = {
     // É possível remover essa val?
-    val stmtcore = visit(module.stmt.get)
+    val stmtcore = visit(module.stmt.get, caseIdGenerator, addedVariables)
 
      OberonModule(
       name = module.name,
@@ -120,7 +121,7 @@ class CoreVisitor() {
       userTypes = module.userTypes,
       constants = module.constants,
       variables = module.variables ++ addedVariables,
-      procedures = module.procedures.map(transformProcedureStatement(_)),
+      procedures = module.procedures.map(transformProcedureStatement(_, caseIdGenerator, addedVariables)),
       stmt = Some(stmtcore)
     )
   }
