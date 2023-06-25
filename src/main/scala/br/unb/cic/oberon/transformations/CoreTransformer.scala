@@ -5,31 +5,30 @@ import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import br.unb.cic.oberon.ir.ast.Procedure
 
-class CoreVisitor() extends OberonVisitorAdapter {
-  override type T = Statement
-  
+class CoreVisitor() {
+
   var addedVariables: List[VariableDeclaration] = Nil
 
-  override def visit(stmt: Statement): Statement = stmt match {
+  def visit(stmt: Statement): Statement = stmt match {
     case SequenceStmt(stmts) =>
-      SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map(_.accept(this))).stmts))
+      SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map((stmt) => visit(stmt))).stmts))
 
     case LoopStmt(stmt) =>
-      WhileStmt(BoolValue(true), stmt.accept(this))
+      WhileStmt(BoolValue(true), visit(stmt))
 
     case RepeatUntilStmt(condition, stmt) =>
-      WhileStmt(BoolValue(true), SequenceStmt(List(stmt.accept(this), IfElseStmt(condition, ExitStmt(), None))).accept(this))
+      WhileStmt(BoolValue(true), SequenceStmt(List(visit(stmt), visit(IfElseStmt(condition, ExitStmt(), None)))))
 
     case ForStmt(initStmt, condition, block) =>
-      SequenceStmt(List(initStmt.accept(this), WhileStmt(condition, block.accept(this))))
+      SequenceStmt(List(visit(initStmt), WhileStmt(condition, visit(block))))
 
     case IfElseIfStmt (condition, thenStmt, elsifStmt, elseStmt) =>
-      IfElseStmt (condition, thenStmt.accept(this), Some(transformElsif(elsifStmt, elseStmt)))
+      IfElseStmt (condition, visit(thenStmt), Some(transformElsif(elsifStmt, elseStmt)))
 
     case CaseStmt(exp, cases, elseStmt) => transformCase(exp, cases, elseStmt)
 
     case WhileStmt(condition, stmt) =>
-      WhileStmt(condition, stmt.accept(this))
+      WhileStmt(condition, visit(stmt))
 
     case _ => stmt
   }
@@ -37,7 +36,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
   private val caseIdGenerator: Iterator[Int] = Iterator.from(0)
 
   private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement]): Statement = {
-    val coreElseStmt = elseStmt.map(_.accept(this))
+    val coreElseStmt = elseStmt.map((stmt) => visit(stmt))
 
     // TODO corrigir comportamento para outras expressões
 
@@ -52,20 +51,20 @@ class CoreVisitor() extends OberonVisitorAdapter {
         case SimpleCase(condition, stmt) :: Nil =>
           val newCondition =
             EQExpression(VarExpression(caseExpressionId), condition)
-          IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+          IfElseStmt(newCondition, visit(stmt), coreElseStmt)
 
         case SimpleCase(condition, stmt) :: tailCases =>
           val newCondition =
             EQExpression(VarExpression(caseExpressionId), condition)
           val newElse = Some(casesToIfElseStmt(tailCases))
-          IfElseStmt(newCondition, stmt.accept(this), newElse)
+          IfElseStmt(newCondition, visit(stmt), newElse)
 
         case RangeCase(min, max, stmt) :: Nil =>
           val newCondition = AndExpression(
             LTEExpression(min, VarExpression(caseExpressionId)),
             LTEExpression(VarExpression(caseExpressionId), max)
           )
-          IfElseStmt(newCondition, stmt.accept(this), coreElseStmt)
+          IfElseStmt(newCondition, visit(stmt), coreElseStmt)
 
         case RangeCase(min, max, stmt) :: tailCases =>
           val newCondition = AndExpression(
@@ -73,7 +72,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
             LTEExpression(VarExpression(caseExpressionId), max)
           )
           val newElse = Some(casesToIfElseStmt(tailCases))
-          IfElseStmt(newCondition, stmt.accept(this), newElse)
+          IfElseStmt(newCondition, visit(stmt), newElse)
 
         case _ => throw new RuntimeException("Invalid CaseStmt without cases")
       }
@@ -89,9 +88,9 @@ class CoreVisitor() extends OberonVisitorAdapter {
   private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement]): Statement =
     elsifStmts match {
       case currentElsif :: Nil =>
-        IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), elseStmt.map(_.accept(this)))
+        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt), elseStmt.map((stmt) => visit(stmt)))
       case currentElsif :: tail =>
-        IfElseStmt(currentElsif.condition, currentElsif.thenStmt.accept(this), Some(transformElsif(tail, elseStmt.map(_.accept(this)))))
+        IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt), Some(transformElsif(tail, elseStmt.map((stmt) => visit(stmt)))))
       case Nil =>
         throw new IllegalArgumentException("elsifStmts cannot be empty.")
     }
@@ -103,7 +102,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
       returnType = procedure.returnType,
       constants = procedure.constants,
       variables = procedure.variables,
-      stmt = procedure.stmt.accept(this))
+      stmt = visit(procedure.stmt))
     }
 
   def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] = stmts.flatMap {
@@ -113,7 +112,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
 
   def transformModule(module: OberonModule): OberonModule = {
     // É possível remover essa val?
-    val stmtcore = module.stmt.get.accept(this)
+    val stmtcore = visit(module.stmt.get)
 
      OberonModule(
       name = module.name,
