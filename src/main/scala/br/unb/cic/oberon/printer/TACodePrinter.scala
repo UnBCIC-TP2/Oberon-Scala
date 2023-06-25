@@ -1,6 +1,5 @@
 package br.unb.cic.oberon.printer
 
-
 import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, DivOp, MulOp, Name, NotOp, OrOp, SubOp, TAC, Temporary}
 
 object TACodePrinter {
