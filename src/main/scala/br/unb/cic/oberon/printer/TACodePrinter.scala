@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, DivOp, MulOp, Name, NotOp, OrOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, MulOp, Name, NotOp, OrOp, SubOp, TAC, Temporary}
 
 object TACodePrinter {
 
@@ -20,6 +20,7 @@ object TACodePrinter {
       case AndOp(s1, s2, dest, label) => println(s"${handleAddress(dest)} = ${handleAddress(s1)} && ${handleAddress(s2)}")
       case OrOp(s1, s2, dest, label) => println(s"${handleAddress(dest)} = ${handleAddress(s1)} || ${handleAddress(s2)}")
       case NotOp(s1, dest, label) => println(s"${handleAddress(dest)} = not(${handleAddress(s1)})")
+      case CopyOp(s1, dest, label) => println(s"${handleAddress(dest)} = ${handleAddress(s1)}")
     }
   }
   /**

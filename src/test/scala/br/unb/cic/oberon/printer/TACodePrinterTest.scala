@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.printer
 
 
+import br.unb.cic.oberon.codegen.LabelGenerator
 import br.unb.cic.oberon.ir.ast.{BooleanType, IntegerType}
 import br.unb.cic.oberon.ir.tac._
 import org.scalatest.funsuite.AnyFunSuite
@@ -14,7 +15,9 @@ class TACodePrinterTest extends AnyFunSuite {
 
     val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
 
+    println("BEGIN TEST ====================>")
     TACodePrinter.printInstructionSequence(ops)
+    println("END TEST ======================>")
   }
 
   test("test print for more than one add expressions in sequence") {
@@ -29,7 +32,9 @@ class TACodePrinterTest extends AnyFunSuite {
       AddOp(t0, t1, t2, "")
     )
 
+    println("BEGIN TEST ====================>")
     TACodePrinter.printInstructionSequence(ops)
+    println("END TEST ======================>")
   }
 
   test("test different operations in sequence") {
@@ -44,7 +49,9 @@ class TACodePrinterTest extends AnyFunSuite {
       SubOp(t1, Constant("6", IntegerType), t2, "")
     )
 
+    println("BEGIN TEST ====================>")
     TACodePrinter.printInstructionSequence(ops)
+    println("END TEST ======================>")
   }
 
   test("test AndOp with NotOp") {
@@ -63,7 +70,23 @@ class TACodePrinterTest extends AnyFunSuite {
       OrOp(t0, t3, t4, "")
     )
 
+    println("BEGIN TEST ====================>")
     TACodePrinter.printInstructionSequence(ops)
+    println("END TEST ======================>")
+  }
+
+  test("testing copy op") {
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+    )
+
+    println("BEGIN TEST ====================>")
+    TACodePrinter.printInstructionSequence(ops)
+    println("END TEST ======================>")
+
   }
 
 }
