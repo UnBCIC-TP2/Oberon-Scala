@@ -173,7 +173,7 @@ trait ExpressionParser extends CompositeParsers {
 trait StatementParser extends ExpressionParser {
     def designator: Parser[Designator] = (
         expressionParser ~ ("[" ~> expressionParser <~ "]") ^^ { case a ~ b => ArrayAssignment(a, b)}
-    |   expressionParser ~ ("." ~> identifier) ^^ { case a ~ b => RecordAssignment(a, b)}
+    |   factor ~ ("." ~> identifier) ^^ { case a ~ b => RecordAssignment(a, b)}
     |   identifier <~ "^" ^^ PointerAssignment
     |   identifier ^^ VarAssignment
     )
