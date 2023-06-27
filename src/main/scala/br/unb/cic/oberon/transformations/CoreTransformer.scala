@@ -134,6 +134,23 @@ class CoreVisitor() extends OberonVisitorAdapter {
     listProceduresCore.toList
   }
 
+  private def transformTestListStatement(listTest: List[Test]): List[Test] = {
+
+    var listTestCore = ListBuffer[Test]()
+
+    for (test <- listTest){
+      addedVariables = Nil
+      val coreStmt = test.stmt.accept(this)
+      listTestCore += Test(modifier = test.modifier,
+        name = test.name,
+        description = test.description,
+        constants = test.constants,
+        variables = test.variables ++ addedVariables,
+        stmt = coreStmt)
+    }
+    listTestCore.toList
+  }
+
   def flatSequenceOfStatements(stmts: List[Statement]): List[Statement] =
     stmts match {
       case SequenceStmt(ss) :: rest => flatSequenceOfStatements(ss) ++ flatSequenceOfStatements(rest)
@@ -144,6 +161,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
   def transformModule(module: OberonModule): OberonModule = {
     
     val stmtprocedureList = transformProcedureListStatement(module.procedures)
+    val stmtTestList = transformTestListStatement(module.tests)
     val stmtcore = module.stmt.get.accept(this)
 
      val coreModule = OberonModule(
@@ -153,6 +171,7 @@ class CoreVisitor() extends OberonVisitorAdapter {
       constants = module.constants,
       variables = module.variables ++ addedVariables,
       procedures = stmtprocedureList,
+      tests = stmtTestList,
       stmt = Some(stmtcore)
     )
 

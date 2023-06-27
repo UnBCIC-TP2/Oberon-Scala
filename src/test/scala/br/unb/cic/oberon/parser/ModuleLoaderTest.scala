@@ -14,9 +14,10 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
                  constants: List[Constant] = List(),
                  variables: List[VariableDeclaration] = List(),
                  procedures: List[Procedure] = List(),
+                 tests: List[Test] = List(),
                  stmt: Option[Statement] = None
                  ): OberonModule = {
-    OberonModule(name, submodules, userTypes, constants, variables, procedures, stmt)
+    OberonModule(name, submodules, userTypes, constants, variables, procedures, tests, stmt)
   }
 
   ignore("Testing if the ModuleLoader imports a file") {

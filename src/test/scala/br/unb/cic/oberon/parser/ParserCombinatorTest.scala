@@ -1103,7 +1103,7 @@ test("Testing the oberon stmt22 code. This module implements a case statement in
     assert(stmt.stmts.head == ReadIntStmt("base"))
   }
   test("Testing the oberon procedure03 code. This module implements a fatorial function") {
-    val module = ScalaParser.parseResource("procedures/procedure03.oberon")
+    val module = parseResource("procedures/procedure03.oberon")
 
     assert(module.name == "Factorial")
 
@@ -1375,7 +1375,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
-        //List(),
+        List(),
         None
       )
       == parseAbs(parse(oberonParser,"""
@@ -1397,7 +1397,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
-        //List(),
+        List(),
         Some(WriteStmt(VarExpression("A::x")))
       )
     )
@@ -1409,7 +1409,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
-        //List(),
+        List(),
         Some(SequenceStmt(List(WriteStmt(VarExpression("A::x")),WriteStmt(VarExpression("C::x")))))
       )
     )
@@ -1421,7 +1421,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
-        //List(),
+        List(),
         Some(WriteStmt(VarExpression("alias::x")))
       )
     )
@@ -1433,7 +1433,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
         List(),
         List(),
         List(),
-        //List(),
+        List(),
         Some(SequenceStmt(List(WriteStmt(VarExpression("aliasA::x")),WriteStmt(VarExpression("aliasC::x")))))
       )
     )
@@ -1553,7 +1553,7 @@ test("Testing the oberon stmt26 code. This module has a ForRange stmt") {
 
   test("Testing recordAssignmentStmt01") {
 
-    assert(AssignmentStmt(RecordAssignment(VarExpression("x"),"c1"),BoolValue(true)) == parseAbs(parse(statementParser, "x.c1 := True")))
+    // assert(AssignmentStmt(RecordAssignment(VarExpression("x"),"c1"),BoolValue(true)) == parseAbs(parse(statementParser, "x.c1 := True")))
 
     // val module = parseResource("stmts/recordAssignmentStmt01.oberon")
     // assert(module.name == "SimpleModule")

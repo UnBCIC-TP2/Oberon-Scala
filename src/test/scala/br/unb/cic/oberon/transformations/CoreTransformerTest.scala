@@ -1131,6 +1131,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(moduleStmt)
     )
 
@@ -1184,6 +1185,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(moduleStmt)
     )
 

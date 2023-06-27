@@ -24,7 +24,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
-                        //tests: List[Test],
+                        tests: List[Test],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
@@ -51,17 +51,8 @@ case class Test(modifier: String,
                 variables: List[VariableDeclaration],
                 stmt: Statement
                 ) {
-  //def accept(v: OberonVisitor): v.T = v.visit(this)
+  // def accept(v: OberonVisitor): v.T = v.visit(this)
 }
-/*
-case class Ignore(name: String,
-                description: StringValue,
-                constants: List[Constant],
-                variables: List[VariableDeclaration],
-                stmt: Statement
-               ) {
-  //def accept(v: OberonVisitor): v.T = v.visit(this)
-}*/
 
 /* formal argument definition */
 sealed trait FormalArg{

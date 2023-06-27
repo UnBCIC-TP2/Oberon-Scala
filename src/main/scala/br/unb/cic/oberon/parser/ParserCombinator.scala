@@ -300,10 +300,10 @@ trait OberonParserFull extends StatementParser {
       }
     )
     
-    class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure])
+    class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure],val tests: List[Test])
     def declarationsParser: Parser[DeclarationProps] =
-        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ^^
-        { case userTypes ~ constants ~ vars ~ procedures => new DeclarationProps(userTypes, constants, vars, procedures) }
+        listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ~ listOpt(rep(testParser)) ^^
+        { case userTypes ~ constants ~ vars ~ procedures ~ tests => new DeclarationProps(userTypes, constants, vars, procedures,tests ) }
     
     def blockParser: Parser[Option[Statement]] = optSolver("BEGIN" ~> multStatementParser <~ "END")
 
@@ -315,6 +315,7 @@ trait OberonParserFull extends StatementParser {
                 declarations.constants,
                 declarations.variables,
                 declarations.procedures,
+                declarations.tests,
                 statements
             )
     }

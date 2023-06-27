@@ -336,7 +336,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
 
   def load_vars(vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
-    OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc)
+    OberonModule("test", Set(), List(), consts, vars, List(),List(), None).accept(tc)
   }
 
   //somente para testes

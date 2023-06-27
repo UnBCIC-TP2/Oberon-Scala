@@ -381,6 +381,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -418,6 +419,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -455,6 +457,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -491,6 +494,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -528,6 +532,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -562,6 +567,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt02)
     )
 
@@ -595,6 +601,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt02)
     )
 
@@ -628,6 +635,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt02)
     )
 
@@ -664,6 +672,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt03)
     )
 
@@ -698,6 +707,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
       constants = Nil,
       variables = List(VariableDeclaration("x", IntegerType)),
       procedures = Nil,
+      tests = Nil,
       stmt = Some(stmt02)
     )
 
