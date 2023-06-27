@@ -33,7 +33,7 @@ class Environment[T](private val top_loc:Int = 0,
     return new Environment[T](top_loc = this.top_loc+1,
       locations = this.locations+(Location(top_loc)-> value),
       global = this.global+(name -> Location(top_loc)) ,
-     procedures = this.procedures,
+      procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
     )
@@ -43,7 +43,7 @@ class Environment[T](private val top_loc:Int = 0,
   def addUserDefinedType(userType: UserDefinedType) : Environment[T] = {
     //userDefinedTypes += userDefinedTypeName(userType) -> userType
     new Environment[T](top_loc = this.top_loc,
-    locations = this.locations,
+      locations = this.locations,
       global = this.global,
       procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes+(this.userDefinedTypeName(userType)-> userType),
@@ -64,23 +64,23 @@ class Environment[T](private val top_loc:Int = 0,
   }
 
   def setLocalVariable(name: String, value: T) : Environment[T] = {
-//    top_loc += 1
-//    if(stack.isEmpty) {
-//      stack.push(Map.empty[String, Location])
-//    }
-//  stack.top += name -> Location(top_loc)
-//   locations += Location(top_loc) -> value
+    //    top_loc += 1
+    //    if(stack.isEmpty) {
+    //      stack.push(Map.empty[String, Location])
+    //    }
+    //  stack.top += name -> Location(top_loc)
+    //   locations += Location(top_loc) -> value
     val copyStack = stack.clone()
     if(copyStack.isEmpty) {
       copyStack.push(Map.empty[String, Location])
     }
     copyStack.top.addOne(name -> Location(top_loc))
     new Environment[T](top_loc = this.top_loc+1,
-        locations = this.locations.addOne(Location(top_loc) -> value),
-        global = this.global,
-        procedures = this.procedures,
-        userDefinedTypes = this.userDefinedTypes,
-        stack = copyStack)
+      locations = this.locations.addOne(Location(top_loc) -> value),
+      global = this.global,
+      procedures = this.procedures,
+      userDefinedTypes = this.userDefinedTypes,
+      stack = copyStack)
   }
 
   def setVariable(name: String, value: T) : Environment[T] = {
@@ -131,12 +131,12 @@ class Environment[T](private val top_loc:Int = 0,
     var copyprocedures = procedures.clone()
     copyprocedures(procedure.name) = procedure
 
-      new Environment[T](top_loc = this.top_loc,
-        locations = this.locations,
-        global = this.global,
-        procedures = copyprocedures,
-        userDefinedTypes = this.userDefinedTypes,
-        stack = this.stack)
+    new Environment[T](top_loc = this.top_loc,
+      locations = this.locations,
+      global = this.global,
+      procedures = copyprocedures,
+      userDefinedTypes = this.userDefinedTypes,
+      stack = this.stack)
   }
 
 
@@ -190,12 +190,12 @@ class Environment[T](private val top_loc:Int = 0,
         userDefinedTypes = this.userDefinedTypes,
         stack = this.stack)
     }
-      else throw new RuntimeException("Variable " + name + " is not defined")
+    else throw new RuntimeException("Variable " + name + " is not defined")
   }
-//  new Environment[T](top_loc = this.top_loc,
-//    locations = this.locations,
-//    global = this.global,
-//    procedures = this.procedures,
-//    userDefinedTypes = this.userDefinedTypes,
+  //  new Environment[T](top_loc = this.top_loc,
+  //    locations = this.locations,
+  //    global = this.global,
+  //    procedures = this.procedures,
+  //    userDefinedTypes = this.userDefinedTypes,
   //    stack = this.stack)
 }

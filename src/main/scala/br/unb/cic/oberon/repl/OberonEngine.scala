@@ -49,7 +49,7 @@ class OberonEngine extends ScriptEngine {
 
   override def put(name: String, value: Object): Unit = {
     //println(f"put call ($name = $value)")
-    interpreter.env.setGlobalVariable(name, objectToExpression(value))
+    interpreter.env = interpreter.env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
@@ -79,7 +79,7 @@ class OberonEngine extends ScriptEngine {
       return
     }
     if (hasVariable(variable)) {
-      interpreter.env.delVariable(variable)
+      interpreter.env=interpreter.env.delVariable(variable)
     }
   }
 
@@ -266,7 +266,7 @@ class OberonEngine extends ScriptEngine {
     def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
 
       val keywordList: List[String] = List("ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO", "ELSE", "ELSIF", "END","EXIT", "FOR", "IF", "IMPORT", "IN", "IS", "LOOP", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER", "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO", "TYPE", "UNTIL", "VAR", "WHILE", "WITH")
-      
+
       for (v <- keywordList) {
         candidates.add(new Candidate(AttributedString.stripAnsi(v), v, null, null, null, null, false));
       }
