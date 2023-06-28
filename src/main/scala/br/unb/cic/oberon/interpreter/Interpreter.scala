@@ -49,6 +49,9 @@ class Interpreter extends OberonVisitorAdapter {
     module.procedures.foreach(p => p.accept(this))
     module.tests.foreach(t => t.accept(this))
 
+    // executes tests
+    module.tests.foreach(t => (callTest(t.name),
+      env = env.pop))
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
