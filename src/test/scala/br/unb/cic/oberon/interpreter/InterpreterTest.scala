@@ -657,14 +657,56 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
   test("Testing procedure06"){
     val module = parseResource("procedures/procedure06.oberon")
 
-    assert(module.name == "Procedure06")
-    module.accept(interpreter)
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    assert(coreModule.name == "Procedure06")
+    coreModule.accept(interpreter)
 
     assert(interpreter.env.lookup("a") == Some(IntValue(2)))
     assert(interpreter.env.lookup("b") == Some(IntValue(4)))
     assert(interpreter.env.lookup("c") == Some(IntValue(1)))
 
   }
+
+  test("Testing Test parser") {
+    val module = parseResource("procedures/procedureTest01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+
+  }
+
+  test("Testing Ignore parser") {
+    assert(Test("IGNORE", "firstTest", StringValue("The first test suite"), List[Constant](), List[VariableDeclaration](), AssertTrueStmt(EQExpression(VarExpression("x"), IntValue(20))))
+      == parseAbs(parse(testParser,
+      """
+    IGNORE firstTest ("The first test suite");
+    BEGIN
+        assert(x = 20)
+    END firstTest
+    """))
+    )
+
+    val thrown = intercept[Exception] {
+      parseAbs(parse(testParser,
+        """
+        IGNORE firstTest ("The first test suite");
+        BEGIN
+            assert(x = 20)
+        END firstTestSuite
+        """))
+    }
+    assert(thrown.getMessage == "Procedure name (firstTest) doesn't match the end identifier (firstTestSuite)")
+  }
+
+
+
+
+
+
+
 
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")
