@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ir.ast.{Location, Procedure, ReferenceToUserDefinedType, Test, Type, UserDefinedType}
+import br.unb.cic.oberon.ir.ast.{Location, Procedure, ReferenceToUserDefinedType, Type, UserDefinedType}
 
 import scala.collection.mutable.{Map, Stack}
 
@@ -22,7 +22,6 @@ class Environment[T](private val top_loc:Int = 0,
                      private val global: Map[String, Location] = Map.empty[String, Location],
                      private val stack: Stack[Map[String, Location]] = Stack.empty[Map[String, Location]],
                      private val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
-                     private val tests: Map[String, Test] = Map.empty[String, Test],
                      private val userDefinedTypes: Map[String, UserDefinedType] = Map.empty[String, UserDefinedType]) {
 
 
@@ -35,7 +34,6 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations+(Location(top_loc)-> value),
       global = this.global+(name -> Location(top_loc)) ,
       procedures = this.procedures,
-      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
     )
@@ -48,7 +46,6 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations,
       global = this.global,
       procedures = this.procedures,
-      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes+(this.userDefinedTypeName(userType)-> userType),
       stack = this.stack)
   }
@@ -62,7 +59,6 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations,
       global = this.global,
       procedures = this.procedures,
-      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = copyStack)
   }
@@ -83,7 +79,6 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations.addOne(Location(top_loc) -> value),
       global = this.global,
       procedures = this.procedures,
-      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = copyStack)
   }
@@ -96,7 +91,6 @@ class Environment[T](private val top_loc:Int = 0,
         locations = newlocations,
         global = this.global,
         procedures = this.procedures,
-        tests = this.tests,
         userDefinedTypes = this.userDefinedTypes,
         stack = this.stack)
     }
@@ -107,7 +101,6 @@ class Environment[T](private val top_loc:Int = 0,
         locations = newlocations,
         global = this.global,
         procedures = this.procedures,
-        tests = this.tests,
         userDefinedTypes = this.userDefinedTypes,
         stack = this.stack)
     }
@@ -146,18 +139,7 @@ class Environment[T](private val top_loc:Int = 0,
       stack = this.stack)
   }
 
-  def declareTest(test: Test): Environment[T] = {
-    //Unit = tests(test.name) = test
-    var copytests = tests.clone()
-    copytests(test.name) = test
 
-    new Environment[T](top_loc = this.top_loc,
-      locations = this.locations,
-      global = this.global,
-      tests = copytests,
-      userDefinedTypes = this.userDefinedTypes,
-      stack = this.stack)
-  }
 
 
   def findProcedure(name: String): Procedure = procedures(name)
