@@ -1,5 +1,4 @@
 package br.unb.cic.oberon.interpreter
-
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
@@ -310,6 +309,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     case NotExpression(exp) => BoolValue(!exp.accept(this).asInstanceOf[Value].value.asInstanceOf[Boolean])
     case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
+    case TestCallStmt(name) =>{
+      val exp = visitTest(name)
+      exp
+  }
     case FunctionCallExpression(name, args) => {
       val exp = visitFunctionCall(name, args)
       exp
@@ -338,11 +341,12 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }
-"""
+
   def visitTest(name: String): Expression = {
     interpreter.callTest(name)
+
   }
-"""
+
 
 
   /**
