@@ -669,6 +669,78 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
   }
 
+  test("Testing Assert true (true)") {
+    val module = parseResource("stmts/AssertTrueStmt01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert true (false)") {
+    val module = parseResource("stmts/AssertTrueStmt02.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert error (no arguments)"){
+    val module = parseResource("stmts/AssertErrorStmt01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert error (with arguments)") {
+    val module = parseResource("stmts/AssertErrorStmt02.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert equal (right)") {
+    val module = parseResource("stmts/AssertEqualStmt01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert equal (wrong)") {
+    val module = parseResource("stmts/AssertEqualStmt02.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert not equal (right)") {
+    val module = parseResource("stmts/AssertNEqualStmt01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
+  test("Testing Assert not equal (wrong)") {
+    val module = parseResource("stmts/AssertNEqualStmt02.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
+
   test("Testing Test parser1") {
     val module = parseResource("procedures/procedureTest03.oberon")
 
@@ -688,15 +760,6 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.accept(interpreter) == ())
 
-  }
-
-  test("Testing Assert true") {
-    val module = parseResource("stmts/AssertTrueStmt01.oberon")
-
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
-
-    coreModule.accept(interpreter)
   }
 
   test("Testing Ignore parser") {
