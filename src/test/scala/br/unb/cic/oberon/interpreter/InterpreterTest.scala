@@ -670,7 +670,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
   }
 
   test("Testing Test parser1") {
-    val module = parseResource("procedures/procedureTest01.oberon")
+    val module = parseResource("procedures/procedureTest03.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)

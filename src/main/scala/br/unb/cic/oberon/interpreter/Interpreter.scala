@@ -37,7 +37,9 @@ class Interpreter extends OberonVisitorAdapter {
     for (p <- lib.stdlib.procedures) {
       env = env.declareProcedure(p)
     }
-
+    for (t <- lib.stdlib.tests) {
+      env = env.declareTest(t)
+    }
   }
 
   override def visit(module: OberonModule): Unit = {
@@ -46,6 +48,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
+    module.tests.foreach(t => t.accept(this))
 
 
     // execute the statement if it is defined.
@@ -197,6 +200,11 @@ class Interpreter extends OberonVisitorAdapter {
     procedure.stmt.accept(this)
   }
 
+  def callTest(name: String): Unit = {
+    val procedure = env.findTest(name)
+
+  }
+
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
       case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, env.pointsTo(name2))
@@ -309,6 +317,8 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }
+
+
 
   /**
    * Eval an arithmetic expression on Numbers
