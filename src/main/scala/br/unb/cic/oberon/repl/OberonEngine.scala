@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.repl
 
 import br.unb.cic.oberon.ir.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
-import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
+import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
@@ -28,7 +28,7 @@ class OberonEngine extends ScriptEngine {
   }
 
   val interpreter = new Interpreter
-  val expressionEval = new EvalExpressionVisitor(interpreter)
+  //val expressionEval = new EvalExpressionVisitor(interpreter)
   val coreVisitor = new CoreVisitor()
 
   override def getEngineName: String = this.getClass.getSimpleName
@@ -196,7 +196,7 @@ class OberonEngine extends ScriptEngine {
   }
 
   private def expressionValue(exp: Expression): Any = {
-    val result = exp.accept(expressionEval)
+    val result = interpreter.evalExpression(interpreter.env, exp)
     result match {
       case v: Value => return v.value
       case _: Undef => return null
@@ -210,7 +210,7 @@ class OberonEngine extends ScriptEngine {
       case s: String => StringValue(s)
       case b: Boolean => BoolValue(b)
       case e: Exception => StringValue(e.getMessage)
-      case e: Expression => e.accept(expressionEval)
+      case e: Expression => interpreter.evalExpression(interpreter.env, e)
       //case _: BoxedUnit => Undef()
       case _ =>
         if (obj != null) println(f"Cannot convert $obj to expression")

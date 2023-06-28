@@ -2,7 +2,7 @@ package br.unb.cic.oberon.arithmetic
 
 import br.unb.cic.oberon.ir.ast.{IntValue, RealValue, MultExpression}
 import org.scalatest.funsuite.AnyFunSuite
-import br.unb.cic.oberon.interpreter.{Interpreter, EvalExpressionVisitor}
+import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon._
 import br.unb.cic.oberon.ir.ast._
 
@@ -46,9 +46,9 @@ class ArithmeticTestSuite extends AnyFunSuite {
     val expected = RealValue(20.0)
 
     val interpreter = new Interpreter()
-    val expVisitor = new EvalExpressionVisitor(interpreter)
+    //val expVisitor = new EvalExpressionVisitor(interpreter)
 
-    val res = m.accept(expVisitor)
+    val res = interpreter.evalExpression(interpreter.env, m)
 
     assert(expected == res)
 

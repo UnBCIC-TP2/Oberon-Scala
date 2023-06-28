@@ -724,5 +724,5 @@ class InterpreterTest extends AnyFunSuite {
 
 
   def evalArraySubscript(name: String, index: Integer): Expression =
-    interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
+    interpreter.evalExpression(interpreter.env, ArraySubscript(VarExpression(name), IntValue(index)))
 }

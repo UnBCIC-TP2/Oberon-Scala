@@ -49,11 +49,11 @@ object JVMCodeGenerator extends CodeGenerator[String] {
   def generateConstants(constants: List[Constant], cw: ClassWriter): Unit = {
     val interpreter = new Interpreter()
 
-    val visitor = new EvalExpressionVisitor(interpreter)
+    //val visitor = new EvalExpressionVisitor(interpreter)
 
     constants.map {
       case (constant) => 
-        val v = constant.exp.accept(visitor)
+        val v = interpreter.evalExpression(interpreter.env, constant.exp)
 
         v match {
           case IntValue (value) => {
