@@ -690,8 +690,14 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
   }
 
+  test("Testing Assert true") {
+    val module = parseResource("stmts/AssertTrueStmt01.oberon")
 
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
 
+    coreModule.accept(interpreter)
+  }
 
   test("Testing Ignore parser") {
     assert(Test("IGNORE", "firstTest", StringValue("The first test suite"), List[Constant](), List[VariableDeclaration](), AssertTrueStmt(EQExpression(VarExpression("x"), IntValue(20))))

@@ -1,0 +1,7 @@
+MODULE AssertTrueModule;
+
+BEGIN
+    assert(TRUE)
+END
+
+END AssertTrueModule.
