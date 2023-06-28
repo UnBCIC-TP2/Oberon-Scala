@@ -1,8 +1,10 @@
 MODULE procedureTest01;
 
+
+
 TEST firstTest ("The first test suite");
       BEGIN
-          assert(FALSE)
+          assert_nq(1 == 2)
       END firstTest
 BEGIN
       write(2)

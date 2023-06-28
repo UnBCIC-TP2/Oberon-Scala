@@ -2,7 +2,7 @@ MODULE procedureTest01;
 
 TEST firstTest ("The first test suite");
       BEGIN
-          assert(FALSE)
+          assert_error()
       END firstTest
 BEGIN
       write(2)

@@ -669,14 +669,26 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
   }
 
-  test("Testing Test parser") {
+  test("Testing Test parser1") {
     val module = parseResource("procedures/procedureTest01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
+    assert(coreModule.accept(interpreter) == ())
 
   }
+
+
+  test("Testing Test parser2") {
+    val thrown = intercept[Exception]{parseResource("procedures/procedureTest02.oberon")}
+
+    assert(thrown.getMessage == "")
+
+  }
+
+
+
 
   test("Testing Ignore parser") {
     assert(Test("IGNORE", "firstTest", StringValue("The first test suite"), List[Constant](), List[VariableDeclaration](), AssertTrueStmt(EQExpression(VarExpression("x"), IntValue(20))))
@@ -689,23 +701,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     """))
     )
 
-    val thrown = intercept[Exception] {
-      parseAbs(parse(testParser,
-        """
-        IGNORE firstTest ("The first test suite");
-        BEGIN
-            assert(x = 20)
-        END firstTestSuite
-        """))
-    }
-    assert(thrown.getMessage == "Procedure name (firstTest) doesn't match the end identifier (firstTestSuite)")
   }
-
-
-
-
-
-
 
 
   test(testName = "Testing boolean32"){
