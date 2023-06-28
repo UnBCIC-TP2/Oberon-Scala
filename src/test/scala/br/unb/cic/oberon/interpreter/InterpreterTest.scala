@@ -769,6 +769,15 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(coreModule.accept(interpreter) == ())
 
   }
+  
+  test("Testing Ignore") {
+    val module = parseResource("procedures/procedureIgnore01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    coreModule.accept(interpreter)
+  }
 
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")

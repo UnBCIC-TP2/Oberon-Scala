@@ -1,6 +1,6 @@
-MODULE procedureTest01;
+MODULE ProcedureIgnore;
 
-TEST firstTest ("The first test suite");
+IGNORE firstTest ("The first test suite");
       BEGIN
           assert(False)
       END firstTest
@@ -9,4 +9,4 @@ BEGIN
       write("oi")
 END
 
-END procedureTest01.
+END ProcedureIgnore.

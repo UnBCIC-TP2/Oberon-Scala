@@ -36,9 +36,6 @@ class Interpreter extends OberonVisitorAdapter {
     for (p <- lib.stdlib.procedures) {
       env = env.declareProcedure(p)
     }
-    for (t <- lib.stdlib.tests) {
-      env = env.declareTest(t)
-    }
   }
 
   override def visit(module: OberonModule): Unit = {
@@ -50,8 +47,9 @@ class Interpreter extends OberonVisitorAdapter {
     module.tests.foreach(t => t.accept(this))
 
     // executes tests
-    module.tests.foreach(t => (callTest(t.name),
-      env = env.pop))
+    module.tests.foreach(t =>
+      if (t.modifier == "TEST")(callTest(t.name), env = env.pop)
+      )
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
@@ -59,6 +57,7 @@ class Interpreter extends OberonVisitorAdapter {
       setupStandardLibraries()
       module.stmt.get.accept(this)
     }
+
   }
 
   override def visit(constant: Constant): Unit = {
