@@ -78,6 +78,10 @@ class Interpreter extends OberonVisitorAdapter {
     env = env.declareProcedure(procedure)
   }
 
+  override def visit(test: Test): Unit = {
+    env = env.declareTest(test)
+  }
+
   def visitArrayAssignment(baseExp: Expression, indexExp: Expression, exp: Expression): Unit = {
     val array = evalExpression(baseExp)
     val index = evalExpression(indexExp)
@@ -163,6 +167,9 @@ class Interpreter extends OberonVisitorAdapter {
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args)
         env = env.pop()
+      case TestCallStmt(name) =>
+        callTest(name)
+        env = env.pop()
     }
   }
 
@@ -233,6 +240,10 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   def returnProcedure() = {
+    env = env.pop()
+  }
+
+  def returnTest() = {
     env = env.pop()
   }
 
@@ -320,16 +331,18 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
 
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {
     interpreter.callProcedure(name, args)
+    interpreter.callTest(name)
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
     interpreter.returnProcedure()
+    interpreter.returnTest()
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }
-
+"""
   def visitTest(name: String): Expression = {
     interpreter.callTest(name)
   }
-
+"""
 
 
   /**
