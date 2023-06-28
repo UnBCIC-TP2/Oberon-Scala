@@ -37,7 +37,6 @@ class Interpreter extends OberonVisitorAdapter {
     for (p <- lib.stdlib.procedures) {
       env = env.declareProcedure(p)
     }
-
   }
 
   override def visit(module: OberonModule): Unit = {

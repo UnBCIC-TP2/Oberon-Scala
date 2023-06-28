@@ -1,5 +1,5 @@
 MODULE SimpleModule;
-
+  
 VAR
   x : INTEGER;
   y : INTEGER;

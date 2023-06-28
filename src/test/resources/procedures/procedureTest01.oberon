@@ -5,7 +5,7 @@ TEST firstTest ("The first test suite");
           assert(FALSE)
       END firstTest
 BEGIN
-      write("oi")
+      write(2)
 END
 
 END procedureTest01.

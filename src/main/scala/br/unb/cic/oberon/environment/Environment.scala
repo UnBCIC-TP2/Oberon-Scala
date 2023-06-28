@@ -140,8 +140,6 @@ class Environment[T](private val top_loc:Int = 0,
   }
 
 
-
-
   def findProcedure(name: String): Procedure = procedures(name)
 
   def push(): Environment[T] ={

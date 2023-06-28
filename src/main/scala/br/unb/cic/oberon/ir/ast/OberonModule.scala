@@ -44,7 +44,6 @@ case class Procedure(name: String,
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
-/* test declaration definition*/
 case class Test(modifier: String,
                 name: String,
                 description: StringValue,
@@ -52,7 +51,7 @@ case class Test(modifier: String,
                 variables: List[VariableDeclaration],
                 stmt: Statement
                 ) {
-  def accept(v: OberonVisitor): v.T = v.visit(this)
+  // def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
 /* formal argument definition */
