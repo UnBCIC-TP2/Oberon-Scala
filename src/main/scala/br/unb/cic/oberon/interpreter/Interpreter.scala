@@ -37,6 +37,9 @@ class Interpreter extends OberonVisitorAdapter {
     for (p <- lib.stdlib.procedures) {
       env = env.declareProcedure(p)
     }
+    for (t <- lib.stdlib.tests) {
+      env = env.declareTest(t)
+    }
   }
 
   override def visit(module: OberonModule): Unit = {
@@ -45,6 +48,7 @@ class Interpreter extends OberonVisitorAdapter {
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
+    module.tests.foreach(t => t.accept(this))
 
 
     // execute the statement if it is defined.

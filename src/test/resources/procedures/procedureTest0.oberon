@@ -5,7 +5,7 @@ TEST firstTest ("The first test suite");
           assert(TRUE)
       END firstTest
 BEGIN
-      write(2)
+      firstTest
 END
 
 END procedureTest01.

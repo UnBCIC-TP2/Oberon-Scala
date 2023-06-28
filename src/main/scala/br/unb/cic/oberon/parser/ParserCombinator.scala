@@ -324,7 +324,7 @@ trait OberonParserFull extends StatementParser {
 
 trait Oberon2ScalaParser extends OberonParserFull {
     def parseResource(resource: String): OberonModule = {
-        return parseAbs(parse(oberonParser, Resources.getContent(resource))) 
+        return parseAbs(parse(oberonParser, Resources.getContent(resource)))
     }
 
     def parseAbs[T](result: ParseResult[T]): T = {
