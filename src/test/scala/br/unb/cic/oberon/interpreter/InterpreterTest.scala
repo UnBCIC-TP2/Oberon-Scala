@@ -669,29 +669,68 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
   }
 
-  test("Testing Test parser1") {
-    val module = parseResource("procedures/procedureTest01.oberon")
+test("Testing Test parser0") {
+  val module = parseResource("procedures/procedureTest0.oberon")
 
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+  assert(coreModule.accept(interpreter) == ())
 
-  }
+}
+test("Testing Test parser1") {
+  val module = parseResource("procedures/procedureTest01.oberon")
 
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
 
-  test("Testing Test parser2") {
-    val module = parseResource("procedures/procedureTest02.oberon")
+  coreModule.accept(interpreter)
 
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
+}
+test("Testing Test parser2") {
+  val module = parseResource("procedures/procedureTest02.oberon")
 
-    assert(coreModule.accept(interpreter) == ())
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
 
-  }
+  assert(coreModule.accept(interpreter) == ())
 
+}
+test("Testing Test parser3") {
+  val module = parseResource("procedures/procedureTest03.oberon")
 
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
+  assert(coreModule.accept(interpreter) == ())
 
+}
+test("Testing Test parser4") {
+  val module = parseResource("procedures/procedureTest04.oberon")
+
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
+
+  assert(coreModule.accept(interpreter) == ())
+
+}
+test("Testing Test parser5") {
+  val module = parseResource("procedures/procedureTest05.oberon")
+
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
+
+  assert(coreModule.accept(interpreter) == ())
+
+}
+test("Testing Test parser6") {
+  val module = parseResource("procedures/procedureTest06.oberon")
+
+  val coreVisitor = new CoreVisitor()
+  val coreModule = coreVisitor.transformModule(module)
+
+  assert(coreModule.accept(interpreter) == ())
+
+}
 
   test("Testing Ignore parser") {
     assert(Test("IGNORE", "firstTest", StringValue("The first test suite"), List[Constant](), List[VariableDeclaration](), AssertTrueStmt(EQExpression(VarExpression("x"), IntValue(20))))
