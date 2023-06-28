@@ -201,8 +201,9 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   def callTest(name: String): Unit = {
-    val procedure = env.findTest(name)
-
+    val test = env.findTest(name)
+    updateEnvironmentWithTest(test)
+    test.stmt.accept(this)
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
@@ -222,6 +223,13 @@ class Interpreter extends OberonVisitorAdapter {
     })
     procedure.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp))
     procedure.variables.foreach(v => env = env.setLocalVariable(v.name, Undef()))
+  }
+
+  def updateEnvironmentWithTest(test: Test): Unit = {
+    env = env.push() // indicates a test.
+
+    test.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp))
+    test.variables.foreach(v => env = env.setLocalVariable(v.name, Undef()))
   }
 
   def returnProcedure() = {
@@ -316,6 +324,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
     interpreter.returnProcedure()
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
+  }
+
+  def visitTest(name: String): Expression = {
+    interpreter.callTest(name)
   }
 
 
