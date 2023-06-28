@@ -164,16 +164,16 @@ class Interpreter extends OberonVisitorAdapter {
       case MetaStmt(f) => f().accept(this)
 
       case AssertTrueStmt(exp: Expression) =>
-        if (!evalCondition(exp)) throw new Exception("Exception thrown from test")
+        if (!evalCondition(exp)) throw new Exception("Exception thrown from assert true")
 
       case AssertError() =>
-        throw new Exception("Exception thrown from test")
+        throw new Exception("Exception thrown from assert error")
 
       case AssertNotEqualStmt(left, right) =>
-        if (left == right) throw new Exception("Exception thrown from test")
+        if (left == right) throw new Exception("Exception thrown from assert not equal")
 
       case AssertEqualStmt(left, right) =>
-        if (left != right) throw new Exception("Exception thrown from test")
+        if (left != right) throw new Exception("Exception thrown from assert equal")
 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args)

@@ -1,7 +1,7 @@
-MODULE AssertTrueModule;
+MODULE AssertErrorModule;
 
 BEGIN
     assert_error()
 END
 
-END AssertTrueModule.
+END AssertErrorModule.
