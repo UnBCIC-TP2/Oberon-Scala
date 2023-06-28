@@ -331,10 +331,10 @@ class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorA
 
   def visitFunctionCall(name: String, args: List[Expression]): Expression = {
     interpreter.callProcedure(name, args)
-    interpreter.callTest(name)
+
     val returnValue = interpreter.env.lookup(Values.ReturnKeyWord)
     interpreter.returnProcedure()
-    interpreter.returnTest()
+
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }
