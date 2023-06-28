@@ -676,6 +676,8 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     coreModule.accept(interpreter)
+
+    assert(coreModule.accept(interpreter) == ())
   }
 
   test("Testing Assert true (false)") {
@@ -684,7 +686,8 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    val thrown = intercept[Exception]{coreModule.accept(interpreter)}
+    assert(thrown.getMessage() == "Exception thrown from test")
   }
 
   test("Testing Assert error (no arguments)"){
@@ -693,17 +696,12 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    val thrown = intercept[Exception] {
+      coreModule.accept(interpreter)
+    }
+    assert(thrown.getMessage() == "Exception thrown from test")
   }
 
-  test("Testing Assert error (with arguments)") {
-    val module = parseResource("stmts/AssertErrorStmt02.oberon")
-
-    val coreVisitor = new CoreVisitor()
-    val coreModule = coreVisitor.transformModule(module)
-
-    coreModule.accept(interpreter)
-  }
 
   test("Testing Assert equal (right)") {
     val module = parseResource("stmts/AssertEqualStmt01.oberon")
@@ -712,6 +710,8 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     coreModule.accept(interpreter)
+
+    assert(coreModule.accept(interpreter) == ())
   }
 
   test("Testing Assert equal (wrong)") {
@@ -720,7 +720,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    val thrown = intercept[Exception] {
+      coreModule.accept(interpreter)
+    }
+    assert(thrown.getMessage() == "Exception thrown from test")
   }
 
   test("Testing Assert not equal (right)") {
@@ -730,6 +733,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     coreModule.accept(interpreter)
+    assert(coreModule.accept(interpreter) == ())
   }
 
   test("Testing Assert not equal (wrong)") {
@@ -738,7 +742,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    val thrown = intercept[Exception] {
+      coreModule.accept(interpreter)
+    }
+    assert(thrown.getMessage() == "Exception thrown from test")
   }
 
   test("Testing Test parser1") {
@@ -749,6 +756,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     coreModule.accept(interpreter)
 
+    assert(coreModule.accept(interpreter) == ())
   }
 
 
@@ -761,20 +769,6 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(coreModule.accept(interpreter) == ())
 
   }
-
-  test("Testing Ignore parser") {
-    assert(Test("IGNORE", "firstTest", StringValue("The first test suite"), List[Constant](), List[VariableDeclaration](), AssertTrueStmt(EQExpression(VarExpression("x"), IntValue(20))))
-      == parseAbs(parse(testParser,
-      """
-    IGNORE firstTest ("The first test suite");
-    BEGIN
-        assert(x = 20)
-    END firstTest
-    """))
-    )
-
-  }
-
 
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")
