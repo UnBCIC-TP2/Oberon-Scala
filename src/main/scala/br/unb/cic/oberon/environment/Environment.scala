@@ -161,8 +161,7 @@ class Environment[T](private val top_loc:Int = 0,
 
 
   def findProcedure(name: String): Procedure = procedures(name)
-
-  def findTest(name:String): Test = tests(name)
+  def findTest(name: String): Test = tests(name)
 
   def push(): Environment[T] ={
     var copystack = stack.clone()
@@ -171,6 +170,7 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations,
       global = this.global,
       procedures = this.procedures,
+      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = copystack)
   }
@@ -181,6 +181,7 @@ class Environment[T](private val top_loc:Int = 0,
       locations = this.locations,
       global = this.global,
       procedures = this.procedures,
+      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = copystack)
   }
@@ -198,6 +199,7 @@ class Environment[T](private val top_loc:Int = 0,
         locations = this.locations,
         global = this.global,
         procedures = this.procedures,
+        tests = this.tests,
         userDefinedTypes = this.userDefinedTypes,
         stack = copystack)
 
@@ -209,6 +211,7 @@ class Environment[T](private val top_loc:Int = 0,
         locations = this.locations,
         global = copyglobal,
         procedures = this.procedures,
+        tests = this.tests,
         userDefinedTypes = this.userDefinedTypes,
         stack = this.stack)
     }
