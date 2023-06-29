@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, MulOp, Name, NotOp, OrOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc.{line, text}
 
@@ -23,6 +23,12 @@ object TACodePrinter {
     instructions.foldLeft(tacHeader)(generateCode)
   }
 
+  /**
+   *
+   * @param tac: document
+   * @param instruction: instruction to deal with
+   * @return
+   */
   private def generateCode(tac: Doc, instruction: TAC): Doc = {
 
     instruction match {
@@ -32,7 +38,18 @@ object TACodePrinter {
       case DivOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "/"))
       case AndOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "&&"))
       case OrOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "||"))
-      case NotOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = not ${handleAddress(s1)}")
+      case RemOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "%"))
+      case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
+      case EqJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} == ${handleAddress(s2)} Goto $dest")
+      case NeqJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} != ${handleAddress(s2)} Goto $dest")
+      case GTJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} > ${handleAddress(s2)} Goto $dest")
+      case GTEJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} >= ${handleAddress(s2)} Goto $dest")
+      case LTJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} < ${handleAddress(s2)} Goto $dest")
+      case LTEJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} <= ${handleAddress(s2)} Goto $dest")
+      case JumpTrue(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == true Goto $dest")
+      case JumpFalse(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == false Goto $dest")
+      case Jump(dest, label) => tac / text(s"Goto $dest")
+      case NotOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = NOT ${handleAddress(s1)}")
       case CopyOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
       case _ => Doc.text("Not implemented in printer")
     }
@@ -64,7 +81,6 @@ object TACodePrinter {
 
   /**
    * This method print all itens in instructions list
-   *
    * @param instructions : reference to instructions list
    */
   def printInstructionSequence(instructions: List[TAC]): Unit = {
