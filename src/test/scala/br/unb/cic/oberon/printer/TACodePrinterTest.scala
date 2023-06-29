@@ -26,7 +26,7 @@ class TACodePrinterTest extends AnyFunSuite {
     val t2 = new Temporary(IntegerType, 2, true)
 
     val ops = List(
-      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, "L1"),
       AddOp(Constant("3", IntegerType), Constant("4", IntegerType), t1, ""),
       AddOp(t0, t1, t2, "")
     )

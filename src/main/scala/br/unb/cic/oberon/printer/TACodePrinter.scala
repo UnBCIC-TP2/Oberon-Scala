@@ -32,13 +32,13 @@ object TACodePrinter {
   private def generateCode(tac: Doc, instruction: TAC): Doc = {
 
     instruction match {
-      case AddOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "+"))
-      case SubOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "-"))
-      case MulOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "*"))
-      case DivOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "/"))
-      case AndOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "&&"))
-      case OrOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "||"))
-      case RemOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "%"))
+      case AddOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "+", label))
+      case SubOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "-", label))
+      case MulOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "*", label))
+      case DivOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "/", label))
+      case AndOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "&&", label))
+      case OrOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "||", label))
+      case RemOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "%", label))
       case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
       case EqJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} == ${handleAddress(s2)} Goto $dest")
       case NeqJump(s1, s2, dest, label) => tac / text(s"if ${handleAddress(s1)} != ${handleAddress(s2)} Goto $dest")
@@ -64,8 +64,11 @@ object TACodePrinter {
    * @param operation of instruction
    * @return
    */
-  private def handleTAC(destiny : Address, s1 : Address, s2: Address, operation : String): String = {
-    s"${handleAddress(destiny)} = ${handleAddress(s1)} $operation ${handleAddress(s2)}"
+  private def handleTAC(destiny : Address, s1 : Address, s2: Address, operation : String, label : String): String = {
+    label match {
+      case "" => s"${handleAddress(destiny)} = ${handleAddress(s1)} $operation ${handleAddress(s2)}"
+      case _ => s"$label:" + "\n" + s"  ${handleAddress(destiny)} = ${handleAddress(s1)} $operation ${handleAddress(s2)}"
+    }
   }
 
   /**
