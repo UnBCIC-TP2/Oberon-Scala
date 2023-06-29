@@ -7,6 +7,9 @@ import org.typelevel.paiges.Doc.{line, text}
 /**
  * This class has the responsibility to print TAC Abstraction in Scala
  * We wanted an string visualization of the abstraction
+ * We can also get a Doc representation using an external library (paiges)
+ * @author Marcelo M. Amorim
+ * @since 28/06/2023
  */
 object TACodePrinter {
 
@@ -16,11 +19,11 @@ object TACodePrinter {
    * @return
    */
   private def buildDocument(instructions: List[TAC]): Doc = {
-    val tacHeader = line + Doc.text("#### Prettier TAC Printer ####") + line
-    instructions.foldRight(tacHeader)(generateCode)
+    val tacHeader = Doc.text("")
+    instructions.foldLeft(tacHeader)(generateCode)
   }
 
-  private def generateCode(instruction: TAC, tac: Doc): Doc = {
+  private def generateCode(tac: Doc, instruction: TAC): Doc = {
 
     instruction match {
       case AddOp(s1, s2, dest, label) => tac / text(handleTAC(dest, s1, s2, "+"))
@@ -65,14 +68,12 @@ object TACodePrinter {
    * @param instructions : reference to instructions list
    */
   def printInstructionSequence(instructions: List[TAC]): Unit = {
-    val tacToPrint: String = docToString(instructions)
-    print(tacToPrint)
+    val tacToPrint: Doc = getTacDocument(instructions)
+    print(tacToPrint.render(60))
   }
 
-  private def docToString(instructions: List[TAC]): String = {
-    val tacDocument = buildDocument(instructions)
-    val tacToPrint = tacDocument.render(60)
-    tacToPrint
+  private def getTacDocument(instructions: List[TAC]): Doc = {
+    buildDocument(instructions)
   }
 
 }

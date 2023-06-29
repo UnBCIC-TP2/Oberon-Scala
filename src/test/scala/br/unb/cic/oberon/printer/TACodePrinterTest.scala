@@ -8,9 +8,12 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TACodePrinterTest extends AnyFunSuite {
 
+
   test("test print for add expressions") {
 
     val t0 = new Temporary(IntegerType, 0, true)
+
+    // t0 = 1 + 2
     val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
 
     TACodePrinter.printInstructionSequence(ops)
@@ -29,6 +32,7 @@ class TACodePrinterTest extends AnyFunSuite {
     )
 
     TACodePrinter.printInstructionSequence(ops)
+
   }
 
   test("test different operations in sequence") {
