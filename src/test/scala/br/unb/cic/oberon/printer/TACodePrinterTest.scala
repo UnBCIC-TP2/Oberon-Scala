@@ -40,7 +40,7 @@ class TACodePrinterTest extends AnyFunSuite {
       AddOp(t0, t1, t2, "")
     )
 
-    val expectedOutput = s"L1:$bl  t0 = 1 + 2" + bl + "t1 = 3 + 4" + bl + "t2 = t0 + t1"
+    val expectedOutput = bl + s"L1:$bl  t0 = 1 + 2" + bl + "t1 = 3 + 4" + bl + "t2 = t0 + t1"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
 
     assert(tacDocumentToPrint.equals(expectedOutput))
