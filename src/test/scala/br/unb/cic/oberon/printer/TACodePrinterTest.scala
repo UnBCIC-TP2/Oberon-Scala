@@ -6,17 +6,26 @@ import br.unb.cic.oberon.ir.tac._
 import org.scalatest.funsuite.AnyFunSuite
 
 
+/**
+ * Tests for TACodePrinter
+ * This tests should see with the printer is correctly handling TAC abstraction
+ */
 class TACodePrinterTest extends AnyFunSuite {
 
+  /**
+   * Doc document always begin with a line break
+   * bl = break line
+   */
+  private val bl = "\n"
 
   test("test print for add expressions") {
 
     val t0 = new Temporary(IntegerType, 0, true)
-
-    // t0 = 1 + 2
     val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
+    val expectedOutput = bl + "t0 = 1 + 2"
 
-    TACodePrinter.printInstructionSequence(ops)
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
+    assert(tacDocumentToPrint.equals(expectedOutput))
   }
 
   test("test print for more than one add expressions in sequence") {
@@ -31,7 +40,10 @@ class TACodePrinterTest extends AnyFunSuite {
       AddOp(t0, t1, t2, "")
     )
 
-    TACodePrinter.printInstructionSequence(ops)
+    val expectedOutput = s"L1:$bl  t0 = 1 + 2" + bl + "t1 = 3 + 4" + bl + "t2 = t0 + t1"
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
+
+    assert(tacDocumentToPrint.equals(expectedOutput))
 
   }
 
@@ -47,7 +59,14 @@ class TACodePrinterTest extends AnyFunSuite {
       SubOp(t1, Constant("6", IntegerType), t2, "")
     )
 
-    TACodePrinter.printInstructionSequence(ops)
+    val firstOp = "t0 = 2 * 2"
+    val secondOp = "t1 = t0 / 3"
+    val thirdOp = "t2 = t1 - 6"
+    val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
+
+    assert(tacDocumentToPrint.equals(expectedOutput))
+
   }
 
   test("test AndOp with NotOp") {
@@ -66,7 +85,7 @@ class TACodePrinterTest extends AnyFunSuite {
       OrOp(t0, t3, t4, "")
     )
 
-    TACodePrinter.printInstructionSequence(ops)
+    TACodePrinter.getTacDocumentStringFormatted(ops)
   }
 
   test("testing copy op") {
@@ -77,10 +96,8 @@ class TACodePrinterTest extends AnyFunSuite {
       CopyOp(t0, Name("var", IntegerType), ""),
     )
 
-    TACodePrinter.printInstructionSequence(ops)
+    TACodePrinter.getTacDocumentStringFormatted(ops)
 
   }
-
-
 
 }
