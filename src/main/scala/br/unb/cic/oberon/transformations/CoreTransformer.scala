@@ -17,7 +17,7 @@ class CoreVisitor() {
       WhileStmt(BoolValue(true), visit(stmt, caseIdGenerator, addedVariables))
 
     case RepeatUntilStmt(condition, stmt) =>
-      WhileStmt(BoolValue(true), SequenceStmt(List(visit(stmt, caseIdGenerator, addedVariables), visit(IfElseStmt(condition, ExitStmt(), None), caseIdGenerator, addedVariables))))
+      WhileStmt(BoolValue(true), visit(SequenceStmt(List(visit(stmt, caseIdGenerator, addedVariables), visit(IfElseStmt(condition, ExitStmt(), None), caseIdGenerator, addedVariables)))))
 
     case ForStmt(initStmt, condition, block) =>
       SequenceStmt(List(visit(initStmt, caseIdGenerator, addedVariables), WhileStmt(condition, visit(block, caseIdGenerator, addedVariables))))
