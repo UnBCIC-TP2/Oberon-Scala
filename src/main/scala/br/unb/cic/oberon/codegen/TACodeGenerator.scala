@@ -5,26 +5,17 @@ import br.unb.cic.oberon.ir.tac._
 import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
 
 object TACodeGenerator extends CodeGenerator[List[TAC]] {
-  
+
   private var tc = new TypeChecker()
   private var expVisitor = new ExpressionTypeVisitor(tc)
 
   override def generateCode(module: OberonModule): List[TAC] = {
-
     load_vars(module.variables, module.constants)
-
     module.stmt match {
       case Some(stm) => generateStatement(stm, List())
+
       case None => List()
     }
-
-    module.procedures match { case _ => List() }
-    module.name match { case _ => List() }
-    module.constants match { case _ => List() }
-    module.variables match { case _ => List() }
-    module.submodules match { case _ => List() }
-    module.userTypes match { case _ => List() }
-
   }
 
 // A geração de código de procedure foi mais difícil do que imaginamos, tivemos algumas dúvidas que não conseguimos resolver pesquisando.
