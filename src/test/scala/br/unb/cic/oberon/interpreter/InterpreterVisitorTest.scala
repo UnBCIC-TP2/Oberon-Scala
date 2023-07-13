@@ -14,10 +14,10 @@ class InterpreterVisitorTest extends AnyFunSuite{
     assert(module.name == "SimpleModule")
 
     interpreter.setTestEnvironment()
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(625)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(100)))
+    assert(result.lookup("x") == Some(IntValue(625)))
+    assert(result.lookup("y") == Some(IntValue(100)))
 
   }
 
@@ -27,9 +27,9 @@ class InterpreterVisitorTest extends AnyFunSuite{
     assert(module.name == "Factorial")
 
     interpreter.setTestEnvironment()
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("res").isDefined)
-    assert(interpreter.env.lookup("res") == Some(IntValue(120)))
+    assert(result.lookup("res").isDefined)
+    assert(result.lookup("res") == Some(IntValue(120)))
   }
 }

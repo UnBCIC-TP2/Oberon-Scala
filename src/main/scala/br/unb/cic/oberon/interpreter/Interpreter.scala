@@ -22,7 +22,7 @@ import scala.language.{existentials, postfixOps}
  * We assume the program is well-typed, otherwise,
  * a runtime exception might be thrown.
  */
-class Interpreter extends OberonVisitorAdapter {
+class Interpreter {
 
 
   type T = Unit
@@ -41,23 +41,24 @@ class Interpreter extends OberonVisitorAdapter {
     envt
   }
 
-  override def visit(module: OberonModule): Unit = {
+def runInterpreter(module: OberonModule): Environment[Expression] = {
     var envt = env
 
     // set up the global declarations
-    module.userTypes.foreach(userType => envt = execUserDefinedType(envt, userType))
-    module.constants.foreach(c => envt = execConstant(envt, c))
-    module.variables.foreach(v => envt = execVariable(envt, v))
-    module.procedures.foreach(p => envt = execProcedure(envt, p))
+    val env1 = module.userTypes.foldLeft(envt)((a, b) => execUserDefinedType(a, b))
+    val env2 = module.constants.foldLeft(env1)((a, b) => execConstant(a, b))
+    val env3 = module.variables.foldLeft(env2)((a, b) => execVariable(a, b))
+    val env4 = module.procedures.foldLeft(env3)((a, b) => execProcedure(a, b))
 
+    envt = env4
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
       envt = setupStandardLibraries(envt)
       envt = execStatement(envt, module.stmt.get)
     }
-
     env = envt
+    envt
   }
 
   def execConstant(environment : Environment[Expression], constant: Constant): Environment[Expression] = {
@@ -84,7 +85,7 @@ class Interpreter extends OberonVisitorAdapter {
     val index = evalExpression(environment, indexExp)
 
     (array, index) match {
-      //case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(environment, exp)
+      case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(environment, exp)
       case _ => throw new RuntimeException
     }
   }
@@ -110,8 +111,6 @@ class Interpreter extends OberonVisitorAdapter {
       case AssignmentStmt(designator, exp) =>
         designator match {
           case VarAssignment(name) => environment.setVariable(name, evalExpression(environment, exp))
-
-          //Analisar melhor
           case ArrayAssignment(array, index) => arrayAssignment(environment, array, index, exp)
           //TODO:
           case RecordAssignment(_, _) => ???
@@ -141,27 +140,29 @@ class Interpreter extends OberonVisitorAdapter {
         else envt
 
       case WhileStmt(condition, whileStmt) =>
-        while (evalCondition(envt, condition) && exit == false )
+        exit = false
+        while (evalCondition(envt, condition) && exit == false)
           envt = execStatement(envt, whileStmt)
         exit = false
         envt
 
       case ForEachStmt(v, exp, stmt) =>
-         val valArray = evalExpression(envt, exp)
-         valArray match {
-           case ArrayValue(values, _) => {
-             values.foreach(value => {
-                 envt = envt.setVariable(v, evalExpression(envt, value))
-                 execStatement(envt, stmt)
-//               val assignment = AssignmentStmt(VarAssignment(v), value)
-//               val stmts = SequenceStmt(List(assignment, stmt))
-//               stmts.accept(this)
-             })
-           envt
-           }
+        val valArray = evalExpression(envt, exp)
+        valArray match {
+          case ArrayValue(values, _) => {
+            values.foreach(value => {
+              envt = envt.setVariable(v, evalExpression(envt, value))
+              execStatement(envt, stmt)
+              //               val assignment = AssignmentStmt(VarAssignment(v), value)
+              //               val stmts = SequenceStmt(List(assignment, stmt))
+              //               stmts.accept(this)
+            })
+          }
 
-           case _ => throw new RuntimeException("erro.... melhorar")
-         }
+          case _ => throw new RuntimeException("erro.... melhorar")
+        }
+        envt
+
       case ExitStmt() =>
         exit = true
         envt
@@ -172,33 +173,11 @@ class Interpreter extends OberonVisitorAdapter {
       //TODO
       //case MetaStmt(f) => f().accept(this)
 
-      //TODO
-      //case ProcedureCallStmt(name, args) =>
-        //callProcedure(name, args)
-        //env = env.pop()
+      case ProcedureCallStmt(name, args) =>
+        callProcedure(name, args, envt)
     }
   }
 
-//Teoricamente não faz nada? não tenho certeza
-  /*
-  private def checkIfElseIfStmt(condition: Expression, thenStmt: Statement, listOfElseIf: List[ElseIfStmt], elseStmt: Option[Statement]): Unit = {
-    var matched = false
-    var i = 0
-
-    if (evalCondition(condition)) thenStmt.accept(this)
-    else {
-      while (i < listOfElseIf.size && !matched) {
-        listOfElseIf(i) match {
-          case ElseIfStmt(condition, stmt) => if (evalCondition(condition)) {
-            stmt.accept(this)
-            matched = true
-          }
-        }
-        i += 1
-      }
-      if (!matched && elseStmt.isDefined) elseStmt.get.accept(this)
-    }
-  }*/
 
   /*
    * process the ReturnStmt(exp) statement.
@@ -209,34 +188,33 @@ class Interpreter extends OberonVisitorAdapter {
   private def setReturnExpression(environment : Environment[Expression], exp: Expression): Environment[Expression] =
     environment.setLocalVariable(Values.ReturnKeyWord, exp)
 
-  def callProcedure(name: String, args: List[Expression]): Unit = {
-    val procedure = env.findProcedure(name)
-    updateEnvironmentWithProcedureCall(procedure, args)
-    procedure.stmt.accept(this)
+  def callProcedure(name: String, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
+    val procedure = environment.findProcedure(name)
+    val envt = updateEnvironmentWithProcedureCall(procedure, args, environment)
+    execStatement(envt, procedure.stmt)
   }
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): Unit = {
+  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
-      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, env.pointsTo(name2))
+      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2))
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      //case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(exp))
+      //case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp))
     })
 
-    env = env.push() // after that, we can "push", to indicate a procedure call.
+    var envt = environment.push() // after that, we can "push", to indicate a procedure call.
 
     mappedArgs.foreach(pair => pair match {
-      case (ParameterByReference(name, _), Some(location: Location)) => env = env.setParameterReference(name, location)
+      case (ParameterByReference(name, _), Some(location: Location)) => envt = envt.setParameterReference(name, location)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      //case (ParameterByValue(name, _), exp: Expression) => env = env.setLocalVariable(name, exp)
+      //case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
 	  case _ => throw new RuntimeException
     })
-    procedure.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp))
-    procedure.variables.foreach(v => env = env.setLocalVariable(v.name, Undef()))
+    procedure.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
+    procedure.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
+
+    envt
   }
 
-  def returnProcedure() = {
-    env = env.pop()
-  }
 
   def evalCondition(environment : Environment[Expression], expression: Expression): Boolean = {
     evalExpression(environment, expression).asInstanceOf[BoolValue].value
@@ -264,15 +242,8 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
 
-//class EvalExpressionVisitor(val interpreter: Interpreter) extends OberonVisitorAdapter {
-  //type T = Expression
-
-
-
   def evalExpression(environment: Environment[Expression], exp: Expression): Expression = exp match {
 
-    //TODO brackets
-    //case Brackets(expression) => expression.accept(this)
 
     case IntValue(v) => IntValue(v)
     case RealValue(v) => RealValue(v)
@@ -288,7 +259,8 @@ class Interpreter extends OberonVisitorAdapter {
       environment.lookup(name).get
 
     //TODO eval array
-    //case ArraySubscript(a, i) => ArraySubscriptExpression(ArraySubscript(a, i))
+    //case ArrayValue(v, t) =>
+    case ArraySubscript(a, i) => ArraySubscriptExpression(environment, ArraySubscript(a, i))
 
     case AddExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1-v2)
@@ -304,35 +276,31 @@ class Interpreter extends OberonVisitorAdapter {
     case NotExpression(exp) => BoolValue(!evalExpression(environment, exp).asInstanceOf[Value].value.asInstanceOf[Boolean])
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
-
-    //TODO eval function
-    case FunctionCallExpression(name, args) => {
-      val exp = visitFunctionCall(environment, name, args)
-      exp
-    }
+    case FunctionCallExpression(name, args) => FunctionCall(environment, name, args)
 
     //TODO FieldAccessExpression
     //TODO PointerAccessExpression
   }
 
   //TODO array assignment
-  /*
-  def ArraySubscriptExpression(arraySubscript: ArraySubscript): Expression = {
-    val array = evalExpression(arraySubscript.arrayBase)
-    val idx = evalExpression(arraySubscript.index)
+
+  def ArraySubscriptExpression(environment : Environment[Expression], arraySubscript: ArraySubscript): Expression = {
+    val array = evalExpression(environment, arraySubscript.arrayBase)
+    val idx = evalExpression(environment, arraySubscript.index)
 
     (array, idx) match {
       case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
       case _ => throw new RuntimeException
     }
   }
-   */
+
+
 
   //TODO function
-  def visitFunctionCall(environment : Environment[Expression], name: String, args: List[Expression]): Expression = {
-    callProcedure(name, args)
-    val returnValue = environment.lookup(Values.ReturnKeyWord)
-    returnProcedure()
+  def FunctionCall(environment : Environment[Expression], name: String, args: List[Expression]): Expression = {
+    var envt = callProcedure(name, args, environment)
+    val returnValue = envt.lookup(Values.ReturnKeyWord)
+    envt = envt.pop()
     assert(returnValue.isDefined) // a function call must set a local variable with the "return" expression
     returnValue.get
   }

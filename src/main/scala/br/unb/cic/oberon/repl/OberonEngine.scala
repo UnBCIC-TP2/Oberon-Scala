@@ -28,7 +28,6 @@ class OberonEngine extends ScriptEngine {
   }
 
   val interpreter = new Interpreter
-  //val expressionEval = new EvalExpressionVisitor(interpreter)
   val coreVisitor = new CoreVisitor()
 
   override def getEngineName: String = this.getClass.getSimpleName
@@ -160,7 +159,7 @@ class OberonEngine extends ScriptEngine {
     val module = ScalaParser.parse(pattern.replaceAllIn(content, m => expressionValue(objectToExpression(args(m.group(1).toInt - 1))).toString))
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    interpreter.runInterpreter(coreModule)
 
     null
   }
@@ -172,11 +171,11 @@ class OberonEngine extends ScriptEngine {
     val command = ScalaParser.parserREPL(statement)
     command match {
       case v: REPLVarDeclaration =>
-        v.declarations.foreach(variable => variable.accept(interpreter))
+        v.declarations.foldLeft(interpreter.env)((a, b) => interpreter.execVariable(a, b))
       case c: REPLConstant =>
-        c.constants.accept(interpreter)
+        interpreter.execConstant(interpreter.env, c.constants)
       case u: REPLUserTypeDeclaration =>
-        u.userTypes.accept(interpreter)
+        interpreter.execUserDefinedType(interpreter.env, u.userTypes)
       case s: REPLStatement =>
         s.stmt match {
           case AssignmentStmt(des, exp) =>
@@ -188,7 +187,7 @@ class OberonEngine extends ScriptEngine {
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => interpreter.visit(coreVisitor.visit(s))
+          case s: Statement => interpreter.execStatement(interpreter.env, coreVisitor.visit(s))
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }

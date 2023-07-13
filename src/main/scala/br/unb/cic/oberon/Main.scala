@@ -77,7 +77,7 @@ object Main extends App {
     val module = ScalaParser.parse(content)
 
     val interpreter = new Interpreter()
-    val result = module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
   }
 
   private def typeCheck() = {

@@ -50,6 +50,7 @@ class Environment[T](private val top_loc:Int = 0,
       stack = this.stack)
   }
 
+
   def setParameterReference(name: String, loc: Location): Environment[T] = {
     //stack.top += name -> loc
     val copyStack = stack.clone()
@@ -128,8 +129,8 @@ class Environment[T](private val top_loc:Int = 0,
 
   def declareProcedure(procedure: Procedure): Environment[T] = {
     //Unit = procedures(procedure.name) = procedure
-    var copyprocedures = procedures.clone()
-    copyprocedures(procedure.name) = procedure
+    val copyprocedures = procedures.clone() + (procedure.name -> procedure)
+    //copyprocedures(procedure.name) = procedure
 
       new Environment[T](top_loc = this.top_loc,
         locations = this.locations,
