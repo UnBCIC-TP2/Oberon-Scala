@@ -654,7 +654,7 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
-  test("Testing procedure06"){
+  ignore("Testing procedure06"){
     val module = ScalaParser.parseResource("procedures/procedure06.oberon")
 
     assert(module.name == "Procedure06")

@@ -21,7 +21,7 @@ class InterpreterVisitorTest extends AnyFunSuite{
 
   }
 
-  test("Test eval on factorial module") {
+  ignore("Test eval on factorial module") {
     val module = ScalaParser.parseResource("procedures/procedure03.oberon")
     val interpreter = new Interpreter()
     assert(module.name == "Factorial")

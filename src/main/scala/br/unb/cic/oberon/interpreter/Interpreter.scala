@@ -42,7 +42,8 @@ class Interpreter {
   }
 
 def runInterpreter(module: OberonModule): Environment[Expression] = {
-    var envt = env
+    var envt = new Environment[Expression]()
+    env = envt
 
     // set up the global declarations
     val env1 = module.userTypes.foldLeft(envt)((a, b) => execUserDefinedType(a, b))
@@ -88,6 +89,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(environment, exp)
       case _ => throw new RuntimeException
     }
+    environment
   }
 
   def execStatement(environment : Environment[Expression], stmt: Statement): Environment[Expression] = {
@@ -104,7 +106,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     var envt = environment
 
     if (exit || environment.lookup(Values.ReturnKeyWord).isDefined) {
-      environment
+      return environment
     }
     // otherwise, we pattern-match on the current stmt.
     stmt match {
@@ -140,23 +142,26 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         else envt
 
       case WhileStmt(condition, whileStmt) =>
+        var envteste = envt
+        while (evalCondition(envteste, condition) && exit == false)
+          envteste = execStatement(envteste, whileStmt)
         exit = false
-        while (evalCondition(envt, condition) && exit == false)
-          envt = execStatement(envt, whileStmt)
-        exit = false
-        envt
+        envteste
 
       case ForEachStmt(v, exp, stmt) =>
         val valArray = evalExpression(envt, exp)
         valArray match {
           case ArrayValue(values, _) => {
+            envt = envt.push()
             values.foreach(value => {
-              envt = envt.setVariable(v, evalExpression(envt, value))
-              execStatement(envt, stmt)
+              envt = envt.setLocalVariable(v, evalExpression(envt, value))
+              envt = execStatement(envt, stmt)
               //               val assignment = AssignmentStmt(VarAssignment(v), value)
               //               val stmts = SequenceStmt(List(assignment, stmt))
               //               stmts.accept(this)
             })
+            envt = envt.pop()
+
           }
 
           case _ => throw new RuntimeException("erro.... melhorar")
@@ -190,23 +195,23 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
   def callProcedure(name: String, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
     val procedure = environment.findProcedure(name)
-    val envt = updateEnvironmentWithProcedureCall(procedure, args, environment)
-    execStatement(envt, procedure.stmt)
+    val env1 = updateEnvironmentWithProcedureCall(procedure, args, environment)
+    execStatement(env1, procedure.stmt)
   }
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
-      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2))
+      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, evalExpression(environment, VarExpression(name2)))
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      //case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp))
+      case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp))
     })
 
     var envt = environment.push() // after that, we can "push", to indicate a procedure call.
 
     mappedArgs.foreach(pair => pair match {
-      case (ParameterByReference(name, _), Some(location: Location)) => envt = envt.setParameterReference(name, location)
+      case (ParameterByReference(name, _), exp) => envt = envt.setLocalVariable(name, exp)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      //case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
+      case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
 	  case _ => throw new RuntimeException
     })
     procedure.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
@@ -295,8 +300,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
 
-
-  //TODO function
   def FunctionCall(environment : Environment[Expression], name: String, args: List[Expression]): Expression = {
     var envt = callProcedure(name, args, environment)
     val returnValue = envt.lookup(Values.ReturnKeyWord)
