@@ -54,7 +54,7 @@ class Environment[T](private val top_loc:Int = 0,
   def setParameterReference(name: String, loc: Location): Environment[T] = {
     //stack.top += name -> loc
     val copyStack = stack.clone()
-    copyStack.top.addOne(name->loc)
+    copyStack.top += name->loc
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
