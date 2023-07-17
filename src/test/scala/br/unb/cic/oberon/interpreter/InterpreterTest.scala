@@ -746,23 +746,33 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(thrown.getMessage() == "Exception thrown from assert not equal")
   }
 
-  test("Testing Test parser1") {
+  test("Testing Test interpreter1") {
     val module = parseResource("procedures/procedureTest01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.accept(interpreter) == ())
+    assert(coreModule.accept(interpreter, "TEST") == ())
   }
 
 
-  test("Testing Test parser2") {
+  test("Testing Test interpreter2") {
     val module = parseResource("procedures/procedureTest02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
     assert(coreModule.accept(interpreter) == ())
+
+  }
+
+  test("Testing Test interpreter3") {
+    val module = parseResource("procedures/procedureTest03.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+    assert(coreModule.accept(interpreter, "BASE") == ())
 
   }
   
