@@ -2,6 +2,8 @@ package br.unb.cic.oberon.ir.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.interpreter.Interpreter
+
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
@@ -28,6 +30,9 @@ case class OberonModule(name: String,
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
+
+  // specifically created for choosing between test and regular interpreter
+  def accept(v: OberonVisitor, s: String): implicit v.T = v.visit(this, s)
 }
 
 // SequenceStatement(List[Stmt]) extends Stmt

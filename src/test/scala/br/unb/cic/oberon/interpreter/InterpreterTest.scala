@@ -675,8 +675,6 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-
-
     assert(coreModule.accept(interpreter) == ())
   }
 

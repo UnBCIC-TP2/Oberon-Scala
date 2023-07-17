@@ -60,6 +60,31 @@ class Interpreter extends OberonVisitorAdapter {
 
   }
 
+  def visit(module: OberonModule, select: String): Unit = {
+    // set up the global declarations
+    module.userTypes.foreach(userType => userType.accept(this))
+    module.constants.foreach(c => c.accept(this))
+    module.variables.foreach(v => v.accept(this))
+    module.procedures.foreach(p => p.accept(this))
+
+    if (select == "TEST"){
+      module.tests.foreach(t => t.accept(this))
+
+      // executes tests
+      module.tests.foreach(t =>
+        if (t.modifier == "TEST") (callTest(t.name), env = env.pop)
+      )
+    }
+
+    // execute the statement if it is defined.
+    // remember, module.stmt is an Option[Statement].
+    if (module.stmt.isDefined && select == "BASE") {
+      setupStandardLibraries()
+      module.stmt.get.accept(this)
+    }
+
+  }
+
   override def visit(constant: Constant): Unit = {
     env = env.setGlobalVariable(constant.name, constant.exp)
   }

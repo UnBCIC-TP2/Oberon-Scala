@@ -51,7 +51,6 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
     case FunctionCallExpression(name, args) => {
       try  {
         val procedure = typeChecker.env.findProcedure(name)
-        
         if(args.length != procedure.args.length) {
           return None
         }
@@ -149,28 +148,40 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker) extends OberonVisitorA
 class TypeChecker extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
 
-  val env =  new Environment[Type]()
+  var env =  new Environment[Type]()
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {
-    module.constants.foreach(c => env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
-    module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
-    module.procedures.foreach(env.declareProcedure)
-    module.userTypes.foreach(env.addUserDefinedType) //added G04
+    module.constants.foreach(c => env = env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get))
+    module.variables.foreach(v => env = env.setGlobalVariable(v.name, v.variableType))
+    module.procedures.foreach(p => env = env.declareProcedure(p))
+    module.tests.foreach(t => env = env.declareTest(t))
+    module.userTypes.foreach( u => env = env.addUserDefinedType(u)) //added G04
 
+    var errorsTest = module.tests.flatMap(t => checkTest(t))
     var errors = module.procedures.flatMap(p => checkProcedure(p))
+    errorsTest.foreach(t => errors = errors:+t)
 
     if(module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
     else errors
   }
 
   def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
-    env.push()
-    procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
-    procedure.constants.foreach(c => env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
-    procedure.variables.foreach(v => env.setLocalVariable(v.name, v.variableType))
+    env = env.push()
+    procedure.args.foreach(a => env = env.setLocalVariable(a.name, a.argumentType))
+    procedure.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
+    procedure.variables.foreach(v => env = env.setLocalVariable(v.name, v.variableType))
     val errors = procedure.stmt.accept(this)
-    env.pop()
+    env = env.pop()
+    errors
+  }
+
+  def checkTest(test: Test): List[(Statement, String)] = {
+    env = env.push()
+    test.constants.foreach(c => env = env.setLocalVariable(c.name, c.exp.accept(expVisitor).get))
+    test.variables.foreach(v => env = env.setLocalVariable(v.name, v.variableType))
+    val errors = test.stmt.accept(this)
+    env = env.pop()
     errors
   }
 
@@ -207,6 +218,10 @@ class TypeChecker extends OberonVisitorAdapter {
     case ReadShortIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadCharStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
+    case AssertEqualStmt(_, _) => visitAssertStmt(stmt)
+    case AssertNotEqualStmt(_, _) => visitAssertStmt(stmt)
+    case AssertTrueStmt(exp) => visitAssertStmt(stmt)
+    case AssertError() => visitAssertStmt(stmt)
     case NewStmt(varName) =>
       env.lookup(varName) match {
         case Some(PointerType(_)) => List()
@@ -309,6 +324,36 @@ private def visitIfElseStmt(stmt: Statement) = stmt match {
       } else {
         (stmt, s"Expression $condition do not have a boolean type") :: errorList
       }
+  }
+
+  private def visitAssertStmt(stmt: Statement) = stmt match {
+    case AssertTrueStmt(condition) =>
+      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
+      if (condition.accept(expVisitor).contains(BooleanType)) {
+        errorList
+      } else {
+        (stmt, s"Expression $condition does not have a boolean type") :: errorList
+      }
+
+    case AssertEqualStmt(left, right) =>
+      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
+      val condition = EQExpression(left, right)
+      if (condition.accept(expVisitor).contains(BooleanType)){
+        errorList
+      } else {
+        (stmt, s"Expression $condition does not have a boolean type") :: errorList
+      }
+
+    case AssertNotEqualStmt(left, right) =>
+      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
+      val condition = NEQExpression(left, right)
+      if (condition.accept(expVisitor).contains(BooleanType)) {
+        errorList
+      } else {
+        (stmt, s"Expression $condition does not have a boolean type") :: errorList
+      }
+
+    case AssertError() => List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
   }
 
   private def visitExitStmt() = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()

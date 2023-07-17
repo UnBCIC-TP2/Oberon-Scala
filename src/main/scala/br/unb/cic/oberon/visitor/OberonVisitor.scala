@@ -16,6 +16,7 @@ trait OberonVisitor {
   type T
 
   def visit(module: OberonModule) : T
+
   def visit(impt: Import) : T
   def visit(constant: Constant) : T
   def visit(variable: VariableDeclaration) : T

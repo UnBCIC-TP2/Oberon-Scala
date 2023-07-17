@@ -201,8 +201,10 @@ class StandardLibraryTest extends AnyFunSuite with Oberon2ScalaParser {
 
 
     module.accept(interpreter)
+    println(interpreter.env.lookup("y"))
+    println(interpreter.env.lookup("z"))
 
-    assert(interpreter.env.lookup("y") == Some(RealValue(-8.0)))
     assert(interpreter.env.lookup("z") == Some(RealValue(2.5)))
+    assert(interpreter.env.lookup("y") == Some(RealValue(-8.0)))
   }
 }

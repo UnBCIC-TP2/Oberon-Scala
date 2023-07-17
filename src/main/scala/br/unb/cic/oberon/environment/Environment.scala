@@ -21,8 +21,8 @@ class Environment[T](private val top_loc:Int = 0,
                      private val locations: Map[Location, T] = Map.empty[Location, T],
                      private val global: Map[String, Location] = Map.empty[String, Location],
                      private val stack: Stack[Map[String, Location]] = Stack.empty[Map[String, Location]],
-                     private val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
-                     private val tests: Map[String, Test] = Map.empty[String, Test],
+                      val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
+                      val tests: Map[String, Test] = Map.empty[String, Test],
                      private val userDefinedTypes: Map[String, UserDefinedType] = Map.empty[String, UserDefinedType]) {
 
 
@@ -135,26 +135,29 @@ class Environment[T](private val top_loc:Int = 0,
 
   def declareProcedure(procedure: Procedure): Environment[T] = {
     //Unit = procedures(procedure.name) = procedure
-    var copyprocedures = procedures.clone()
-    copyprocedures(procedure.name) = procedure
+    var copyProcedures = procedures.clone()
+    copyProcedures(procedure.name) = procedure
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
       global = this.global,
-      procedures = copyprocedures,
+      procedures = copyProcedures,
+      tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack)
   }
 
   def declareTest(test: Test): Environment[T] = {
     //Unit = tests(test.name) = test
-    var copytests = tests.clone()
-    copytests(test.name) = test
+    var copyTests = tests.clone()
+
+    copyTests(test.name) = test
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
       global = this.global,
-      tests = copytests,
+      procedures = this.procedures,
+      tests = copyTests,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack)
   }
