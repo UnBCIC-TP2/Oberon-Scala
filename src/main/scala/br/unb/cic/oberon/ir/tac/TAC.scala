@@ -33,7 +33,7 @@ case class NegOp(s1: Address, dest: Address, label: String) extends UniOp(s1, de
 
 case class NotOp(s1: Address, dest: Address, label: String) extends UniOp(s1, dest, label) {}
 
-case class CopyOp(s1: Address, dest: Address, label: String) extends TAC(label) {}
+case class MoveOp(s1: Address, dest: Address, label: String) extends TAC(label) {}
 
 case class NOp(label: String) extends TAC(label) {}
 
@@ -70,11 +70,18 @@ case class Call(procLabel: String, n: Int, label: String) extends TAC(label) {}
 
 case class Return(s1: Address, label: String) extends TAC(label) {}
 
+case class New(s1: Address, label: String) extends  TAC(label) {}
 
 
-case class ListGet(list: Address, index: Address, dest: Address, label: String) extends TAC(label) {}
 
-case class ListSet(s1: Address, index: Address, listDest: Address, label: String) extends TAC(label) {}
+case class ArrayGet(list: Address, offset: Address, dest: Address, label: String) extends TAC(label) {}
+
+case class ArraySet(s1: Address, offset: Address, listDest: Address, label: String) extends TAC(label) {}
+
+
+case class RecordGet(record: Address, offset: Address, dest: Address, label: String) extends TAC(label) {}
+
+case class RecordSet(s1: Address, offset: Address, record: Address, label: String) extends TAC(label) {}
 
 
 

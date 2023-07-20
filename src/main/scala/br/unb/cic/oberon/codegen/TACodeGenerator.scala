@@ -9,6 +9,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   private var tc = new TypeChecker()
   private var expVisitor = new ExpressionTypeVisitor(tc)
 
+  private val typeByteSize: Map[Type, Int] =
+    Map(IntegerType -> 4,
+      RealType -> 4
+    )
+
   override def generateCode(module: OberonModule): List[TAC] = {
     load_vars(module.variables, module.constants)
     module.stmt match {
@@ -18,9 +23,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     }
   }
 
-// A geração de código de procedure foi mais difícil do que imaginamos, tivemos algumas dúvidas que não conseguimos resolver pesquisando.
-//  def generateProcedure(proc: Procedure, insts: List[TAC]): (Address, List[TAC]) = {}
-
   def generateStatement(stmt: Statement, insts: List[TAC]): List[TAC] = {
     stmt match {
       case AssignmentStmt(designator, exp) =>
@@ -28,12 +30,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         designator match {
           case VarAssignment(varName) =>
             val v = Name(varName, exp.accept(expVisitor).get)
-            return insts1 :+ CopyOp(t, v, "") 
+            return insts1 :+ MoveOp(t, v, "")
 
           case ArrayAssignment(array, index) =>
             val (a, insts2) = generateExpression(array, insts1)
-            val (i, insts3) = generateExpression(index, insts2)
-            return insts3 :+ ListSet(t, i, a, "")
+            val offset = getArrayOffset(a, index)
+            insts2 :+ ArraySet(t, offset, a, "")
 
           case PointerAssignment(pointerName) =>
             val p = Name(pointerName, LocationType)
@@ -48,15 +50,32 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           (acc, stm) => generateStatement(stm, acc)
         }
 
-// No final não conseguimos implementar a geração de procedures
-//      case ProcedureCallStmt(name, argsExps) =>
-//        val (args, argInsts) = argsExps.foldLeft((List[Address](),insts)) {
-//          (acc, expr) => 
-//            val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2)
-//            (acc._1 :+ address, ops)
-//        }
-//        val params = args.map(x => Param(x, ""))
-//        return argInsts ++ params :+ Call(name, args.length, "")
+
+      case ProcedureCallStmt(name, argsExps) => {
+        val argsTAC = argsExps.map(exp => generateExpression(exp, List()))
+        val TACops = argsTAC.flatMap {
+          case (_, tac: List[TAC]) => tac
+        }
+        val param = argsTAC.map(_._1).map {
+          case t: Temporary => (List[TAC](), Param(t, ""))
+          case name1: Name =>
+            val t = new Temporary(name1.t)
+            (List(MoveOp(name1, t, "")), Param(t, ""))
+
+          case const: Constant =>
+            val t = new Temporary(const.t)
+            (List(MoveOp(const, t, "")), Param(t, ""))
+
+        }
+
+        val paramops = param.map(_._1)
+        val paramops2 = paramops.flatten
+        val param2 = param.map(_._2)
+
+        insts ++ TACops ++ paramops2 ++ param2 :+ Call(name, argsExps.length, "")
+
+      }
+
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
         val l1 = LabelGenerator.generateLabel
@@ -281,29 +300,23 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t0, t1) = (temps(0), temps(1))
         return (t1, insts2 :+ SLTOp(r, l, t0, "") :+ NotOp(t0, t1, ""))
 
-// No final não conseguimos implementar a geração de procedures.
-//      case FunctionCallExpression(name, args) =>
-//        val (args, argInsts) = argsExps.foldLeft((List[Address](),insts)) {
-//          (acc, expr) => 
-//            val (address, ops) = TACodeGenerator.generateExpression(expr, acc._2)
-//            (acc._1 :+ address, ops)
-//        }
-//        val params = args.map(x => Param(x, ""))
-//        return (funcs.get(name), argInsts ++ params :+ Call(name, args.length), "")
-
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
         val t = new Temporary(expr.accept(expVisitor).get)
-        return (t, insts2 :+ ListGet(a, i, t, ""))
+         (t, insts2 :+ ArrayGet(a, i, t, ""))
 
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
         val t = new Temporary(expr.accept(expVisitor).get)
         return (t, insts :+ GetValue(p, t, ""))
 
-      case FieldAccessExpression(exp, name) =>
-        throw new Exception("FieldAccessExpression não foi implementada!")
+      case FieldAccessExpression(record, field) =>
+        val (name: Name, insts1: List[TAC]) = generateExpression(record, insts)
+        val offset = getRecordOffset(name, field)
+        val fieldtype = getFieldType(name, field)
+        val t = new Temporary(fieldtype)
+        (t, insts1 :+ RecordGet(name, offset, t, ""))
     }
   }
 
@@ -332,11 +345,51 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
       case None => insts1
     }
-  } 
+  }
+
+  private def getArrayOffset(array: Address, index: Expression): Address = {
+    val arrayType = array match {
+      case Name(_, ArrayType(_, baseType)) => baseType
+    }
+    val index1 = index match {
+      case IntValue(value) => value
+    }
+
+    val offset = typeByteSize.getOrElse(arrayType, 0) * index1
+
+
+    Constant(offset.toString, IntegerType)
+
+  }
+
+  private def getRecordOffset(record: Name, field: String): Constant = {
+    val variables: List[VariableDeclaration] = record.t.asInstanceOf[RecordType].variables
+    val targetIndex: Int = variables.indexWhere(_.name == field)
+    val variables2: List[VariableDeclaration] = variables.take(targetIndex + 1)
+
+    val offset: Int = variables2.map {
+      case VariableDeclaration(name, ArrayType(size, vartype)) => size * typeByteSize.getOrElse(vartype, 0)
+      case VariableDeclaration(_, vartype) => typeByteSize.getOrElse(vartype, 0)
+    }.sum
+
+    Constant(offset.toString, IntegerType)
+  }
+
+  private def getFieldType(record: Name, field: String): Type = {
+    val variables: List[VariableDeclaration] = record.t.asInstanceOf[RecordType].variables
+    variables.find(_.name == field).map(_.variableType) match {
+      case Some(ty) => ty
+      case None => throw new IllegalArgumentException("All variables need a Type")
+    }
+  }
 
 
   def load_vars(vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
     OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc)
+  }
+
+  def load_userTypes_and_vars(userTypes: List[UserDefinedType], vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
+    OberonModule("test", Set(), userTypes, consts, vars, List(), None).accept(tc)
   }
 
   //somente para testes

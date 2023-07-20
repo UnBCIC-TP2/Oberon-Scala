@@ -276,7 +276,7 @@ class TACodeTest extends AnyFunSuite {
 
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
-      ListGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t0, "")
+      ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t0, "")
     )    
     // lista[2]
     assert(list == ops)
@@ -311,7 +311,7 @@ class TACodeTest extends AnyFunSuite {
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), "")
+      MoveOp(t0, Name("var", IntegerType), "")
     )    
     // var = 1+2
     assert(list == ops)
@@ -374,7 +374,7 @@ class TACodeTest extends AnyFunSuite {
     val ops = List(
       NeqJump(Constant("0", IntegerType), Constant("0", IntegerType), l1, ""),
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
+      MoveOp(t0, Name("var", IntegerType), ""),
       NOp(l1)
       )
     // if(1==1){var = 1 + 2}
@@ -403,11 +403,11 @@ class TACodeTest extends AnyFunSuite {
       OrOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, ""),
       JumpFalse(t0, l1, ""),
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t1, ""),
-      CopyOp(t1, Name("var", IntegerType), ""),
+      MoveOp(t1, Name("var", IntegerType), ""),
       Jump(l2, ""),
       NOp(l1),
       SubOp(Constant("3", IntegerType), Constant("2", IntegerType), t2, ""),
-      CopyOp(t2, Name("var", IntegerType), ""),
+      MoveOp(t2, Name("var", IntegerType), ""),
       NOp(l2)
     )
     // if(1|0){var = 1 + 2} else {var = 3 - 2}
@@ -431,7 +431,7 @@ class TACodeTest extends AnyFunSuite {
     val ops = List(
       JumpTrue(Constant("false", BooleanType), l1, ""),
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
+      MoveOp(t0, Name("var", IntegerType), ""),
       NOp(l1),
       )
     // if(!(false)){var = 1 + 2}
@@ -457,11 +457,179 @@ class TACodeTest extends AnyFunSuite {
       Jump(l1, ""),
       NOp(l2),
       AddOp(Name("var", IntegerType), Constant("1", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),  
+      MoveOp(t0, Name("var", IntegerType), ""),
       NOp(l1),
       LTEJump(Name("var", IntegerType), Constant("5", IntegerType), l2, ""),  
     )
     // while(var < 5){var = var + 1}
     assert(list == ops)
+  }
+
+
+test("Testing procedure sum(var1,var2)") {
+  TACodeGenerator.reset()
+  Temporary.reset()
+  val list_var = List(VariableDeclaration("var1", IntegerType), VariableDeclaration("var2", IntegerType))
+  TACodeGenerator.load_vars(list_var)
+  val procedureName = "sum"
+  val procedureCallStmt = ProcedureCallStmt(procedureName, List(VarExpression("var1"), VarExpression("var2")))
+  val list = TACodeGenerator.generateStatement(procedureCallStmt, List())
+
+  Temporary.reset()
+
+  val t0 = new Temporary(IntegerType, 0, manual = true)
+  val t1 = new Temporary(IntegerType, 1, manual = true)
+  val ops = List(
+    MoveOp(Name("var1", IntegerType), t0, ""),
+    MoveOp(Name("var2", IntegerType), t1, ""),
+    Param(t0, ""),
+    Param(t1, ""),
+    Call("sum", 2, "")
+  )
+  assert(list == ops)
+}
+test("testing procedure sub(1+2,1+1)") {
+
+  val procedureName = "sub"
+  val procedureCallStmt = ProcedureCallStmt(procedureName, List(AddExpression(IntValue(1), IntValue(2)),
+    AddExpression(IntValue(1), IntValue(1))))
+  val list = TACodeGenerator.generateStatement(procedureCallStmt, List())
+  Temporary.reset()
+  val t0 = new Temporary(IntegerType, 0, true)
+  val t1 = new Temporary(IntegerType, 1, true)
+  val ops = List(
+    AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+    AddOp(Constant("1", IntegerType), Constant("1", IntegerType), t1, ""),
+    Param(t0, ""),
+    Param(t1, ""),
+    Call("sub", 2, "")
+  )
+
+  assert(ops == list)
+}
+
+test("testing RecordAssignment") {
+  TACodeGenerator.reset()
+  val userTypeName = "date"
+  val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
+  val list_userTypes = List(UserDefinedType(userTypeName, RecordType(typeVariables)))
+  val list_var = List(VariableDeclaration("d1", ReferenceToUserDefinedType("date")))
+
+  TACodeGenerator.load_userTypes_and_vars(userTypes = list_userTypes, vars = list_var)
+
+  val recordAssignment = AssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), IntValue(5))
+
+  val list = TACodeGenerator.generateStatement(recordAssignment, List())
+
+  val ops = List(RecordSet(Constant("5", IntegerType), Constant("4", IntegerType),
+    Name("d1", RecordType(List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType)))), ""))
+
+  assert(list == ops)
+
+
+}
+test("testing RecordAssignment 2") {
+  TACodeGenerator.reset()
+  val userTypeName = "date"
+  val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
+  val list_userTypes = List(UserDefinedType(userTypeName, RecordType(typeVariables)))
+  val list_var = List(VariableDeclaration("d1", ReferenceToUserDefinedType("date")))
+
+  TACodeGenerator.load_userTypes_and_vars(userTypes = list_userTypes, vars = list_var)
+
+  val recordAssignment = AssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), AddExpression(IntValue(3), IntValue(5)))
+
+  val list = TACodeGenerator.generateStatement(recordAssignment, List())
+  Temporary.reset()
+  val t0 = new Temporary(IntegerType, 0, true)
+
+  val ops = List(AddOp(Constant("3", IntegerType), Constant("5", IntegerType), t0, ""),
+    RecordSet(t0, Constant("4", IntegerType),
+      Name("d1", RecordType(List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType)))), ""))
+
+  assert(list == ops)
+
+}
+test("testing RecordAssignment 3") {
+  TACodeGenerator.reset()
+  val userTypeName = "date"
+  val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
+  val list_userTypes = List(UserDefinedType(userTypeName, RecordType(typeVariables)))
+  val list_var = List(VariableDeclaration("d1", ReferenceToUserDefinedType("date")))
+
+  TACodeGenerator.load_userTypes_and_vars(userTypes = list_userTypes, vars = list_var)
+
+  val recordAssignment = AssignmentStmt(RecordAssignment(VarExpression("d1"), "month"), IntValue(5))
+
+  val list = TACodeGenerator.generateStatement(recordAssignment, List())
+
+  val ops = List(RecordSet(Constant("5", IntegerType), Constant("8", IntegerType),
+    Name("d1", RecordType(List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType)))), ""))
+
+  assert(list == ops)
+
+
+}
+
+test("testing RecordAssignment offset com array") {
+  TACodeGenerator.reset()
+  val userTypeName = "date"
+  val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType))
+  val list_userTypes = List(UserDefinedType(userTypeName, RecordType(typeVariables)))
+  val list_var = List(VariableDeclaration("d1", ReferenceToUserDefinedType("date")))
+
+  TACodeGenerator.load_userTypes_and_vars(userTypes = list_userTypes, vars = list_var)
+
+  val recordAssignment = AssignmentStmt(RecordAssignment(VarExpression("d1"), "month"), IntValue(5))
+
+  val list = TACodeGenerator.generateStatement(recordAssignment, List())
+
+  val ops = List(RecordSet(Constant("5", IntegerType), Constant("24", IntegerType),
+    Name("d1", RecordType(List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType)))), ""))
+
+  assert(list == ops)
+
+
+}
+
+test("testing Record Usage") {
+  TACodeGenerator.reset()
+  val userTypeName = "date"
+  val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType))
+  val list_userTypes = List(UserDefinedType(userTypeName, RecordType(typeVariables)))
+  val list_var = List(VariableDeclaration("d1", ReferenceToUserDefinedType("date")))
+
+  TACodeGenerator.load_userTypes_and_vars(userTypes = list_userTypes, vars = list_var)
+
+  val recordUsage = FieldAccessExpression(VarExpression("d1"), "day")
+
+  val (t, list) = TACodeGenerator.generateExpression(recordUsage, List())
+  Temporary.reset()
+  val t0 = new Temporary(IntegerType, 0, true)
+
+  val ops = List(RecordGet(Name("d1", RecordType(List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType)))),
+    Constant("4", IntegerType), t0, ""))
+
+  assert(list == ops)
+
+
+}
+
+  test("testing New statement") {
+    TACodeGenerator.reset()
+    val list_var = List(VariableDeclaration("p", PointerType(IntegerType)))
+
+    TACodeGenerator.load_vars(list_var)
+
+    val newstmt = NewStmt("p")
+
+    val list = TACodeGenerator.generateStatement(newstmt, List())
+    Temporary.reset()
+
+
+    val ops = List(New(Name("p", PointerType(IntegerType)), ""))
+
+    assert(list == ops)
+
   }
 }
