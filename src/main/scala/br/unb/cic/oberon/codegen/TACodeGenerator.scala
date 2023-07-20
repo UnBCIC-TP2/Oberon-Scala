@@ -30,7 +30,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         designator match {
           case VarAssignment(varName) =>
             val v = Name(varName, exp.accept(expVisitor).get)
-            return insts1 :+ MoveOp(t, v, "")
+             insts1 :+ MoveOp(t, v, "")
 
           case ArrayAssignment(array, index) =>
             val (a, insts2) = generateExpression(array, insts1)
@@ -39,10 +39,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
           case PointerAssignment(pointerName) =>
             val p = Name(pointerName, LocationType)
-            return insts1 :+ SetPointer(t, p, "")
+             insts1 :+ SetPointer(t, p, "")
 
-          case RecordAssignment(_,_) =>
-            throw new Exception("Records não foram implementados!") 
+          case RecordAssignment(record,field) =>
+            val (name: Name, insts2: List[TAC]) = generateExpression(record, insts1)
+            val offset = getRecordOffset(name, field)
+            insts2 :+ RecordSet(t, offset, name, "")
         }
 
       case SequenceStmt(stmts) =>
@@ -201,8 +203,9 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ElseIfStmt(_,_) =>
         throw new Exception("ElseIfStmt não foi implementado")
 
-      case NewStmt(_) =>
-        throw new Exception("NewStmt não foi implementado")
+      case NewStmt(varName) =>
+        val (variable: Address, insts1) = generateExpression(VarExpression(varName), insts)
+        insts1 :+ New(variable, "")
 
       case MetaStmt(_) =>
         throw new Exception("MetaStmt não foi implementado")
@@ -368,7 +371,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     val variables2: List[VariableDeclaration] = variables.take(targetIndex + 1)
 
     val offset: Int = variables2.map {
-      case VariableDeclaration(name, ArrayType(size, vartype)) => size * typeByteSize.getOrElse(vartype, 0)
+      case VariableDeclaration(_, ArrayType(size, vartype)) => size * typeByteSize.getOrElse(vartype, 0)
       case VariableDeclaration(_, vartype) => typeByteSize.getOrElse(vartype, 0)
     }.sum
 
