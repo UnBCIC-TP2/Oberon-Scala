@@ -197,11 +197,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ExitStmt() =>
         return insts :+ Exit("")
 
-      case ForEachStmt(_,_,_) =>
-        throw new Exception("ForEachStmt não foi implementado")
-
-      case ElseIfStmt(_,_) =>
-        throw new Exception("ElseIfStmt não foi implementado")
 
       case NewStmt(varName) =>
         val (variable: Address, insts1) = generateExpression(VarExpression(varName), insts)
