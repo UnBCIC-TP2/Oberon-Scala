@@ -12,9 +12,8 @@ import org.typelevel.paiges.Doc._
 
 import scala.util.matching.Regex
 
-abstract class JimpleCodeGenerator extends CodeGenerator[String] {}
 
-case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
+object JimpleCodeGenerator extends CodeGenerator[String] {
   val indentSize:Doc = Doc.spaces(4)
   val doubleIndentSize:Doc = Doc.spaces(8)
   val twoLines: Doc = line * 2
@@ -26,16 +25,23 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
 
     val fields = generateFields(module)
     val methodSignatures = generateMethodSignatures(module)
+    val methods = generateMethods(module, fields, methodSignatures)
+
+
+    ClassDeclaration(
+      modifiers = List(PublicModifer),
+      classType = TObject(module.name),
+      superClass = TObject("java.lang.Object"),
+      interfaces = List.empty[JimpleType],
+      fields = fields,
+      methods = methods,
+    )
+
+
     val methodsString = generateMethods(module, fields, methodSignatures).toString()
     var ConditionPrintClinit: Boolean = false
 
-    //Só pra teste---------------------------------------------------------------------\\
-    val methodsForConstants = generateConstantAssignments(module, fields, methodSignatures)
-    val methodsForFloatAndExpressions = jimpleStatement(module.stmt, module, fields, methodSignatures, 0)
-
-    println(methodsString)
-    //----------------------------------------------------------------------------------\\
-
+    //Tudo que estiver comentado, foi implementado pelo Grupo 06 do 2023.1
 
     // Cabeçalho
     val ModuleName: Doc = Doc.text(module.name)
@@ -54,8 +60,6 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
       }else{
         text("")
       }
-
-    //indentSize + text("public static void main(java.lang.String[])") / indentSize + Doc.char('{')
 
     // Instanciação de variaveis
     var VariablesAndConstants: Doc = Doc.text("")
@@ -80,6 +84,7 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
 
     val ExpressionsListTuple = findExpressions(methodsString)
 
+
     // Instanciação de Métodos
 
     var MainMethods: Doc = Doc.text("")
@@ -87,19 +92,17 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
     if(ConditionPrintClinit == true){
       MainMethods = MainMethods + twoLines + indentSize + text("public static void <clinit>()") / indentSize + Doc.char('{')
 
-      for(tuple <- ExpressionsListTuple){
+      for(tuple <- ExpressionsListTuple) {
         var ExpressionDoc = defineStaticExpressionToDoc(tuple)
-        MainMethods = MainMethods / doubleIndentSize + text("<") + ModuleName + text(": ") + ExpressionDoc + Doc.line
-      }
+        if (ExpressionDoc == Doc.text("")) {
 
+        } else {
+          MainMethods = MainMethods / doubleIndentSize + text("<") + ModuleName + text(": ") + ExpressionDoc + Doc.line
+        }
+      }
 
       MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
     }
-
-
-
-
-
 
     // Pretty Print Final
 
@@ -115,11 +118,13 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
 
     val expressionImm: Regex = """\(AssignStmtInt\((\w+)\),ImmediateExpressionInt\((\d+)\)""".r
     val expressionPlu: Regex = """\(AssignStmtInt\((\w+)\),PlusExpression\((\d+),(\d+)\)\)""".r
-
+    val expressionBoo: Regex = """\(AssignStmtBoolean\((\w+)\),BooleanExpression\((\w+)\)\)""".r
+    val expressionMul: Regex = """\(AssignStmtInt\((\w+)\),MultExpression\((\d+),(\d+)\)\)""".r
 
     val secondElement = element._2.toString
 
     if (secondElement.contains("ImmediateExpressionInt")) {
+
       // Extrair os valores usando expressões regulares
       val extractedValues: Option[(String, Int)] = expressionImm.findFirstMatchIn(element.toString()).map { matchResult =>
         (matchResult.group(1), matchResult.group(2).toInt)
@@ -130,17 +135,46 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
           envio = envio + Doc.text(s"int $variable> = $intValue;")
       }
 
-    } else if(secondElement.contains("PlusExpression")){
+    } else if(secondElement.contains("PlusExpression")) {
 
       // Extrair os valores usando expressões regulares
-      val extractedValues1: Option[(String, Int, Int)] = expressionPlu.findFirstMatchIn(element.toString()).map { matchResult =>
+      val extractedValues: Option[(String, Int, Int)] = expressionPlu.findFirstMatchIn(element.toString()).map { matchResult =>
         (matchResult.group(1), matchResult.group(2).toInt, matchResult.group(3).toInt)
       }
       // Imprimir os valores extraídos ou tratar caso não tenham sido encontrados
-      extractedValues1 match {
+      extractedValues match {
         case Some((variable, intValue, intValue2)) =>
           val soma: Int = intValue + intValue2
           envio = envio + Doc.text(s"int $variable> = $soma;")
+      }
+
+    }else if(secondElement.contains("BooleanExpression")){
+
+      // Extrair os valores usando expressões regulares
+      val extractedValues: Option[(String, String)] = expressionBoo.findFirstMatchIn(element.toString()).map { matchResult =>
+        (matchResult.group(1), matchResult.group(2))
+      }
+      // Imprimir os valores extraídos ou tratar caso não tenham sido encontrados
+      extractedValues match {
+        case Some((variable, boolean)) =>
+          if (boolean == ("true")) {
+            envio = envio + Doc.text(s"boolean $variable> = 1;")
+          }else if(boolean == ("false")){
+            envio = envio + Doc.text(s"boolean $variable> = 0;")
+          }
+      }
+
+    }else if(secondElement.contains("MultExpression")) {
+
+      // Extrair os valores usando expressões regulares
+      val extractedValues: Option[(String, Int, Int)] = expressionMul.findFirstMatchIn(element.toString()).map { matchResult =>
+        (matchResult.group(1), matchResult.group(2).toInt, matchResult.group(3).toInt)
+      }
+      // Imprimir os valores extraídos ou tratar caso não tenham sido encontrados
+      extractedValues match {
+        case Some((variable, intValue, intValue2)) =>
+          val mult: Int = intValue * intValue2
+          envio = envio + Doc.text(s"int $variable> = $mult;")
       }
     }
 
@@ -197,6 +231,7 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
     case class PlusExpression(value1: Any, value2: Any)
     case class AssignStmtBoolean(fieldName: String)
     case class BooleanExpression(fieldName: String)
+    case class MultExpression(value1: Any, value2: Any)
 
     // Definindo os padrões de regex para as correspondências
     val expressionImmediateInt: Regex = """ImmediateExpression\(ImmediateValue\(IntValue\((\d+)\)""".r
@@ -204,6 +239,7 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
     val expressionPlus: Regex = """PlusExpression\(ImmediateValue\(IntValue\((\d+)\)\),ImmediateValue\(IntValue\((\d+)\)""".r
     val expressionAssignBoolean: Regex = """AssignStmt\(StaticField\(FieldSignature\([^,]+,TBoolean,(\w+)\)""".r
     val expressionBoolean: Regex = """ImmediateExpression\(ImmediateValue\(BooleanValue\((\w+)\)""".r
+    val expressionMult: Regex = """MultExpression\(ImmediateValue\(IntValue\((\d+)\)\),ImmediateValue\(IntValue\((\d+)\)""".r
 
     // Função para converter o valor correspondente para o caso apropriado
     def parseMatchedValue(matchedValue: String): Any = matchedValue.toInt
@@ -215,6 +251,7 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
       case expressionPlus(value1, value2) => (PlusExpression(parseMatchedValue(value1), parseMatchedValue(value2)), pos)
       case expressionAssignBoolean(fieldName) => (AssignStmtBoolean(fieldName),pos)
       case expressionBoolean(fieldName) => (BooleanExpression(fieldName),pos)
+      case expressionMult(value1, value2) => (MultExpression(parseMatchedValue(value1), parseMatchedValue(value2)), pos)
     }
 
     // Encontrando todas as correspondências na string e armazenando-as em uma lista junto com suas posições
@@ -223,7 +260,8 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
         expressionAssignInt.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
         expressionPlus.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
         expressionAssignBoolean.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
-        expressionBoolean.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start))).toList
+        expressionBoolean.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
+        expressionMult.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start))).toList
 
     // Classificando a lista com base nas posições das correspondências na string original
     val sortedExpressions = allExpressionsWithPos.sortBy(_._2)
@@ -233,11 +271,9 @@ case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
     // Imprimindo as correspondências na ordem em que aparecem na string original
     sortedExpressions.foreach { case (expr, _) =>
       tempList = tempList :+ (expr)
-      println(expr)
     }
 
     val unrakedList: List[(Any, Any)] = listToTuples(tempList).reverse
-    println(unrakedList)
 
     unrakedList
   }
