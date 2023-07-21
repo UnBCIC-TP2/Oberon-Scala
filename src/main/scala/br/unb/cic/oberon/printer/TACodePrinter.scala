@@ -2,7 +2,7 @@ package br.unb.cic.oberon.printer
 
 import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
-import org.typelevel.paiges.Doc.{line, text}
+import org.typelevel.paiges.Doc.{ line, text }
 
 /**
  * This class has the responsibility to print TAC Abstraction in Scala
