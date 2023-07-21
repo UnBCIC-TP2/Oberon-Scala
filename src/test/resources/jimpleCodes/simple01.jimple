@@ -1,0 +1,22 @@
+public class SimpleModule1 extends java.lang.Object
+{
+    public static final int x;
+
+    public void <init>()
+    {
+        SimpleModule1 r0;
+
+        r0 := @this: SimpleModule1;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void <clinit>()
+    {
+        <SimpleModule1: int x> = 5;
+
+        return;
+    }
+}
