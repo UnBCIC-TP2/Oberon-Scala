@@ -1,42 +1,248 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{
-  IntValue => OberonIntValue,
-  BoolValue => OberonBoolValue,
-  RealValue => OberonRealValue,
-  CharValue => OberonCharValue,
-  StringValue => OberonStringValue,
-  NullValue => OberonNullValue,
-  AndExpression => OberonAndExpression,
-  OrExpression => OberonOrExpression,
-  NotExpression => OberonNotExpression,
-  AddExpression => OberonAddExpression,
-  SubExpression => OberonSubExpression,
-  MultExpression => OberonMultExpression,
-  DivExpression => OberonDivExpression,
-  ModExpression => OberonModExpression,
-  _
-}
+import br.unb.cic.oberon.ir.ast.{AddExpression => OberonAddExpression, AndExpression => OberonAndExpression, BoolValue => OberonBoolValue, CharValue => OberonCharValue, DivExpression => OberonDivExpression, IntValue => OberonIntValue, ModExpression => OberonModExpression, MultExpression => OberonMultExpression, NotExpression => OberonNotExpression, NullValue => OberonNullValue, OrExpression => OberonOrExpression, RealValue => OberonRealValue, StringValue => OberonStringValue, SubExpression => OberonSubExpression, _}
+import br.unb.cic.oberon.ir.jimple
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
+import br.unb.cic.oberon.transformations.CoreChecker
 
 import scala.collection.mutable.ListBuffer
+import org.typelevel.paiges.Doc
+import org.typelevel.paiges.Doc._
 
-object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
-  override def generateCode(module: OberonModule): ClassDeclaration = {
+import scala.util.matching.Regex
+
+abstract class JimpleCodeGenerator extends CodeGenerator[String] {}
+
+case class PaigesJimpleGenerator() extends JimpleCodeGenerator {
+  val indentSize:Doc = Doc.spaces(4)
+  val doubleIndentSize:Doc = Doc.spaces(8)
+  val twoLines: Doc = line * 2
+
+  override def generateCode(module: OberonModule): String = {
+
+    if (module.stmt.isDefined && !CoreChecker.isModuleCore(module))
+      throw new NotOberonCoreException("Não podemos compilar módulo que não seja OberonCore")
+
     val fields = generateFields(module)
     val methodSignatures = generateMethodSignatures(module)
-    val methods = generateMethods(module, fields, methodSignatures)
+    val methodsString = generateMethods(module, fields, methodSignatures).toString()
+    var ConditionPrintClinit: Boolean = false
 
-    ClassDeclaration(
-      modifiers = List(PublicModifer),
-      classType = TObject(module.name),
-      superClass = TObject("java.lang.Object"),
-      interfaces = List.empty[JimpleType],
-      fields = fields,
-      methods = methods,
-    )
+    //Só pra teste---------------------------------------------------------------------\\
+    val methodsForConstants = generateConstantAssignments(module, fields, methodSignatures)
+    val methodsForFloatAndExpressions = jimpleStatement(module.stmt, module, fields, methodSignatures, 0)
+
+    println(methodsString)
+    //----------------------------------------------------------------------------------\\
+
+
+    // Cabeçalho
+    val ModuleName: Doc = Doc.text(module.name)
+    val MainHeader = text("Public Class ") + ModuleName + text(" extends java.lang.Object") / Doc.char('{')
+
+    //Inicialização da Main
+
+    val HasVoid = FindInString("TVoid,main,", methodsString)
+
+    val MainTitle =
+      if (HasVoid) {
+        indentSize + text("public void <init>()") / indentSize + Doc.char('{') / doubleIndentSize +
+          ModuleName + text(" r0;") + twoLines + doubleIndentSize + text("r0 := @this: ") + ModuleName + text(";") +
+          twoLines + doubleIndentSize + text("specialinvoke r0.<java.lang.Object: void <init>()>();") +
+          twoLines + doubleIndentSize + text("return;") + indentSize
+      }else{
+        text("")
+      }
+
+    //indentSize + text("public static void main(java.lang.String[])") / indentSize + Doc.char('{')
+
+    // Instanciação de variaveis
+    var VariablesAndConstants: Doc = Doc.text("")
+    var variablesAndConstant: Doc = Doc.text("")
+
+    for (elemento <- fields) {
+      val name : Doc = text(elemento.name)
+      val tipo : Doc = text(generateTypeString(elemento.fieldType))
+
+      if ((elemento.modifiers).toString() == "List(PublicModifer, StaticModifier, FinalModifier)"){
+        variablesAndConstant = text("Public static final ") + tipo + space + name
+        if(ConditionPrintClinit == (false)){
+          ConditionPrintClinit = true
+        }
+      } else {
+        variablesAndConstant = text("Public ") + tipo + space + name
+      }
+      VariablesAndConstants = VariablesAndConstants + indentSize + variablesAndConstant + text(";") + Doc.line
+    }
+
+    // Percorre pelos metódos e retorna uma lista de expressões
+
+    val ExpressionsListTuple = findExpressions(methodsString)
+
+    // Instanciação de Métodos
+
+    var MainMethods: Doc = Doc.text("")
+
+    if(ConditionPrintClinit == true){
+      MainMethods = MainMethods + twoLines + indentSize + text("public static void <clinit>()") / indentSize + Doc.char('{')
+
+      for(tuple <- ExpressionsListTuple){
+        var ExpressionDoc = defineStaticExpressionToDoc(tuple)
+        MainMethods = MainMethods / doubleIndentSize + text("<") + ModuleName + text(": ") + ExpressionDoc + Doc.line
+      }
+
+
+      MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
+    }
+
+
+
+
+
+
+    // Pretty Print Final
+
+    val Jcode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}')
+    Jcode.render(1000)
   }
+
+  //Funções auxiliares para o Pretty Print
+
+  def defineStaticExpressionToDoc(element: (Any, Any)) : Doc ={
+
+    var envio:Doc = Doc.text("")
+
+    val expressionImm: Regex = """\(AssignStmtInt\((\w+)\),ImmediateExpressionInt\((\d+)\)""".r
+    val expressionPlu: Regex = """\(AssignStmtInt\((\w+)\),PlusExpression\((\d+),(\d+)\)\)""".r
+
+
+    val secondElement = element._2.toString
+
+    if (secondElement.contains("ImmediateExpressionInt")) {
+      // Extrair os valores usando expressões regulares
+      val extractedValues: Option[(String, Int)] = expressionImm.findFirstMatchIn(element.toString()).map { matchResult =>
+        (matchResult.group(1), matchResult.group(2).toInt)
+      }
+      // Imprimir os valores extraídos ou tratar caso não tenham sido encontrados
+      extractedValues match {
+        case Some((variable, intValue)) =>
+          envio = envio + Doc.text(s"int $variable> = $intValue;")
+      }
+
+    } else if(secondElement.contains("PlusExpression")){
+
+      // Extrair os valores usando expressões regulares
+      val extractedValues1: Option[(String, Int, Int)] = expressionPlu.findFirstMatchIn(element.toString()).map { matchResult =>
+        (matchResult.group(1), matchResult.group(2).toInt, matchResult.group(3).toInt)
+      }
+      // Imprimir os valores extraídos ou tratar caso não tenham sido encontrados
+      extractedValues1 match {
+        case Some((variable, intValue, intValue2)) =>
+          val soma: Int = intValue + intValue2
+          envio = envio + Doc.text(s"int $variable> = $soma;")
+      }
+    }
+
+    envio
+  }
+
+  // Procura se há uma determinada string dentro de outra string
+  def FindInString(queroAchar: String, stringCompleta: String): Boolean = {
+
+    val regex = queroAchar.r
+    val result = regex.findFirstIn(stringCompleta).isDefined
+
+    result
+  }
+
+  // Gera o tipo utilizado pelo Pretty Print, recebendo como input um Tipo Jimple
+  def generateTypeString(value: JimpleType): String = value match{
+
+    case TInteger => "int"
+    case TBoolean => "boolean"
+    case TFloat => "float"
+    case TCharacter => "char"
+    case TString => "string"
+    case TNull => "null"
+    case TVoid => "void"
+    case TUnknown => "unknown"
+    case other => extractTypeString(other.toString)
+  }
+
+  // Caso o tipo seja diferente dos demais, usa essa função para retornar ele mesmo
+  def extractTypeString(str: String): String = {
+    val pattern: Regex = "TObject\\((.*)\\)".r
+    str match {
+      case pattern(content) => content
+      case _ => str
+    }
+  }
+
+  // Pega uma lista de qualquer tipo e transforma em uma lista de Tuplas
+  def listToTuples(list: List[Any]): List[(Any,Any)] = {
+    list.grouped(2).collect {
+      case List(x, y) => (x, y)
+    }.toList
+  }
+
+  // Procura as expressões solicitadas nos métodos jimple
+  def findExpressions(text: String): List[(Any,Any)] = {
+
+    val inputString = text
+
+    // Definindo case classes para representar as correspondências encontradas
+    case class ImmediateExpressionInt(value: Any)
+    case class AssignStmtInt(fieldName: String)
+    case class PlusExpression(value1: Any, value2: Any)
+    case class AssignStmtBoolean(fieldName: String)
+    case class BooleanExpression(fieldName: String)
+
+    // Definindo os padrões de regex para as correspondências
+    val expressionImmediateInt: Regex = """ImmediateExpression\(ImmediateValue\(IntValue\((\d+)\)""".r
+    val expressionAssignInt: Regex = """AssignStmt\(StaticField\(FieldSignature\([^,]+,TInteger,(\w+)\)""".r
+    val expressionPlus: Regex = """PlusExpression\(ImmediateValue\(IntValue\((\d+)\)\),ImmediateValue\(IntValue\((\d+)\)""".r
+    val expressionAssignBoolean: Regex = """AssignStmt\(StaticField\(FieldSignature\([^,]+,TBoolean,(\w+)\)""".r
+    val expressionBoolean: Regex = """ImmediateExpression\(ImmediateValue\(BooleanValue\((\w+)\)""".r
+
+    // Função para converter o valor correspondente para o caso apropriado
+    def parseMatchedValue(matchedValue: String): Any = matchedValue.toInt
+
+    // Função para mapear o padrão de regex para o caso apropriado
+    def mapMatchedValue(expr: String, pos: Int): (Any, Int) = expr match {
+      case expressionImmediateInt(value) => (ImmediateExpressionInt(parseMatchedValue(value)), pos)
+      case expressionAssignInt(fieldName) => (AssignStmtInt(fieldName), pos)
+      case expressionPlus(value1, value2) => (PlusExpression(parseMatchedValue(value1), parseMatchedValue(value2)), pos)
+      case expressionAssignBoolean(fieldName) => (AssignStmtBoolean(fieldName),pos)
+      case expressionBoolean(fieldName) => (BooleanExpression(fieldName),pos)
+    }
+
+    // Encontrando todas as correspondências na string e armazenando-as em uma lista junto com suas posições
+    val allExpressionsWithPos: List[(Any, Int)] = (
+      expressionImmediateInt.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
+        expressionAssignInt.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
+        expressionPlus.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
+        expressionAssignBoolean.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start)) ++
+        expressionBoolean.findAllMatchIn(inputString).map(m => mapMatchedValue(m.matched, m.start))).toList
+
+    // Classificando a lista com base nas posições das correspondências na string original
+    val sortedExpressions = allExpressionsWithPos.sortBy(_._2)
+
+    var tempList: List[Any] = List.empty
+
+    // Imprimindo as correspondências na ordem em que aparecem na string original
+    sortedExpressions.foreach { case (expr, _) =>
+      tempList = tempList :+ (expr)
+      println(expr)
+    }
+
+    val unrakedList: List[(Any, Any)] = listToTuples(tempList).reverse
+    println(unrakedList)
+
+    unrakedList
+  }
+
+  // -------------------------------------------------------------------------------------
 
   def generateConstants(module: OberonModule): List[Field] = {
     val visitor = new ExpressionTypeVisitor(new TypeChecker())
@@ -48,28 +254,36 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
     ))
   }
 
-  def generateVariables(module: OberonModule): List[Field] = module.variables.map(variable => Field(
-    modifiers = List(PublicModifer, StaticModifier),
-    fieldType = jimpleType(variable.variableType, module),
-    name = variable.name
-  ))
+  def generateVariables(module: OberonModule): List[Field] = {
+
+    module.variables.map(variable => Field(
+      modifiers = List(PublicModifer, StaticModifier),
+      fieldType = jimpleType(variable.variableType, module),
+      name = variable.name
+    ))
+  }
 
   def generateFields(module: OberonModule) = generateConstants(module) ::: generateVariables(module)
 
   def generateUserDefinedTypes(module: OberonModule): List[JimpleType] =
     module.userTypes.map(userType => jimpleUserDefinedType(userType.name, module))
 
-  def generateMethodSignatures(module: OberonModule): List[MethodSignature] = module.procedures.map(procedure => MethodSignature(
-    className = module.name,
-    returnType = jimpleType(procedure.returnType, module),
-    methodName = procedure.name,
-    formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
-  ))
+  def generateMethodSignatures(module: OberonModule): List[MethodSignature] = {
+    module.procedures.map(procedure => MethodSignature(
+      className = module.name,
+      returnType = jimpleType(procedure.returnType, module),
+      methodName = procedure.name,
+      formals = procedure.args.map(arg => jimpleType(arg.argumentType, module))
+    ))
+  }
 
-  def generateConstantAssignments(module: OberonModule, fields: List[Field], methodSignatures: List[MethodSignature]): List[JimpleStatement] =
-    module.constants.map(constant => AssignStmt(StaticField(FieldSignature(module.name, fields.find(field => field.name == constant.name).get.fieldType, constant.name)), jimpleExpression(constant.exp, module, fields, methodSignatures)))
+  def generateConstantAssignments(module: OberonModule, fields: List[Field], methodSignatures: List[MethodSignature]): List[JimpleStatement] = {
+    module.constants.map(constant => AssignStmt(StaticField(FieldSignature(module.name,
+      fields.find(field => field.name == constant.name).get.fieldType, constant.name)),
+      jimpleExpression(constant.exp, module, fields, methodSignatures)))
+  }
 
-  def generateMethods(module: OberonModule, fields: List[Field], methodSignatures: List[MethodSignature]): List[Method] =
+  def generateMethods(module: OberonModule, fields: List[Field], methodSignatures: List[MethodSignature]): List[Method] = {
     module.procedures.map(procedure => jimpleMethod(procedure, module, fields, methodSignatures)) :+ Method(
       modifiers = List(PublicModifer, StaticModifier),
       returnType = TVoid,
@@ -82,6 +296,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
         catchClauses = List.empty[CatchClause],
       )
     )
+  }
 
   def jimpleMethod(procedure: Procedure, module: OberonModule, fields: List[Field], methodSignatures: List[MethodSignature]): Method = Method(
     modifiers = List(PublicModifer, StaticModifier),
