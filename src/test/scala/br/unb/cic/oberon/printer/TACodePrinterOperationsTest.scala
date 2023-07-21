@@ -100,7 +100,7 @@ class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
+      MoveOp(t0, Name("var", IntegerType), ""),
     )
 
     val firstOp = "t0 = 1 + 2"

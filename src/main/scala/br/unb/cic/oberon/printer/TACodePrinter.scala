@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, MoveOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc.{ line, text }
 
@@ -54,7 +54,7 @@ object TACodePrinter {
       case JumpFalse(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == false $jumpStatement $dest")
       case Jump(dest, label) => tac / text(s"$jumpStatement $dest")
       case NotOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = NOT ${handleAddress(s1)}")
-      case CopyOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
+      case MoveOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
       case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
       case _ => text("Not implemented in printer")
     }
