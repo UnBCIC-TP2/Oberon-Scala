@@ -37,11 +37,11 @@ object JVMCodeGenerator extends CodeGenerator[String] {
   }
 
   def generateVariables(variables: List[VariableDeclaration], cw: ClassWriter): Unit = {
-    variables.foreach((v : VariableDeclaration) =>
+    variables.foreach((v: VariableDeclaration) =>
       v.variableType match {
-        case IntegerType =>  cw.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
+        case IntegerType => cw.visitField(ACC_PUBLIC, v.name, "I", null, Integer.valueOf(0)).visitEnd()
         case BooleanType => cw.visitField(ACC_PUBLIC, v.name, "Z", null, false).visitEnd()
-		case _ => throw new Exception("Non-exhaustive match in case statement.")
+        case _ => throw new Exception("Non-exhaustive match in case statement.")
       }
     )
   }
@@ -49,17 +49,17 @@ object JVMCodeGenerator extends CodeGenerator[String] {
   def generateConstants(constants: List[Constant], cw: ClassWriter): Unit = {
     val interpreter = new Interpreter()
 
-    val visitor = new EvalExpressionVisitor(interpreter)
+    //val visitor = new EvalExpressionVisitor(interpreter)
 
     constants.map {
-      case (constant) => 
-        val v = constant.exp.accept(visitor)
+      case (constant) =>
+        val v = interpreter.evalExpression(interpreter.env, constant.exp)
 
         v match {
-          case IntValue (value) => {
+          case IntValue(value) => {
             cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "I", null, value).visitEnd();
           }
-          case BoolValue (value) => {
+          case BoolValue(value) => {
             cw.visitField(ACC_PUBLIC + ACC_FINAL, constant.name, "Z", null, value).visitEnd();
           }
         }
@@ -88,7 +88,7 @@ object JVMCodeGenerator extends CodeGenerator[String] {
     //
     val mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null)
 
-    mv.visitCode()  // the method has a body... think something like '{'
+    mv.visitCode() // the method has a body... think something like '{'
 
     //
     // loads the static "out" field of java.lang.System and
@@ -109,11 +109,11 @@ object JVMCodeGenerator extends CodeGenerator[String] {
     // is not a static method, the object "out" is also
     // popped out from the stack.
     //
-    mv.visitMethodInsn(INVOKEVIRTUAL,                // we have different invoke instructions
-      Type.getInternalName(classOf[PrintStream]),    // the base class of the method
-      "println",                              // the name of the method.
+    mv.visitMethodInsn(INVOKEVIRTUAL, // we have different invoke instructions
+      Type.getInternalName(classOf[PrintStream]), // the base class of the method
+      "println", // the name of the method.
       Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(classOf[String])), // the method descriptor
-      false)                               // if this method comes from an interface
+      false) // if this method comes from an interface
 
     //
     // the return instruction. note, even void method

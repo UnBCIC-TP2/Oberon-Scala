@@ -77,7 +77,7 @@ object Main extends App with Oberon2ScalaParser {
     val module = parseAbs(parse(oberonParser,content))
 
     val interpreter = new Interpreter()
-    val result = module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
   }
 
   private def typeCheck() = {
