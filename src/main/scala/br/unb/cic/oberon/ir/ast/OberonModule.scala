@@ -30,9 +30,6 @@ case class OberonModule(name: String,
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
-
-  // accept that allows choice between test and base+test interpreter, s can be either "TEST" or "BOTH"
-  def accept(v: Interpreter, s: String): v.T = v.visit(this, s)
 }
 
 // SequenceStatement(List[Stmt]) extends Stmt

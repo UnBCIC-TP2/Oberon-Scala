@@ -53,10 +53,11 @@ class Environment[T](private val top_loc:Int = 0,
       stack = this.stack)
   }
 
+
   def setParameterReference(name: String, loc: Location): Environment[T] = {
     //stack.top += name -> loc
     val copyStack = stack.clone()
-    copyStack.top.addOne(name->loc)
+    copyStack.top += name->loc
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
@@ -135,13 +136,13 @@ class Environment[T](private val top_loc:Int = 0,
 
   def declareProcedure(procedure: Procedure): Environment[T] = {
     //Unit = procedures(procedure.name) = procedure
-    var copyProcedures = procedures.clone()
-    copyProcedures(procedure.name) = procedure
+    val copyprocedures = procedures.clone() + (procedure.name -> procedure)
+    //copyprocedures(procedure.name) = procedure
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
       global = this.global,
-      procedures = copyProcedures,
+      procedures = copyprocedures,
       tests = this.tests,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack)
@@ -149,21 +150,21 @@ class Environment[T](private val top_loc:Int = 0,
 
   def declareTest(test: Test): Environment[T] = {
     //Unit = tests(test.name) = test
-    var copyTests = tests.clone()
-
-    copyTests(test.name) = test
+    val copytests = tests.clone() + (test.name -> test)
+    // copytests(test.name) = test
 
     new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
       global = this.global,
       procedures = this.procedures,
-      tests = copyTests,
+      tests = copytests,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack)
   }
 
 
   def findProcedure(name: String): Procedure = procedures(name)
+
   def findTest(name: String): Test = tests(name)
 
   def push(): Environment[T] ={

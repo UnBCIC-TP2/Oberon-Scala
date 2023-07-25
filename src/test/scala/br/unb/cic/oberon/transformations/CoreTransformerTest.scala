@@ -57,9 +57,9 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(6)))
-    assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(6)))
+    assert(result.lookup("factorial") == Some(IntValue(120)))
   }
 
   test("Testing the loop_stmt02 expressions after conversion to While") {

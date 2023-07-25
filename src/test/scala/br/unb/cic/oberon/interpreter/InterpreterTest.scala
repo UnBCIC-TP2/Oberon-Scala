@@ -2,6 +2,7 @@ package br.unb.cic.oberon.interpreter
 
 import java.nio.file.{Files, Paths}
 
+import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
@@ -21,12 +22,12 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
-    coreModule.accept(interpreter)
+    var result = interpreter.runInterpreter(coreModule)
+    result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
-    assert(interpreter.env.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
-    assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
+    assert(result.lookup("x") == Some(IntValue(5))) // FOR TO x
+    assert(result.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
+    assert(result.lookup("z") == Some(IntValue(15))) // z = result
 
   }
 
@@ -38,10 +39,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(120)))
+    assert(result.lookup("x") == Some(IntValue(1)))
+    assert(result.lookup("y") == Some(IntValue(120)))
 
   }
 
@@ -53,10 +54,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(1)))
+    assert(result.lookup("x") == Some(IntValue(1)))
+    assert(result.lookup("y") == Some(IntValue(1)))
 
   }
 
@@ -68,10 +69,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(0)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(1)))
+    assert(result.lookup("x") == Some(IntValue(0)))
+    assert(result.lookup("y") == Some(IntValue(1)))
 
   }
 
@@ -81,9 +82,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("ant") == Some(IntValue(13)))
+    assert(result.lookup("ant") == Some(IntValue(13)))
 
   }
 
@@ -95,10 +96,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(15)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(18)))
+    assert(result.lookup("x") == Some(IntValue(15)))
+    assert(result.lookup("z") == Some(IntValue(18)))
 
   }
 
@@ -110,10 +111,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(90)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(0)))
+    assert(result.lookup("x") == Some(IntValue(90)))
+    assert(result.lookup("z") == Some(IntValue(0)))
 
   }
 
@@ -125,10 +126,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(101)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(0)))
+    assert(result.lookup("x") == Some(IntValue(101)))
+    assert(result.lookup("z") == Some(IntValue(0)))
 
   }
 
@@ -140,10 +141,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(101)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(2)))
+    assert(result.lookup("x") == Some(IntValue(101)))
+    assert(result.lookup("z") == Some(IntValue(2)))
 
   }
 
@@ -155,10 +156,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(52)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+    assert(result.lookup("x") == Some(IntValue(52)))
+    assert(result.lookup("z") == Some(IntValue(10)))
 
   }
 
@@ -170,24 +171,24 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(52)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+    assert(result.lookup("x") == Some(IntValue(52)))
+    assert(result.lookup("z") == Some(IntValue(10)))
 
   }
 
   test("Testing interpreter on interpreter_fibonacci02 program: Fibonacci index 10 = 55") {
     val module = parseResource("procedures/interpreter_fibonacci02.oberon")
-    
+
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("ant") == Some(IntValue(55)))
+    assert(result.lookup("ant") == Some(IntValue(55)))
   }
 
   test("Testing interpreter on interpreter_factorial04 program: factorial(4)") {
@@ -198,10 +199,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(1)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(24)))
+    assert(result.lookup("x") == Some(IntValue(1)))
+    assert(result.lookup("y") == Some(IntValue(24)))
 
   }
 
@@ -213,10 +214,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(-50)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+    assert(result.lookup("x") == Some(IntValue(-50)))
+    assert(result.lookup("z") == Some(IntValue(10)))
 
   }
 
@@ -228,10 +229,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(25)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(10)))
+    assert(result.lookup("x") == Some(IntValue(25)))
+    assert(result.lookup("z") == Some(IntValue(10)))
 
   }
 
@@ -243,9 +244,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(1)));
+    assert(result.lookup("y") == Some(IntValue(1)));
 
   }
 
@@ -257,9 +258,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(2)));
+    assert(result.lookup("y") == Some(IntValue(2)));
 
   }
 
@@ -271,9 +272,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+    assert(result.lookup("y") == Some(IntValue(3)));
 
   }
 
@@ -285,9 +286,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(4)));
+    assert(result.lookup("y") == Some(IntValue(4)));
 
   }
 
@@ -299,9 +300,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(5)));
+    assert(result.lookup("y") == Some(IntValue(5)));
 
   }
 
@@ -313,9 +314,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(2)));
+    assert(result.lookup("y") == Some(IntValue(2)));
 
   }
 
@@ -327,9 +328,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(2)));
+    assert(result.lookup("y") == Some(IntValue(2)));
 
   }
 
@@ -341,9 +342,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "SimpleModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+    assert(result.lookup("y") == Some(IntValue(3)));
 
   }
 
@@ -355,10 +356,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x").contains(IntValue(11)));
-    assert(interpreter.env.lookup("sum").contains(IntValue(55)));
+    assert(result.lookup("x").contains(IntValue(11)));
+    assert(result.lookup("sum").contains(IntValue(55)));
 
   }
 
@@ -370,10 +371,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("sum") == Some(IntValue(330)));
-    assert(interpreter.env.lookup("x") == Some(IntValue(21)));
+    assert(result.lookup("sum") == Some(IntValue(330)));
+    assert(result.lookup("x") == Some(IntValue(21)));
 
   }
 
@@ -385,9 +386,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("sum") == Some(IntValue(11)));
+    assert(result.lookup("sum") == Some(IntValue(11)));
 
   }
 
@@ -399,9 +400,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(20)));
+    assert(result.lookup("x") == Some(IntValue(20)));
 
   }
 
@@ -413,9 +414,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(0)));
+    assert(result.lookup("x") == Some(IntValue(0)));
 
   }
 
@@ -426,10 +427,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     assert(coreModule.name == "RepeatUntilModule")
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(11)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(40)));
+    assert(result.lookup("x") == Some(IntValue(11)));
+    assert(result.lookup("y") == Some(IntValue(40)));
 
   }
 
@@ -441,10 +442,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(3)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+    assert(result.lookup("x") == Some(IntValue(3)));
+    assert(result.lookup("y") == Some(IntValue(3)));
   }
 
   test("Testing RepeatUntil stmt on RepeatUntilStmt08 program") {
@@ -455,10 +456,10 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "RepeatUntilModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(10)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(10)));
+    assert(result.lookup("x") == Some(IntValue(10)));
+    assert(result.lookup("y") == Some(IntValue(10)));
   }
 
   test("Testing LoopStmt stmt on loop_stmt01 program") {
@@ -474,8 +475,8 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "LoopStmt")
 
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(-1)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(-1)))
   }
 
   test("Testing LoopStmt stmt on loop_stmt02 program") {
@@ -491,9 +492,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "LoopStmt")
 
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(6)))
-    assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(6)))
+    assert(result.lookup("factorial") == Some(IntValue(120)))
   }
 
   test("Testing LoopStmt stmt on loop_stmt03 program") {
@@ -509,9 +510,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "LoopStmt")
 
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(10)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(100)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(10)))
+    assert(result.lookup("y") == Some(IntValue(100)))
   }
 
 
@@ -523,12 +524,12 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "UserTypeModule")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(evalArraySubscript("a", 0) == IntValue(5))
-    assert(evalArraySubscript("b", 1) == IntValue(10))
+    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
+    assert(evalArraySubscript(result, "b", 1) == IntValue(10))
   }
-  
+
   test("stmt36") {
     val module = parseResource("stmts/stmt36.oberon")
 
@@ -537,11 +538,11 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "UserTypeModule")
 
-    coreModule.accept(interpreter)
-    assert(evalArraySubscript("a", 0) == IntValue(5))
-    assert(evalArraySubscript("a", 1) == IntValue(10))
-    assert(evalArraySubscript("b", 0) == IntValue(10))
-    assert(evalArraySubscript("a", 2) == IntValue(25))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
+    assert(evalArraySubscript(result, "a", 1) == IntValue(10))
+    assert(evalArraySubscript(result, "b", 0) == IntValue(10))
+    assert(evalArraySubscript(result, "a", 2) == IntValue(25))
   }
 
   test("stmt37") {
@@ -552,9 +553,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "UserTypeModule")
 
-    coreModule.accept(interpreter)
-    assert(evalArraySubscript("a", 0) == IntValue(5))
-    assert(evalArraySubscript("a", 2) == IntValue(25))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
+    assert(evalArraySubscript(result, "a", 2) == IntValue(25))
   }
 
   test("Module A has no imports"){
@@ -565,7 +566,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "A")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(interpreter.env.lookup("x").isDefined)
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
   }
@@ -578,7 +579,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "B")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(interpreter.env.lookup("x").isDefined)
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
   }
@@ -592,7 +593,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "F")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(interpreter.env.lookup("x").isDefined)
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
   }
@@ -605,7 +606,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(coreModule.name == "D")
 
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(interpreter.env.lookup("x").isDefined)
     assert(interpreter.env.lookup("x") == Some(IntValue(1)))
     //assert(interpreter.env.lookup("x") == Some(IntValue(2)))
@@ -615,16 +616,16 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/ArrayAssignmentStmt03.oberon")
 
     assert(module.name == "ArrayAssignmentStmt03")
-    module.accept(interpreter)
-    assert(interpreter.env.lookup("array").isDefined)
-    assert(interpreter.env.lookup("outroarray").isDefined)
+    val result = interpreter.runInterpreter(module)
+    assert(result.lookup("array").isDefined)
+    assert(result.lookup("outroarray").isDefined)
 
 
-    assert(evalArraySubscript("outroarray", 0) == IntValue(1))
-    assert(evalArraySubscript("outroarray", 1) == IntValue(5))
+    assert(evalArraySubscript(result, "outroarray", 0) == IntValue(1))
+    assert(evalArraySubscript(result, "outroarray", 1) == IntValue(5))
 
     for (i <- 0 to 2){
-      assert(evalArraySubscript("array", i) == IntValue(10*(i+1)))
+      assert(evalArraySubscript(result, "array", i) == IntValue(10*(i+1)))
     }
   }
 
@@ -632,25 +633,25 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/ArrayAssignmentStmt06.oberon")
 
     assert(module.name == "ArrayAssignmentStmt06")
-    module.accept(interpreter)
-    assert(interpreter.env.lookup("i").isDefined)
-    assert(interpreter.env.lookup("arr").isDefined)
+    val result = interpreter.runInterpreter(module)
+    assert(result.lookup("i").isDefined)
+    assert(result.lookup("arr").isDefined)
 
-    assert(evalArraySubscript("arr", 5) == Undef())
-    assert(evalArraySubscript("arr", 0) == IntValue(1))
-    assert(evalArraySubscript("arr", 9) == IntValue(2))
+    assert(evalArraySubscript(result, "arr", 5) == Undef())
+    assert(evalArraySubscript(result, "arr", 0) == IntValue(1))
+    assert(evalArraySubscript(result, "arr", 9) == IntValue(2))
   }
-  
+
   test("Testing aritmetic37"){
     val module = parseResource("aritmetic/aritmetic37.oberon")
 
     assert(module.name == "Aritmetic37")
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(5)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)))
-    assert(interpreter.env.lookup("z") == Some(IntValue(2)))
-    assert(interpreter.env.lookup("w") == Some(IntValue(1)))
+    assert(result.lookup("x") == Some(IntValue(5)))
+    assert(result.lookup("y") == Some(IntValue(3)))
+    assert(result.lookup("z") == Some(IntValue(2)))
+    assert(result.lookup("w") == Some(IntValue(1)))
 
   }
 
@@ -661,11 +662,11 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     assert(coreModule.name == "Procedure06")
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
-    assert(interpreter.env.lookup("a") == Some(IntValue(2)))
-    assert(interpreter.env.lookup("b") == Some(IntValue(4)))
-    assert(interpreter.env.lookup("c") == Some(IntValue(1)))
+    assert(result.lookup("a") == Some(IntValue(2)))
+    assert(result.lookup("b") == Some(IntValue(4)))
+    assert(result.lookup("c") == Some(IntValue(1)))
 
   }
 
@@ -675,7 +676,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.accept(interpreter) == ())
+    interpreter.runInterpreter(coreModule)
   }
 
   test("Testing Assert true (false)") {
@@ -684,7 +685,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    val thrown = intercept[Exception]{coreModule.accept(interpreter)}
+    val thrown = intercept[Exception]{interpreter.runInterpreter(coreModule)}
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
@@ -695,7 +696,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     val thrown = intercept[Exception] {
-      coreModule.accept(interpreter)
+      interpreter.runInterpreter(coreModule)
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
@@ -707,9 +708,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-
-
-    assert(coreModule.accept(interpreter) == ())
+    interpreter.runInterpreter(coreModule)
   }
 
   test("Testing Assert equal (wrong)") {
@@ -719,7 +718,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     val thrown = intercept[Exception] {
-      coreModule.accept(interpreter)
+      interpreter.runInterpreter(coreModule)
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
@@ -731,7 +730,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
 
-    assert(coreModule.accept(interpreter) == ())
+    interpreter.runInterpreter(coreModule) == ()
   }
 
   test("Testing Assert not equal (wrong)") {
@@ -741,7 +740,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     val thrown = intercept[Exception] {
-      coreModule.accept(interpreter)
+      interpreter.runInterpreter(coreModule)
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
@@ -752,8 +751,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-
-    assert(coreModule.accept(interpreter, "TEST") == ())
+    assert(interpreter.runInterpreter(coreModule, "TEST") == ())
   }
 
 
@@ -763,8 +761,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.accept(interpreter, "TEST") == ())
-
+    interpreter.runInterpreter(coreModule, "TEST")
   }
 
   test("Testing base interpreter in procedure Test 3") {
@@ -773,8 +770,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.accept(interpreter) == ())
-
+    interpreter.runInterpreter(coreModule) == ()
   }
 
   test("Testing both interpreters in procedure Test 3") {
@@ -785,19 +781,19 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
 
     val thrown = intercept[Exception] {
-      coreModule.accept(interpreter, "BOTH")
+      interpreter.runInterpreter(coreModule, "BOTH")
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
 
   }
-  
+
   test("Testing Ignore") {
     val module = parseResource("procedures/procedureIgnore01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    interpreter.runInterpreter(coreModule)
   }
 
   test(testName = "Testing boolean32"){
@@ -805,11 +801,11 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(module.name == "Boolean32")
 
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("x") == Some(BoolValue(true)))
-    assert(interpreter.env.lookup("a") == Some(BoolValue(false)))
-    assert(interpreter.env.lookup("b") == Some(BoolValue(true)))
+    assert(result.lookup("x") == Some(BoolValue(true)))
+    assert(result.lookup("a") == Some(BoolValue(false)))
+    assert(result.lookup("b") == Some(BoolValue(true)))
   }
 
   test(testName = "Testing the module ForEachStmt"){
@@ -818,9 +814,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(module.stmt.isDefined)
 
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("s") == Some(IntValue(6)))
+    assert(result.lookup("s") == Some(IntValue(6)))
   }
 
   test(testName = "Testing the module SUMMATION"){
@@ -829,9 +825,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(module.stmt.isDefined)
 
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(6)))
+    assert(result.lookup("x") == Some(IntValue(6)))
   }
 
   test(testName = "Testing bee1013: Sample Test 1"){
@@ -840,9 +836,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(module.stmt.isDefined)
 
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("answer") == Some(IntValue(106)))
+    assert(result.lookup("answer") == Some(IntValue(106)))
   }
 
   test(testName = "Testing bee1013: Sample Test 2"){
@@ -851,12 +847,12 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     assert(module.stmt.isDefined)
 
-    module.accept(interpreter)
+    val result = interpreter.runInterpreter(module)
 
-    assert(interpreter.env.lookup("answer") == Some(IntValue(217)))
+    assert(result.lookup("answer") == Some(IntValue(217)))
   }
 
 
-  def evalArraySubscript(name: String, index: Integer): Expression =
-    interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index)))
+  def evalArraySubscript(environment: Environment[Expression], name: String, index: Integer): Expression =
+    interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))
 }
