@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.repl
 
 import br.unb.cic.oberon.ir.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
-import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
+import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreVisitor
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
@@ -28,7 +28,6 @@ class OberonEngine extends ScriptEngine {
   }
 
   val interpreter = new Interpreter
-  val expressionEval = new EvalExpressionVisitor(interpreter)
   val coreVisitor = new CoreVisitor()
 
   override def getEngineName: String = this.getClass.getSimpleName
@@ -49,7 +48,7 @@ class OberonEngine extends ScriptEngine {
 
   override def put(name: String, value: Object): Unit = {
     //println(f"put call ($name = $value)")
-    interpreter.env.setGlobalVariable(name, objectToExpression(value))
+    interpreter.env = interpreter.env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
@@ -79,7 +78,7 @@ class OberonEngine extends ScriptEngine {
       return
     }
     if (hasVariable(variable)) {
-      interpreter.env.delVariable(variable)
+      interpreter.env=interpreter.env.delVariable(variable)
     }
   }
 
@@ -160,7 +159,7 @@ class OberonEngine extends ScriptEngine {
     val module = ScalaParser.parse(pattern.replaceAllIn(content, m => expressionValue(objectToExpression(args(m.group(1).toInt - 1))).toString))
     val coreModule = coreVisitor.transformModule(module)
 
-    coreModule.accept(interpreter)
+    interpreter.runInterpreter(coreModule)
 
     null
   }
@@ -172,11 +171,11 @@ class OberonEngine extends ScriptEngine {
     val command = ScalaParser.parserREPL(statement)
     command match {
       case v: REPLVarDeclaration =>
-        v.declarations.foreach(variable => variable.accept(interpreter))
+        v.declarations.foldLeft(interpreter.env)((a, b) => interpreter.execVariable(a, b))
       case c: REPLConstant =>
-        c.constants.accept(interpreter)
+        interpreter.execConstant(interpreter.env, c.constants)
       case u: REPLUserTypeDeclaration =>
-        u.userTypes.accept(interpreter)
+        interpreter.execUserDefinedType(interpreter.env, u.userTypes)
       case s: REPLStatement =>
         s.stmt match {
           case AssignmentStmt(des, exp) =>
@@ -188,7 +187,7 @@ class OberonEngine extends ScriptEngine {
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => interpreter.visit(coreVisitor.visit(s))
+          case s: Statement => interpreter.execStatement(interpreter.env, coreVisitor.visit(s))
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }
@@ -196,7 +195,7 @@ class OberonEngine extends ScriptEngine {
   }
 
   private def expressionValue(exp: Expression): Any = {
-    val result = exp.accept(expressionEval)
+    val result = interpreter.evalExpression(interpreter.env, exp)
     result match {
       case v: Value => return v.value
       case _: Undef => return null
@@ -210,7 +209,7 @@ class OberonEngine extends ScriptEngine {
       case s: String => StringValue(s)
       case b: Boolean => BoolValue(b)
       case e: Exception => StringValue(e.getMessage)
-      case e: Expression => e.accept(expressionEval)
+      case e: Expression => interpreter.evalExpression(interpreter.env, e)
       //case _: BoxedUnit => Undef()
       case _ =>
         if (obj != null) println(f"Cannot convert $obj to expression")
@@ -266,7 +265,7 @@ class OberonEngine extends ScriptEngine {
     def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
 
       val keywordList: List[String] = List("ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO", "ELSE", "ELSIF", "END","EXIT", "FOR", "IF", "IMPORT", "IN", "IS", "LOOP", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER", "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO", "TYPE", "UNTIL", "VAR", "WHILE", "WITH")
-      
+
       for (v <- keywordList) {
         candidates.add(new Candidate(AttributedString.stripAnsi(v), v, null, null, null, null, false));
       }

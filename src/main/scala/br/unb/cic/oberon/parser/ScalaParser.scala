@@ -78,7 +78,7 @@ class ParserVisitor {
     val userTypes = ctx.declarations().userTypeDeclaration().asScala.toList.map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(name.getText, submodules, userTypes, constants, variables, procedures, block)
+    module = OberonModule(name.getText, submodules, userTypes, constants, variables, procedures,List(), block)
   }
 
   /**

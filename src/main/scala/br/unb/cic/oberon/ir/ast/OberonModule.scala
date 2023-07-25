@@ -2,6 +2,8 @@ package br.unb.cic.oberon.ir.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.interpreter.Interpreter
+
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
@@ -24,6 +26,7 @@ case class OberonModule(name: String,
                         constants: List[Constant],
                         variables: List[VariableDeclaration],
                         procedures: List[Procedure],
+                        tests: List[Test],
                         stmt: Option[Statement]
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
@@ -40,6 +43,17 @@ case class Procedure(name: String,
                      variables: List[VariableDeclaration],
                      stmt: Statement
                     ) {
+  def accept(v: OberonVisitor): v.T = v.visit(this)
+}
+
+/* test declaration definition*/
+case class Test(modifier: String,
+                name: String,
+                description: StringValue,
+                constants: List[Constant],
+                variables: List[VariableDeclaration],
+                stmt: Statement
+                ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
@@ -216,6 +230,7 @@ case class ReadShortIntStmt(varName: String) extends Statement
 case class ReadCharStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression]) extends Statement
+case class TestCallStmt(name: String) extends Statement
 case class IfElseStmt(condition: Expression, thenStmt: Statement, elseStmt: Option[Statement]) extends Statement
 case class IfElseIfStmt(condition: Expression, thenStmt: Statement, elseifStmt: List[ElseIfStmt], elseStmt: Option[Statement]) extends Statement
 case class ElseIfStmt(condition: Expression, thenStmt: Statement) extends Statement
@@ -229,6 +244,10 @@ case class CaseStmt(exp: Expression, cases: List[CaseAlternative], elseStmt: Opt
 case class ExitStmt() extends Statement
 case class NewStmt(varName: String) extends Statement
 case class MetaStmt(f: () => Statement) extends Statement
+case class AssertTrueStmt(exp: Expression) extends Statement
+case class AssertEqualStmt(left: Expression, right: Expression) extends Statement
+case class AssertNotEqualStmt(left: Expression, right: Expression) extends Statement
+case class AssertError() extends Statement
 
 trait CaseAlternative {
   def accept(v: OberonVisitor): v.T = v.visit(this)

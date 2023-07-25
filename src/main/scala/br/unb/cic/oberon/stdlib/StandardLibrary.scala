@@ -22,7 +22,7 @@ class StandardLibrary[T](env: Environment[T]) {
   }
 
   val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(),
-    List(inc, dec, abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile, stringToInt, stringToFloat), None)
+    List(inc, dec, abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile, stringToInt, stringToFloat),List(), None)
   
   def stringToInt = Procedure(
     "STRINGTOINT",

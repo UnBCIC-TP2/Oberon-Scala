@@ -7,9 +7,10 @@ BEGIN
     x := 5;
 	z := 0;
     FOR y := 0 TO y <= x DO
-      z := z + y;
-	  y := y + 1
+        z := z + y;
+	    y := y + 1
     END;
+
     write(z)
 END
 

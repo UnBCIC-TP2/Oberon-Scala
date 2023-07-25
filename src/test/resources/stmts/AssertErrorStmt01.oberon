@@ -1,0 +1,7 @@
+MODULE AssertErrorModule;
+
+BEGIN
+    assert_error()
+END
+
+END AssertErrorModule.

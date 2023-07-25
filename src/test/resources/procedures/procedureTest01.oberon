@@ -1,0 +1,12 @@
+MODULE procedureTest01;
+
+TEST firstTest ("The first test suite");
+      BEGIN
+          assert(True)
+      END firstTest
+
+BEGIN
+      assert(False)
+END
+
+END procedureTest01.
