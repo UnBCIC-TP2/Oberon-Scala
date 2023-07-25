@@ -191,8 +191,9 @@ class TypeChecker extends OberonVisitorAdapter {
       env.setLocalVariable(variable.name, variable.variableType)
     }
 
+    env = localEnvWithVariables
     val errors = test.stmt.accept(this)
-    val updatedEnv = localEnvWithVariables.pop()
+    env = localEnvWithVariables.pop()
 
     errors
   }
