@@ -218,10 +218,7 @@ class TypeChecker extends OberonVisitorAdapter {
     case ReadShortIntStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case ReadCharStmt(v) => if(env.lookup(v).isDefined) List() else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) => if(exp.accept(expVisitor).isDefined) List() else List((stmt, s"Expression $exp is ill typed."))
-    case AssertEqualStmt(_, _) => visitAssertStmt(stmt)
-    case AssertNotEqualStmt(_, _) => visitAssertStmt(stmt)
     case AssertTrueStmt(exp) => visitAssertStmt(stmt)
-    case AssertError() => visitAssertStmt(stmt)
     case NewStmt(varName) =>
       env.lookup(varName) match {
         case Some(PointerType(_)) => List()
@@ -334,26 +331,6 @@ private def visitIfElseStmt(stmt: Statement) = stmt match {
       } else {
         (stmt, s"Expression $condition does not have a boolean type") :: errorList
       }
-
-    case AssertEqualStmt(left, right) =>
-      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
-      val condition = EQExpression(left, right)
-      if (condition.accept(expVisitor).contains(BooleanType)){
-        errorList
-      } else {
-        (stmt, s"Expression $condition does not have a boolean type") :: errorList
-      }
-
-    case AssertNotEqualStmt(left, right) =>
-      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
-      val condition = NEQExpression(left, right)
-      if (condition.accept(expVisitor).contains(BooleanType)) {
-        errorList
-      } else {
-        (stmt, s"Expression $condition does not have a boolean type") :: errorList
-      }
-
-    case AssertError() => List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
   }
 
   private def visitExitStmt() = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()

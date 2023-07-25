@@ -44,12 +44,6 @@ class Interpreter extends OberonVisitorAdapter {
     module.constants.foreach(c => c.accept(this))
     module.variables.foreach(v => v.accept(this))
     module.procedures.foreach(p => p.accept(this))
-    module.tests.foreach(t => t.accept(this))
-
-    // executes tests
-    module.tests.foreach(t =>
-      if (t.modifier == "TEST")(callTest(t.name), env = env.pop)
-      )
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
@@ -61,28 +55,19 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   def visit(module: OberonModule, select: String): Unit = {
-    // set up the global declarations
-    module.userTypes.foreach(userType => userType.accept(this))
-    module.constants.foreach(c => c.accept(this))
-    module.variables.foreach(v => v.accept(this))
-    module.procedures.foreach(p => p.accept(this))
-
-    if (select == "TEST"){
+    if (select == "BOTH") visit(module) // executes base interpreter
+    if (select == "TEST") { // set up the global declarations for test only interpreter
+      module.userTypes.foreach(userType => userType.accept(this))
+      module.constants.foreach(c => c.accept(this))
+      module.variables.foreach(v => v.accept(this))
+    }
+    if (select == "TEST" || select == "BOTH"){
       module.tests.foreach(t => t.accept(this))
-
       // executes tests
       module.tests.foreach(t =>
         if (t.modifier == "TEST") (callTest(t.name), env = env.pop)
       )
     }
-
-    // execute the statement if it is defined.
-    // remember, module.stmt is an Option[Statement].
-    if (module.stmt.isDefined && select == "BASE") {
-      setupStandardLibraries()
-      module.stmt.get.accept(this)
-    }
-
   }
 
   override def visit(constant: Constant): Unit = {
@@ -191,16 +176,7 @@ class Interpreter extends OberonVisitorAdapter {
       case MetaStmt(f) => f().accept(this)
 
       case AssertTrueStmt(exp: Expression) =>
-        if (!evalCondition(exp)) throw new Exception("Exception thrown from assert true")
-
-      case AssertError() =>
-        throw new Exception("Exception thrown from assert error")
-
-      case AssertNotEqualStmt(left, right) =>
-        if (left == right) throw new Exception("Exception thrown from assert not equal")
-
-      case AssertEqualStmt(left, right) =>
-        if (left != right) throw new Exception("Exception thrown from assert equal")
+        if (!evalCondition(exp)) throw new Exception("Exception thrown from assert")
 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args)
@@ -276,10 +252,6 @@ class Interpreter extends OberonVisitorAdapter {
   }
 
   def returnProcedure() = {
-    env = env.pop()
-  }
-
-  def returnTest() = {
     env = env.pop()
   }
 

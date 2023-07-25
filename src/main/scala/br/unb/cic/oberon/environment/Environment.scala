@@ -21,8 +21,8 @@ class Environment[T](private val top_loc:Int = 0,
                      private val locations: Map[Location, T] = Map.empty[Location, T],
                      private val global: Map[String, Location] = Map.empty[String, Location],
                      private val stack: Stack[Map[String, Location]] = Stack.empty[Map[String, Location]],
-                      val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
-                      val tests: Map[String, Test] = Map.empty[String, Test],
+                     private val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
+                     private val tests: Map[String, Test] = Map.empty[String, Test],
                      private val userDefinedTypes: Map[String, UserDefinedType] = Map.empty[String, UserDefinedType]) {
 
 

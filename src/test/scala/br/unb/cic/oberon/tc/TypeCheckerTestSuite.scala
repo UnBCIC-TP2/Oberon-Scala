@@ -1486,6 +1486,28 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
     assert(res.size == 0)
   }
 
+  test("Test assert equal statement (true)"){
+    val visitor = new TypeChecker()
+    val module = parseResource("stmts/AssertEqualStmt01.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val res = coreModule.accept(visitor)
+
+    assert(res.size == 0)
+  }
+
+  test("Test assert equal statement (wrong)") {
+    val visitor = new TypeChecker()
+    val module = parseResource("stmts/AssertEqualStmt03.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val res = coreModule.accept(visitor)
+
+    assert(res.size == 1)
+  }
+
   test("Test test procedure (right)") {
     val visitor = new TypeChecker()
     val module = parseResource("procedures/procedureTest01.oberon")
@@ -1502,7 +1524,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
     val visitor = new TypeChecker()
     val module = parseResource("procedures/procedureTest07.oberon")
 
-    val res = module.accept(visitor)
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val res = coreModule.accept(visitor)
     assert(res.size == 1)
   }
 
@@ -1510,7 +1534,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
     val visitor = new TypeChecker()
     val module = parseResource("procedures/procedureTest08.oberon")
 
-    val res = module.accept(visitor)
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val res = coreModule.accept(visitor)
     assert(res.size == 1)
   }
 
@@ -1518,7 +1544,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser{
     val visitor = new TypeChecker()
     val module = parseResource("procedures/procedureTest09.oberon")
 
-    val res = module.accept(visitor)
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+    val res = coreModule.accept(visitor)
     assert(res.size == 0)
   }
 

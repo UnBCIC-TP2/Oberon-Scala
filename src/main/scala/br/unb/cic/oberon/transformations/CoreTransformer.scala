@@ -31,6 +31,15 @@ class CoreVisitor() extends OberonVisitorAdapter {
     case WhileStmt(condition, stmt) =>
       WhileStmt(condition, stmt.accept(this))
 
+    case AssertEqualStmt(left, right) =>
+      AssertTrueStmt(EQExpression(left, right))
+
+    case AssertNotEqualStmt(left, right) =>
+      AssertTrueStmt(NEQExpression(left, right))
+
+    case AssertError() =>
+      AssertTrueStmt(BoolValue(false))
+
     case _ => stmt
   }
 

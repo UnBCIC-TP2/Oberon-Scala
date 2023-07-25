@@ -31,7 +31,7 @@ case class OberonModule(name: String,
                        ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 
-  // accept that allows choice between test and base interpreter, s can be "BASE" or "TEST"
+  // accept that allows choice between test and base+test interpreter, s can be either "TEST" or "BOTH"
   def accept(v: Interpreter, s: String): v.T = v.visit(this, s)
 }
 
