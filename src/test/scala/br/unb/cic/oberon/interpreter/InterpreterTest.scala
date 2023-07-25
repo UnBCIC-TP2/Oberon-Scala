@@ -675,8 +675,6 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-
-
     assert(coreModule.accept(interpreter) == ())
   }
 
@@ -687,7 +685,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = coreVisitor.transformModule(module)
 
     val thrown = intercept[Exception]{coreModule.accept(interpreter)}
-    assert(thrown.getMessage() == "Exception thrown from assert true")
+    assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
   test("Testing Assert error (no arguments)"){
@@ -699,7 +697,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val thrown = intercept[Exception] {
       coreModule.accept(interpreter)
     }
-    assert(thrown.getMessage() == "Exception thrown from assert error")
+    assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
 
@@ -723,7 +721,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val thrown = intercept[Exception] {
       coreModule.accept(interpreter)
     }
-    assert(thrown.getMessage() == "Exception thrown from assert equal")
+    assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
   test("Testing Assert not equal (right)") {
@@ -745,26 +743,51 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val thrown = intercept[Exception] {
       coreModule.accept(interpreter)
     }
-    assert(thrown.getMessage() == "Exception thrown from assert not equal")
+    assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
-  test("Testing Test parser1") {
+  test("Testing Test interpreter1") {
     val module = parseResource("procedures/procedureTest01.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
-    assert(coreModule.accept(interpreter) == ())
+
+    assert(coreModule.accept(interpreter, "TEST") == ())
   }
 
 
-  test("Testing Test parser2") {
+  test("Testing Test interpreter2") {
     val module = parseResource("procedures/procedureTest02.oberon")
 
     val coreVisitor = new CoreVisitor()
     val coreModule = coreVisitor.transformModule(module)
 
+    assert(coreModule.accept(interpreter, "TEST") == ())
+
+  }
+
+  test("Testing base interpreter in procedure Test 3") {
+    val module = parseResource("procedures/procedureTest03.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
     assert(coreModule.accept(interpreter) == ())
+
+  }
+
+  test("Testing both interpreters in procedure Test 3") {
+    val module = parseResource("procedures/procedureTest03.oberon")
+
+    val coreVisitor = new CoreVisitor()
+    val coreModule = coreVisitor.transformModule(module)
+
+
+    val thrown = intercept[Exception] {
+      coreModule.accept(interpreter, "BOTH")
+    }
+    assert(thrown.getMessage() == "Exception thrown from assert")
 
   }
   
