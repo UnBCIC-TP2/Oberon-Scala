@@ -2,14 +2,18 @@ package br.unb.cic.oberon.transformations
 
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+
 import scala.collection.mutable.ListBuffer
 import br.unb.cic.oberon.ir.ast.Procedure
+
+import java.util.concurrent.atomic.AtomicInteger
 
 class CoreVisitor() {
 
   //var addedVariables: List[VariableDeclaration] = Nil
 
-  def visit(stmt: Statement, caseIdGenerator: Int = 0, addedVariables: List[VariableDeclaration] = Nil): Statement = stmt match {
+  def visit(stmt: Statement, caseIdGenerator: AtomicInteger = new AtomicInteger(0), addedVariables: List[VariableDeclaration] = Nil): Statement = {
+    stmt match {
     case SequenceStmt(stmts) =>
       SequenceStmt(flatSequenceOfStatements(SequenceStmt(stmts.map((stmt) => visit(stmt, caseIdGenerator, addedVariables))).stmts))
 
@@ -32,18 +36,19 @@ class CoreVisitor() {
 
     case _ => stmt
   }
+  }
 
   //private val caseIdGenerator: Iterator[Int] = Iterator.from(0)
 
-  private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement], caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Statement = {
+  private def transformCase(exp: Expression, cases: List[CaseAlternative], elseStmt: Option[Statement], caseIdGenerator: AtomicInteger, addedVariables: List[VariableDeclaration]): Statement = {
     val coreElseStmt = elseStmt.map((stmt) => visit(stmt, caseIdGenerator, addedVariables))
 
     // TODO corrigir comportamento para outras expressões
 
     val caseExpressionId = exp match {
       case VarExpression(name) => name
-      case _ => f"case_exp#${caseIdGenerator + 1}"
-    }
+      case _ => {
+        f"case_exp#${caseIdGenerator.getAndIncrement()}"}}
     val caseExpressionEvaluation = AssignmentStmt(VarAssignment(caseExpressionId), exp)
 
     def casesToIfElseStmt(cases: List[CaseAlternative]): IfElseStmt =
@@ -86,7 +91,7 @@ class CoreVisitor() {
     }
   }
 
-  private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement], caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Statement =
+  private def transformElsif(elsifStmts: List[ElseIfStmt], elseStmt: Option[Statement], caseIdGenerator: AtomicInteger, addedVariables: List[VariableDeclaration]): Statement =
     elsifStmts match {
       case currentElsif :: Nil =>
         IfElseStmt(currentElsif.condition, visit(currentElsif.thenStmt, caseIdGenerator, addedVariables), elseStmt.map((stmt) => visit(stmt, caseIdGenerator, addedVariables)))
@@ -96,7 +101,7 @@ class CoreVisitor() {
         throw new IllegalArgumentException("elsifStmts cannot be empty.")
     }
 
-  private def transformProcedureStatement(procedure: Procedure, caseIdGenerator: Int, addedVariables: List[VariableDeclaration]): Procedure = {
+  private def transformProcedureStatement(procedure: Procedure, caseIdGenerator: AtomicInteger, addedVariables: List[VariableDeclaration]): Procedure = {
       Procedure(
       name = procedure.name,
       args = procedure.args,
@@ -111,7 +116,7 @@ class CoreVisitor() {
     case s => List(s)
   }
 
-  def transformModule(module: OberonModule, caseIdGenerator: Int = 0, addedVariables: List[VariableDeclaration] = Nil): OberonModule = {
+  def transformModule(module: OberonModule, caseIdGenerator: AtomicInteger = new AtomicInteger(0), addedVariables: List[VariableDeclaration] = Nil): OberonModule = {
     // É possível remover essa val?
     val stmtcore = visit(module.stmt.get, caseIdGenerator, addedVariables)
 
