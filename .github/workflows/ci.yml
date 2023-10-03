@@ -1,17 +1,16 @@
-name: CI
+name: Building and Testing Oberon
 
 on: [ push, pull_request ]
 
 jobs:
-  test:
+  testing-oberon-scala:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 8
-      uses: actions/setup-java@v2
+    - uses: actions/checkout@v1
+    - uses: olafurpg/setup-scala@v11
       with:
-        java-version: '8'
-        distribution: 'adopt'
-    - name: Build and test
-      run: sbt -v -Dfile.encoding=UTF-8 +test
+        java-version: adopt@1.11
+    - name: Compiling...
+      run: sbt compile
+    - name: Testing...
+      run: sbt test
