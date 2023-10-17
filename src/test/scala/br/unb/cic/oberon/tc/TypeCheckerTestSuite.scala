@@ -139,7 +139,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(IntValue(34), stmt01, list1, None).accept(coreTransformer)
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(IntValue(34), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -158,7 +158,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt03 = ElseIfStmt(IntValue(70), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None).accept(coreTransformer)
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -180,7 +180,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt06 = ElseIfStmt(BoolValue(false), stmt01)
     val list1 = List(stmt03, stmt04, stmt05, stmt06)
 
-    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, None).accept(coreTransformer)
+    val stmt07 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -198,7 +198,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None).accept(coreTransformer)
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 1)
@@ -218,7 +218,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt04 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt04)
 
-    val stmt05 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)).accept(coreTransformer)
+    val stmt05 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -238,7 +238,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt06 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt04, stmt05, stmt06)
 
-    val stmt07 = IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)).accept(coreTransformer)
+    val stmt07 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03)))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
@@ -258,7 +258,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
 
-    val stmt04 = IfElseIfStmt(BoolValue(true), stmt01, list1, None).accept(coreTransformer)
+    val stmt04 = coreTransformer.visit(IfElseIfStmt(BoolValue(true), stmt01, list1, None))
 
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
@@ -305,7 +305,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02).accept(coreTransformer)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 1)
@@ -320,7 +320,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01,IntValue(10), stmt02).accept(coreTransformer)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01,IntValue(10), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 1)
@@ -334,7 +334,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02).accept(coreTransformer)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 1)
     assert(stmt03.accept(visitor).size == 1)
@@ -349,7 +349,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env.setGlobalVariable("y", IntegerType)
 
-    val stmt03 = ForStmt(stmt01, BoolValue(true), stmt02).accept(coreTransformer)
+    val stmt03 = coreTransformer.visit(ForStmt(stmt01, BoolValue(true), stmt02))
     assert(stmt01.accept(visitor).size == 0)
     assert(stmt02.accept(visitor).size == 0)
     assert(stmt03.accept(visitor).size == 0)
@@ -728,7 +728,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     val condition  = LTExpression(VarExpression("x"), IntValue(10))
     val stmt01     = ReadIntStmt("x")
-    val repeatStmt = RepeatUntilStmt(condition, stmt01).accept(coreTransformer)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -743,7 +743,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     val condition  = EQExpression(VarExpression("x"), IntValue(0))
     val stmt01     = ReadIntStmt("x")
-    val repeatStmt = RepeatUntilStmt(condition, stmt01).accept(coreTransformer)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -757,7 +757,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val stmt01  =  AssignmentStmt("x", IntValue(10))
 
-    val stmt02  = RepeatUntilStmt(BoolValue(true), stmt01).accept(coreTransformer)
+    val stmt02  = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
@@ -772,7 +772,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val stmt03 = IfElseStmt(BoolValue(false), stmt01, Some(stmt02))
     val stmt04 = AssignmentStmt("x", IntValue(20))
     val stmt05 = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
-    val stmt06 = RepeatUntilStmt(BoolValue(true), stmt05).accept(coreTransformer)
+    val stmt06 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt05))
 
     assert(stmt01.accept(visitor).size == 1)
     assert(stmt02.accept(visitor).size == 1)
@@ -790,7 +790,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
   val condition  = AndExpression(GTEExpression(VarExpression("x"), IntValue(1)),
     LTEExpression(VarExpression("x"), IntValue(10)))
   val stmt01     = ReadIntStmt("x")
-  val repeatStmt = RepeatUntilStmt(condition, stmt01).accept(coreTransformer)
+  val repeatStmt = coreTransformer.visit(RepeatUntilStmt(condition, stmt01))
 
   visitor.env.setGlobalVariable("x", IntegerType)
 
@@ -804,10 +804,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01).accept(coreTransformer)
-    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01).accept(coreTransformer)
-    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02).accept(coreTransformer)
-    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03).accept(coreTransformer)
+    val repeatStmt01 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
+    val repeatStmt02 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt01))
+    val repeatStmt03 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt02))
+    val repeatStmt04 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt03))
 
     visitor.env.setGlobalVariable("x", IntegerType)
     val allStmts = List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
@@ -822,10 +822,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01       = AssignmentStmt("x", IntValue(10))
-    val repeatStmt01 = RepeatUntilStmt(BoolValue(true), stmt01).accept(coreTransformer)
-    val repeatStmt02 = RepeatUntilStmt(BoolValue(true), repeatStmt01).accept(coreTransformer)
-    val repeatStmt03 = RepeatUntilStmt(BoolValue(true), repeatStmt02).accept(coreTransformer)
-    val repeatStmt04 = RepeatUntilStmt(BoolValue(true), repeatStmt03).accept(coreTransformer)
+    val repeatStmt01 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
+    val repeatStmt02 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt01))
+    val repeatStmt03 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt02))
+    val repeatStmt04 = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), repeatStmt03))
 
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
@@ -840,7 +840,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
 
     val boolVar    = VarExpression("flag")
     val stmt01     = AssignmentStmt(boolVar.name, BoolValue(true))
-    val repeatStmt = RepeatUntilStmt(boolVar, stmt01).accept(coreTransformer)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(boolVar, stmt01))
 
     visitor.env.setGlobalVariable("flag", BooleanType)
 
@@ -853,7 +853,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01     = AssignmentStmt("x", BoolValue(false))
-    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01).accept(coreTransformer)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     visitor.env.setGlobalVariable("x", IntegerType)
@@ -866,7 +866,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01     = AssignmentStmt("x", BoolValue(false))
-    val repeatStmt = RepeatUntilStmt(BoolValue(true), stmt01).accept(coreTransformer)
+    val repeatStmt = coreTransformer.visit(RepeatUntilStmt(BoolValue(true), stmt01))
     val stmt02     = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
     assert(stmt02.accept(visitor).size == 4)
