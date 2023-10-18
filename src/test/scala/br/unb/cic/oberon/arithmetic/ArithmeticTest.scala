@@ -37,7 +37,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
     assert(expected == (i09 / i02))
   }
 
-  test("Test a multiplication between two real"){
+  test("Test a multiplication between two real") {
 
     val r10 = RealValue(10.0)
     val r2 = RealValue(2.0)

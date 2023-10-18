@@ -1,23 +1,32 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ir.ast.{AddExpression, BoolValue, BooleanType, DivExpression, EQExpression, IntValue, IntegerType, SubExpression}
+import br.unb.cic.oberon.ir.ast.{
+  AddExpression,
+  BoolValue,
+  BooleanType,
+  DivExpression,
+  EQExpression,
+  IntValue,
+  IntegerType,
+  SubExpression
+}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import org.scalatest.funsuite.AnyFunSuite
 
 class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
 
-    test("Test expression type on simple values") {
-      val visitor = new ExpressionTypeVisitor(new TypeChecker())
-      val val10 = IntValue(10)
-      val bTrue = BoolValue(true)
-      val bFalse = BoolValue(false)
+  test("Test expression type on simple values") {
+    val visitor = new ExpressionTypeVisitor(new TypeChecker())
+    val val10 = IntValue(10)
+    val bTrue = BoolValue(true)
+    val bFalse = BoolValue(false)
 
-      assert(val10.accept(visitor) == Some(IntegerType))
+    assert(val10.accept(visitor) == Some(IntegerType))
 
-      assert(bTrue.accept(visitor) == Some(BooleanType))
+    assert(bTrue.accept(visitor) == Some(BooleanType))
 
-      assert(bFalse.accept(visitor) == Some(BooleanType))
-    }
+    assert(bFalse.accept(visitor) == Some(BooleanType))
+  }
 
   test("Test expression type on add expressions") {
     val visitor = new ExpressionTypeVisitor(new TypeChecker())
@@ -88,6 +97,5 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
 
     assert(invalidAdd.accept(visitor) == None)
   }
-
 
 }

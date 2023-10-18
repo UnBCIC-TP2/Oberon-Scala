@@ -6,7 +6,7 @@ import br.unb.cic.oberon.ir.ast.{IntValue, OberonModule}
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 
-class InterpreterVisitorTest extends AnyFunSuite{
+class InterpreterVisitorTest extends AnyFunSuite {
 
   test("Test interpreter on stmt05 program") {
     val module = ScalaParser.parseResource("stmts/stmt05.oberon")

@@ -13,7 +13,13 @@ class ClassVisitorTest(version: Integer) extends ClassVisitor(version) {
   val VAR: Int = ACC_PUBLIC;
   val CONST: Int = ACC_PUBLIC + ACC_FINAL;
 
-  override def visitField(access: Int, name: String, desc: String, signature: String, value: Any): FieldVisitor = {
+  override def visitField(
+      access: Int,
+      name: String,
+      desc: String,
+      signature: String,
+      value: Any
+  ): FieldVisitor = {
     numberOfTotalFields += 1;
 
     access match {

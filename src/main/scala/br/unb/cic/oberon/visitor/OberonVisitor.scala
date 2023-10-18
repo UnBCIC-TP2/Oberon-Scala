@@ -2,35 +2,33 @@ package br.unb.cic.oberon.visitor
 
 import br.unb.cic.oberon.ir.ast._
 
-/**
- * The abstract definition of an Oberon Visitor.
- * Note: here we are using a hybrid approach for
- * implementing visitors. Although it resembles
- * the OO flavor, we relies on pattern matching
- * to deal with the specificities of all concrete
- * elements of the Oberon language.
- *
- * @author rbonifacio
- */
+/** The abstract definition of an Oberon Visitor. Note: here we are using a
+  * hybrid approach for implementing visitors. Although it resembles the OO
+  * flavor, we relies on pattern matching to deal with the specificities of all
+  * concrete elements of the Oberon language.
+  *
+  * @author
+  *   rbonifacio
+  */
 trait OberonVisitor {
   type T
 
-  def visit(module: OberonModule) : T
-  def visit(impt: Import) : T
-  def visit(constant: Constant) : T
-  def visit(variable: VariableDeclaration) : T
-  def visit(procedure: Procedure) : T
-  def visit(arg: FormalArg) : T
-  def visit(exp: Expression) : T
-  def visit(stmt: Statement) : T
+  def visit(module: OberonModule): T
+  def visit(impt: Import): T
+  def visit(constant: Constant): T
+  def visit(variable: VariableDeclaration): T
+  def visit(procedure: Procedure): T
+  def visit(arg: FormalArg): T
+  def visit(exp: Expression): T
+  def visit(stmt: Statement): T
   def visit(aType: Type): T
   def visit(caseAlt: CaseAlternative): T
   def visit(userType: UserDefinedType): T
 }
 
 abstract class OberonVisitorAdapter extends OberonVisitor {
-  override def visit(module: OberonModule): T = ???   // ??? means: undef
-  override def visit(impt: Import) : T = ???
+  override def visit(module: OberonModule): T = ??? // ??? means: undef
+  override def visit(impt: Import): T = ???
   override def visit(constant: Constant): T = ???
   override def visit(variable: VariableDeclaration): T = ???
   override def visit(procedure: Procedure): T = ???

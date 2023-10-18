@@ -8,15 +8,24 @@ import br.unb.cic.oberon.ir.ast._
 
 class ModuleLoaderTestSuite extends AbstractTestSuite {
 
-  def makeModule(name: String = "",
-                 submodules: Set[String] = Set(),
-                 userTypes: List[UserDefinedType] = List(),
-                 constants: List[Constant] = List(),
-                 variables: List[VariableDeclaration] = List(),
-                 procedures: List[Procedure] = List(),
-                 stmt: Option[Statement] = None
-                 ): OberonModule = {
-    OberonModule(name, submodules, userTypes, constants, variables, procedures, stmt)
+  def makeModule(
+      name: String = "",
+      submodules: Set[String] = Set(),
+      userTypes: List[UserDefinedType] = List(),
+      constants: List[Constant] = List(),
+      variables: List[VariableDeclaration] = List(),
+      procedures: List[Procedure] = List(),
+      stmt: Option[Statement] = None
+  ): OberonModule = {
+    OberonModule(
+      name,
+      submodules,
+      userTypes,
+      constants,
+      variables,
+      procedures,
+      stmt
+    )
   }
 
   ignore("Testing if the ModuleLoader imports a file") {
@@ -36,10 +45,14 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     val expected = makeModule(
       name = "B",
       variables = List(VariableDeclaration("A::x", IntegerType)),
-      stmt = Some(SequenceStmt(List(
-          AssignmentStmt("A::x", IntValue(1)),
-          WriteStmt(VarExpression("A::x"))
-      )))
+      stmt = Some(
+        SequenceStmt(
+          List(
+            AssignmentStmt("A::x", IntValue(1)),
+            WriteStmt(VarExpression("A::x"))
+          )
+        )
+      )
     )
     assert(module == expected)
   }

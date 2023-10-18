@@ -4,17 +4,44 @@ import org.jline.builtins.Completers.OptionCompleter
 import org.jline.builtins.Options.HelpException
 import org.jline.builtins.{ConfigurationPath, Styles}
 import org.jline.console.ConsoleEngine.ExecutionResult
-import org.jline.console.{CmdDesc, CommandInput, CommandMethods, CommandRegistry, ConsoleEngine, Printer, SystemRegistry}
+import org.jline.console.{
+  CmdDesc,
+  CommandInput,
+  CommandMethods,
+  CommandRegistry,
+  ConsoleEngine,
+  Printer,
+  SystemRegistry
+}
 import org.jline.console.impl.{JlineCommandRegistry, SystemRegistryImpl}
 import org.jline.reader.Parser.ParseContext
-import org.jline.reader.impl.completer.{ArgumentCompleter, NullCompleter, StringsCompleter}
-import org.jline.reader.{Completer, EOFError, EndOfFileException, LineReader, Parser, SyntaxError}
+import org.jline.reader.impl.completer.{
+  ArgumentCompleter,
+  NullCompleter,
+  StringsCompleter
+}
+import org.jline.reader.{
+  Completer,
+  EOFError,
+  EndOfFileException,
+  LineReader,
+  Parser,
+  SyntaxError
+}
 import org.jline.terminal.Terminal
 import org.jline.utils.AttributedStringBuilder
 
 import java.io.{BufferedReader, File, FileReader}
 import java.{lang, util}
-import java.nio.file.{FileSystems, Files, InvalidPathException, NoSuchFileException, Path, PathMatcher, Paths}
+import java.nio.file.{
+  FileSystems,
+  Files,
+  InvalidPathException,
+  NoSuchFileException,
+  Path,
+  PathMatcher,
+  Paths
+}
 import java.util.regex.Pattern
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -23,7 +50,14 @@ import scala.jdk.CollectionConverters._
 import scala.jdk.FunctionConverters._
 import scala.util.control.Breaks.break
 
-class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: OberonEngine, printer: Printer, workDir: () => Path, configPath: ConfigurationPath) extends JlineCommandRegistry() with ConsoleEngine {
+class REPLConsoleEngine(
+    commands: Option[Array[Commands.Console]],
+    engine: OberonEngine,
+    printer: Printer,
+    workDir: () => Path,
+    configPath: ConfigurationPath
+) extends JlineCommandRegistry()
+    with ConsoleEngine {
   private val VAR_PATH = "PATH"
   private val VAR_CONSOLE_OPTIONS = "CONSOLE_OPTIONS"
   private val OPTION_VERBOSE = "-v"
@@ -31,7 +65,12 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   private val END_HELP = "END_HELP"
   private val HELP_MAX_SIZE = 30
 
-  def this(scriptEngine: OberonEngine, printer: Printer, workDir: () => Path, configPath: ConfigurationPath) {
+  def this(
+      scriptEngine: OberonEngine,
+      printer: Printer,
+      workDir: () => Path,
+      configPath: ConfigurationPath
+  ) {
     this(None, scriptEngine, printer, workDir, configPath)
   }
   private var reader: Option[LineReader] = None
@@ -41,16 +80,29 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   private val pipes = Map[String, List[String]]()
   private var exception: Option[Exception] = None;
 
-  val cmds: Array[Commands.Console] = commands.getOrElse(Commands.Console.values())
+  val cmds: Array[Commands.Console] =
+    commands.getOrElse(Commands.Console.values())
   val commandName = new util.HashMap[Commands.Console, String]
   val commandExecute = new util.HashMap[Commands.Console, CommandMethods]
   for (cmd <- cmds) {
     commandName.put(cmd, cmd.name().toLowerCase())
   }
 
-  commandExecute.put(Commands.Console.DEL, new CommandMethods((i => del(i)).asJava, (c => variableCompleter(c)).asJava))
-  commandExecute.put(Commands.Console.SHOW, new CommandMethods((i => show(i)).asJava, (c => variableCompleter(c)).asJava))
-  commandExecute.put(Commands.Console.PRNT, new CommandMethods((i => prnt(i)).asJava, (c => prntCompleter(c)).asJava))
+  commandExecute.put(
+    Commands.Console.DEL,
+    new CommandMethods((i => del(i)).asJava, (c => variableCompleter(c)).asJava)
+  )
+  commandExecute.put(
+    Commands.Console.SHOW,
+    new CommandMethods(
+      (i => show(i)).asJava,
+      (c => variableCompleter(c)).asJava
+    )
+  )
+  commandExecute.put(
+    Commands.Console.PRNT,
+    new CommandMethods((i => prnt(i)).asJava, (c => prntCompleter(c)).asJava)
+  )
   /*
   commandExecute.put(Commands.Console.SLURP, new CommandMethods((i => slurpcmd(i)).asJava, (c => slurpCompleter(c)).asJava))
   commandExecute.put(Commands.Console.DOC, new CommandMethods((i => doc(i)).asJava, (c => docCompleter(c)).asJava))
@@ -58,9 +110,13 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
    */
   registerCommands(commandName, commandExecute)
 
-  override def setLineReader(lineReader: LineReader): Unit = reader = Some(lineReader)
-  override def setSystemRegistry(sr: SystemRegistry): Unit = systemRegistry = Some(sr)
-  override def setScriptExtension(extension: String): Unit = scriptExtension = extension
+  override def setLineReader(lineReader: LineReader): Unit = reader = Some(
+    lineReader
+  )
+  override def setSystemRegistry(sr: SystemRegistry): Unit = systemRegistry =
+    Some(sr)
+  override def setScriptExtension(extension: String): Unit = scriptExtension =
+    extension
 
   private def parser: Parser = reader.get.getParser
   private def terminal: Terminal = systemRegistry.get.terminal()
@@ -72,8 +128,10 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   override def hasAlias(name: String): Boolean = false
   override def getAlias(name: String): String = name
 
-  override def getPipes: util.Map[String, util.List[String]] = pipes.map(kv => (kv._1, kv._2.asJava)).asJava
-  override def getNamedPipes: util.List[String] = pipes.keySet.filter(p => p.matches("[a-zA-Z0-9]+")).toList.asJava
+  override def getPipes: util.Map[String, util.List[String]] =
+    pipes.map(kv => (kv._1, kv._2.asJava)).asJava
+  override def getNamedPipes: util.List[String] =
+    pipes.keySet.filter(p => p.matches("[a-zA-Z0-9]+")).toList.asJava
 
   override def scriptCompleters(): util.List[Completer] = {
     List[Completer](
@@ -88,22 +146,34 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     ).asJava
   }
 
-  private def scriptExtensions: List[String] = engine.getExtensions.asScala.toList.concat(List(scriptExtension))
+  private def scriptExtensions: List[String] =
+    engine.getExtensions.asScala.toList.concat(List(scriptExtension))
   private def scriptNames: util.Set[String] = scripts().keySet()
   override def scripts(): util.Map[String, lang.Boolean] = {
     try {
       val scripts = ListBuffer[Path]()
       if (engine.hasVariable(VAR_PATH)) {
-        val dirs = engine.get(VAR_PATH).asInstanceOf[List[String]].flatMap { f =>
-          val file = if (f.startsWith("~")) f.replace("~", System.getProperty("user.home")) else f
-          val dir = new File(file)
-          if (dir.exists() && dir.isDirectory) Some(file) else None
-        }
+        val dirs =
+          engine.get(VAR_PATH).asInstanceOf[List[String]].flatMap { f =>
+            val file =
+              if (f.startsWith("~"))
+                f.replace("~", System.getProperty("user.home"))
+              else f
+            val dir = new File(file)
+            if (dir.exists() && dir.isDirectory) Some(file) else None
+          }
         for (d <- dirs) {
           scriptExtensions.foreach(se => {
             val regex = d + "/*." + se
-            val pathMatcher = FileSystems.getDefault.getPathMatcher("glob:" + regex)
-            Files.find(Paths.get(new File(regex).getParent), Integer.MAX_VALUE, (path, _) => pathMatcher.matches(path)).forEach(p => scripts.addOne(p))
+            val pathMatcher =
+              FileSystems.getDefault.getPathMatcher("glob:" + regex)
+            Files
+              .find(
+                Paths.get(new File(regex).getParent),
+                Integer.MAX_VALUE,
+                (path, _) => pathMatcher.matches(path)
+              )
+              .forEach(p => scripts.addOne(p))
           })
         }
       }
@@ -111,11 +181,15 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
       for (path <- scripts) {
         val name = path.toFile.getName
         val idx = name.lastIndexOf(".")
-        scriptsMap.put(name.substring(0, idx), name.substring(idx + 1).equals(scriptExtension))
+        scriptsMap.put(
+          name.substring(0, idx),
+          name.substring(idx + 1).equals(scriptExtension)
+        )
       }
       return scriptsMap
     } catch {
-      case n: NoSuchFileException => error("Failed reading PATH. No file found: " + n.getMessage)
+      case n: NoSuchFileException =>
+        error("Failed reading PATH. No file found: " + n.getMessage)
       case i: InvalidPathException => {
         error("Failed reading PATH. Invalid path:")
         error(i.toString)
@@ -134,7 +208,8 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     args.map(arg => {
       if (arg.matches(regexPath)) {
         val matcher = Pattern.compile(regexPath).matcher(arg)
-        matcher.group(1) + engine.get(matcher.group(2)) + matcher.group(3).asInstanceOf[Object]
+        matcher.group(1) + engine
+          .get(matcher.group(2)) + matcher.group(3).asInstanceOf[Object]
       } else if (arg.startsWith("${")) {
         engine.execute(expandName(arg))
       } else if (arg.startsWith("$")) {
@@ -145,7 +220,9 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     })
   }
 
-  private def expandToList(args: Array[String]): String = expandToList(args.toList.asJava)
+  private def expandToList(args: Array[String]): String = expandToList(
+    args.toList.asJava
+  )
   override def expandToList(params: util.List[String]): String = {
     /*
      * TODO: List expansion
@@ -158,7 +235,8 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     if (name.matches("^\\$" + regexVar)) {
       name.substring(1)
     } else if (name.matches("^\\$\\{" + regexVar + "}.*")) {
-      val matcher = Pattern.compile("^\\$\\{(" + regexVar + ")}(.*)").matcher(name)
+      val matcher =
+        Pattern.compile("^\\$\\{(" + regexVar + ")}(.*)").matcher(name)
       matcher.group(1) + matcher.group(2)
     } else {
       name
@@ -183,7 +261,10 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   }
 
   private def quote(variable: String): String = {
-    if ((variable.startsWith("\"") && variable.endsWith("\"")) ||(variable.startsWith("'") && variable.endsWith("'"))) {
+    if (
+      (variable.startsWith("\"") && variable.endsWith("\"")) || (variable
+        .startsWith("'") && variable.endsWith("'"))
+    ) {
       variable
     } else if (variable.contains("\\\"")) {
       "'" + variable + "'"
@@ -215,7 +296,10 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
       })
 
       val cmd = ws.get(0).substring(idx + 1)
-      sb.append(classOf[SystemRegistry].getCanonicalName).append(".get().invoke('").append(cmd).append("'")
+      sb.append(classOf[SystemRegistry].getCanonicalName)
+        .append(".get().invoke('")
+        .append(cmd)
+        .append("'")
       for (arg <- argv) {
         sb.append(", ")
         sb.append(arg)
@@ -228,14 +312,22 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
   }
 
   @throws[Exception]
-  override def execute(script: File, cmdLine: String, args: Array[String]): Object = {
+  override def execute(
+      script: File,
+      cmdLine: String,
+      args: Array[String]
+  ): Object = {
     val file = new ScriptFile(script, cmdLine, args)
     file.execute
     file.getResult
   }
 
   @throws[Exception]
-  override def execute(cmd: String, line: String, args: Array[String]): Object = {
+  override def execute(
+      cmd: String,
+      line: String,
+      args: Array[String]
+  ): Object = {
     if (!line.trim.startsWith("#")) {
       var file: Option[ScriptFile] = None
       if (parser.validCommandName(cmd)) {
@@ -267,9 +359,13 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
 
   override def purge(): Unit = engine.del("_*")
 
-  override def putVariable(name: String, value: Object): Unit = engine.put(name, value)
+  override def putVariable(name: String, value: Object): Unit =
+    engine.put(name, value)
   override def getVariable(name: String): Object = {
-    if (!hasVariable(name)) throw new IllegalArgumentException("Variable " + name + " does not exists!")
+    if (!hasVariable(name))
+      throw new IllegalArgumentException(
+        "Variable " + name + " does not exists!"
+      )
     engine.get(name)
   }
   override def hasVariable(name: String): Boolean = engine.hasVariable(name)
@@ -283,7 +379,8 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
 
   // Console options
   private def consoleOptions(): Map[String, Object] = {
-    if(engine.hasVariable(VAR_CONSOLE_OPTIONS)) getVariable(VAR_CONSOLE_OPTIONS).asInstanceOf[Map[String, Object]]
+    if (engine.hasVariable(VAR_CONSOLE_OPTIONS))
+      getVariable(VAR_CONSOLE_OPTIONS).asInstanceOf[Map[String, Object]]
     else Map[String, Object]()
   }
 
@@ -300,25 +397,42 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     try {
       consoleOptions().contains(option)
     } catch {
-      case e: Exception => trace(new Exception("Bad CONSOLE_OPTION value: " + e.getMessage))
+      case e: Exception =>
+        trace(new Exception("Bad CONSOLE_OPTION value: " + e.getMessage))
     }
     false
   }
 
   // Post process
-  override def postProcess(line: String, result: Object, output: String): ExecutionResult = {
-    val _output = if(output != null && output.trim.nonEmpty && !consoleOption("no-splittedOutput")) output.split("\\r?\\n") else output
+  override def postProcess(
+      line: String,
+      result: Object,
+      output: String
+  ): ExecutionResult = {
+    val _output =
+      if (
+        output != null && output.trim.nonEmpty && !consoleOption(
+          "no-splittedOutput"
+        )
+      ) output.split("\\r?\\n")
+      else output
     val consoleVar = parser.getVariable(line)
     if (consoleVar != null && result != null) {
       engine.put("output", _output)
     }
 
     if (systemRegistry.get.hasCommand(parser.getCommand(line))) {
-      postProcess(line, if(consoleVar != null && result == null) _output else result)
+      postProcess(
+        line,
+        if (consoleVar != null && result == null) _output else result
+      )
     } else {
-      val _result = if(result == null) _output else result
+      val _result = if (result == null) _output else result
       val status = saveResult(consoleVar, _result)
-      new ExecutionResult(status, if(consoleVar != null && !consoleVar.startsWith("_")) null else _result)
+      new ExecutionResult(
+        status,
+        if (consoleVar != null && !consoleVar.startsWith("_")) null else _result
+      )
     }
   }
 
@@ -326,7 +440,7 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     var status = 0
     var out = result match {
       case str: String if str.trim.isEmpty => null
-      case _ => result
+      case _                               => result
     }
     val consoleVar = parser.getVariable(line)
     if (consoleVar != null) {
@@ -338,7 +452,8 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     new ExecutionResult(status, out)
   }
 
-  override def postProcess(result: Object): ExecutionResult = new ExecutionResult(saveResult(null, result), result)
+  override def postProcess(result: Object): ExecutionResult =
+    new ExecutionResult(saveResult(null, result), result)
 
   private def saveResult(variable: String, result: Object): Int = {
     /* TODO: Implement saveResult
@@ -359,16 +474,22 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
          trace(e)
          return 1
     }
-    */
+     */
     1
   }
 
   @throws[Exception]
-  override def invoke(session: CommandRegistry.CommandSession, command: String, args: AnyRef*): Any = {
+  override def invoke(
+      session: CommandRegistry.CommandSession,
+      command: String,
+      args: AnyRef*
+  ): Any = {
     var out: Any = null
     exception = None
     if (hasCommand(command)) {
-      out = getCommandMethods(command).execute().apply(new CommandInput(command, Array.from(args), session))
+      out = getCommandMethods(command)
+        .execute()
+        .apply(new CommandInput(command, Array.from(args), session))
     } else {
       val _args = ListBuffer[String]()
       for (arg <- args) {
@@ -419,7 +540,8 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     printer.println(options.asJava, obj)
   }
 
-  override def persist(file: Path, obj: Object): Unit = engine.persist(file, obj)
+  override def persist(file: Path, obj: Object): Unit =
+    engine.persist(file, obj)
 
   /*
    * Slurp is a kind of JSON parsing, I don't think it's useful for this project
@@ -439,7 +561,10 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
       parseOptions(usage, input.args().asInstanceOf[Array[Object]])
       val options = mutable.Map[String, Object]()
       options.put(Printer.MAX_DEPTH, Int.box(0))
-      printer.println(options.asJava, engine.find(if(input.args().nonEmpty) input.args()(0) else null))
+      printer.println(
+        options.asJava,
+        engine.find(if (input.args().nonEmpty) input.args()(0) else null)
+      )
     } catch {
       case e: Exception => exception = Some(e)
     }
@@ -494,7 +619,12 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     ).asJava
   }
 
-  private class ScriptFile(val script: File, val cmdLine: String, var args: Array[String], private var verbose: Boolean) {
+  private class ScriptFile(
+      val script: File,
+      val cmdLine: String,
+      var args: Array[String],
+      private var verbose: Boolean
+  ) {
     private var result: Object = null
     private var extension = ""
 
@@ -517,7 +647,10 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     }
 
     def setScriptExtension(command: String): Unit = {
-      extension = if (command.contains(".")) command.substring(command.lastIndexOf(".") + 1) else ""
+      extension =
+        if (command.contains("."))
+          command.substring(command.lastIndexOf(".") + 1)
+        else ""
       if (!isEngineScript && !isConsoleScript) {
         throw new IllegalArgumentException("Command not found: " + command)
       }
@@ -552,7 +685,11 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
     def execute: Boolean = {
       if (!isScript) return false
       result = null
-      if (util.Arrays.asList(args).contains(OPTION_HELP(0)) || util.Arrays.asList(args).contains(OPTION_HELP(1))) {
+      if (
+        util.Arrays.asList(args).contains(OPTION_HELP(0)) || util.Arrays
+          .asList(args)
+          .contains(OPTION_HELP(1))
+      ) {
         val bufferedSource = Source.fromFile(script)
         var size = 0
         val usage = new StringBuilder
@@ -617,8 +754,14 @@ class REPLConsoleEngine(commands: Option[Array[Commands.Console]], engine: Obero
               parser.parse(line, line.length + 1, ParseContext.ACCEPT_LINE)
               done = true
               for ((arg, i) <- args.zipWithIndex) {
-                line = line.replaceAll("\\s\\$" + i + "\\b", (" " + expandParameterName(arg) + " "))
-                line = line.replaceAll("\\$\\{" + i + "(|:-.*)}", expandParameterName(arg))
+                line = line.replaceAll(
+                  "\\s\\$" + i + "\\b",
+                  (" " + expandParameterName(arg) + " ")
+                )
+                line = line.replaceAll(
+                  "\\$\\{" + i + "(|:-.*)}",
+                  expandParameterName(arg)
+                )
               }
               line = line.replaceAll("\\$\\{@}", expandToList(args))
               line = line.replaceAll("\\$@", expandToList(args))

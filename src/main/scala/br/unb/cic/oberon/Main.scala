@@ -1,6 +1,10 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
+import br.unb.cic.oberon.codegen.{
+  CodeGenerator,
+  JVMCodeGenerator,
+  PaigesBasedGenerator
+}
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
@@ -18,19 +22,45 @@ object Main extends App {
     banner("Compiler and interpreter for Oberon")
 
     object tc extends Subcommand("typeChecker") {
-      val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
+      val inputPath = opt[Path](
+        name = "in",
+        descr = "Path of the input file",
+        argName = "path",
+        required = true
+      )
       validatePathExists(inputPath)
     }
 
     object interpreter extends Subcommand("interpreter") {
-      val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
+      val inputPath = opt[Path](
+        name = "in",
+        descr = "Path of the input file",
+        argName = "path",
+        required = true
+      )
       validatePathExists(inputPath)
     }
 
     object compile extends Subcommand("compile") {
-      val inputPath = opt[Path](name="in", descr = "Path of the input file", argName = "path", required=true)
-      val outputPath = opt[Path](name = "out", descr = "Path of the output file", argName = "path", required=true)
-      val backend = choice(name="backend", choices=Seq("llvm", "c", "jvm"), default=Some("c"), descr="Which backend to compile to", argName="backend")
+      val inputPath = opt[Path](
+        name = "in",
+        descr = "Path of the input file",
+        argName = "path",
+        required = true
+      )
+      val outputPath = opt[Path](
+        name = "out",
+        descr = "Path of the output file",
+        argName = "path",
+        required = true
+      )
+      val backend = choice(
+        name = "backend",
+        choices = Seq("llvm", "c", "jvm"),
+        default = Some("c"),
+        descr = "Which backend to compile to",
+        argName = "backend"
+      )
 
       validatePathExists(inputPath)
     }
@@ -47,10 +77,10 @@ object Main extends App {
   }
 
   conf.subcommand match {
-    case Some(conf.tc) => typeCheck()
+    case Some(conf.tc)          => typeCheck()
     case Some(conf.interpreter) => interpret()
-    case Some(conf.compile) => compile()
-    case Some(conf.repl) => REPL.runREPL()
+    case Some(conf.compile)     => compile()
+    case Some(conf.repl)        => REPL.runREPL()
   }
 
   private def compile() {
@@ -64,7 +94,10 @@ object Main extends App {
       }
       case "jvm" => {
         val generatedCode = JVMCodeGenerator.generateCode(module)
-        Files.write(conf.compile.outputPath.get.get, Base64.getDecoder.decode(generatedCode))
+        Files.write(
+          conf.compile.outputPath.get.get,
+          Base64.getDecoder.decode(generatedCode)
+        )
       }
       case "llvm" => {
         Files.writeString(conf.compile.outputPath.get.get, "LLVM :)")

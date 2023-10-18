@@ -1,9 +1,27 @@
 package br.unb.cic.oberon.repl
 
-import br.unb.cic.oberon.ir.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
+import br.unb.cic.oberon.ir.ast.{
+  ArrayAssignment,
+  AssignmentStmt,
+  BoolValue,
+  Expression,
+  IntValue,
+  PointerAssignment,
+  REPLConstant,
+  REPLExpression,
+  REPLStatement,
+  REPLUserTypeDeclaration,
+  REPLVarDeclaration,
+  RecordAssignment,
+  Statement,
+  StringValue,
+  Undef,
+  Value,
+  VarAssignment
+}
 import br.unb.cic.oberon.interpreter.{EvalExpressionVisitor, Interpreter}
 import br.unb.cic.oberon.parser.ScalaParser
-import br.unb.cic.oberon.transformations.CoreVisitor
+import br.unb.cic.oberon.transformations.CoreTransformer
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
 import org.jline.reader.impl.completer.{AggregateCompleter, StringsCompleter}
@@ -29,32 +47,35 @@ class OberonEngine extends ScriptEngine {
 
   val interpreter = new Interpreter
   val expressionEval = new EvalExpressionVisitor(interpreter)
-  val coreVisitor = new CoreVisitor()
+  // val coreVisitor = new CoreTransformer()
 
   override def getEngineName: String = this.getClass.getSimpleName
-  override def getExtensions: java.util.List[String] = Collections.singletonList("oberon")
+  override def getExtensions: java.util.List[String] =
+    Collections.singletonList("oberon")
 
-  override def getScriptCompleter: Completer = {compileCompleter}
+  override def getScriptCompleter: Completer = { compileCompleter }
 
-  private def compileCompleter : Completer = {
+  private def compileCompleter: Completer = {
 
     val vCompleter = new VariableCompleter(this)
     val kCompleter = new KeywordCompleter(this)
-    val  completer = new AggregateCompleter(vCompleter, kCompleter)
+    val completer = new AggregateCompleter(vCompleter, kCompleter)
 
     return completer
   }
 
-  override def hasVariable(name: String): Boolean = interpreter.env.lookup(name).isDefined
+  override def hasVariable(name: String): Boolean =
+    interpreter.env.lookup(name).isDefined
 
   override def put(name: String, value: Object): Unit = {
-    //println(f"put call ($name = $value)")
+    // println(f"put call ($name = $value)")
     interpreter.env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
     val variable = interpreter.env.lookup(name)
-    if (variable.isDefined) expressionValue(variable.get).asInstanceOf[Object] else null
+    if (variable.isDefined) expressionValue(variable.get).asInstanceOf[Object]
+    else null
   }
 
   override def find(name: String): util.Map[String, Object] = {
@@ -97,10 +118,10 @@ class OberonEngine extends ScriptEngine {
   override def toString(obj: Object): String = {
     // println("toString call", obj.getClass)
     obj match {
-      case s: String => s
-      case i: Integer => i.toString
-      case b: lang.Boolean => b.toString
-      case v: Value => v.value.toString
+      case s: String         => s
+      case i: Integer        => i.toString
+      case b: lang.Boolean   => b.toString
+      case v: Value          => v.value.toString
       case m: util.Map[_, _] => "{}"
       case _ =>
         if (obj == null) "null"
@@ -116,15 +137,23 @@ class OberonEngine extends ScriptEngine {
     null
   }
 
-  override def getSerializationFormats: util.List[String] = List(Format.JSON.toString, Format.NONE.toString).asJava
-  override def getDeserializationFormats: util.List[String] = List(Format.JSON.toString, Format.OBERON.toString, Format.NONE.toString).asJava
+  override def getSerializationFormats: util.List[String] =
+    List(Format.JSON.toString, Format.NONE.toString).asJava
+  override def getDeserializationFormats: util.List[String] = List(
+    Format.JSON.toString,
+    Format.OBERON.toString,
+    Format.NONE.toString
+  ).asJava
 
   /*
    * TODO: implement deserialize
    */
   override def deserialize(value: String, formatStr: String): Object = {
     val out = value.asInstanceOf[Object];
-    val format = if (formatStr != null && formatStr.nonEmpty) Format.withName(formatStr.toUpperCase) else null
+    val format =
+      if (formatStr != null && formatStr.nonEmpty)
+        Format.withName(formatStr.toUpperCase)
+      else null
     if (format == Format.NONE) {
       // do nothing
     } else if (format == Format.JSON) {
@@ -138,15 +167,14 @@ class OberonEngine extends ScriptEngine {
     out
   }
 
-  override def persist(file: Path, obj: Object): Unit = persist(file, obj, getSerializationFormats().get(0));
+  override def persist(file: Path, obj: Object): Unit =
+    persist(file, obj, getSerializationFormats().get(0));
 
   /*
    * TODO: implement persist
    * https://github.com/jline/jline3/blob/master/console/src/main/java/org/jline/console/ConsoleEngine.java#L125
    */
-  override def persist(file: Path, obj: Object, format: String): Unit = {
-
-  }
+  override def persist(file: Path, obj: Object, format: String): Unit = {}
 
   /*
    * TODO: execute file with arguments (replace $1, $2, ... with parameters values)
@@ -157,8 +185,16 @@ class OberonEngine extends ScriptEngine {
     i.close()
 
     val pattern: Regex = "\\$(\\d+)".r
-    val module = ScalaParser.parse(pattern.replaceAllIn(content, m => expressionValue(objectToExpression(args(m.group(1).toInt - 1))).toString))
-    val coreModule = coreVisitor.transformModule(module)
+    val module = ScalaParser.parse(
+      pattern.replaceAllIn(
+        content,
+        m =>
+          expressionValue(
+            objectToExpression(args(m.group(1).toInt - 1))
+          ).toString
+      )
+    )
+    val coreModule = CoreTransformer.reduceOberonModule(module)
 
     coreModule.accept(interpreter)
 
@@ -182,13 +218,14 @@ class OberonEngine extends ScriptEngine {
           case AssignmentStmt(des, exp) =>
             des match {
               // TODO: Other types of assignment
-              case ArrayAssignment(_, _) => ???
+              case ArrayAssignment(_, _)  => ???
               case RecordAssignment(_, _) => ???
-              case PointerAssignment(_) => ???
+              case PointerAssignment(_)   => ???
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => interpreter.visit(coreVisitor.visit(s))
+          case s: Statement =>
+            interpreter.visit(CoreTransformer.reduceToCoreStatement(s))
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }
@@ -206,12 +243,12 @@ class OberonEngine extends ScriptEngine {
 
   private def objectToExpression(obj: Object): Expression = {
     obj.asInstanceOf[Any] match {
-      case i: Int => IntValue(i)
-      case s: String => StringValue(s)
-      case b: Boolean => BoolValue(b)
-      case e: Exception => StringValue(e.getMessage)
+      case i: Int        => IntValue(i)
+      case s: String     => StringValue(s)
+      case b: Boolean    => BoolValue(b)
+      case e: Exception  => StringValue(e.getMessage)
       case e: Expression => e.accept(expressionEval)
-      //case _: BoxedUnit => Undef()
+      // case _: BoxedUnit => Undef()
       case _ =>
         if (obj != null) println(f"Cannot convert $obj to expression")
         Undef()
@@ -220,7 +257,8 @@ class OberonEngine extends ScriptEngine {
 
   override def execute(closure: Object, args: Object*): Object = ???
 
-  private def internalFind(variable: String): List[String] = interpreter.env.allVariables().filter(v => v.matches(variable)).toList
+  private def internalFind(variable: String): List[String] =
+    interpreter.env.allVariables().filter(v => v.matches(variable)).toList
 
   def scriptDescription(line: CmdLine): CmdDesc = {
     val out = new CmdDesc
@@ -228,10 +266,15 @@ class OberonEngine extends ScriptEngine {
     out
   }
 
-  private class VariableCompleter(var oberonEngine : OberonEngine) extends Completer {
+  private class VariableCompleter(var oberonEngine: OberonEngine)
+      extends Completer {
     val inspector = new Inspector(oberonEngine)
 
-    def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
+    def complete(
+        reader: org.jline.reader.LineReader,
+        commandLine: org.jline.reader.ParsedLine,
+        candidates: java.util.List[org.jline.reader.Candidate]
+    ): Unit = {
       assert(commandLine != null)
       assert(candidates != null)
       val wordbuffer = commandLine.word()
@@ -240,35 +283,104 @@ class OberonEngine extends ScriptEngine {
       var idx = -1
       var len = 1
       try {
-        len = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).toList.last.toString.size
-        idx = raw"[\+\-\*\=\/\(]|(:=)".r.findAllMatchIn(wordbuffer).map(_.start).toList.last
-      }
-      catch{
+        len = raw"[\+\-\*\=\/\(]|(:=)".r
+          .findAllMatchIn(wordbuffer)
+          .toList
+          .last
+          .toString
+          .size
+        idx = raw"[\+\-\*\=\/\(]|(:=)".r
+          .findAllMatchIn(wordbuffer)
+          .map(_.start)
+          .toList
+          .last
+      } catch {
         case e: java.util.NoSuchElementException => {}
       }
 
-      val pref = wordbuffer.substring(0, idx+len)
+      val pref = wordbuffer.substring(0, idx + len)
       val variables = inspector.getVariables()
-      for(v <- variables){
-        candidates.add(new Candidate(AttributedString.stripAnsi(pref + v), v, null, null, null, null, false));
+      for (v <- variables) {
+        candidates.add(
+          new Candidate(
+            AttributedString.stripAnsi(pref + v),
+            v,
+            null,
+            null,
+            null,
+            null,
+            false
+          )
+        );
       }
     }
   }
 
-  private class Inspector(var oberonEngine : OberonEngine) {
+  private class Inspector(var oberonEngine: OberonEngine) {
 
-    def getVariables(): Iterable[String] = (oberonEngine.find(null).asScala).keys
+    def getVariables(): Iterable[String] =
+      (oberonEngine.find(null).asScala).keys
 
   }
 
-  private class KeywordCompleter (var oberonEngine : OberonEngine) extends Completer {
+  private class KeywordCompleter(var oberonEngine: OberonEngine)
+      extends Completer {
 
-    def complete(reader: org.jline.reader.LineReader, commandLine: org.jline.reader.ParsedLine, candidates: java.util.List[org.jline.reader.Candidate]): Unit = {
+    def complete(
+        reader: org.jline.reader.LineReader,
+        commandLine: org.jline.reader.ParsedLine,
+        candidates: java.util.List[org.jline.reader.Candidate]
+    ): Unit = {
 
-      val keywordList: List[String] = List("ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO", "ELSE", "ELSIF", "END","EXIT", "FOR", "IF", "IMPORT", "IN", "IS", "LOOP", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER", "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO", "TYPE", "UNTIL", "VAR", "WHILE", "WITH")
-      
+      val keywordList: List[String] = List(
+        "ARRAY",
+        "BEGIN",
+        "BY",
+        "CASE",
+        "CONST",
+        "DIV",
+        "DO",
+        "ELSE",
+        "ELSIF",
+        "END",
+        "EXIT",
+        "FOR",
+        "IF",
+        "IMPORT",
+        "IN",
+        "IS",
+        "LOOP",
+        "MOD",
+        "MODULE",
+        "NIL",
+        "OF",
+        "OR",
+        "POINTER",
+        "PROCEDURE",
+        "RECORD",
+        "REPEAT",
+        "RETURN",
+        "THEN",
+        "TO",
+        "TYPE",
+        "UNTIL",
+        "VAR",
+        "WHILE",
+        "WITH"
+      )
+
       for (v <- keywordList) {
-        candidates.add(new Candidate(AttributedString.stripAnsi(v), v, null, null, null, null, false));
+        candidates.add(
+          new Candidate(
+            AttributedString.stripAnsi(v),
+            v,
+            null,
+            null,
+            null,
+            null,
+            false
+          )
+        );
       }
     }
   }

@@ -8,7 +8,7 @@ class TACTestSuite extends AnyFunSuite {
     Temporary.reset
     val t0 = new Temporary(IntegerType)
     val t1 = new Temporary(IntegerType)
-    
+
     assert(t0.number == 0 && t1.number == 1)
   }
 }

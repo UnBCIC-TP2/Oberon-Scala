@@ -14,7 +14,9 @@ import java.io.File
 class JVMCodeGenTest extends AnyFunSuite {
 
   test("Generate code with fields of simple01.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple01.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple01.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -47,7 +49,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code with fields of simple02.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple02.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple02.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -79,8 +83,10 @@ class JVMCodeGenTest extends AnyFunSuite {
     assert(0 == v.numberOfBooleanConstants);
   }
 
- test("Generate code with fields of simple03.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple03.oberon").toURI)
+  test("Generate code with fields of simple03.oberon") {
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple03.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -113,7 +119,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple04.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple04.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple04.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -146,7 +154,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple05.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple05.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple05.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -179,7 +189,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple06.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple06.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple06.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -212,7 +224,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple07.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple07.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple07.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -245,7 +259,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple08.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple08.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple08.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -278,7 +294,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple09.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple09.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple09.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -311,7 +329,9 @@ class JVMCodeGenTest extends AnyFunSuite {
   }
 
   test("Generate code of simple10.oberon") {
-    val path = Paths.get(getClass.getClassLoader.getResource("simple/simple10.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("simple/simple10.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -351,8 +371,10 @@ class JVMCodeGenTest extends AnyFunSuite {
   def createOutputFile(name: String) = {
     val base = Paths.get("target" + File.separatorChar + "out")
     Files.createDirectories(base)
-    val classFile = Paths.get("target" + File.separatorChar +  "out" + File.separatorChar + name + ".class")
-    if(Files.exists(classFile)) {
+    val classFile = Paths.get(
+      "target" + File.separatorChar + "out" + File.separatorChar + name + ".class"
+    )
+    if (Files.exists(classFile)) {
       Files.delete(classFile)
     }
     Files.createFile(classFile)

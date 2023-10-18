@@ -17,7 +17,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.constants.head == Constant("x", IntValue(5)))
   }
 
-  test("Testing the oberon simple02 code. This module has one constants and two variables") {
+  test(
+    "Testing the oberon simple02 code. This module has one constants and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple02.oberon")
 
     assert(module.name == "SimpleModule2")
@@ -28,7 +30,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-  test("Testing the oberon simple03 code. This module has three constants and two variables") {
+  test(
+    "Testing the oberon simple03 code. This module has three constants and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple03.oberon")
 
     assert(module.name == "SimpleModule3")
@@ -42,80 +46,125 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-  test("Testing the oberon simple04 code. This module has three constants, a sum, and two variables") {
+  test(
+    "Testing the oberon simple04 code. This module has three constants, a sum, and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple04.oberon")
     assert(module.name == "SimpleModule4")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", IntValue(5)))
     assert(module.constants(1) == Constant("y", IntValue(10)))
-    assert(module.constants(2) == Constant("z", AddExpression(IntValue(5), IntValue(10))))
-
+    assert(
+      module.constants(2) == Constant(
+        "z",
+        AddExpression(IntValue(5), IntValue(10))
+      )
+    )
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-  test("Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables") {
+  test(
+    "Testing the oberon simple05 code. This module has one constant, a multiplication, and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple05.oberon")
 
     assert(module.name == "SimpleModule5")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("z", MultExpression(IntValue(5), IntValue(10))))
-
+    assert(
+      module.constants.head == Constant(
+        "z",
+        MultExpression(IntValue(5), IntValue(10))
+      )
+    )
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-
-  test("Testing the oberon simple06 code. This module has one constants, complex expression, and two variables") {
+  test(
+    "Testing the oberon simple06 code. This module has one constants, complex expression, and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple06.oberon")
 
     assert(module.name == "SimpleModule6")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("z", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
-
+    assert(
+      module.constants.head == Constant(
+        "z",
+        AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))
+      )
+    )
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-  test("Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables") {
+  test(
+    "Testing the oberon simple07 code. This module has two constants, a complex expression, and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple07.oberon")
 
     assert(module.name == "SimpleModule7")
     assert(module.constants.size == 2)
-    assert(module.constants.head == Constant("x", AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))))
-      assert(module.constants(1) == Constant("y",
-        AddExpression(IntValue(5),
-         DivExpression(
-           MultExpression(IntValue(10), IntValue(3)),
-           IntValue(5)))))
+    assert(
+      module.constants.head == Constant(
+        "x",
+        AddExpression(IntValue(5), MultExpression(IntValue(10), IntValue(3)))
+      )
+    )
+    assert(
+      module.constants(1) == Constant(
+        "y",
+        AddExpression(
+          IntValue(5),
+          DivExpression(MultExpression(IntValue(10), IntValue(3)), IntValue(5))
+        )
+      )
+    )
 
     assert(module.variables.size == 2)
     assert(module.variables.head == VariableDeclaration("abc", IntegerType))
     assert(module.variables(1) == VariableDeclaration("def", BooleanType))
   }
 
-  test("Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables") {
+  test(
+    "Testing the oberon simple08 code. This module has three constants, a boolean expresson, and two variables"
+  ) {
     val module = ScalaParser.parseResource("simple/simple08.oberon")
 
     assert(module.name == "SimpleModule8")
     assert(module.constants.size == 3)
     assert(module.constants.head == Constant("x", BoolValue(false)))
     assert(module.constants(1) == Constant("y", BoolValue(true)))
-    assert(module.constants(2) == Constant("z", AndExpression(BoolValue(true), BoolValue(false))))
+    assert(
+      module.constants(2) == Constant(
+        "z",
+        AndExpression(BoolValue(true), BoolValue(false))
+      )
+    )
   }
 
-  test("Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'") {
+  test(
+    "Testing the oberon simple09 code. This module has one constant and an expression involving both 'and' and 'or'"
+  ) {
     val module = ScalaParser.parseResource("simple/simple09.oberon")
 
     assert(module.name == "SimpleModule9")
     assert(module.constants.size == 1)
-    assert(module.constants.head == Constant("z", OrExpression(AndExpression(BoolValue(true), BoolValue(false)), BoolValue(false))))
+    assert(
+      module.constants.head == Constant(
+        "z",
+        OrExpression(
+          AndExpression(BoolValue(true), BoolValue(false)),
+          BoolValue(false)
+        )
+      )
+    )
   }
 
   test("Testing the oberon arrayIndex01 module. This module has a ArrayIndex") {
@@ -138,7 +187,15 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),AddExpression(IntValue(2), IntValue(6)))))
+    assert(
+      stmts.head == AssignmentStmt(
+        "x",
+        ArraySubscript(
+          VarExpression("a"),
+          AddExpression(IntValue(2), IntValue(6))
+        )
+      )
+    )
     assert(stmts(1) == WriteStmt(VarExpression("x")))
   }
 
@@ -162,11 +219,18 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts.head == AssignmentStmt("x", ArraySubscript(VarExpression("a"),IntValue(8))))
+    assert(
+      stmts.head == AssignmentStmt(
+        "x",
+        ArraySubscript(VarExpression("a"), IntValue(8))
+      )
+    )
     assert(stmts(1) == WriteStmt(VarExpression("x")))
   }
 
-  test("Testing the oberon stmt01 code. This module has a block of three statements") {
+  test(
+    "Testing the oberon stmt01 code. This module has a block of three statements"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt01.oberon")
 
     assert(module.name == "SimpleModule")
@@ -185,10 +249,16 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(stmts.head == ReadIntStmt("x"))
     assert(stmts(1) == ReadIntStmt("y"))
-    assert(stmts(2) == WriteStmt(AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      stmts(2) == WriteStmt(
+        AddExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
-  test("Testing the oberon stmt02 code. This module has a block of four statements") {
+  test(
+    "Testing the oberon stmt02 code. This module has a block of four statements"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt02.oberon")
 
     assert(module.name == "SimpleModule")
@@ -207,7 +277,12 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(stmts.head == ReadIntStmt("x"))
     assert(stmts(1) == ReadIntStmt("y"))
-    assert(stmts(2) == AssignmentStmt("z", AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      stmts(2) == AssignmentStmt(
+        "z",
+        AddExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
     assert(stmts(3) == WriteStmt(VarExpression("z")))
   }
 
@@ -234,8 +309,8 @@ class ParserTestSuite extends AbstractTestSuite {
     // the third stmt must be an IfElseStmt
     stmts(2) match {
       case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
-        assert(s1 == AssignmentStmt("max",VarExpression("x")))
+        assert(cond == GTExpression(VarExpression("x"), VarExpression("max")))
+        assert(s1 == AssignmentStmt("max", VarExpression("x")))
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
@@ -266,24 +341,30 @@ class ParserTestSuite extends AbstractTestSuite {
     // the third stmt must be an WhileStmt
     stmts(2) match {
       case WhileStmt(cond, stmt) =>
-        assert(cond == LTExpression(VarExpression("x"),VarExpression("y")))
-        assert(stmt == AssignmentStmt("x", MultExpression(VarExpression("x"), VarExpression("x"))))
+        assert(cond == LTExpression(VarExpression("x"), VarExpression("y")))
+        assert(
+          stmt == AssignmentStmt(
+            "x",
+            MultExpression(VarExpression("x"), VarExpression("x"))
+          )
+        )
       case _ => fail("expecting an if-then stmt")
     }
     assert(stmts(3) == WriteStmt(VarExpression("x")))
   }
 
-  test("Testing the oberon stmt06 code. This module has a simple case statement") {
+  test(
+    "Testing the oberon stmt06 code. This module has a simple case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt06.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(!module.stmt.isEmpty)
 
-
     module.stmt.getOrElse(false) match {
       case SequenceStmt(stmts) => assert(stmts.length == 3)
-      case _ => fail("Expected a sequence of 3 statements!!")
+      case _                   => fail("Expected a sequence of 3 statements!!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts;
@@ -344,7 +425,12 @@ class ParserTestSuite extends AbstractTestSuite {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
-        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+        assert(
+          stmt == AssignmentStmt(
+            "z",
+            AddExpression(VarExpression("z"), VarExpression("y"))
+          )
+        )
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
@@ -370,18 +456,24 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x")))
+    val code =
+      AssignmentStmt("k", AddExpression(VarExpression("z"), VarExpression("x")))
 
     assert(stmts.head == ReadIntStmt("y"))
 
     stmts(1) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("x", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("x"),VarExpression("y")))
-        assert(stmt == ForStmt(AssignmentStmt("z", IntValue(0)), LTExpression(VarExpression("z"),VarExpression("y")), code))
+        assert(cond == LTExpression(VarExpression("x"), VarExpression("y")))
+        assert(
+          stmt == ForStmt(
+            AssignmentStmt("z", IntValue(0)),
+            LTExpression(VarExpression("z"), VarExpression("y")),
+            code
+          )
+        )
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
-
 
     assert(stmts(2) == WriteStmt(VarExpression("k")))
 
@@ -410,7 +502,12 @@ class ParserTestSuite extends AbstractTestSuite {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
         assert(cond == LTExpression(VarExpression("y"), IntValue(10)))
-        assert(stmt == AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y"))))
+        assert(
+          stmt == AssignmentStmt(
+            "z",
+            AddExpression(VarExpression("z"), VarExpression("y"))
+          )
+        )
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
@@ -434,8 +531,12 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(2)));
-    val code2 = AssignmentStmt("z", AddExpression(VarExpression("z"), VarExpression("y")));
+    val code =
+      AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(2)));
+    val code2 = AssignmentStmt(
+      "z",
+      AddExpression(VarExpression("z"), VarExpression("y"))
+    );
 
     assert(stmts.head == ReadIntStmt("x"))
 
@@ -443,7 +544,7 @@ class ParserTestSuite extends AbstractTestSuite {
     stmts(1) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
+        assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
         assert(stmt == SequenceStmt(List(code, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
@@ -480,9 +581,12 @@ class ParserTestSuite extends AbstractTestSuite {
     stmts(1) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
+        assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
         assert(stmt == SequenceStmt(List(code1, code2, code3)))
-      case _ => fail("expecting: SequenceStmt(List(ReadIntStmt(z), AssignmentStmt(z,DivExpression(VarExpression(z),AddExpression(VarExpression(y),IntValue(1)))), WriteStmt(VarExpression(z))))")
+      case _ =>
+        fail(
+          "expecting: SequenceStmt(List(ReadIntStmt(z), AssignmentStmt(z,DivExpression(VarExpression(z),AddExpression(VarExpression(y),IntValue(1)))), WriteStmt(VarExpression(z))))"
+        )
     }
 
   }
@@ -505,12 +609,18 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val stmts = sequence.stmts
 
-    val multiplica = MultExpression(VarExpression("w"), AddExpression(VarExpression("y"), IntValue(1)))
+    val multiplica = MultExpression(
+      VarExpression("w"),
+      AddExpression(VarExpression("y"), IntValue(1))
+    )
     val codiguinho = AddExpression(VarExpression("v"), multiplica)
     val codee = ReadIntStmt("w");
     val code = AssignmentStmt("v", codiguinho);
 
-    val code2 = AssignmentStmt("u", AddExpression(VarExpression("u"),VarExpression("w")));
+    val code2 = AssignmentStmt(
+      "u",
+      AddExpression(VarExpression("u"), VarExpression("w"))
+    );
 
     assert(stmts.head == ReadIntStmt("x"))
     assert(stmts(1) == AssignmentStmt("v", IntValue(0)))
@@ -518,21 +628,31 @@ class ParserTestSuite extends AbstractTestSuite {
     stmts(2) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
+        assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
         assert(stmt == SequenceStmt(List(codee, code)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
-    assert(stmts(3) == AssignmentStmt("v", DivExpression(VarExpression("v"), VarExpression("x"))))
+    assert(
+      stmts(3) == AssignmentStmt(
+        "v",
+        DivExpression(VarExpression("v"), VarExpression("x"))
+      )
+    )
 
     stmts(4) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("z", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("z"),VarExpression("x")))
+        assert(cond == LTExpression(VarExpression("z"), VarExpression("x")))
         assert(stmt == SequenceStmt(List(codee, code2)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
-    assert(stmts(5) == AssignmentStmt("u", DivExpression(VarExpression("u"), VarExpression("x"))))
+    assert(
+      stmts(5) == AssignmentStmt(
+        "u",
+        DivExpression(VarExpression("u"), VarExpression("x"))
+      )
+    )
 
     assert(stmts(6) == WriteStmt(VarExpression("v")))
     assert(stmts(7) == WriteStmt(VarExpression("u")))
@@ -562,7 +682,12 @@ class ParserTestSuite extends AbstractTestSuite {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", VarExpression("x")))
         assert(cond == LTExpression(VarExpression("y"), IntValue(100)))
-        assert(stmt == AssignmentStmt("y", MultExpression(VarExpression("y"), VarExpression("y"))))
+        assert(
+          stmt == AssignmentStmt(
+            "y",
+            MultExpression(VarExpression("y"), VarExpression("y"))
+          )
+        )
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
@@ -587,7 +712,8 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)));
+    val code =
+      AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)));
     val code2 = WriteStmt(VarExpression("y"));
 
     assert(stmts.head == ReadIntStmt("x"))
@@ -603,7 +729,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-   test("Testing the oberon stmt15 code. This module has a For statement") {
+  test("Testing the oberon stmt15 code. This module has a For statement") {
     val module = ScalaParser.parseResource("stmts/stmt15.oberon")
 
     assert(module.name == "SimpleModule")
@@ -630,12 +756,12 @@ class ParserTestSuite extends AbstractTestSuite {
     stmts(1) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", IntValue(0)))
-        assert(cond == LTExpression(VarExpression("y"),VarExpression("x")))
+        assert(cond == LTExpression(VarExpression("y"), VarExpression("x")))
         assert(stmt == SequenceStmt(List(code, code1)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
-     assert(stmts(2) == WriteStmt(VarExpression("z")))
+    assert(stmts(2) == WriteStmt(VarExpression("z")))
 
   }
 
@@ -656,8 +782,15 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    val code = AssignmentStmt("z", AddExpression(VarExpression("z"), DivExpression(VarExpression("z"), VarExpression("y"))))
-    val code1 = AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)))
+    val code = AssignmentStmt(
+      "z",
+      AddExpression(
+        VarExpression("z"),
+        DivExpression(VarExpression("z"), VarExpression("y"))
+      )
+    )
+    val code1 =
+      AssignmentStmt("y", SubExpression(VarExpression("y"), IntValue(2)))
 
     assert(stmts.head == ReadIntStmt("x"))
 
@@ -665,16 +798,18 @@ class ParserTestSuite extends AbstractTestSuite {
     stmts(1) match {
       case ForStmt(init, cond, stmt) =>
         assert(init == AssignmentStmt("y", VarExpression("x")))
-        assert(cond == GTExpression(VarExpression("y"),IntValue(0)))
+        assert(cond == GTExpression(VarExpression("y"), IntValue(0)))
         assert(stmt == SequenceStmt(List(code, code1)))
       case _ => fail("expecting an assigment stmt and if-then stmt")
     }
 
-     assert(stmts(2) == WriteStmt(VarExpression("z")))
+    assert(stmts(2) == WriteStmt(VarExpression("z")))
 
   }
 
-  test("Testing the oberon stmt17 code. This module has a case statement with range cases, two variabels, read and write statements") {
+  test(
+    "Testing the oberon stmt17 code. This module has a case statement with range cases, two variabels, read and write statements"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt17.oberon")
 
     assert(module.name == "RangeCaseModule")
@@ -688,7 +823,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmts) => assert(stmts.length == 4)
-      case _ => fail("This module should have 4 statements!")
+      case _                   => fail("This module should have 4 statements!")
     }
 
     // Verifying the statements
@@ -708,17 +843,29 @@ class ParserTestSuite extends AbstractTestSuite {
     val caseAlts = caseStmt.cases
 
     assert(caseAlts.length == 2)
-    assert(caseAlts.head == RangeCase(IntValue(0), IntValue(9),
-      AssignmentStmt("y", MultExpression(IntValue(2), VarExpression("x")))))
-    assert(caseAlts(1) == RangeCase(IntValue(10), IntValue(20),
-      AssignmentStmt("y", MultExpression(IntValue(4), VarExpression("x")))))
+    assert(
+      caseAlts.head == RangeCase(
+        IntValue(0),
+        IntValue(9),
+        AssignmentStmt("y", MultExpression(IntValue(2), VarExpression("x")))
+      )
+    )
+    assert(
+      caseAlts(1) == RangeCase(
+        IntValue(10),
+        IntValue(20),
+        AssignmentStmt("y", MultExpression(IntValue(4), VarExpression("x")))
+      )
+    )
 
     // Verifying the last statement
     assert(sequenceStmts(3) == WriteStmt(VarExpression("y")))
 
   }
 
-  test("Testing the oberon stmt18 code. this module has a simple case statement with range case, reading min and max") {
+  test(
+    "Testing the oberon stmt18 code. this module has a simple case statement with range case, reading min and max"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt18.oberon")
     assert(module.name == "SimpleRangeCaseModule")
 
@@ -732,7 +879,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmts) => assert(stmts.length == 5)
-      case _ => fail("This module should have 5 statements!")
+      case _                   => fail("This module should have 5 statements!")
     }
 
     // Verifying the statements
@@ -753,9 +900,22 @@ class ParserTestSuite extends AbstractTestSuite {
     val caseAlts = caseStmt.cases
 
     assert(caseAlts.length == 3)
-    assert(caseAlts.head == SimpleCase(IntValue(1), AssignmentStmt("xs",IntValue(5))))
-    assert(caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt("xs", IntValue(10))))
-    assert(caseAlts(2) == RangeCase(VarExpression("min"), VarExpression("max"), AssignmentStmt("xs", IntValue(20))))
+    assert(
+      caseAlts.head == SimpleCase(
+        IntValue(1),
+        AssignmentStmt("xs", IntValue(5))
+      )
+    )
+    assert(
+      caseAlts(1) == SimpleCase(IntValue(2), AssignmentStmt("xs", IntValue(10)))
+    )
+    assert(
+      caseAlts(2) == RangeCase(
+        VarExpression("min"),
+        VarExpression("max"),
+        AssignmentStmt("xs", IntValue(20))
+      )
+    )
 
     caseStmt.elseStmt.getOrElse(false) match {
       case AssignmentStmt(VarAssignment(varName), exp) => {
@@ -768,7 +928,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon stmt19 code. This module has three variabels, two case statements, an read and a write statements") {
+  test(
+    "Testing the oberon stmt19 code. This module has three variabels, two case statements, an read and a write statements"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt19.oberon")
     assert(module.name == "CaseModule")
 
@@ -783,7 +945,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 5)
-      case _ => fail("This module should have 5 statements!")
+      case _                  => fail("This module should have 5 statements!")
     }
 
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
@@ -800,8 +962,15 @@ class ParserTestSuite extends AbstractTestSuite {
     caseStmt1.cases.foreach(_miniCase => {
       val miniCase = _miniCase.asInstanceOf[SimpleCase]
 
-      assert(miniCase == SimpleCase(IntValue(caseLabel),
-        AssignmentStmt("y", AddExpression(VarExpression("x"), IntValue(caseSum)))))
+      assert(
+        miniCase == SimpleCase(
+          IntValue(caseLabel),
+          AssignmentStmt(
+            "y",
+            AddExpression(VarExpression("x"), IntValue(caseSum))
+          )
+        )
+      )
 
       caseSum += 5
       caseLabel *= 2
@@ -823,8 +992,13 @@ class ParserTestSuite extends AbstractTestSuite {
     caseStmt2.cases.foreach(_miniCase => {
       val miniCase = _miniCase.asInstanceOf[RangeCase]
 
-      assert(miniCase == RangeCase(IntValue(minCaseValue), IntValue(maxCaseValue),
-        AssignmentStmt("z", IntValue(assignmentValue))))
+      assert(
+        miniCase == RangeCase(
+          IntValue(minCaseValue),
+          IntValue(maxCaseValue),
+          AssignmentStmt("z", IntValue(assignmentValue))
+        )
+      )
 
       maxCaseValue *= 2
       minCaseValue = maxCaseValue / 2 + 1
@@ -843,7 +1017,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon stmt20 code. This module implements the factorial function with a case statement") {
+  test(
+    "Testing the oberon stmt20 code. This module implements the factorial function with a case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt20.oberon")
 
     assert(module.name == "ProcedureCaseModule")
@@ -866,34 +1042,59 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(factorialCaseStmt.exp == VarExpression("n"))
     assert(factorialCaseStmt.cases.length == 2)
 
-    assert(factorialCaseStmt.cases.head == SimpleCase(IntValue(0), ReturnStmt(IntValue(1))))
-    assert(factorialCaseStmt.cases(1) == SimpleCase(IntValue(1), ReturnStmt(IntValue(1))))
+    assert(
+      factorialCaseStmt.cases.head == SimpleCase(
+        IntValue(0),
+        ReturnStmt(IntValue(1))
+      )
+    )
+    assert(
+      factorialCaseStmt.cases(1) == SimpleCase(
+        IntValue(1),
+        ReturnStmt(IntValue(1))
+      )
+    )
 
     factorialCaseStmt.elseStmt.getOrElse(None) match {
       case ReturnStmt(MultExpression(left, right)) => {
         assert(left == VarExpression("n"))
 
-        assert(right == FunctionCallExpression("factorial", List(
-          SubExpression(VarExpression("n"), IntValue(1))
-        )))
+        assert(
+          right == FunctionCallExpression(
+            "factorial",
+            List(
+              SubExpression(VarExpression("n"), IntValue(1))
+            )
+          )
+        )
       }
 
       case _ => fail("Missing an elseStmt in the factorial procedure case")
     }
 
-    assert(factorialStmt(1) == ReturnStmt(MultExpression(VarExpression("n"),
-      FunctionCallExpression("factorial", List(
-        SubExpression(VarExpression("n"), IntValue(1)))))))
+    assert(
+      factorialStmt(1) == ReturnStmt(
+        MultExpression(
+          VarExpression("n"),
+          FunctionCallExpression(
+            "factorial",
+            List(SubExpression(VarExpression("n"), IntValue(1)))
+          )
+        )
+      )
+    )
     // End of the factorial procedure verification
 
     // Verifying the body module statements
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmts) => succeed
-      case _ => fail("Expecting a sequence of statements!")
+      case _                   => fail("Expecting a sequence of statements!")
     }
   }
 
-  test("Testing the oberon stmt21 code. This module tests if a number is even with a case statement") {
+  test(
+    "Testing the oberon stmt21 code. This module tests if a number is even with a case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt21.oberon")
 
     assert(module.name == "SimpleRangeCaseModule")
@@ -903,20 +1104,29 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.variables.head == VariableDeclaration("x", IntegerType))
     assert(module.variables(1) == VariableDeclaration("aux", IntegerType))
 
-
     assert(module.stmt.nonEmpty);
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 5)
-      case _ => fail("This module should have 5 statements!")
+      case _                  => fail("This module should have 5 statements!")
     }
 
     // Verifying statements
     val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
     assert(sequenceStmts.head == ReadIntStmt("x"))
-    assert(sequenceStmts(1) == AssignmentStmt("aux", DivExpression(VarExpression("x"), IntValue(2))))
-    assert(sequenceStmts(2) == AssignmentStmt("aux", MultExpression(VarExpression("aux"), IntValue(2))))
+    assert(
+      sequenceStmts(1) == AssignmentStmt(
+        "aux",
+        DivExpression(VarExpression("x"), IntValue(2))
+      )
+    )
+    assert(
+      sequenceStmts(2) == AssignmentStmt(
+        "aux",
+        MultExpression(VarExpression("aux"), IntValue(2))
+      )
+    )
 
     // Verifying the case statement
 
@@ -924,7 +1134,12 @@ class ParserTestSuite extends AbstractTestSuite {
     val caseAlts = caseStmt.cases
 
     assert(caseAlts.length == 1)
-    assert(caseAlts.head == SimpleCase(VarExpression("x"), AssignmentStmt("aux",IntValue(0))))
+    assert(
+      caseAlts.head == SimpleCase(
+        VarExpression("x"),
+        AssignmentStmt("aux", IntValue(0))
+      )
+    )
 
     caseStmt.elseStmt.getOrElse(None) match {
       case AssignmentStmt(VarAssignment(varName), exp) => {
@@ -939,7 +1154,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon stmt22 code. This module implements a case statement inside a case statement") {
+  test(
+    "Testing the oberon stmt22 code. This module implements a case statement inside a case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt22.oberon")
 
     assert(module.name == "CaseCaseModule")
@@ -952,7 +1169,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 3)
-      case _ => fail("This module should have 3 statements!")
+      case _                  => fail("This module should have 3 statements!")
     }
 
     // Verifying the statements
@@ -960,7 +1177,6 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(sequenceStmts.head == ReadIntStmt("x"));
 
     val caseStmt1 = sequenceStmts(1).asInstanceOf[CaseStmt]
-
 
     // Verifying the caseStmt properties
     assert(caseStmt1.exp == VarExpression("x"))
@@ -973,20 +1189,33 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(caseAlts.length == 2)
     assert(caseStmt1.elseStmt.isEmpty)
 
-    val innerCase = CaseStmt(VarExpression("x"), List(RangeCase(IntValue(1), IntValue(5),
-      AssignmentStmt("x", IntValue(5))), RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))),
-      None)
+    val innerCase = CaseStmt(
+      VarExpression("x"),
+      List(
+        RangeCase(IntValue(1), IntValue(5), AssignmentStmt("x", IntValue(5))),
+        RangeCase(IntValue(6), IntValue(10), AssignmentStmt("x", IntValue(10)))
+      ),
+      None
+    )
 
     assert(caseAlts(0) == RangeCase(IntValue(1), IntValue(10), innerCase))
 
-    assert(caseAlts(1) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("x",MultExpression(VarExpression("x"), IntValue(2)))))
+    assert(
+      caseAlts(1) == RangeCase(
+        IntValue(11),
+        IntValue(20),
+        AssignmentStmt("x", MultExpression(VarExpression("x"), IntValue(2)))
+      )
+    )
 
     // Verifying the write statement
     assert(sequenceStmts(2) == WriteStmt(VarExpression("x")))
 
   }
 
-  test("Testing the oberon stmt23 code. This module has a while with a case statement") {
+  test(
+    "Testing the oberon stmt23 code. This module has a while with a case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt23.oberon")
 
     assert(module.name == "WhileCaseModule")
@@ -1004,38 +1233,85 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val myWhileStmt = sequenceStmts(1).asInstanceOf[WhileStmt];
 
-    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20)))
+    assert(
+      myWhileStmt.condition == LTExpression(VarExpression("x"), IntValue(20))
+    )
 
     myWhileStmt.stmt match {
       case SequenceStmt(stmts) => assert(stmts.length == 2)
-      case _ => fail("Expected a sequence of statements in the while statement!")
+      case _ =>
+        fail("Expected a sequence of statements in the while statement!")
     }
 
-    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[CaseStmt]
+    val innerCase = myWhileStmt.stmt
+      .asInstanceOf[SequenceStmt]
+      .stmts
+      .head
+      .asInstanceOf[CaseStmt]
 
     assert(innerCase.exp == VarExpression("x"))
 
-    assert(innerCase.cases.head == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+    assert(
+      innerCase.cases.head == SimpleCase(
+        IntValue(0),
+        AssignmentStmt("sum", IntValue(0))
+      )
+    )
 
-    assert(innerCase.cases(1) == RangeCase(IntValue(1), IntValue(9), AssignmentStmt("sum",
-      AddExpression(VarExpression("sum"), VarExpression("x")))))
+    assert(
+      innerCase.cases(1) == RangeCase(
+        IntValue(1),
+        IntValue(9),
+        AssignmentStmt(
+          "sum",
+          AddExpression(VarExpression("sum"), VarExpression("x"))
+        )
+      )
+    )
 
-    assert(innerCase.cases(2) == SimpleCase(IntValue(10), SequenceStmt(List(WriteStmt(VarExpression("sum")),
-      AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))))))
+    assert(
+      innerCase.cases(2) == SimpleCase(
+        IntValue(10),
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("sum")),
+            AssignmentStmt("sum", MultExpression(IntValue(2), IntValue(10)))
+          )
+        )
+      )
+    )
 
-    assert(innerCase.cases(3) == RangeCase(IntValue(11), IntValue(20), AssignmentStmt("sum", AddExpression(
-      VarExpression("sum"), MultExpression(IntValue(2), VarExpression("x"))))))
+    assert(
+      innerCase.cases(3) == RangeCase(
+        IntValue(11),
+        IntValue(20),
+        AssignmentStmt(
+          "sum",
+          AddExpression(
+            VarExpression("sum"),
+            MultExpression(IntValue(2), VarExpression("x"))
+          )
+        )
+      )
+    )
 
     assert(innerCase.elseStmt == None)
 
-    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+    assert(
+      myWhileStmt.stmt
+        .asInstanceOf[SequenceStmt]
+        .stmts(1)
+        .asInstanceOf[AssignmentStmt] ==
+        AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+    )
 
     assert(sequenceStmts(2) == WriteStmt(VarExpression("sum")))
 
   }
 
-  test("Testing the oberon stmt24 code. This module has a while with a case statement") {
+  test(
+    "Testing the oberon stmt24 code. This module has a while with a case statement"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt24.oberon")
 
     assert(module.name == "WhileCaseModule")
@@ -1055,30 +1331,56 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val myWhileStmt = sequenceStmts(2).asInstanceOf[WhileStmt];
 
-    assert(myWhileStmt.condition == LTExpression(VarExpression("x"), VarExpression("lim")))
+    assert(
+      myWhileStmt.condition == LTExpression(
+        VarExpression("x"),
+        VarExpression("lim")
+      )
+    )
 
     myWhileStmt.stmt match {
       case SequenceStmt(stmts) => assert(stmts.length == 2)
-      case _ => fail("Expected a sequence of statements in the while statement!")
+      case _ =>
+        fail("Expected a sequence of statements in the while statement!")
     }
 
-    val innerCase = myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[CaseStmt]
+    val innerCase = myWhileStmt.stmt
+      .asInstanceOf[SequenceStmt]
+      .stmts
+      .head
+      .asInstanceOf[CaseStmt]
 
     assert(innerCase.exp == VarExpression("x"))
 
-    assert(innerCase.cases(0) == SimpleCase(IntValue(0), AssignmentStmt("sum", IntValue(0))))
+    assert(
+      innerCase.cases(0) == SimpleCase(
+        IntValue(0),
+        AssignmentStmt("sum", IntValue(0))
+      )
+    )
 
-    assert(innerCase.elseStmt.getOrElse(None) == AssignmentStmt("sum", AddExpression(
-      VarExpression("sum"), VarExpression("x"))))
+    assert(
+      innerCase.elseStmt.getOrElse(None) == AssignmentStmt(
+        "sum",
+        AddExpression(VarExpression("sum"), VarExpression("x"))
+      )
+    )
 
-    assert(myWhileStmt.stmt.asInstanceOf[SequenceStmt].stmts(1).asInstanceOf[AssignmentStmt] ==
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))
+    assert(
+      myWhileStmt.stmt
+        .asInstanceOf[SequenceStmt]
+        .stmts(1)
+        .asInstanceOf[AssignmentStmt] ==
+        AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+    )
 
     assert(sequenceStmts(3) == WriteStmt(VarExpression("sum")))
 
   }
 
-  test("Testing the oberon stmt25 code. This module tests if a ForRange stmt is correctly converted to a For stmt") {
+  test(
+    "Testing the oberon stmt25 code. This module tests if a ForRange stmt is correctly converted to a For stmt"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt25.oberon")
 
     assert("ForRangeModule" == module.name)
@@ -1089,8 +1391,14 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(AssignmentStmt("x", IntValue(0)) == forStmt.init)
     assert(LTEExpression(VarExpression("x"), IntValue(10)) == forStmt.condition)
-    assert(SequenceStmt(List(WriteStmt(VarExpression("x")),
-      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))))) == forStmt.stmt)
+    assert(
+      SequenceStmt(
+        List(
+          WriteStmt(VarExpression("x")),
+          AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+        )
+      ) == forStmt.stmt
+    )
 
   }
 
@@ -1113,8 +1421,10 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val innerInit = AssignmentStmt("x", VarExpression("min"))
     val innerCondition = LTEExpression(VarExpression("x"), VarExpression("max"))
-    val innerStmts = List(WriteStmt(VarExpression("x")), AssignmentStmt("x", AddExpression(
-      VarExpression("x"), IntValue(1))))
+    val innerStmts = List(
+      WriteStmt(VarExpression("x")),
+      AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+    )
 
     val forStmts = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
 
@@ -1125,7 +1435,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon stmt27 code. This module has a ForRange stmt nested with another ForRange stmt") {
+  test(
+    "Testing the oberon stmt27 code. This module has a ForRange stmt nested with another ForRange stmt"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt27.oberon")
 
     assert("ForRangeModule" == module.name)
@@ -1142,7 +1454,12 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(condExpr1 == forRangeStmt.condition)
 
     val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    assert(
+      AssignmentStmt(
+        "x",
+        AddExpression(VarExpression("x"), IntValue(1))
+      ) == stmts1(1)
+    )
     val nestedFor = stmts1.head.asInstanceOf[ForStmt]
 
     val initStmt2 = AssignmentStmt("y", VarExpression("x"))
@@ -1152,11 +1469,18 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(initStmt2 == nestedFor.init)
     assert(condExpr2 == nestedFor.condition)
     assert(WriteStmt(VarExpression("y")) == stmt2(0))
-    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+    assert(
+      AssignmentStmt(
+        "y",
+        AddExpression(VarExpression("y"), IntValue(1))
+      ) == stmt2(1)
+    )
 
   }
 
-  test("Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt") {
+  test(
+    "Testing the oberon stmt28 code. This module has a ForRange stmt nested with another ForRange stmt"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt28.oberon")
 
     assert("ForRangeModule" == module.name)
@@ -1164,10 +1488,11 @@ class ParserTestSuite extends AbstractTestSuite {
 
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmts) => assert(3 == stmts.length)
-      case _ => fail("Expected a sequence of 3 statements!!!")
+      case _                   => fail("Expected a sequence of 3 statements!!!")
     }
 
-    val sequenceStmts = module.stmt.getOrElse(None).asInstanceOf[SequenceStmt].stmts
+    val sequenceStmts =
+      module.stmt.getOrElse(None).asInstanceOf[SequenceStmt].stmts
     assert(ReadIntStmt("min") == sequenceStmts.head)
     assert(ReadIntStmt("max") == sequenceStmts(1))
 
@@ -1180,7 +1505,12 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(condExpr1 == forRangeStmt.condition)
 
     val stmts1 = forRangeStmt.stmt.asInstanceOf[SequenceStmt].stmts
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts1(1))
+    assert(
+      AssignmentStmt(
+        "x",
+        AddExpression(VarExpression("x"), IntValue(1))
+      ) == stmts1(1)
+    )
     val nestedFor = stmts1(0).asInstanceOf[ForStmt]
 
     val initStmt2 = AssignmentStmt("y", VarExpression("x"))
@@ -1190,11 +1520,18 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(initStmt2 == nestedFor.init)
     assert(condExpr2 == nestedFor.condition)
     assert(WriteStmt(VarExpression("y")) == stmt2(0))
-    assert(AssignmentStmt("y", AddExpression(VarExpression("y"), IntValue(1))) == stmt2(1))
+    assert(
+      AssignmentStmt(
+        "y",
+        AddExpression(VarExpression("y"), IntValue(1))
+      ) == stmt2(1)
+    )
 
   }
 
-  test("Testing the oberon stmt29 code. This module has a ForRange with a procedure") {
+  test(
+    "Testing the oberon stmt29 code. This module has a ForRange with a procedure"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt29.oberon")
 
     assert("ForRangeModule" == module.name)
@@ -1209,8 +1546,17 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(initStmt == forStmt.init)
     assert(condExpr == forStmt.condition)
-    assert(WriteStmt(FunctionCallExpression("squareOf", List(VarExpression("x")))) == stmts(0))
-    assert(AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1))) == stmts(1))
+    assert(
+      WriteStmt(
+        FunctionCallExpression("squareOf", List(VarExpression("x")))
+      ) == stmts(0)
+    )
+    assert(
+      AssignmentStmt(
+        "x",
+        AddExpression(VarExpression("x"), IntValue(1))
+      ) == stmts(1)
+    )
   }
 
   test("Testing the oberon stmt30 code. This module has IF-ELSIF statement") {
@@ -1236,9 +1582,13 @@ class ParserTestSuite extends AbstractTestSuite {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
         assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
         assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(
+          elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7))
+        )
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(
+          elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9))
+        )
         assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
         assert(elseStmt.contains(AssignmentStmt("y", IntValue(4))))
       case _ => fail("expecting an if-then stmt")
@@ -1247,7 +1597,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  test("Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt") {
+  test(
+    "Testing the oberon IfElseIfStmt09 code. This module has IF-ELSIF statement without ELSE stmt"
+  ) {
     val module = ScalaParser.parseResource("stmts/IfElseIfStmt09.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1270,7 +1622,9 @@ class ParserTestSuite extends AbstractTestSuite {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
         assert(cond == GTExpression(VarExpression("x"), IntValue(1)))
         assert(thenStmt == AssignmentStmt("y", IntValue(0)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(3)))
+        assert(
+          elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(3))
+        )
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
         assert(elseStmt == None)
       case _ => fail("expecting an if-then stmt")
@@ -1279,7 +1633,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
 
-  test("Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts") {
+  test(
+    "Testing the oberon IfElseIfStmt10 code. This module has IF-ELSIF statement with ten ELSEIF stmts"
+  ) {
     val module = ScalaParser.parseResource("stmts/IfElseIfStmt10.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1302,25 +1658,45 @@ class ParserTestSuite extends AbstractTestSuite {
       case IfElseIfStmt(cond, thenStmt, elseIfs, elseStmt) =>
         assert(cond == LTExpression(VarExpression("x"), IntValue(5)))
         assert(thenStmt == AssignmentStmt("y", IntValue(1)))
-        assert(elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7)))
+        assert(
+          elseIfs(0).condition == LTExpression(VarExpression("x"), IntValue(7))
+        )
         assert(elseIfs(0).thenStmt == AssignmentStmt("y", IntValue(2)))
-        assert(elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9)))
+        assert(
+          elseIfs(1).condition == LTExpression(VarExpression("x"), IntValue(9))
+        )
         assert(elseIfs(1).thenStmt == AssignmentStmt("y", IntValue(3)))
-        assert(elseIfs(2).condition == LTExpression(VarExpression("x"), IntValue(11)))
+        assert(
+          elseIfs(2).condition == LTExpression(VarExpression("x"), IntValue(11))
+        )
         assert(elseIfs(2).thenStmt == AssignmentStmt("y", IntValue(4)))
-        assert(elseIfs(3).condition == LTExpression(VarExpression("x"), IntValue(13)))
+        assert(
+          elseIfs(3).condition == LTExpression(VarExpression("x"), IntValue(13))
+        )
         assert(elseIfs(3).thenStmt == AssignmentStmt("y", IntValue(5)))
-        assert(elseIfs(4).condition == LTExpression(VarExpression("x"), IntValue(15)))
+        assert(
+          elseIfs(4).condition == LTExpression(VarExpression("x"), IntValue(15))
+        )
         assert(elseIfs(4).thenStmt == AssignmentStmt("y", IntValue(6)))
-        assert(elseIfs(5).condition == LTExpression(VarExpression("x"), IntValue(17)))
+        assert(
+          elseIfs(5).condition == LTExpression(VarExpression("x"), IntValue(17))
+        )
         assert(elseIfs(5).thenStmt == AssignmentStmt("y", IntValue(7)))
-        assert(elseIfs(6).condition == LTExpression(VarExpression("x"), IntValue(19)))
+        assert(
+          elseIfs(6).condition == LTExpression(VarExpression("x"), IntValue(19))
+        )
         assert(elseIfs(6).thenStmt == AssignmentStmt("y", IntValue(8)))
-        assert(elseIfs(7).condition == LTExpression(VarExpression("x"), IntValue(21)))
+        assert(
+          elseIfs(7).condition == LTExpression(VarExpression("x"), IntValue(21))
+        )
         assert(elseIfs(7).thenStmt == AssignmentStmt("y", IntValue(9)))
-        assert(elseIfs(8).condition == LTExpression(VarExpression("x"), IntValue(23)))
+        assert(
+          elseIfs(8).condition == LTExpression(VarExpression("x"), IntValue(23))
+        )
         assert(elseIfs(8).thenStmt == AssignmentStmt("y", IntValue(10)))
-        assert(elseIfs(9).condition == EQExpression(VarExpression("x"), IntValue(25)))
+        assert(
+          elseIfs(9).condition == EQExpression(VarExpression("x"), IntValue(25))
+        )
         assert(elseIfs(9).thenStmt == AssignmentStmt("y", IntValue(11)))
         assert(elseStmt == Some(AssignmentStmt("y", IntValue(12))))
       case _ => fail("expecting an if-then stmt")
@@ -1328,7 +1704,6 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(stmts(2) == WriteStmt(VarExpression("y")))
   }
-
 
   test("Testing the oberon procedure01 code. This module has a procedure") {
     val module = ScalaParser.parseResource("procedures/procedure01.oberon")
@@ -1345,7 +1720,10 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(procedure.returnType == Some(IntegerType))
 
     procedure.stmt match {
-      case ReturnStmt(AddExpression(VarExpression("v1"), VarExpression("v2"))) => succeed
+      case ReturnStmt(
+            AddExpression(VarExpression("v1"), VarExpression("v2"))
+          ) =>
+        succeed
       case _ => fail("expecting a return stmt")
     }
 
@@ -1355,10 +1733,19 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(stmt.stmts.head == ReadIntStmt("x"))
     assert(stmt.stmts(1) == ReadIntStmt("y"))
-    assert(stmt.stmts(2) == WriteStmt(FunctionCallExpression("sum", List(VarExpression("x"), VarExpression("y")))))
+    assert(
+      stmt.stmts(2) == WriteStmt(
+        FunctionCallExpression(
+          "sum",
+          List(VarExpression("x"), VarExpression("y"))
+        )
+      )
+    )
   }
 
-  test("Testing the oberon procedure02 code. This module resembles the code of the LDTA challenge") {
+  test(
+    "Testing the oberon procedure02 code. This module resembles the code of the LDTA challenge"
+  ) {
     val module = ScalaParser.parseResource("procedures/procedure02.oberon")
 
     assert(module.name == "Multiples")
@@ -1373,7 +1760,10 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(procedure.returnType == Some(IntegerType))
 
     procedure.stmt match {
-      case ReturnStmt(MultExpression(VarExpression("i"), VarExpression("base"))) => succeed
+      case ReturnStmt(
+            MultExpression(VarExpression("i"), VarExpression("base"))
+          ) =>
+        succeed
       case _ => fail("expecting a return i * base stmt")
     }
 
@@ -1384,7 +1774,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmt.stmts.head == ReadIntStmt("base"))
   }
 
-  test("Testing the oberon procedure03 code. This module implements a fatorial function") {
+  test(
+    "Testing the oberon procedure03 code. This module implements a fatorial function"
+  ) {
     val module = ScalaParser.parseResource("procedures/procedure03.oberon")
 
     assert(module.name == "Factorial")
@@ -1400,21 +1792,45 @@ class ParserTestSuite extends AbstractTestSuite {
 
     procedure.stmt match {
       case SequenceStmt(_) => succeed
-      case _ => fail("expecting a sequence of stmts")
+      case _               => fail("expecting a sequence of stmts")
     }
 
     val SequenceStmt(stmts) = procedure.stmt // pattern matching...
     assert(stmts.size == 2)
 
-    assert(stmts.head == IfElseStmt(EQExpression(VarExpression("i"), IntValue(1)), ReturnStmt(IntValue(1)), None))
-    assert(stmts(1) == ReturnStmt(MultExpression(VarExpression("i"), FunctionCallExpression("factorial", List(SubExpression(VarExpression("i"), IntValue(1)))))))
+    assert(
+      stmts.head == IfElseStmt(
+        EQExpression(VarExpression("i"), IntValue(1)),
+        ReturnStmt(IntValue(1)),
+        None
+      )
+    )
+    assert(
+      stmts(1) == ReturnStmt(
+        MultExpression(
+          VarExpression("i"),
+          FunctionCallExpression(
+            "factorial",
+            List(SubExpression(VarExpression("i"), IntValue(1)))
+          )
+        )
+      )
+    )
 
     module.stmt.get match {
       case SequenceStmt(ss) => {
-        assert(ss.head == AssignmentStmt("res", FunctionCallExpression("factorial", List(IntValue(5)))))
+        assert(
+          ss.head == AssignmentStmt(
+            "res",
+            FunctionCallExpression("factorial", List(IntValue(5)))
+          )
+        )
         assert(ss(1) == WriteStmt(VarExpression("res")))
       }
-      case _ => fail("expecting a sequence of stmts: an assignment and a print stmt (Write)")
+      case _ =>
+        fail(
+          "expecting a sequence of stmts: an assignment and a print stmt (Write)"
+        )
     }
   }
 
@@ -1458,8 +1874,9 @@ class ParserTestSuite extends AbstractTestSuite {
 //    assert(stmt.stmts(1) == ReadIntStmt("b"))
 //  }
 
-
-  test("Testing the oberon ArrayAssignmentStmt01 code. This module has a simple array assignment") {
+  test(
+    "Testing the oberon ArrayAssignmentStmt01 code. This module has a simple array assignment"
+  ) {
     val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt01.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1477,10 +1894,17 @@ class ParserTestSuite extends AbstractTestSuite {
     val stmts = sequence.stmts
 
     assert(stmts.head == ReadIntStmt("x"))
-    assert(stmts(1) == new AssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
+    assert(
+      stmts(1) == new AssignmentStmt(
+        ArrayAssignment(VarExpression("array"), IntValue(0)),
+        VarExpression("x")
+      )
+    )
 
   }
-  test("Testing the oberon ArrayAssignmentStmt02 code. This module has an array assignment in IF-THEN") {
+  test(
+    "Testing the oberon ArrayAssignmentStmt02 code. This module has an array assignment in IF-THEN"
+  ) {
     val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt02.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1503,8 +1927,13 @@ class ParserTestSuite extends AbstractTestSuite {
     // the third stmt must be an IfElseStmt
     stmts(2) match {
       case IfElseStmt(cond, s1, s2) =>
-        assert(cond == GTExpression(VarExpression("x"),VarExpression("max")))
-		assert(s1 == new AssignmentStmt(ArrayAssignment(VarExpression("array"), IntValue(0)), VarExpression("x")))
+        assert(cond == GTExpression(VarExpression("x"), VarExpression("max")))
+        assert(
+          s1 == new AssignmentStmt(
+            ArrayAssignment(VarExpression("array"), IntValue(0)),
+            VarExpression("x")
+          )
+        )
         assert(s2.isEmpty) // the else stmt is None
       case _ => fail("expecting an if-then stmt")
     }
@@ -1512,7 +1941,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmts(3) == WriteStmt(VarExpression("max")))
   }
 
-  test("Testing the oberon stmt32 code. This module has some user types declarations") {
+  test(
+    "Testing the oberon stmt32 code. This module has some user types declarations"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt32.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1522,7 +1953,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.userTypes.size == 4)
   }
 
-  test("Testing the oberon ArrayAssignmentStmt04 code. This module has two array assignments") {
+  test(
+    "Testing the oberon ArrayAssignmentStmt04 code. This module has two array assignments"
+  ) {
     val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt04.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1539,12 +1972,29 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-	  assert(stmts.head == new AssignmentStmt(ArrayAssignment(VarExpression("v"), IntValue(2)), IntValue(3)))
-	  assert(stmts(1) == AssignmentStmt(("sum"), AddExpression(IntValue(9),IntValue(2))))
-	  assert(stmts(2) == new AssignmentStmt(ArrayAssignment(VarExpression("v"), IntValue(2)), VarExpression("sum")))
+    assert(
+      stmts.head == new AssignmentStmt(
+        ArrayAssignment(VarExpression("v"), IntValue(2)),
+        IntValue(3)
+      )
+    )
+    assert(
+      stmts(1) == AssignmentStmt(
+        ("sum"),
+        AddExpression(IntValue(9), IntValue(2))
+      )
+    )
+    assert(
+      stmts(2) == new AssignmentStmt(
+        ArrayAssignment(VarExpression("v"), IntValue(2)),
+        VarExpression("sum")
+      )
+    )
   }
 
-  test("Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index") {
+  test(
+    "Testing the oberon ArrayAssignmentStmt05 code. This module has an assignmet array with sum in the index"
+  ) {
     val module = ScalaParser.parseResource("stmts/ArrayAssignmentStmt05.oberon")
 
     assert(module.name == "SimpleModule")
@@ -1552,35 +2002,44 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.userTypes.length == 1)
   }
 
-  test("Testing the oberon stmt33 code. This module has a record and array type declarations"){
+  test(
+    "Testing the oberon stmt33 code. This module has a record and array type declarations"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt33.oberon")
-
 
     assert(module.name == "UserTypeModule")
     assert(module.userTypes.size == 3)
   }
 
   test("Testing the oberon recordAssignmentStmt01 code") {
-    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt01.oberon")
+    val module =
+      ScalaParser.parseResource("stmts/recordAssignmentStmt01.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(module.stmt.isDefined)
 
-    assert(module.stmt.get == new AssignmentStmt(RecordAssignment(VarExpression("d1"), "day"), IntValue(5)))
+    assert(
+      module.stmt.get == new AssignmentStmt(
+        RecordAssignment(VarExpression("d1"), "day"),
+        IntValue(5)
+      )
+    )
   }
 
   test("Testing the oberon recordAssignmentStmt02 code") {
-    val module = ScalaParser.parseResource("stmts/recordAssignmentStmt02.oberon")
+    val module =
+      ScalaParser.parseResource("stmts/recordAssignmentStmt02.oberon")
 
     assert(module.name == "SimpleModule")
 
     assert(module.userTypes.length == 1)
   }
 
-  test("Testing the oberon stmt34 code. This module has a record and array type declarations"){
+  test(
+    "Testing the oberon stmt34 code. This module has a record and array type declarations"
+  ) {
     val module = ScalaParser.parseResource("stmts/stmt34.oberon")
-
 
     assert(module.name == "UserTypeModule")
 
@@ -1592,21 +2051,42 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-
-
-  test("Testing the oberon ExpressionNameParser1 code. This module tests if the parser can see expression name access"){
+  test(
+    "Testing the oberon ExpressionNameParser1 code. This module tests if the parser can see expression name access"
+  ) {
     val module = ScalaParser.parseResource("stmts/ExpressionNameParser1.oberon")
     assert(module.name == "ExpressionNameModule")
     assert(module.stmt.isDefined)
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[VarExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .asInstanceOf[FieldAccessExpression]
+        .exp
+        .isInstanceOf[VarExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .asInstanceOf[FieldAccessExpression]
+        .name
+        .isInstanceOf[String]
+    )
   }
 
-  test("Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name"){
+  test(
+    "Testing the oberon ExpressionNameParser2 code. This module tests if the parser can translate operations with expression name"
+  ) {
     val module = ScalaParser.parseResource("stmts/ExpressionNameParser2.oberon")
 
     assert(module.name == "ExpressionNameModule")
@@ -1615,28 +2095,71 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .right
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.asInstanceOf[IntValue].value == 1)
-
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .left
+        .asInstanceOf[IntValue]
+        .value == 1
+    )
 
   }
 
-  test("Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words"){
+  test(
+    "Testing the oberon ExpressionNameParser3 code. This module tests if the parser can see expression name with more than two words"
+  ) {
     val module = ScalaParser.parseResource("stmts/ExpressionNameParser3.oberon")
 
-  	assert(module.name == "ExpressionNameModule")
+    assert(module.name == "ExpressionNameModule")
 
-  	assert(module.stmt.isDefined)
+    assert(module.stmt.isDefined)
 
-  	assert(module.stmt.get.asInstanceOf[WriteStmt].expression.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].exp.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .asInstanceOf[FieldAccessExpression]
+        .exp
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[WriteStmt].expression.asInstanceOf[FieldAccessExpression].name.isInstanceOf[String])
+    assert(
+      module.stmt.get
+        .asInstanceOf[WriteStmt]
+        .expression
+        .asInstanceOf[FieldAccessExpression]
+        .name
+        .isInstanceOf[String]
+    )
   }
 
-  test("Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names"){
+  test(
+    "Testing the oberon ExpressionNameParser4 code. This module tests if the parser can translate operations with two expression names"
+  ) {
     val module = ScalaParser.parseResource("stmts/ExpressionNameParser4.oberon")
 
     assert(module.name == "ExpressionNameModule")
@@ -1645,13 +2168,35 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .left
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .right
+        .isInstanceOf[FieldAccessExpression]
+    )
 
   }
 
-  test("Testing the oberon ExpressionNameParser5 code. This module tests if the parser can translate different operations with type record declarations"){
+  test(
+    "Testing the oberon ExpressionNameParser5 code. This module tests if the parser can translate different operations with type record declarations"
+  ) {
     val module = ScalaParser.parseResource("stmts/ExpressionNameParser5.oberon")
 
     assert(module.name == "ExpressionNameModule")
@@ -1660,16 +2205,51 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.size == 2)
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].left.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .left
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-    assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].left.isInstanceOf[FieldAccessExpression])
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .right
+        .asInstanceOf[MultExpression]
+        .left
+        .isInstanceOf[FieldAccessExpression]
+    )
 
-	  assert(module.stmt.get.asInstanceOf[SequenceStmt].stmts.head.asInstanceOf[AssignmentStmt].exp.asInstanceOf[AddExpression].right.asInstanceOf[MultExpression].right.isInstanceOf[FieldAccessExpression])
-
+    assert(
+      module.stmt.get
+        .asInstanceOf[SequenceStmt]
+        .stmts
+        .head
+        .asInstanceOf[AssignmentStmt]
+        .exp
+        .asInstanceOf[AddExpression]
+        .right
+        .asInstanceOf[MultExpression]
+        .right
+        .isInstanceOf[FieldAccessExpression]
+    )
 
   }
 
-  test("Testing the oberon userTypeSimple01 code module. This module has a record type declaration, with invalid declarations") {
+  test(
+    "Testing the oberon userTypeSimple01 code module. This module has a record type declaration, with invalid declarations"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple01.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1677,7 +2257,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.userTypes.length == 2)
   }
 
-  test("Testing the oberon userTypeSimple02 code module. This module has array and record type declarations") {
+  test(
+    "Testing the oberon userTypeSimple02 code module. This module has array and record type declarations"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple02.oberon")
     // val sequenceStmts = module.stmt.get.asInstanceOf[SequenceStmt].stmts
 
@@ -1688,8 +2270,12 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val typeList = module.userTypes
 
-    val halls = RecordType(List(VariableDeclaration("integrante", BooleanType),
-      VariableDeclaration("matricula",IntegerType)))
+    val halls = RecordType(
+      List(
+        VariableDeclaration("integrante", BooleanType),
+        VariableDeclaration("matricula", IntegerType)
+      )
+    )
 
     val halls_array = ArrayType(9, ReferenceToUserDefinedType("HALLS"))
 
@@ -1704,7 +2290,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon userTypeSimple03 code module. This module has a record type declaration, with invalid declarations"){
+  test(
+    "Testing the oberon userTypeSimple03 code module. This module has a record type declaration, with invalid declarations"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple03.oberon")
 
     assert(module.name == "test")
@@ -1715,11 +2303,18 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val test_array = ArrayType(5, BooleanType)
 
-    val tipo1 = RecordType(List(
-      VariableDeclaration("num", IntegerType),
-      VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))))
+    val tipo1 = RecordType(
+      List(
+        VariableDeclaration("num", IntegerType),
+        VariableDeclaration("numum", ReferenceToUserDefinedType("test_array"))
+      )
+    )
 
-    val tipo2 =  RecordType(List(VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))))
+    val tipo2 = RecordType(
+      List(
+        VariableDeclaration("num_record", ReferenceToUserDefinedType("tipo1"))
+      )
+    )
 
     val typetoTest = List(test_array, tipo1, tipo2)
 
@@ -1732,24 +2327,34 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  ignore("Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)") {
+  ignore(
+    "Testing the oberon userTypeSimple04 code module. This module has an array and a record type declarations, with the array declaration using negative size (useful for typecheck tests)"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple04.oberon")
 
     assert(module.name == "UserTypeModule")
 
     assert(module.userTypes.length == 3)
 
-    val listDeclaration = List(VariableDeclaration("size", IntegerType),
-      VariableDeclaration("variables", ReferenceToUserDefinedType("cplusplus")), VariableDeclaration("Varinho",
-      ReferenceToUserDefinedType("myType")))
-
+    val listDeclaration = List(
+      VariableDeclaration("size", IntegerType),
+      VariableDeclaration("variables", ReferenceToUserDefinedType("cplusplus")),
+      VariableDeclaration("Varinho", ReferenceToUserDefinedType("myType"))
+    )
 
     assert(module.userTypes(0).baseType == ArrayType(10, BooleanType))
     assert(module.userTypes(1).baseType == RecordType(listDeclaration))
-    assert(module.userTypes(2).baseType == ArrayType(5, ReferenceToUserDefinedType("java")))
+    assert(
+      module.userTypes(2).baseType == ArrayType(
+        5,
+        ReferenceToUserDefinedType("java")
+      )
+    )
   }
 
-  test("Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"){
+  test(
+    "Testing the oberon userTypeSimple05 code module. This module has some user type declarations with a variables using theses types"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple05.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1758,18 +2363,22 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(module.variables.length == 3)
 
-    val varList = List(VariableDeclaration("x", ReferenceToUserDefinedType("simple")),
+    val varList = List(
+      VariableDeclaration("x", ReferenceToUserDefinedType("simple")),
       VariableDeclaration("y", ReferenceToUserDefinedType("simple")),
-      VariableDeclaration("z", ReferenceToUserDefinedType("complicated")))
+      VariableDeclaration("z", ReferenceToUserDefinedType("complicated"))
+    )
 
-    var it : Int = 0
+    var it: Int = 0
     module.variables.foreach(v => {
       assert(v == varList(it))
       it += 1
     })
   }
 
-  test("Testing the oberon userTypeSimple06 code module. This module has a record and array type declaration"){
+  test(
+    "Testing the oberon userTypeSimple06 code module. This module has a record and array type declaration"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple06.oberon")
 
     assert(module.name == "test_ando")
@@ -1780,13 +2389,21 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val cheesewithbread = ArrayType(10, IntegerType)
 
-    val cheesewithoutbread = RecordType(List(
-      VariableDeclaration("var1", IntegerType),
-      VariableDeclaration("var2", ReferenceToUserDefinedType("cheesewithbread"))))
+    val cheesewithoutbread = RecordType(
+      List(
+        VariableDeclaration("var1", IntegerType),
+        VariableDeclaration(
+          "var2",
+          ReferenceToUserDefinedType("cheesewithbread")
+        )
+      )
+    )
 
-    val cheesewithhalfabread =  ArrayType(100000, ReferenceToUserDefinedType("cheesewithoutbread"))
+    val cheesewithhalfabread =
+      ArrayType(100000, ReferenceToUserDefinedType("cheesewithoutbread"))
 
-    val typetoTest = List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
+    val typetoTest =
+      List(cheesewithbread, cheesewithoutbread, cheesewithhalfabread)
 
     var it: Int = 0
 
@@ -1797,7 +2414,9 @@ class ParserTestSuite extends AbstractTestSuite {
 
   }
 
-  test("Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"){
+  test(
+    "Testing the oberon userTypeSimple07 code module. This module has a procedure using a user defined type"
+  ) {
     val module = ScalaParser.parseResource("simple/userTypeSimple07.oberon")
 
     assert(module.name == "UserTypeModule")
@@ -1810,18 +2429,30 @@ class ParserTestSuite extends AbstractTestSuite {
 
     assert(userProcedure.name == "initialize_array")
     assert(userProcedure.args.length == 1)
-    assert(userProcedure.returnType.get.asInstanceOf[ReferenceToUserDefinedType] == ReferenceToUserDefinedType("simple"))
+    assert(
+      userProcedure.returnType.get
+        .asInstanceOf[ReferenceToUserDefinedType] == ReferenceToUserDefinedType(
+        "simple"
+      )
+    )
     assert(userProcedure.variables.length == 1)
     assert(userProcedure.stmt.asInstanceOf[SequenceStmt].stmts.length == 3)
   }
 
-  test("Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD") {
+  test(
+    "Testing the oberon aritmetic38 code module. This module demonstrates the high precedence of MOD"
+  ) {
     val module = ScalaParser.parseResource("aritmetic/aritmetic38.oberon")
 
     assert(module.name == "Aritmetic38")
     assert(module.constants.size == 1)
-    assert(module.constants.head == 
-      Constant("x", AddExpression(IntValue(6), ModExpression(IntValue(5), IntValue(4)))))
+    assert(
+      module.constants.head ==
+        Constant(
+          "x",
+          AddExpression(IntValue(6), ModExpression(IntValue(5), IntValue(4)))
+        )
+    )
   }
 
   test("Testing module B oberon import module feature. Import one module") {
@@ -1834,7 +2465,7 @@ class ParserTestSuite extends AbstractTestSuite {
   test("Testing module D oberon import module feature. Import two modules") {
     val moduleD = ScalaParser.parseResource("imports/D.oberon")
 
-    val expectedSet = Set("A","C")
+    val expectedSet = Set("A", "C")
     assert(expectedSet == moduleD.submodules)
   }
 
@@ -1845,16 +2476,19 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(expectedSet == moduleF.submodules)
   }
 
-  test("Testing module H oberon import module feature. A := aliasA, C := aliasC, D"){
+  test(
+    "Testing module H oberon import module feature. A := aliasA, C := aliasC, D"
+  ) {
     val moduleH = ScalaParser.parseResource("imports/H.oberon")
 
     val expectedSet = Set("A", "C", "D")
     assert(expectedSet == moduleH.submodules)
   }
 
-
   test("Testing LoopStmt stmt on loop_stmt01 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("stmts/loop_stmt01.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -1868,7 +2502,9 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Testing LoopStmt stmt on loop_stmt02 program") {
-    val path = Paths.get(getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("stmts/loop_stmt02.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -1882,7 +2518,9 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Printing new types on console") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("aritmetic/aritmetic34.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -1901,7 +2539,9 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Reading new types") {
-    val path = Paths.get(getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").toURI)
+    val path = Paths.get(
+      getClass.getClassLoader.getResource("aritmetic/aritmetic35.oberon").toURI
+    )
 
     assert(path != null)
 
@@ -1927,7 +2567,9 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(IntValue(1)))
 
     val exp2 = ScalaParser.parserREPL(sum)
-    assert(exp2 == REPLExpression(AddExpression(VarExpression("x"), IntValue(4))))
+    assert(
+      exp2 == REPLExpression(AddExpression(VarExpression("x"), IntValue(4)))
+    )
   }
 
   test("Testing the parser for addition expressions") {
@@ -1938,7 +2580,11 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(AddExpression(IntValue(7), IntValue(14))))
 
     val exp2 = ScalaParser.parserREPL(sum2)
-    assert(exp2 == REPLExpression(AddExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        AddExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for subtraction expressions") {
@@ -1949,7 +2595,11 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(SubExpression(IntValue(21), IntValue(5))))
 
     val exp2 = ScalaParser.parserREPL(sub2)
-    assert(exp2 == REPLExpression(SubExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        SubExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for multiplication expressions") {
@@ -1960,7 +2610,11 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(MultExpression(IntValue(3), IntValue(7))))
 
     val exp2 = ScalaParser.parserREPL(multi2)
-    assert(exp2 == REPLExpression(MultExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        MultExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for division expressions") {
@@ -1971,7 +2625,11 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(DivExpression(IntValue(500), IntValue(7))))
 
     val exp2 = ScalaParser.parserREPL(div2)
-    assert(exp2 == REPLExpression(DivExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        DivExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for a boolean expression") {
@@ -1986,10 +2644,16 @@ class ParserTestSuite extends AbstractTestSuite {
     val and2 = "x && y"
 
     val exp1 = ScalaParser.parserREPL(and1)
-    assert(exp1 == REPLExpression(AndExpression(BoolValue(true), BoolValue(false))))
+    assert(
+      exp1 == REPLExpression(AndExpression(BoolValue(true), BoolValue(false)))
+    )
 
     val exp2 = ScalaParser.parserREPL(and2)
-    assert(exp2 == REPLExpression(AndExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        AndExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for or operation expressions") {
@@ -1997,10 +2661,16 @@ class ParserTestSuite extends AbstractTestSuite {
     val or2 = "x || y"
 
     val exp1 = ScalaParser.parserREPL(or1)
-    assert(exp1 == REPLExpression(OrExpression(BoolValue(true), BoolValue(true))))
+    assert(
+      exp1 == REPLExpression(OrExpression(BoolValue(true), BoolValue(true)))
+    )
 
     val exp2 = ScalaParser.parserREPL(or2)
-    assert(exp2 == REPLExpression(OrExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        OrExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for equal expressions") {
@@ -2011,7 +2681,11 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp1 == REPLExpression(EQExpression(IntValue(1), BoolValue(true))))
 
     val exp2 = ScalaParser.parserREPL(eq2)
-    assert(exp2 == REPLExpression(EQExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp2 == REPLExpression(
+        EQExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for logical bigger and lesser") {
@@ -2036,17 +2710,32 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(exp4 == REPLExpression(LTEExpression(IntValue(5), IntValue(5))))
 
     val exp5 = ScalaParser.parserREPL(eq5)
-    assert(exp5 == REPLExpression(GTExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp5 == REPLExpression(
+        GTExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
 
     val exp6 = ScalaParser.parserREPL(eq6)
-    assert(exp6 == REPLExpression(LTExpression(VarExpression("x"), VarExpression("y"))))
+    assert(
+      exp6 == REPLExpression(
+        LTExpression(VarExpression("x"), VarExpression("y"))
+      )
+    )
   }
 
   test("Testing the parser for FunctionCallExpression expression") {
     val procedure1 = "sum(x,y)"
 
     val exp1 = ScalaParser.parserREPL(procedure1)
-    assert(exp1 == REPLExpression(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y")))))
+    assert(
+      exp1 == REPLExpression(
+        FunctionCallExpression(
+          "sum",
+          List(VarExpression("x"), VarExpression("y"))
+        )
+      )
+    )
   }
 
   test("Testing the parser for assignment statements") {
@@ -2058,10 +2747,18 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmt1 == REPLStatement(AssignmentStmt("a", IntValue(2))))
 
     val stmt2 = ScalaParser.parserREPL(assign2)
-    assert(stmt2 == REPLStatement(AssignmentStmt("b", AddExpression(IntValue(2),IntValue(3)))))
+    assert(
+      stmt2 == REPLStatement(
+        AssignmentStmt("b", AddExpression(IntValue(2), IntValue(3)))
+      )
+    )
 
     val stmt3 = ScalaParser.parserREPL(assign3)
-    assert(stmt3 == REPLStatement(AssignmentStmt("c", AddExpression(VarExpression("a"),IntValue(3)))))
+    assert(
+      stmt3 == REPLStatement(
+        AssignmentStmt("c", AddExpression(VarExpression("a"), IntValue(3)))
+      )
+    )
   }
 
   test("Testing the parser for ReadIntStmt statements") {
@@ -2080,49 +2777,123 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmt1 == REPLStatement(WriteStmt(IntValue(1))))
 
     val stmt2 = ScalaParser.parserREPL(write2)
-    assert(stmt2 == REPLStatement(WriteStmt(AddExpression(IntValue(2),VarExpression("a")))))
+    assert(
+      stmt2 == REPLStatement(
+        WriteStmt(AddExpression(IntValue(2), VarExpression("a")))
+      )
+    )
 
     val stmt3 = ScalaParser.parserREPL(write3)
-    assert(stmt3 == REPLStatement(WriteStmt(FunctionCallExpression("sum",List(VarExpression("x"),VarExpression("y"))))))
+    assert(
+      stmt3 == REPLStatement(
+        WriteStmt(
+          FunctionCallExpression(
+            "sum",
+            List(VarExpression("x"), VarExpression("y"))
+          )
+        )
+      )
+    )
   }
 
   test("Testing the parser for IfElseStmt and IfElseIfStmt statements") {
     val ifElse1 = "IF (x < 0 ) THEN y := 1 ELSE y := 3 END;"
-    val ifELse2 = "IF (x < 0 ) THEN y := 1 ELSIF (x > 0) THEN y := 2 ELSE y := 3 END;"
+    val ifELse2 =
+      "IF (x < 0 ) THEN y := 1 ELSIF (x > 0) THEN y := 2 ELSE y := 3 END;"
 
     val stmt1 = ScalaParser.parserREPL(ifElse1)
-    assert(stmt1 == REPLStatement(IfElseStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),Option(AssignmentStmt("y",IntValue(3))))))
+    assert(
+      stmt1 == REPLStatement(
+        IfElseStmt(
+          LTExpression(VarExpression("x"), IntValue(0)),
+          AssignmentStmt("y", IntValue(1)),
+          Option(AssignmentStmt("y", IntValue(3)))
+        )
+      )
+    )
 
     val stmt2 = ScalaParser.parserREPL(ifELse2)
-    assert(stmt2 == REPLStatement(IfElseIfStmt(LTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(1)),List(ElseIfStmt(GTExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("y",IntValue(2)))),Option(AssignmentStmt("y",IntValue(3))))))
+    assert(
+      stmt2 == REPLStatement(
+        IfElseIfStmt(
+          LTExpression(VarExpression("x"), IntValue(0)),
+          AssignmentStmt("y", IntValue(1)),
+          List(
+            ElseIfStmt(
+              GTExpression(VarExpression("x"), IntValue(0)),
+              AssignmentStmt("y", IntValue(2))
+            )
+          ),
+          Option(AssignmentStmt("y", IntValue(3)))
+        )
+      )
+    )
   }
 
   test("Testing the parser for WhileStmt statements") {
     val while1 = "WHILE (x >= 0) DO x := x - 1 END;"
 
     val stmt1 = ScalaParser.parserREPL(while1)
-    assert(stmt1 == REPLStatement(WhileStmt(GTEExpression(VarExpression("x"),IntValue(0)),AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1))))))
+    assert(
+      stmt1 == REPLStatement(
+        WhileStmt(
+          GTEExpression(VarExpression("x"), IntValue(0)),
+          AssignmentStmt("x", SubExpression(VarExpression("x"), IntValue(1)))
+        )
+      )
+    )
   }
 
   test("Testing the parser for ReaptUntilStmt statements") {
     val repeat1 = "REPEAT x := x + 1 UNTIL x > 2"
 
     val stmt1 = ScalaParser.parserREPL(repeat1)
-    assert(stmt1 == REPLStatement(RepeatUntilStmt(GTExpression(VarExpression("x"),IntValue(2)),AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))))
+    assert(
+      stmt1 == REPLStatement(
+        RepeatUntilStmt(
+          GTExpression(VarExpression("x"), IntValue(2)),
+          AssignmentStmt("x", AddExpression(VarExpression("x"), IntValue(1)))
+        )
+      )
+    )
   }
 
   test("Testing the parser for ForStmt statements") {
     val for1 = "FOR x IN 0 .. 10 DO write(x) END"
 
     val stmt1 = ScalaParser.parserREPL(for1)
-    assert(stmt1 == REPLStatement(ForStmt(AssignmentStmt("x",IntValue(0)),LTEExpression(VarExpression("x"),IntValue(10)),SequenceStmt(List(WriteStmt(VarExpression("x")), AssignmentStmt("x",AddExpression(VarExpression("x"),IntValue(1))))))))
+    assert(
+      stmt1 == REPLStatement(
+        ForStmt(
+          AssignmentStmt("x", IntValue(0)),
+          LTEExpression(VarExpression("x"), IntValue(10)),
+          SequenceStmt(
+            List(
+              WriteStmt(VarExpression("x")),
+              AssignmentStmt(
+                "x",
+                AddExpression(VarExpression("x"), IntValue(1))
+              )
+            )
+          )
+        )
+      )
+    )
   }
 
   test("Testing the parser for CaseStmt statements") {
     val case1 = "CASE x OF 0: y := 1 ELSE y := 0 END"
 
     val stmt1 = ScalaParser.parserREPL(case1)
-    assert(stmt1 == REPLStatement(CaseStmt(VarExpression("x"),List(SimpleCase(IntValue(0),AssignmentStmt("y",IntValue(1)))),Some(AssignmentStmt("y",IntValue(0))))))
+    assert(
+      stmt1 == REPLStatement(
+        CaseStmt(
+          VarExpression("x"),
+          List(SimpleCase(IntValue(0), AssignmentStmt("y", IntValue(1)))),
+          Some(AssignmentStmt("y", IntValue(0)))
+        )
+      )
+    )
   }
 
   test("Testing the parser for VarDeclaration") {
@@ -2131,13 +2902,28 @@ class ParserTestSuite extends AbstractTestSuite {
     val var3 = "x, y: INTEGER;"
 
     val variable1 = ScalaParser.parserREPL(var1)
-    assert(variable1 == REPLVarDeclaration(List(VariableDeclaration("x",IntegerType))))
+    assert(
+      variable1 == REPLVarDeclaration(
+        List(VariableDeclaration("x", IntegerType))
+      )
+    )
 
     val variable2 = ScalaParser.parserREPL(var2)
-    assert(variable2 == REPLVarDeclaration(List(VariableDeclaration("x",BooleanType))))
+    assert(
+      variable2 == REPLVarDeclaration(
+        List(VariableDeclaration("x", BooleanType))
+      )
+    )
 
-    val variable3= ScalaParser.parserREPL(var3)
-    assert(variable3 == REPLVarDeclaration(List(VariableDeclaration("x",IntegerType),VariableDeclaration("y",IntegerType))))
+    val variable3 = ScalaParser.parserREPL(var3)
+    assert(
+      variable3 == REPLVarDeclaration(
+        List(
+          VariableDeclaration("x", IntegerType),
+          VariableDeclaration("y", IntegerType)
+        )
+      )
+    )
   }
 
   test("Testing the parser for Constant declaration") {
@@ -2145,40 +2931,70 @@ class ParserTestSuite extends AbstractTestSuite {
     val const2 = "y = x + 1;"
 
     val constant1 = ScalaParser.parserREPL(const1)
-    assert(constant1 == REPLConstant(Constant("x",IntValue(0))))
+    assert(constant1 == REPLConstant(Constant("x", IntValue(0))))
 
     val constant2 = ScalaParser.parserREPL(const2)
-    assert(constant2 == REPLConstant(Constant("y",AddExpression(VarExpression("x"),IntValue(1)))))
+    assert(
+      constant2 == REPLConstant(
+        Constant("y", AddExpression(VarExpression("x"), IntValue(1)))
+      )
+    )
   }
 //Testing the oberon pointerDecl1 code
   test("Testing the oberon pointerDecl1 code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl1.oberon")
 
     assert(module.variables.size == 5)
-    assert(module.variables.head == VariableDeclaration("a", PointerType(IntegerType)))
-    assert(module.variables(1) == VariableDeclaration("b", PointerType(RealType)))
-    assert(module.variables(2) == VariableDeclaration("c", PointerType(CharacterType)))
-    assert(module.variables(3) == VariableDeclaration("d", PointerType(BooleanType)))
-    assert(module.variables(4) == VariableDeclaration("e", PointerType(StringType)))
+    assert(
+      module.variables.head == VariableDeclaration(
+        "a",
+        PointerType(IntegerType)
+      )
+    )
+    assert(
+      module.variables(1) == VariableDeclaration("b", PointerType(RealType))
+    )
+    assert(
+      module.variables(2) == VariableDeclaration(
+        "c",
+        PointerType(CharacterType)
+      )
+    )
+    assert(
+      module.variables(3) == VariableDeclaration("d", PointerType(BooleanType))
+    )
+    assert(
+      module.variables(4) == VariableDeclaration("e", PointerType(StringType))
+    )
   }
 
   test("Testing the oberon pointerDecl2 code") {
     val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
 
     assert(module.variables.size == 2)
-    assert(module.variables.head == VariableDeclaration("a", PointerType(ReferenceToUserDefinedType("aluno"))))
-    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("notas"))))
+    assert(
+      module.variables.head == VariableDeclaration(
+        "a",
+        PointerType(ReferenceToUserDefinedType("aluno"))
+      )
+    )
+    assert(
+      module.variables(1) == VariableDeclaration(
+        "b",
+        PointerType(ReferenceToUserDefinedType("notas"))
+      )
+    )
 
   }
 
-  //Testing the oberon pointerAssign1 code
+  // Testing the oberon pointerAssign1 code
   test("Testing the oberon pointerAssign1 code") {
     val module = ScalaParser.parseResource("Pointers/pointerAssign1.oberon")
 
-    //test if there are 5 statements in stmts list
+    // test if there are 5 statements in stmts list
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 5)
-      case _ => fail("This module should have 5 statements!")
+      case _                  => fail("This module should have 5 statements!")
     }
 
     val epsilon = 1e-2f
@@ -2186,21 +3002,33 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-    assert(stmts.head == new AssignmentStmt(PointerAssignment("a"), IntValue(1)))
-    assert(stmts(1) === new AssignmentStmt(PointerAssignment("b"), RealValue(9.5)))
-    assert(stmts(2) == new AssignmentStmt(PointerAssignment("c"), CharValue('c')))
-    assert(stmts(3) == new AssignmentStmt(PointerAssignment("d"), BoolValue(true)))
-    assert(stmts(4) == new AssignmentStmt(PointerAssignment("e"), StringValue("Hello.")))
+    assert(
+      stmts.head == new AssignmentStmt(PointerAssignment("a"), IntValue(1))
+    )
+    assert(
+      stmts(1) === new AssignmentStmt(PointerAssignment("b"), RealValue(9.5))
+    )
+    assert(
+      stmts(2) == new AssignmentStmt(PointerAssignment("c"), CharValue('c'))
+    )
+    assert(
+      stmts(3) == new AssignmentStmt(PointerAssignment("d"), BoolValue(true))
+    )
+    assert(
+      stmts(4) == new AssignmentStmt(
+        PointerAssignment("e"),
+        StringValue("Hello.")
+      )
+    )
   }
 
-
-  test("Testing the oberon pointerAssign2 code"){
+  test("Testing the oberon pointerAssign2 code") {
     val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
 
-    //conferir a contagem de statement
+    // conferir a contagem de statement
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 4)
-      case _ => fail("This module should have 4 statements!")
+      case _                  => fail("This module should have 4 statements!")
     }
 
     // 2 ou 4 conferir. tentativa: 1 record, 1 array, 2 pointer
@@ -2208,60 +3036,137 @@ class ParserTestSuite extends AbstractTestSuite {
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-    assert(stmts.head  == new AssignmentStmt(RecordAssignment(VarExpression("a"), "nome"), StringValue("Manuela")))
-    assert(stmts(1) == new AssignmentStmt(RecordAssignment(VarExpression("a"), "idade"), IntValue(23)))
-    assert(stmts(2) == new AssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(0)),RealValue(9.5)))
-    assert(stmts(3) == new AssignmentStmt(ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),RealValue(9.0)))
+    assert(
+      stmts.head == new AssignmentStmt(
+        RecordAssignment(VarExpression("a"), "nome"),
+        StringValue("Manuela")
+      )
+    )
+    assert(
+      stmts(1) == new AssignmentStmt(
+        RecordAssignment(VarExpression("a"), "idade"),
+        IntValue(23)
+      )
+    )
+    assert(
+      stmts(2) == new AssignmentStmt(
+        ArrayAssignment(PointerAccessExpression("b"), IntValue(0)),
+        RealValue(9.5)
+      )
+    )
+    assert(
+      stmts(3) == new AssignmentStmt(
+        ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),
+        RealValue(9.0)
+      )
+    )
   }
 
-  test("Testing the oberon pointerAssign3 code"){
+  test("Testing the oberon pointerAssign3 code") {
     val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
 
     assert(module.variables.size == 3)
-    assert(module.variables.head == VariableDeclaration("a", PointerType(RealType)))
-    assert(module.variables(1) == VariableDeclaration("b", PointerType(ReferenceToUserDefinedType("pointerA"))))
-    assert(module.variables(2) == VariableDeclaration("c", PointerType(PointerType(IntegerType))))
+    assert(
+      module.variables.head == VariableDeclaration("a", PointerType(RealType))
+    )
+    assert(
+      module.variables(1) == VariableDeclaration(
+        "b",
+        PointerType(ReferenceToUserDefinedType("pointerA"))
+      )
+    )
+    assert(
+      module.variables(2) == VariableDeclaration(
+        "c",
+        PointerType(PointerType(IntegerType))
+      )
+    )
 
-    //conferir a contagem de statement
+    // conferir a contagem de statement
     module.stmt.getOrElse(None) match {
       case SequenceStmt(stmt) => assert(stmt.length == 2)
-      case _ => fail("This module should have 2 statements!")
+      case _                  => fail("This module should have 2 statements!")
     }
 
-    //verificar com o grupo numeros
+    // verificar com o grupo numeros
     assert(module.userTypes.size == 1)
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
-    //opção IDE de convert to block expression - real value
-    assert(stmts.head  == new AssignmentStmt(PointerAssignment("a"), RealValue(10.5)))
-    assert(stmts(1)  == new AssignmentStmt(PointerAssignment("b"), VarExpression("a")))
+    // opção IDE de convert to block expression - real value
+    assert(
+      stmts.head == new AssignmentStmt(PointerAssignment("a"), RealValue(10.5))
+    )
+    assert(
+      stmts(1) == new AssignmentStmt(PointerAssignment("b"), VarExpression("a"))
+    )
   }
 
-  test(testName = "Testing the oberon pointerOps1 code"){
+  test(testName = "Testing the oberon pointerOps1 code") {
     val module = ScalaParser.parseResource("Pointers/pointerOps1.oberon")
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
-    assert(stmts(2) == AssignmentStmt("c",MultExpression(AddExpression(PointerAccessExpression("a"),PointerAccessExpression("b")),SubExpression(PointerAccessExpression("b"),PointerAccessExpression("a")))))
+    assert(
+      stmts(2) == AssignmentStmt(
+        "c",
+        MultExpression(
+          AddExpression(
+            PointerAccessExpression("a"),
+            PointerAccessExpression("b")
+          ),
+          SubExpression(
+            PointerAccessExpression("b"),
+            PointerAccessExpression("a")
+          )
+        )
+      )
+    )
   }
 
-
-  test(testName = "Testing the oberon LinkedList code"){
+  test(testName = "Testing the oberon LinkedList code") {
     val module = ScalaParser.parseResource("Pointers/linkedList.oberon")
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
     assert(module.userTypes.size == 1)
-    assert(module.userTypes(0) == UserDefinedType("linkedList", RecordType(List(VariableDeclaration("value", IntegerType), VariableDeclaration("next", PointerType(ReferenceToUserDefinedType("linkedList")))))))
-    assert(module.variables(0) == VariableDeclaration("list", ReferenceToUserDefinedType("linkedList")))
+    assert(
+      module.userTypes(0) == UserDefinedType(
+        "linkedList",
+        RecordType(
+          List(
+            VariableDeclaration("value", IntegerType),
+            VariableDeclaration(
+              "next",
+              PointerType(ReferenceToUserDefinedType("linkedList"))
+            )
+          )
+        )
+      )
+    )
+    assert(
+      module.variables(0) == VariableDeclaration(
+        "list",
+        ReferenceToUserDefinedType("linkedList")
+      )
+    )
 
-    assert(stmts.head == new AssignmentStmt(RecordAssignment(VarExpression("list"), "value"), IntValue(10)))
-    assert(stmts(1) == new AssignmentStmt(RecordAssignment(VarExpression("list"), "next"), NullValue))
+    assert(
+      stmts.head == new AssignmentStmt(
+        RecordAssignment(VarExpression("list"), "value"),
+        IntValue(10)
+      )
+    )
+    assert(
+      stmts(1) == new AssignmentStmt(
+        RecordAssignment(VarExpression("list"), "next"),
+        NullValue
+      )
+    )
   }
 
-  test(testName = "Testing the module ForEachStmt"){
+  test(testName = "Testing the module ForEachStmt") {
     val module = ScalaParser.parseResource("stmts/ForEachStmt.oberon")
     assert(module.name == "ForEachStmt")
 
@@ -2277,8 +3182,9 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }
 
-  test(testName = "Testing the module PointerNewStatement"){
-    val module = ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+  test(testName = "Testing the module PointerNewStatement") {
+    val module =
+      ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
     assert(module.name == "PointerNewStatement")
 
     assert(module.stmt.isDefined)
@@ -2291,7 +3197,9 @@ class ParserTestSuite extends AbstractTestSuite {
     }
   }
 
-  test("Testing lambdaType code. This module declares two lambda expression types") {
+  test(
+    "Testing lambdaType code. This module declares two lambda expression types"
+  ) {
     val module = ScalaParser.parseResource("lambda/lambdaType.oberon")
 
     assert(module.name == "Lambda01")
@@ -2337,7 +3245,7 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(x.name == "x")
     assert(x.exp.isInstanceOf[LambdaExpression])
   }
-  
+
   test(
     "Testing lambdaExpressions03 code. This module declares and assignes a lambda expression variable"
   ) {
@@ -2350,4 +3258,3 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
 }
-

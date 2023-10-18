@@ -11,7 +11,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
   interpreter.setTestEnvironment()
 
-  test(testName = "Test for the INC function"){
+  test(testName = "Test for the INC function") {
     val module = ScalaParser.parseResource("stmts/INCTest.oberon")
 
     assert(module.name == "INCTest")
@@ -23,7 +23,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
-  test(testName = "Test for the DEC function"){
+  test(testName = "Test for the DEC function") {
     val module = ScalaParser.parseResource("stmts/DECTest.oberon")
 
     assert(module.name == "DECTest")
@@ -34,12 +34,10 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("y") == Some(RealValue(-9.0)))
   }
 
-
   test("Test for the ABS function") {
     val module = ScalaParser.parseResource("stdlib/ABSTest.oberon")
 
     assert(module.name == "ABSTest")
-
 
     module.accept(interpreter)
     assert(interpreter.env.lookup("x") == Some(IntValue(-10)))
@@ -51,7 +49,6 @@ class StandardLibraryTest extends AnyFunSuite {
     val module = ScalaParser.parseResource("stdlib/ODDTest.oberon")
 
     assert(module.name == "ODDTest")
-
 
     module.accept(interpreter)
 
@@ -66,7 +63,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "FLOORTest")
 
-
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("y") == Some(IntValue(10)))
@@ -78,18 +74,16 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "RNDTest")
 
-
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("y") == Some(IntValue(10)))
     assert(interpreter.env.lookup("z") == Some(IntValue(-1)))
   }
 
-  test(testName = "Test for the FLT function"){
+  test(testName = "Test for the FLT function") {
     val module = ScalaParser.parseResource("stdlib/FLTTest.oberon")
 
     assert(module.name == "FLTTest")
-
 
     module.accept(interpreter)
 
@@ -102,7 +96,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "POWTest")
 
-
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("z") == Some(RealValue(0.25298221281347033)))
@@ -114,7 +107,6 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "SQRTest")
 
-
     module.accept(interpreter)
 
     assert(interpreter.env.lookup("z") == Some(RealValue(14.0)))
@@ -125,7 +117,6 @@ class StandardLibraryTest extends AnyFunSuite {
     val module = ScalaParser.parseResource("stdlib/CEILTest.oberon")
 
     assert(module.name == "CEILTest")
-
 
     module.accept(interpreter)
 
@@ -139,10 +130,15 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "READFILETest")
 
-
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
+    assert(
+      interpreter.env.lookup("y") == Some(
+        StringValue(
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append"
+        )
+      )
+    )
 
   }
 
@@ -151,16 +147,31 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "WRITEFILETest")
 
-
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
-    assert(interpreter.env.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")))
+    assert(
+      interpreter.env.lookup("x") == Some(
+        StringValue("src/test/resources/stdlib/plainFile.txt")
+      )
+    )
+    assert(
+      interpreter.env.lookup("y") == Some(
+        StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+      )
+    )
 
     if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
-      assert(interpreter.env.lookup("z") == Some(StringValue("src\\test\\resources\\stdlib\\plainFile.txt")))
+      assert(
+        interpreter.env.lookup("z") == Some(
+          StringValue("src\\test\\resources\\stdlib\\plainFile.txt")
+        )
+      )
     else
-      assert(interpreter.env.lookup("z") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+      assert(
+        interpreter.env.lookup("z") == Some(
+          StringValue("src/test/resources/stdlib/plainFile.txt")
+        )
+      )
 
   }
 
@@ -169,24 +180,40 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "APPENDFILETest")
 
-
     module.accept(interpreter)
 
-    assert(interpreter.env.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
-    assert(interpreter.env.lookup("w") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
+    assert(
+      interpreter.env.lookup("x") == Some(
+        StringValue("src/test/resources/stdlib/plainFile.txt")
+      )
+    )
+    assert(
+      interpreter.env.lookup("w") == Some(
+        StringValue(
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append"
+        )
+      )
+    )
 
     if (System.getProperty("os.name").split(" ")(0).contains("Windows"))
-      assert(interpreter.env.lookup("m") == Some(StringValue("src\\test\\resources\\stdlib\\plainFile.txt")))
+      assert(
+        interpreter.env.lookup("m") == Some(
+          StringValue("src\\test\\resources\\stdlib\\plainFile.txt")
+        )
+      )
     else
-      assert(interpreter.env.lookup("m") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
+      assert(
+        interpreter.env.lookup("m") == Some(
+          StringValue("src/test/resources/stdlib/plainFile.txt")
+        )
+      )
 
   }
 
-   test(testName = "Test for the STRINGTOINT function"){
+  test(testName = "Test for the STRINGTOINT function") {
     val module = ScalaParser.parseResource("stdlib/STRINGTOINTTest.oberon")
 
     assert(module.name == "STRINGTOINTTest")
-
 
     module.accept(interpreter)
 
@@ -194,11 +221,10 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(interpreter.env.lookup("z") == Some(IntValue(2)))
   }
 
-  test(testName = "Test for the STRINGTOREAL function"){
+  test(testName = "Test for the STRINGTOREAL function") {
     val module = ScalaParser.parseResource("stdlib/STRINGTOREALTest.oberon")
 
     assert(module.name == "STRINGTOREALTest")
-
 
     module.accept(interpreter)
 

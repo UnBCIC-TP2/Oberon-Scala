@@ -1,6 +1,5 @@
 package br.unb.cic.oberon.interpreter
 
-
 import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -45,8 +44,10 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val valTrue = BoolValue(true)
     val valFalse = BoolValue(false)
 
-
-    val exp = AndExpression(valTrue, AndExpression(valTrue, OrExpression(valTrue, valFalse)))
+    val exp = AndExpression(
+      valTrue,
+      AndExpression(valTrue, OrExpression(valTrue, valFalse))
+    )
     assert(exp.accept(visitor) == valTrue)
   }
 

@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.parser.ScalaParser
-import br.unb.cic.oberon.transformations.CoreVisitor
+import br.unb.cic.oberon.transformations.CoreTransformer
 import br.unb.cic.oberon.util.Resources
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -10,11 +10,9 @@ import java.io.{BufferedWriter, File, FileWriter}
 class CCodeGenTest extends AnyFunSuite {
 
   private def testGenerator(oberonFile: String) = {
-
     val module = ScalaParser.parseResource(oberonFile)
     val coreModule = if (module.stmt.isDefined) {
-      val coreVisitor = new CoreVisitor()
-      coreVisitor.transformModule(module)
+      CoreTransformer.reduceOberonModule(module)
     } else {
       module
     }
@@ -23,7 +21,7 @@ class CCodeGenTest extends AnyFunSuite {
 
     val CFile: String = s"cCode/$oberonFile".replace(".oberon", ".c")
 
-    //saveStringToFile(generatedCCode, s"c:/$CFile")
+    // saveStringToFile(generatedCCode, s"c:/$CFile")
     val cCode = Resources.getContent(CFile)
 
     assert(generatedCCode == cCode)
@@ -65,7 +63,6 @@ class CCodeGenTest extends AnyFunSuite {
   test(" C generator for interpreter_fibonacci01") {
     testGenerator("procedures/interpreter_fibonacci01.oberon")
   }
-
 
   test("First RepeatUntil Test") {
     testGenerator("stmts/repeatuntil.oberon")
@@ -160,19 +157,19 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("simple/arrayScopes.oberon")
   }
 
-  test("C generator for Procedure with local var"){
+  test("C generator for Procedure with local var") {
     testGenerator("procedures/procedure_with_local_var.oberon")
   }
 
-  test("C generator for Procedure with local var array"){
+  test("C generator for Procedure with local var array") {
     testGenerator("procedures/procedure_with_local_var_array.oberon")
   }
 
-  test("C generator for Type Int"){
+  test("C generator for Type Int") {
     testGenerator("type/typeInt.oberon")
   }
 
-  test("C generator for Record Usage"){
+  test("C generator for Record Usage") {
     testGenerator("stmts/recordUsage.oberon")
   }
 

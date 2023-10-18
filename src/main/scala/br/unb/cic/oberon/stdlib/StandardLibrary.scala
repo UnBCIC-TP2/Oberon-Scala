@@ -11,28 +11,60 @@ import scala.collection.mutable.Map
 
 class StandardLibrary[T](env: Environment[T]) {
 
-  def readf (path:String) : String = {
+  def readf(path: String): String = {
     val buffer = Source.fromFile(path)
     var string = ""
-    for (line <- buffer.getLines()){
+    for (line <- buffer.getLines()) {
       string = string + line
     }
     buffer.close()
     string
   }
 
-  val stdlib = OberonModule("STDLIB", Set.empty[String], List(), List(), List(),
-    List(inc, dec, abs, odd, ceil, floor, round, intToFloat, power, sqrroot, ceil, readFile, writeFile, appendFile, stringToInt, stringToFloat), None)
-  
+  val stdlib = OberonModule(
+    "STDLIB",
+    Set.empty[String],
+    List(),
+    List(),
+    List(),
+    List(
+      inc,
+      dec,
+      abs,
+      odd,
+      ceil,
+      floor,
+      round,
+      intToFloat,
+      power,
+      sqrroot,
+      ceil,
+      readFile,
+      writeFile,
+      appendFile,
+      stringToInt,
+      stringToFloat
+    ),
+    None
+  )
+
   def stringToInt = Procedure(
     "STRINGTOINT",
     List(ParameterByValue("x", StringType)),
     Some(IntegerType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup(name = "x").get.asInstanceOf[StringValue].value.toInt)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            IntValue(
+              env.lookup(name = "x").get.asInstanceOf[StringValue].value.toInt
+            )
+          )
+        )
+      )
+    )
   )
 
   def stringToFloat = Procedure(
@@ -41,9 +73,17 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(RealType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[StringValue].value.toFloat)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            RealValue(
+              env.lookup(name = "x").get.asInstanceOf[StringValue].value.toFloat
+            )
+          )
+        )
+      )
+    )
   )
 
   def inc = Procedure(
@@ -52,7 +92,12 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() => AssignmentStmt(VarAssignment("x"), AddExpression(VarExpression("x"), IntValue(1))))
+    MetaStmt(() =>
+      AssignmentStmt(
+        VarAssignment("x"),
+        AddExpression(VarExpression("x"), IntValue(1))
+      )
+    )
   )
 
   def dec = Procedure(
@@ -61,24 +106,31 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() => AssignmentStmt(VarAssignment("x"), AddExpression(VarExpression("x"), IntValue(-1))))
+    MetaStmt(() =>
+      AssignmentStmt(
+        VarAssignment("x"),
+        AddExpression(VarExpression("x"), IntValue(-1))
+      )
+    )
   )
 
   def abs = Procedure(
-    "ABS",                             // name
+    "ABS", // name
     List(ParameterByValue("x", IntegerType)), // formal arguments
-    Some(IntegerType),                 // return type
-    List(),                            // local constants
-    List(),                            // local variables
+    Some(IntegerType), // return type
+    List(), // local constants
+    List(), // local variables
 
     //
     // this is the procedure body
     // if(x < 0) return -1 * x
     // else      return x
     //
-    IfElseStmt(LTExpression(VarExpression("x"), IntValue(0)),
+    IfElseStmt(
+      LTExpression(VarExpression("x"), IntValue(0)),
       ReturnStmt(MultExpression(IntValue(-1), VarExpression("x"))),
-      Some(ReturnStmt(VarExpression("x"))))
+      Some(ReturnStmt(VarExpression("x")))
+    )
   )
 
   def odd = Procedure(
@@ -87,21 +139,36 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(BooleanType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(BoolValue((env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            BoolValue(
+              (env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0
+            )
+          )
+        )
+      )
     )
   )
 
   def ceil = Procedure(
-    "CEIL",                         // name
+    "CEIL", // name
     List(ParameterByValue("x", RealType)), // formal arguments
-    Some(IntegerType),                 // return type
-    List(),                         // local constants
-    List(),                         // local variables
+    Some(IntegerType), // return type
+    List(), // local constants
+    List(), // local variables
 
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup("x").get.asInstanceOf[RealValue].value.ceil.toInt))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            IntValue(
+              env.lookup("x").get.asInstanceOf[RealValue].value.ceil.toInt
+            )
+          )
+        )
+      )
     )
   )
 
@@ -111,9 +178,23 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(IntegerType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.floor.toInt)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            IntValue(
+              env
+                .lookup(name = "x")
+                .get
+                .asInstanceOf[RealValue]
+                .value
+                .floor
+                .toInt
+            )
+          )
+        )
+      )
+    )
   )
 
   def round = Procedure(
@@ -122,9 +203,23 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(IntegerType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(IntValue(env.lookup(name = "x").get.asInstanceOf[RealValue].value.round.toInt)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            IntValue(
+              env
+                .lookup(name = "x")
+                .get
+                .asInstanceOf[RealValue]
+                .value
+                .round
+                .toInt
+            )
+          )
+        )
+      )
+    )
   )
 
   def intToFloat = Procedure(
@@ -133,9 +228,17 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(RealType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(env.lookup(name = "x").get.asInstanceOf[IntValue].value.toFloat)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            RealValue(
+              env.lookup(name = "x").get.asInstanceOf[IntValue].value.toFloat
+            )
+          )
+        )
+      )
+    )
   )
   def power = Procedure(
     "POW",
@@ -143,32 +246,58 @@ class StandardLibrary[T](env: Environment[T]) {
     Some(RealType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(scala.math.pow(env.lookup(name = "x").get.asInstanceOf[RealValue].value, env.lookup(name = "y").get.asInstanceOf[RealValue].value)))))
-    ))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            RealValue(
+              scala.math.pow(
+                env.lookup(name = "x").get.asInstanceOf[RealValue].value,
+                env.lookup(name = "y").get.asInstanceOf[RealValue].value
+              )
+            )
+          )
+        )
+      )
+    )
+  )
   def sqrroot = Procedure(
     "SQR",
     List(ParameterByValue("x", RealType)),
     Some(RealType),
     List(),
     List(),
-
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(RealValue(scala.math.sqrt(env.lookup(name = "x").get.asInstanceOf[RealValue].value)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            RealValue(
+              scala.math.sqrt(
+                env.lookup(name = "x").get.asInstanceOf[RealValue].value
+              )
+            )
+          )
+        )
+      )
     )
   )
 
-
-
   def readFile = Procedure(
     "READFILE",
-    List(ParameterByValue("x",StringType)),
+    List(ParameterByValue("x", StringType)),
     Some(StringType),
     List(),
     List(),
     SequenceStmt(
-      List(MetaStmt(() => ReturnStmt(StringValue(readf(env.lookup(name = "x").get.asInstanceOf[StringValue].value)))))
+      List(
+        MetaStmt(() =>
+          ReturnStmt(
+            StringValue(
+              readf(env.lookup(name = "x").get.asInstanceOf[StringValue].value)
+            )
+          )
+        )
+      )
     )
   )
 
@@ -183,24 +312,37 @@ class StandardLibrary[T](env: Environment[T]) {
   //      env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value.getBytes(StandardCharsets.UTF_8)).toString)))
   //  )
 
-  def writeF (path:String, content:String) : String={
+  def writeF(path: String, content: String): String = {
 
     var file = new FileOutputStream(path)
 
-    if (file  != null) file.close()
+    if (file != null) file.close()
 
-    Files.write(Paths.get(path),
-      content.getBytes(StandardCharsets.UTF_8)).toString
+    Files
+      .write(Paths.get(path), content.getBytes(StandardCharsets.UTF_8))
+      .toString
   }
 
   def writeFile = Procedure(
-    "WRITEFILE",                       // name
-    List(ParameterByValue("PATH", StringType), ParameterByValue("CONTENT", StringType)), // arguments
-    Some(StringType),                  // return the File Path
-    List(),                            // local constants
-    List(),                            // local variables
+    "WRITEFILE", // name
+    List(
+      ParameterByValue("PATH", StringType),
+      ParameterByValue("CONTENT", StringType)
+    ), // arguments
+    Some(StringType), // return the File Path
+    List(), // local constants
+    List(), // local variables
 
-    MetaStmt(() => ReturnStmt(StringValue(this.writeF(env.lookup(name = "PATH").get.asInstanceOf[StringValue].value, env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value))))
+    MetaStmt(() =>
+      ReturnStmt(
+        StringValue(
+          this.writeF(
+            env.lookup(name = "PATH").get.asInstanceOf[StringValue].value,
+            env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value
+          )
+        )
+      )
+    )
   )
 
   /*def appendF (path:String, content:String) : String={
@@ -212,24 +354,37 @@ class StandardLibrary[T](env: Environment[T]) {
     File(path).appendAll(content).toString
   }*/
 
-  def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-    try { f(param) } finally { import scala.language.reflectiveCalls; param.close() }
+  def using[A <: { def close(): Unit }, B](param: A)(f: A => B): B =
+    try { f(param) }
+    finally { import scala.language.reflectiveCalls; param.close() }
 
-  def appendF(path:String, content:String) =
-    using (new FileWriter(path, true)){
-      fileWriter => using (new PrintWriter(fileWriter)) {
-        printWriter => printWriter.println(content).toString
+  def appendF(path: String, content: String) =
+    using(new FileWriter(path, true)) { fileWriter =>
+      using(new PrintWriter(fileWriter)) { printWriter =>
+        printWriter.println(content).toString
       }
     }
 
   def appendFile = Procedure(
-    "APPENDFILE",                       // name
-    List(ParameterByValue("PATH", StringType), ParameterByValue("CONTENT", StringType)), // arguments
-    Some(StringType),                  // return the File Path
-    List(),                            // local constants
-    List(),                            // local variables
+    "APPENDFILE", // name
+    List(
+      ParameterByValue("PATH", StringType),
+      ParameterByValue("CONTENT", StringType)
+    ), // arguments
+    Some(StringType), // return the File Path
+    List(), // local constants
+    List(), // local variables
 
-    MetaStmt(() => ReturnStmt(StringValue(appendF(env.lookup(name = "PATH").get.asInstanceOf[StringValue].value, env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value))))
+    MetaStmt(() =>
+      ReturnStmt(
+        StringValue(
+          appendF(
+            env.lookup(name = "PATH").get.asInstanceOf[StringValue].value,
+            env.lookup(name = "CONTENT").get.asInstanceOf[StringValue].value
+          )
+        )
+      )
+    )
   )
 
 }
