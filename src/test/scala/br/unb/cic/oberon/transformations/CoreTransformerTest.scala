@@ -67,9 +67,9 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(6)))
-    assert(interpreter.env.lookup("factorial") == Some(IntValue(120)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(6)))
+    assert(result.lookup("factorial") == Some(IntValue(120)))
   }
 
   test("Testing the loop_stmt02 expressions after conversion to While") {
@@ -135,10 +135,10 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment
-    coreModule.accept(interpreter)
-    assert(interpreter.env.lookup("x") == Some(IntValue(10)))
-    assert(interpreter.env.lookup("i") == Some(IntValue(10)))
-    assert(interpreter.env.lookup("y") == Some(IntValue(100)))
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("x") == Some(IntValue(10)))
+    assert(result.lookup("i") == Some(IntValue(10)))
+    assert(result.lookup("y") == Some(IntValue(100)))
   }
 
   test("Testing the loop_stmt03 expressions after conversion to While") {
@@ -227,11 +227,11 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "RepeatUntilModule");
-    assert(interpreter.env.lookup("x").contains(IntValue(11)));
-    assert(interpreter.env.lookup("sum").contains(IntValue(55)));
+    assert(result.lookup("x").contains(IntValue(11)));
+    assert(result.lookup("sum").contains(IntValue(55)));
   }
 
   test("Testing the RepeatUntilStmt01 expressions after conversion to While") {
@@ -307,11 +307,11 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(coreModule.name == "RepeatUntilModule")
-    assert(interpreter.env.lookup("sum") == Some(IntValue(330)));
-    assert(interpreter.env.lookup("x") == Some(IntValue(21)));
+    assert(result.lookup("sum") == Some(IntValue(330)));
+    assert(result.lookup("x") == Some(IntValue(21)));
 
   }
 
@@ -334,11 +334,11 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "RepeatUntilModule");
-    assert(interpreter.env.lookup("x").contains(IntValue(11)))
-    assert(interpreter.env.lookup("y").contains(IntValue(40)))
+    assert(result.lookup("x").contains(IntValue(11)))
+    assert(result.lookup("y").contains(IntValue(40)))
   }
 
   test("Testing the RepeatUntilStmt06 expressions after conversion to While") {
@@ -413,11 +413,11 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "RepeatUntilModule");
-    assert(interpreter.env.lookup("x").contains(IntValue(3)));
-    assert(interpreter.env.lookup("y").contains(IntValue(3)));
+    assert(result.lookup("x").contains(IntValue(3)));
+    assert(result.lookup("y").contains(IntValue(3)));
   }
 
   test("Testing the RepeatUntilStmt07 expressions after conversion to While") {
@@ -479,12 +479,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "RepeatUntilModule");
 
-    assert(interpreter.env.lookup("x").contains(IntValue(10)));
-    assert(interpreter.env.lookup("y").contains(IntValue(19)));
+    assert(result.lookup("x").contains(IntValue(10)));
+    assert(result.lookup("y").contains(IntValue(19)));
   }
 
   test("Testing the repeatuntil02 expressions after conversion to While") {
@@ -562,12 +562,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "RepeatUntilModule");
 
-    assert(interpreter.env.lookup("x").contains(IntValue(2)));
-    assert(interpreter.env.lookup("y").contains(IntValue(2)));
+    assert(result.lookup("x").contains(IntValue(2)));
+    assert(result.lookup("y").contains(IntValue(2)));
   }
 
   test("Testing the repeatuntil04 expressions after conversion to While") {
@@ -667,15 +667,13 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(5))) // FOR TO x
-    assert(
-      interpreter.env.lookup("y") == Some(IntValue(6))
-    ) // y = x + 1 (after last FOR)
-    assert(interpreter.env.lookup("z") == Some(IntValue(15))) // z = result
+    assert(result.lookup("x") == Some(IntValue(5))) // FOR TO x
+    assert(result.lookup("y") == Some(IntValue(6))) // y = x + 1 (after last FOR)
+    assert(result.lookup("z") == Some(IntValue(15))) // z = result
   }
 
   test("Testing the interpreter_stmt01 expressions after conversion to While") {
@@ -737,12 +735,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(10))) // FOR TO x
-    assert(interpreter.env.lookup("k") == Some(IntValue(18))) // k = result
+    assert(result.lookup("x") == Some(IntValue(10))) // FOR TO x
+    assert(result.lookup("k") == Some(IntValue(18))) // k = result
   }
 
   test("Testing the stmtForCore01 expressions after conversion to While") {
@@ -817,12 +815,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(1)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(1)));
+    assert(result.lookup("x") == Some(IntValue(1)));
+    assert(result.lookup("y") == Some(IntValue(1)));
   }
 
   test("Testing the IfElseIfStmt01 expressions after conversion to IfElse") {
@@ -879,11 +877,11 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(2)));
+    assert(result.lookup("y") == Some(IntValue(2)));
   }
 
   test("Testing the IfElseIfStmt03 evaluation after conversion to OberonCore") {
@@ -900,12 +898,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(10)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
+    assert(result.lookup("x") == Some(IntValue(10)));
+    assert(result.lookup("y") == Some(IntValue(3)));
   }
 
   test("Testing the IfElseIfStmt03 expressions after conversion to IfElse") {
@@ -962,12 +960,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("x") == Some(IntValue(55)));
-    assert(interpreter.env.lookup("y") == Some(IntValue(5)));
+    assert(result.lookup("x") == Some(IntValue(55)));
+    assert(result.lookup("y") == Some(IntValue(5)));
   }
 
   test("Testing the IfElseIfStmt05 expressions after conversion to IfElse") {
@@ -1036,12 +1034,12 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
 
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("y") == Some(IntValue(3)));
-    assert(interpreter.env.lookup("x") == Some(IntValue(0)));
+    assert(result.lookup("y") == Some(IntValue(3)));
+    assert(result.lookup("x") == Some(IntValue(0)));
   }
 
   test("Testing the IfElseIfStmt08 expressions after conversion to IfElse") {
@@ -1101,10 +1099,10 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("xs") == Some(IntValue(0)));
+    assert(result.lookup("xs") == Some(IntValue(0)));
   }
 
   test("Testing the StmtCaseCore01 expressions after conversion to IfElse") {
@@ -1173,10 +1171,10 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(module.name == "SimpleModule")
 
-    assert(interpreter.env.lookup("xs") == Some(IntValue(10)));
+    assert(result.lookup("xs") == Some(IntValue(10)));
   }
 
   test("Testing the StmtCaseCore02 expressions after conversion to IfElse") {
@@ -1245,10 +1243,10 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(module.name == "SimpleRangeCaseModule")
 
-    assert(interpreter.env.lookup("xs") == Some(IntValue(5)));
+    assert(result.lookup("xs") == Some(IntValue(5)));
   }
 
   test("Testing the StmtCaseCore03 expressions after conversion to IfElse") {
@@ -1316,10 +1314,10 @@ class CoreTransformerTest extends AbstractTestSuite {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    coreModule.accept(interpreter)
+    val result = interpreter.runInterpreter(coreModule)
     assert(module.name == "SimpleRangeCaseModule")
 
-    assert(interpreter.env.lookup("xs") == Some(IntValue(20)));
+    assert(result.lookup("xs") == Some(IntValue(20)));
   }
 
   test("Testing the StmtCaseCore04 expressions after conversion to IfElse") {

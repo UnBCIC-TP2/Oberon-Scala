@@ -175,7 +175,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
 class TypeChecker extends OberonVisitorAdapter {
   type T = List[(Statement, String)]
 
-  val env = new Environment[Type]()
+  var env = new Environment[Type]()
   val expVisitor = new ExpressionTypeVisitor(this)
 
   override def visit(module: OberonModule): List[(Statement, String)] = {

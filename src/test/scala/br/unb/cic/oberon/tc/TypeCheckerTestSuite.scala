@@ -27,7 +27,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val read01 = ReadIntStmt("x")
     val read02 = ReadIntStmt("y")
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     assert(read01.accept(visitor) == List())
     assert(read02.accept(visitor).size == 1)
@@ -38,7 +38,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val read01 = ReadRealStmt("x")
     val read02 = ReadRealStmt("y")
 
-    visitor.env.setGlobalVariable("x", RealType)
+    visitor.env = visitor.env.setGlobalVariable("x", RealType)
 
     assert(read01.accept(visitor) == List())
     assert(read02.accept(visitor).size == 1)
@@ -62,7 +62,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       AddExpression(IntValue(5), BoolValue(false))
     ) // invalid stmt
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor).size == 1)
@@ -80,7 +80,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt04 = WriteStmt(VarExpression("x"))
     val stmt05 = WriteStmt(VarExpression("y"))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     assert(stmt01.accept(visitor) == List())
     assert(stmt02.accept(visitor).size == 1)
@@ -97,7 +97,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = IfElseStmt(IntValue(10), stmt01, None)
     assert(stmt01.accept(visitor) == List())
@@ -131,8 +131,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
 
@@ -146,8 +146,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(20))
     val stmt02 = AssignmentStmt("z", IntValue(30))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("z", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("z", IntegerType)
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
@@ -166,8 +166,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("z", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("z", IntegerType)
 
     val stmt03 = ElseIfStmt(IntValue(70), stmt02)
     val list1 = List(stmt03)
@@ -188,8 +188,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("z", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("z", IntegerType)
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val stmt04 = ElseIfStmt(IntValue(73), stmt02)
@@ -211,7 +211,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
@@ -231,8 +231,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt02 = AssignmentStmt("z", IntValue(100))
     val stmt03 = AssignmentStmt("w", IntValue(20))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("z", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("z", IntegerType)
 
     val stmt04 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt04)
@@ -275,8 +275,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(15))
     val stmt02 = AssignmentStmt("y", IntValue(5))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = ElseIfStmt(BoolValue(true), stmt02)
     val list1 = List(stmt03)
@@ -295,7 +295,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(IntValue(10), stmt01)
     assert(stmt01.accept(visitor) == List())
@@ -315,7 +315,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
     assert(stmt01.accept(visitor).size == 0)
@@ -327,7 +327,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(10))
 
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
@@ -342,8 +342,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, IntValue(10), stmt02)
@@ -358,7 +358,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(100))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
@@ -373,8 +373,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(0))
     val stmt02 = AssignmentStmt("y", IntValue(10))
 
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
@@ -391,8 +391,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -431,8 +431,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -471,8 +471,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -511,8 +511,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -551,8 +551,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -621,7 +621,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -654,7 +654,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
-    visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
@@ -686,8 +686,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt01 = AssignmentStmt("x", IntValue(10))
     val stmt02 = AssignmentStmt("y", IntValue(15))
-    visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.setGlobalVariable("y", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
     val caseElse = AssignmentStmt("x", IntValue(20))
 
