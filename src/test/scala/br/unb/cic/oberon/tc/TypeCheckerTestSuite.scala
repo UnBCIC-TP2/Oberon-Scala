@@ -29,8 +29,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(read01.accept(visitor) == List())
-    assert(read02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(read01) == List())
+    assert(visitor.checkStmt(read02).size == 1)
   }
 
   test("Test read real statement type checker") {
@@ -40,8 +40,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env = visitor.env.setGlobalVariable("x", RealType)
 
-    assert(read01.accept(visitor) == List())
-    assert(read02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(read01) == List())
+    assert(visitor.checkStmt(read02).size == 1)
   }
 
   test("Test write statement type checker") {
@@ -49,8 +49,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val write01 = WriteStmt(IntValue(5))
     val write02 = WriteStmt(AddExpression(IntValue(5), BoolValue(false)))
 
-    assert(write01.accept(visitor) == List())
-    assert(write02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(write01) == List())
+    assert(visitor.checkStmt(write02).size == 1)
   }
 
   test("Test assignment statement type checker") {
@@ -64,9 +64,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 1)
   }
 
   test("Test a sequence of statements type checker") {
@@ -82,15 +82,15 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 1)
 
     val seq1 = SequenceStmt(List(stmt01, stmt04))
     val seq2 = SequenceStmt(List(stmt01, stmt05))
 
-    assert(seq1.accept(visitor).size == 0)
-    assert(seq2.accept(visitor).size == 1)
+    assert(visitor.checkStmt(seq1).size == 0)
+    assert(visitor.checkStmt(seq2).size == 1)
   }
 
   test("Test if-else statement type checker (with invalid condition)") {
@@ -100,8 +100,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = IfElseStmt(IntValue(10), stmt01, None)
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02).size == 1)
   }
 
   test("Test if-else statement type checker (with invalid then-stmt)") {
@@ -109,8 +109,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
     val stmt02 = IfElseStmt(BoolValue(true), stmt01, None)
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
   }
 
   test(
@@ -121,9 +121,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt02 = AssignmentStmt("y", IntValue(10))
     val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
 
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 2)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 2)
   }
 
   test("Test if-else statement type checker") {
@@ -136,9 +136,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt03.accept(visitor).size == 0)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt03).size == 0)
   }
 
   test("Test if-else-if statment type checker (invalid condition 'if')") {
@@ -156,9 +156,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(IntValue(34), stmt01, list1, None)
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt04.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt04).size == 1)
   }
 
   test("Test else-if statment type checker (invalid condition 'else-if')") {
@@ -176,9 +176,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt04.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt04).size == 1)
   }
 
   test(
@@ -201,9 +201,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt07.accept(visitor).size == 2)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt07).size == 2)
   }
 
   test("Test else-if statment type checker (invalid then-stmt 'else-if')") {
@@ -220,9 +220,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt04.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt04).size == 1)
   }
 
   test("Test if-else-if statment type checker (invalid else-stmt)") {
@@ -241,10 +241,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt03.accept(visitor).size == 1)
-    assert(stmt05.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt05).size == 1)
   }
 
   test(
@@ -264,10 +264,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
     )
 
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 1)
-    assert(stmt07.accept(visitor).size == 7)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt07).size == 7)
   }
 
   test("Test if-else-if statment type checker") {
@@ -285,9 +285,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt04.accept(visitor).size == 0)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt04).size == 0)
 
   }
 
@@ -298,8 +298,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(IntValue(10), stmt01)
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02).size == 1)
   }
 
   test("Test while statement type checker (with invalid stmt)") {
@@ -307,8 +307,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
   }
 
   test("Test while statement type checker") {
@@ -318,8 +318,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
   }
 
   test("Test for statement type checker (with invalid init)") {
@@ -332,9 +332,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt03.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt03).size == 1)
   }
 
   test("Test for statement type checker (with invalid condition)") {
@@ -348,9 +348,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, IntValue(10), stmt02)
     )
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt03.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt03).size == 1)
   }
 
   test("Test for statement type checker (with invalid stmt)") {
@@ -363,9 +363,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 1)
   }
 
   test("Test for statement type checker") {
@@ -379,9 +379,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(stmt01.accept(visitor).size == 0)
-    assert(stmt02.accept(visitor).size == 0)
-    assert(stmt03.accept(visitor).size == 0)
+    assert(visitor.checkStmt(stmt01).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt03).size == 0)
   }
 
   test(
@@ -418,10 +418,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 1)
   }
 
   test(
@@ -458,10 +458,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 1)
   }
 
   test(
@@ -498,10 +498,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 2)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 2)
   }
 
   test(
@@ -538,10 +538,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 2)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 2)
   }
 
   test(
@@ -578,10 +578,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 1)
   }
 
   ignore("Test switch-case statement type checker SimpleCase (Boolean cases)") {
@@ -610,9 +610,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore) == List())
   }
 
   test(
@@ -643,9 +643,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 1)
   }
 
   test(
@@ -676,9 +676,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor).size == 2)
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore).size == 2)
   }
 
   test("Test switch-case statement type checker RangeCase") {
@@ -713,10 +713,10 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(stmt02.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(stmt02) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore) == List())
   }
 
   test("Test switch-case statement type checker SimpleCase") {
@@ -745,9 +745,9 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(caseElse.accept(visitor) == List())
-    assert(testModuleCore.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(caseElse) == List())
+    assert(visitor.checkModule(testModuleCore) == List())
   }
 
   /*
@@ -774,8 +774,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(repeatStmt.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(repeatStmt) == List())
   }
 
   test("Test the type checker of a valid Repeat statement 2") {
@@ -788,8 +788,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(repeatStmt.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(repeatStmt) == List())
   }
 
   test("Test the type checker of a valid Repeat statement 3") {
@@ -800,8 +800,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       RepeatUntilStmt(BoolValue(true), stmt01)
     )
 
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
   }
 
   test("Test a invalid Repeat statement in the type checker") {
@@ -816,12 +816,12 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       RepeatUntilStmt(BoolValue(true), stmt05)
     )
 
-    assert(stmt01.accept(visitor).size == 1)
-    assert(stmt02.accept(visitor).size == 1)
-    assert(stmt03.accept(visitor).size == 2)
-    assert(stmt04.accept(visitor).size == 1)
-    assert(stmt05.accept(visitor).size == 5)
-    assert(stmt06.accept(visitor).size == 5)
+    assert(visitor.checkStmt(stmt01).size == 1)
+    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt03).size == 2)
+    assert(visitor.checkStmt(stmt04).size == 1)
+    assert(visitor.checkStmt(stmt05).size == 5)
+    assert(visitor.checkStmt(stmt06).size == 5)
   }
 
   test("Test the type checker of a valid Repeat statement 4") {
@@ -837,8 +837,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt01.accept(visitor) == List())
-    assert(repeatStmt.accept(visitor) == List())
+    assert(visitor.checkStmt(stmt01) == List())
+    assert(visitor.checkStmt(repeatStmt) == List())
 
   }
 
@@ -864,7 +864,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
     allStmts.foreach(stmt => {
-      assert(stmt.accept(visitor).size == 0)
+      assert(visitor.checkStmt(stmt).size == 0)
     })
   }
 
@@ -888,7 +888,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
     allStmts.foreach(stmt => {
-      assert(stmt.accept(visitor).size == 1)
+      assert(visitor.checkStmt(stmt).size == 1)
     })
   }
 
@@ -902,7 +902,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("flag", BooleanType)
 
-    assert(repeatStmt.accept(visitor).size == 0)
+    assert(visitor.checkStmt(repeatStmt).size == 0)
 
   }
 
@@ -917,7 +917,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(stmt02.accept(visitor).size == 0)
+    assert(visitor.checkStmt(stmt02).size == 0)
   }
 
   test("Test a invalid Repeat statement, with a sequence of statements") {
@@ -929,7 +929,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     )
     val stmt02 = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
-    assert(stmt02.accept(visitor).size == 4)
+    assert(visitor.checkStmt(stmt02).size == 4)
   }
 
   test("Test a loop statement, from loop_stmt03") {
@@ -946,7 +946,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val visitor = new TypeChecker()
 
-    val errors = visitor.visit(CoreTransformer.reduceOberonModule(module))
+    val errors = visitor.checkModule(CoreTransformer.reduceOberonModule(module))
 
     assert(errors.size == 0)
   }
@@ -954,7 +954,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
   test("Test assignment to pointer value") {
     val module = ScalaParser.parseResource("stmts/tc_PointerAccessStmt.oberon")
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
 
     assert(errors.size == 0)
   }
@@ -962,7 +962,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
   test("Test arithmetic operation with pointers") {
     val module = ScalaParser.parseResource("stmts/tc_PointerOperation.oberon")
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
 
     assert(errors.size == 0)
   }
@@ -971,7 +971,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val module =
       ScalaParser.parseResource("stmts/tc_PointerAssignmentWrong.oberon")
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
 
     val erro1 = (
       AssignmentStmt("x", VarExpression("p")),
@@ -990,7 +990,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val module =
       ScalaParser.parseResource("stmts/tc_PointerOperationWrong.oberon")
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
 
     val erro1 = (
       AssignmentStmt(
@@ -1007,7 +1007,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
   test("Test assignment of NullValue to pointer") {
     val module = ScalaParser.parseResource("stmts/tc_PointerNull.oberon")
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
 
     assert(errors.size == 0)
   }
@@ -1018,7 +1018,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1029,7 +1029,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1040,7 +1040,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), BoolValue(false)))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1056,7 +1056,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
         )
       )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.isEmpty)
   }
@@ -1072,7 +1072,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
         )
       )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.isEmpty)
   }
@@ -1092,7 +1092,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt = WriteStmt(FunctionCallExpression("proc", Nil))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1123,7 +1123,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", List(IntValue(5), BoolValue(true)))
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1145,7 +1145,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", List(IntValue(5)))
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1169,7 +1169,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", Nil)
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1200,7 +1200,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", List(IntValue(5), IntValue(0)))
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1231,7 +1231,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", List(IntValue(0)))
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1262,7 +1262,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       FunctionCallExpression("proc", List(IntValue(5), VarExpression("404")))
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1303,7 +1303,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmts = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
 
-    val typeCheckerErrors = stmts.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmts)
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1313,7 +1313,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1324,7 +1324,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env.setGlobalVariable("b", IntegerType)
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1335,7 +1335,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env.setGlobalVariable("b", PointerType(UndefinedType))
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1346,7 +1346,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     visitor.env.setGlobalVariable("b", PointerType(IntegerType))
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1360,7 +1360,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       CharValue('a')
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1374,7 +1374,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       CharValue('a')
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1387,7 +1387,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       CharValue('a')
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1401,7 +1401,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       CharValue('a')
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1415,7 +1415,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       CharValue('a')
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1432,7 +1432,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       StringValue("teste")
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1449,7 +1449,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IntValue(8)
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1468,7 +1468,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       RealValue(3.0)
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1493,7 +1493,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       RealValue(3.0)
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1518,7 +1518,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       IntValue(3)
     )
 
-    val typeCheckerErrors = stmt.accept(visitor)
+    val typeCheckerErrors = visitor.checkStmt(stmt)
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1529,7 +1529,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val visitor = new TypeChecker()
 
-    assert(module.accept(visitor) == List())
+    assert(visitor.checkModule(module) == List())
   }
 
   test("Type checking expressions with user defined types") {
@@ -1550,9 +1550,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
       ReferenceToUserDefinedType("MediaArray")
     )
 
-    assert(simpleAssignment.accept(visitor) == List())
-
-    assert(arrayAssigment.accept(visitor) == List())
+    assert(visitor.checkStmt(simpleAssignment) == List())
+    assert(visitor.checkStmt(arrayAssigment) == List())
   }
 
   test("Type checker for the new stmt") {
@@ -1564,7 +1563,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val visitor = new TypeChecker()
 
-    val res = module.accept(visitor)
+    val res = visitor.checkModule(module)
 
     assert(res.isEmpty)
 
@@ -1578,24 +1577,22 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
     val visitor = new TypeChecker()
 
-    val res = module.accept(visitor)
+    val res = visitor.checkModule(module)
 
     assert(res.isEmpty)
   }
 
   test("Test valid lambda expression assignment") {
     val visitor = new TypeChecker()
-    val module =
-      ScalaParser.parseResource("lambda/lambdaExpressionsTC01.oberon")
-    val res = module.accept(visitor)
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC01.oberon")
+    val res = visitor.checkModule(module)
     assert(res.isEmpty)
   }
 
   test("Test lambda expression assignment with wrong number of arguments.") {
     val visitor = new TypeChecker()
-    val module =
-      ScalaParser.parseResource("lambda/lambdaExpressionsTC02.oberon")
-    val res = module.accept(visitor)
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC02.oberon")
+    val res = visitor.checkModule(module)
 
     assert(res.size == 1)
     val msg = res(0)._2
@@ -1604,9 +1601,8 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
   test("Test lambda expression assignment with argument of wrong type.") {
     val visitor = new TypeChecker()
-    val module =
-      ScalaParser.parseResource("lambda/lambdaExpressionsTC03.oberon")
-    val res = module.accept(visitor)
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsTC03.oberon")
+    val res = visitor.checkModule(module)
 
     assert(res.size == 1)
     val msg = res(0)._2
@@ -1617,7 +1613,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val module =
       ScalaParser.parseResource("lambda/lambdaExpressionsTC04.oberon")
-    val res = module.accept(visitor)
+    val res = visitor.checkModule(module)
     assert(res.size == 1)
     val msg = res(0)._2
     assert(msg.contains("is ill typed"))
@@ -1627,15 +1623,14 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     val visitor = new TypeChecker()
     val module =
       ScalaParser.parseResource("lambda/lambdaExpressionsTC05.oberon")
-    val res = module.accept(visitor)
-    assert(res.isEmpty)
+    assert(visitor.checkModule(module).isEmpty)
   }
 
   test("Test lambda expression assignment with wrong return type.") {
     val visitor = new TypeChecker()
     val module =
       ScalaParser.parseResource("lambda/lambdaExpressionsTC06.oberon")
-    val res = module.accept(visitor)
+    val res = visitor.checkModule(module)
 
     assert(res.size == 1)
     val msg = res.head._2

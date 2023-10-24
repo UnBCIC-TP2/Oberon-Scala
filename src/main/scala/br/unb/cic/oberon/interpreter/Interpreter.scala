@@ -32,33 +32,31 @@ class Interpreter {
 
 
   def setupStandardLibraries(environment: Environment[Expression]): Environment[Expression] = {
-    var envt = environment
+    var temp = environment
     val lib = new StandardLibrary[Expression](environment)
     for(p <- lib.stdlib.procedures) {
-      envt = envt.declareProcedure(p)
+      temp = temp.declareProcedure(p)
     }
-    envt
+    temp
   }
 
 def runInterpreter(module: OberonModule): Environment[Expression] = {
-    var envt = new Environment[Expression]()
-    env = envt
+    env = new Environment[Expression]()
 
     // set up the global declarations
-    val env1 = module.userTypes.foldLeft(envt)((a, b) => execUserDefinedType(a, b))
+    val env1 = module.userTypes.foldLeft(env)((a, b) => execUserDefinedType(a, b))
     val env2 = module.constants.foldLeft(env1)((a, b) => execConstant(a, b))
     val env3 = module.variables.foldLeft(env2)((a, b) => execVariable(a, b))
     val env4 = module.procedures.foldLeft(env3)((a, b) => execProcedure(a, b))
 
-    envt = env4
+    env = env4
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
     if (module.stmt.isDefined) {
-      envt = setupStandardLibraries(envt)
-      envt = execStatement(envt, module.stmt.get)
+      env = setupStandardLibraries(env)
+      env = execStatement(env, module.stmt.get)
     }
-    env = envt
-    envt
+    env
   }
 
   def execConstant(environment : Environment[Expression], constant: Constant): Environment[Expression] = {
@@ -112,40 +110,43 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     stmt match {
       case AssignmentStmt(designator, exp) =>
         designator match {
-          case VarAssignment(name) => environment.setVariable(name, evalExpression(environment, exp))
-          case ArrayAssignment(array, index) => arrayAssignment(environment, array, index, exp)
+          case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp))
+          case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
           case RecordAssignment(_, _) => ???
           case PointerAssignment(_) => ???
         }
+        envt
 
       case SequenceStmt(stmts) =>
         stmts.foreach(s => envt = execStatement(envt, s))
         envt
 
       case ReadRealStmt(name) =>
-        environment.setVariable(name, RealValue(StdIn.readLine().toFloat))
+        envt = envt.setVariable(name, RealValue(StdIn.readLine().toFloat))
+        envt
 
       case ReadIntStmt(name) =>
-        environment.setVariable(name, IntValue(StdIn.readLine().toInt))
+        envt = envt.setVariable(name, IntValue(StdIn.readLine().toInt))
+        envt
 
       case ReadCharStmt(name) =>
-        environment.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
+        envt = envt.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
+        envt
 
       case WriteStmt(exp) =>
-        printStream.println(evalExpression(environment, exp))
+        printStream.println(evalExpression(envt, exp))
         envt
 
       case IfElseStmt(condition, thenStmt, elseStmt) =>
-        if (evalCondition(environment, condition)) execStatement(environment, thenStmt)
-        else if (elseStmt.isDefined) execStatement(environment, elseStmt.get)
+        if (evalCondition(envt, condition)) execStatement(envt, thenStmt)
+        else if (elseStmt.isDefined) execStatement(envt, elseStmt.get)
         else envt
 
       case WhileStmt(condition, whileStmt) =>
-        var envteste = envt
-        while (evalCondition(envteste, condition) && exit == false)
-          envteste = execStatement(envteste, whileStmt)
+        while (evalCondition(envt, condition) && exit == false)
+          envt = execStatement(envt, whileStmt)
         exit = false
-        envteste
+        envt
 
       case ForEachStmt(v, exp, stmt) =>
         val valArray = evalExpression(envt, exp)
@@ -160,7 +161,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
               //               stmts.accept(this)
             })
             envt = envt.pop()
-
           }
 
           case _ => throw new RuntimeException("erro.... melhorar")
@@ -173,8 +173,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case ReturnStmt(exp: Expression) =>
         setReturnExpression(envt, evalExpression(envt, exp))
 
-      //TODO
-      //case MetaStmt(f) => f().accept(this)
+      case MetaStmt(f) => execStatement(envt, f())
 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)

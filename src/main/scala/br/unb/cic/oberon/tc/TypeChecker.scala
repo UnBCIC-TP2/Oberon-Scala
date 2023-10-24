@@ -4,20 +4,19 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
-class ExpressionTypeVisitor(val typeChecker: TypeChecker)
-    extends OberonVisitorAdapter {
+class ExpressionTypeChecker(val typeChecker: TypeChecker) {
   type T = Option[Type]
 
-  override def visit(t: Type): Option[Type] = t match {
+   def checkType(t: Type): Option[Type] = t match {
     case UndefinedType => None
     case _             => typeChecker.env.baseType(t)
   }
 
-  override def visit(exp: Expression): Option[Type] =
-    visitExpression(exp).flatMap(t => typeChecker.env.baseType(t))
+   def checkExpression(exp: Expression): Option[Type] =
+     computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
 
-  def visitExpression(exp: Expression): Option[Type] = exp match {
-    case Brackets(exp)       => exp.accept(this)
+  def computeGeneralExpressionType(exp: Expression): Option[Type] = exp match {
+    case Brackets(exp)       => checkExpression(exp)
     case IntValue(_)         => Some(IntegerType)
     case RealValue(_)        => Some(RealType)
     case CharValue(_)        => Some(CharacterType)
@@ -68,7 +67,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
           return None
         }
 
-        val givenArgumentTypes = args.map(_.accept(this))
+        val givenArgumentTypes = args.map(arg => checkExpression(arg))
         val neededArgumentTypes = procedure.args.map(_.argumentType)
 
         val areArgTypesWrong = givenArgumentTypes
@@ -92,7 +91,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
     case ArrayValue(values, arrayType) =>
       if (
         values.isEmpty || values
-          .forall(v => v.accept(this).get == arrayType.baseType)
+          .forall(v => checkExpression(v).get == arrayType.baseType)
       ) {
         Some(arrayType)
       } else None
@@ -108,7 +107,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
-    (array.accept(this), index.accept(this)) match {
+    (checkExpression(array), checkExpression(index)) match {
       case (Some(ArrayType(_, UndefinedType)), _) =>
         None
       case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
@@ -118,7 +117,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
   }
 
   def fieldAccessCheck(exp: Expression, attributeName: String): T = {
-    exp.accept(this) match {
+    checkExpression(exp) match {
       case Some(ReferenceToUserDefinedType(userTypeName)) => {
         typeChecker.env.lookupUserDefinedType(userTypeName) match {
           case Some(UserDefinedType(_, RecordType(variables))) =>
@@ -139,7 +138,7 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
   def pointerAccessCheck(name: String) = {
     typeChecker.env
       .lookup(name)
-      .flatMap(_.accept(this))
+      .flatMap(t => checkType(t))
       .flatMap({
         case PointerType(varType) => Some(varType)
         case _                    => None
@@ -147,12 +146,11 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
   }
 
   def lambdaExpressionCheck(args: List[FormalArg], exp: Expression): T = {
-    typeChecker.env.push()
+    typeChecker.env = typeChecker.env.push()
     args.foreach(a => typeChecker.env.setLocalVariable(a.name, a.argumentType))
     val argTypes = args.map(a => a.argumentType)
-    val expType = exp.accept(this)
-    typeChecker.env.pop()
-
+    val expType = checkExpression(exp)
+    typeChecker.env = typeChecker.env.pop()
     expType match {
       case None => None
       case _    => Some(LambdaType(argTypes, expType.get))
@@ -165,74 +163,58 @@ class ExpressionTypeVisitor(val typeChecker: TypeChecker)
       expected: List[Type],
       result: Type
   ): Option[Type] = {
-    val t1 = left.accept(this)
-    val t2 = right.accept(this)
+    val t1 = checkExpression(left)
+    val t2 = checkExpression(right)
     if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
     else None
   }
 }
 
-class TypeChecker extends OberonVisitorAdapter {
+class TypeChecker {
   type T = List[(Statement, String)]
 
   var env = new Environment[Type]()
-  val expVisitor = new ExpressionTypeVisitor(this)
+  val expVisitor = new ExpressionTypeChecker(this)
 
-  override def visit(module: OberonModule): List[(Statement, String)] = {
-    module.constants.foreach(c =>
-      env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get)
-    )
-    module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
-    module.procedures.foreach(env.declareProcedure)
-    module.userTypes.foreach(env.addUserDefinedType) // added G04
+   def checkModule(module: OberonModule): List[(Statement, String)] = {
+//    module.constants.foreach(c =>
+//      env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get)
+//    )
+//    module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
+//    module.procedures.foreach(env.declareProcedure)
+//    module.userTypes.foreach(env.addUserDefinedType) // added G04
 
-    var errors = module.procedures.flatMap(p => checkProcedure(p))
+    env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp).get))
+    env = module.variables.foldLeft(env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType))
+    env = module.procedures.foldLeft(env)((acc, p) => acc.declareProcedure(p))
+    env = module.userTypes.foldLeft(env)((acc, t) => acc.addUserDefinedType(t))
 
-    if (module.stmt.isDefined) errors ++ module.stmt.get.accept(this)
+    val errors = module.procedures.flatMap(p => checkProcedure(p))
+
+    if (module.stmt.isDefined) errors ++ checkStmt(module.stmt.get)
     else errors
   }
 
   def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
-    env.push()
-    procedure.args.foreach(a => env.setLocalVariable(a.name, a.argumentType))
-    procedure.constants.foreach(c =>
-      env.setLocalVariable(c.name, c.exp.accept(expVisitor).get)
-    )
-    procedure.variables.foreach(v =>
-      env.setLocalVariable(v.name, v.variableType)
-    )
-    val errors = procedure.stmt.accept(this)
-    env.pop()
+    env = env.push()
+    env = procedure.args.foldLeft(env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType))
+    env = procedure.constants.foldLeft(env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp).get))
+    env = procedure.variables.foldLeft(env)((acc, v) => acc.setLocalVariable(v.name, v.variableType))
+    val errors = checkStmt(procedure.stmt)
+    env = env.pop()
     errors
   }
 
-  def visitForEachStmt(forEachStmt: ForEachStmt): List[(Statement, String)] = {
-    val expType = forEachStmt.exp.accept(expVisitor)
-    val varType = env.lookup(forEachStmt.varName)
-
-    val res = if (expType.isDefined && expType.get.isInstanceOf[ArrayType]) {
-      val arrayBaseType =
-        expType.get.asInstanceOf[ArrayType].baseType.accept(expVisitor)
-      if (arrayBaseType != varType)
-        List((forEachStmt, "invalid types in the foreach statement"))
-      else
-        List()
-    } else {
-      List((forEachStmt, "invalid types in the foreach statement"))
-    }
-    res ++ forEachStmt.stmt.accept(this)
-  }
-
-  override def visit(stmt: Statement) = stmt match {
-    case AssignmentStmt(_, _)    => visitAssignment(stmt)
+   def checkStmt(stmt: Statement): List[(Statement, String)] = stmt match {
+    case AssignmentStmt(_, _)    => checkAssignment(stmt)
     case IfElseStmt(_, _, _)     => visitIfElseStmt(stmt)
     case WhileStmt(_, _)         => visitWhileStmt(stmt)
     case ForEachStmt(v, e, s)    => visitForEachStmt(ForEachStmt(v, e, s))
     case ExitStmt()              => visitExitStmt()
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
-    case SequenceStmt(stmts)     => stmts.flatMap(s => s.accept(this))
+    case SequenceStmt(stmts)     => stmts.flatMap(s => checkStmt(s))
     case ReturnStmt(exp) =>
-      if (exp.accept(expVisitor).isDefined) List()
+      if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
     case ReadLongRealStmt(v) =>
       if (env.lookup(v).isDefined) List()
@@ -253,7 +235,7 @@ class TypeChecker extends OberonVisitorAdapter {
       if (env.lookup(v).isDefined) List()
       else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) =>
-      if (exp.accept(expVisitor).isDefined) List()
+      if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
     case NewStmt(varName) =>
       env.lookup(varName) match {
@@ -263,115 +245,109 @@ class TypeChecker extends OberonVisitorAdapter {
     case _ => throw new RuntimeException("Statement not part of Oberon-Core")
   }
 
-  private def visitAssignment(stmt: Statement) = stmt match {
-    case AssignmentStmt(VarAssignment(v), exp) =>
-      if (env.lookup(v).isDefined) {
-        if (exp.accept(expVisitor).isDefined) {
-          if (env.lookup(v).get != exp.accept(expVisitor).get) {
-            val varType = env.lookup(v).get.accept(expVisitor).get
-            val expType = exp.accept(expVisitor).get
 
-            if (
-              (varType.isInstanceOf[PointerType]) &&
-              (expType == NullType)
-            ) {
-              List()
-            } else if (
-              (varType == IntegerType) &&
-              (expType == BooleanType)
-            ) {
-              List()
-            } else if (
-              (varType == BooleanType) &&
-              (expType == IntegerType)
-            ) {
-              List()
-            } else if (varType.isInstanceOf[LambdaType]) {
-              val expectedType = varType.asInstanceOf[LambdaType]
-              val passedType = expType.asInstanceOf[LambdaType]
+  private def checkAssignment(stmt: Statement): T = stmt match {
+    case AssignmentStmt(VarAssignment(v), exp) => checkVarAssigment(v, exp)
+    case AssignmentStmt(PointerAssignment(p), exp) => checkPointerAssigment(p, exp)
+    case AssignmentStmt(ArrayAssignment(arr, element), exp) => checkArrayAssigment(arr, element, exp)
+    case AssignmentStmt(RecordAssignment(record, field), exp) => checkRecordAssigment(record, field, exp)
+  }
 
-              val expectedArgs = expectedType.argsTypes
-              val passedArgs = passedType.argsTypes
-
-              if (expectedArgs.size != passedArgs.size) {
-                List(
-                  (
-                    stmt,
-                    s"Wrong number of arguments. Expected ${expectedArgs.size}, got ${passedArgs.size}."
-                  )
-                )
-              } else if (expectedType.returnType != passedType.returnType) {
-                List(
-                  (
-                    stmt,
-                    s"Wrong return type. Expected ${expectedType.returnType}, got ${passedType.returnType}."
-                  )
-                )
-              } else {
-                val allTypesMatch = expectedArgs
-                  .zip(passedArgs)
-                  .map(pair => pair._1 == pair._2)
-                  .forall(v => v)
-
-                if (!allTypesMatch) {
-                  List((stmt, "Arguments types do not match type definition."))
-                } else {
-                  List()
-                }
-              }
-            } else {
-              List((stmt, s"Assignment between different types: $v, $exp"))
-            }
-          } else List()
-        } else List((stmt, s"Expression $exp is ill typed"))
-      } else List((stmt, s"Variable $v not declared"))
-    case AssignmentStmt(designator, exp) => {
-      val varType = visitAssignmentAlternative(designator)
-      if (varType.isDefined && varType == exp.accept(expVisitor)) {
-        List()
-      } else List((stmt, s"Expression $exp doesn't match variable type."))
+  private def checkVarAssigment(v: String, exp: Expression): T = {
+    val result = for {
+      varType <- env.lookup(v)
+      expType <- expVisitor.checkExpression(exp)
+    } yield (varType, expType)
+    result match {
+      case Some((PointerType(_), NullType)) => List()
+      case Some((IntegerType, BooleanType)) => List()
+      case Some((BooleanType, IntegerType)) => List()
+      case Some((t1, t2)) if t1 == t2 => List()
+      case Some((t1, t2)) if t1 != t2 => List((AssignmentStmt(VarAssignment(v), exp), s"Assignment between different types: $v, $exp"))
+      case None => if(! env.lookup(v).isDefined) List((AssignmentStmt(VarAssignment(v), exp), s"Variable $v not declared")) else List((AssignmentStmt(VarAssignment(v), exp), s"Expression $exp is ill typed"))
     }
   }
 
-  private def visitAssignmentAlternative(designator: Designator): Option[Type] =
-    designator match {
-      case PointerAssignment(pointerName) =>
-        expVisitor.pointerAccessCheck(pointerName)
-      case VarAssignment(varName) =>
-        env.lookup(varName).flatMap(_.accept(expVisitor))
-      case ArrayAssignment(array, elem) =>
-        expVisitor.arrayElementAccessCheck(array, elem)
-      case RecordAssignment(record, atrib) =>
-        expVisitor.fieldAccessCheck(record, atrib)
+  private def checkPointerAssigment(v: String, exp: Expression): T = {
+    val res = for {
+      pointerType <- expVisitor.pointerAccessCheck(v)
+      expType <- expVisitor.checkExpression(exp)
+    } yield (pointerType, expType)
+    res match {
+      case Some((t1, t2)) if t1 == t2 => List()
+      case Some((t1, t2)) if t1 != t2 => List((AssignmentStmt(PointerAssignment(v), exp), s"Expression $exp doesn't match variable type."))
+      case None => List((AssignmentStmt(PointerAssignment(v), exp), s"Could not compute the types correctly."))
     }
+  }
+
+  private def checkArrayAssigment(arr: Expression, element: Expression, exp: Expression): T = {
+    val res = for {
+      arrType <- expVisitor.checkExpression(arr)
+      elementType <- expVisitor.checkExpression(element)
+      expType <- expVisitor.checkExpression(exp)
+    } yield (arrType, elementType, expType)
+    res match {
+      case Some((t1, IntegerType, t2)) if t1 == t2 => List()
+      case Some((t1, IntegerType, t2)) if t1 != t2 => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Expression $exp doesn't match the array type."))
+      case Some((_, t, _)) if t != IntegerType => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"The index expression must be an integer."))
+      case None => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Could not compute the types correctly."))
+    }
+  }
+
+  private def checkRecordAssigment(record: Expression, field: String, exp: Expression): T = {
+    val res = for {
+      fieldAccessType <- expVisitor.fieldAccessCheck(record, field)
+      expType = expVisitor.checkExpression(exp)
+    } yield (fieldAccessType, expType)
+    res match {
+      case Some((t1, t2)) if t1 == t2 => List()
+      case Some((t1, t2)) if t1 != t2 => List((AssignmentStmt(RecordAssignment(record, field), exp), s"Expression $exp doesn't match variable type."))
+      case None => List((AssignmentStmt(RecordAssignment(record, field), exp), s"Could not compute the types correctly."))
+    }
+  }
+
+
 
   private def visitIfElseStmt(stmt: Statement) = stmt match {
     case IfElseStmt(condition, thenStmt, elseStmt) =>
-      var errorList = thenStmt.accept(this)
-
-      if (!condition.accept(expVisitor).contains(BooleanType)) {
+      var errorList = checkStmt(thenStmt)
+      if (!expVisitor.checkExpression(condition).contains(BooleanType)) {
         errorList = (
           stmt,
           s"Expression $condition does not have a boolean type"
         ) :: errorList
       }
-
-      errorList ++ elseStmt.map(_.accept(this)).getOrElse(List())
+      errorList ++ elseStmt.map(s => checkStmt(s)).getOrElse(List())
   }
 
   private def visitWhileStmt(stmt: Statement) = stmt match {
     case WhileStmt(condition, stmt) =>
-      val errorList = stmt.accept(this)
+      val errorList = checkStmt(stmt)
 
-      if (condition.accept(expVisitor).contains(BooleanType)) {
+      if (expVisitor.checkExpression(condition).contains(BooleanType)) {
         errorList
       } else {
         (stmt, s"Expression $condition do not have a boolean type") :: errorList
       }
   }
 
-  private def visitExitStmt() =
-    List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
+  def visitForEachStmt(forEachStmt: ForEachStmt): List[(Statement, String)] = {
+    val expType = expVisitor.checkExpression(forEachStmt.exp)
+    val varType = env.lookup(forEachStmt.varName)
+
+    val res = if (expType.isDefined && expType.get.isInstanceOf[ArrayType]) {
+      val arrayBaseType =
+        expVisitor.checkType(expType.get.asInstanceOf[ArrayType].baseType)
+      if (arrayBaseType != varType)
+        List((forEachStmt, "invalid types in the foreach statement"))
+      else
+        List()
+    } else {
+      List((forEachStmt, "invalid types in the foreach statement"))
+    }
+    res ++ checkStmt(forEachStmt.stmt)
+  }
+  private def visitExitStmt(): T = List()
 
   /*
    * Type checker for a procedure call. This is the "toughest" implementation
@@ -385,17 +361,17 @@ class TypeChecker extends OberonVisitorAdapter {
    *
    * @return Our error representation (statement + string with the error message)
    */
-  private def procedureCallStmt(stmt: Statement): List[(Statement, String)] =
+  private def procedureCallStmt(stmt: Statement): T =
     stmt match {
       case ProcedureCallStmt(name, args) =>
         val procedure = env.findProcedure(name)
         if (procedure == null)
-          return List((stmt, s"Procedure $name has not been declared."))
+          List((stmt, s"Procedure $name has not been declared."))
         else {
           // check if the type of the formal arguments and the actual arguments
           // match.
           val formalArgumentTypes = procedure.args.map(a => a.argumentType)
-          val actualArgumentTypes = args.map(a => a.accept(expVisitor).get)
+          val actualArgumentTypes = args.map(a => expVisitor.checkExpression(a).get)
           // the two lists must have the same size.
           if (formalArgumentTypes.size != actualArgumentTypes.size) {
             return List(
@@ -412,7 +388,7 @@ class TypeChecker extends OberonVisitorAdapter {
             )
           }
           // if everything above is ok, lets check the procedure body.
-          procedure.stmt.accept(this)
+          checkStmt(stmt)
         }
     }
 }

@@ -118,7 +118,7 @@ object Main extends App {
     val module = ScalaParser.parse(content)
 
     val visitor = new TypeChecker()
-    val errors = visitor.visit(module)
+    val errors = visitor.checkModule(module)
     if (errors.isEmpty) {
       println("The code is correctly typed")
     } else {

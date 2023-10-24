@@ -2,12 +2,12 @@ package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
 import br.unb.cic.oberon.ir.tac._
-import br.unb.cic.oberon.tc.{ExpressionTypeVisitor, TypeChecker}
+import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
 
 object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
   private var tc = new TypeChecker()
-  private var expVisitor = new ExpressionTypeVisitor(tc)
+  private var expVisitor = new ExpressionTypeChecker(tc)
 
   override def generateCode(module: OberonModule): List[TAC] = {
     load_vars(module.variables, module.constants)
@@ -27,7 +27,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t, insts1) = generateExpression(exp, insts)
         designator match {
           case VarAssignment(varName) =>
-            val v = Name(varName, exp.accept(expVisitor).get)
+            val v = Name(varName, expVisitor.checkExpression(exp).get)
             return insts1 :+ CopyOp(t, v, "")
 
           case ArrayAssignment(array, index) =>
@@ -274,14 +274,14 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         return (Constant("Null", NullType), insts)
 
       case VarExpression(name) =>
-        return (Name(name, expr.accept(expVisitor).get), insts)
+        return (Name(name, expVisitor.checkExpression(expr).get), insts)
 
       case AddExpression(left, right) =>
         val (t, l, r, insts2) = generateBinaryExpression(
           left,
           right,
           insts,
-          expr.accept(expVisitor).get
+          expVisitor.checkExpression(expr).get
         )
         return (t, insts2 :+ AddOp(l, r, t, ""))
 
@@ -290,7 +290,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expr.accept(expVisitor).get
+          expVisitor.checkExpression(expr).get
         )
         return (t, insts2 :+ SubOp(l, r, t, ""))
 
@@ -299,7 +299,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expr.accept(expVisitor).get
+          expVisitor.checkExpression(expr).get
         )
         return (t, insts2 :+ MulOp(l, r, t, ""))
 
@@ -308,7 +308,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expr.accept(expVisitor).get
+          expVisitor.checkExpression(expr).get
         )
 
         return (t, insts2 :+ DivOp(l, r, t, ""))
@@ -398,12 +398,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expr.accept(expVisitor).get)
+        val t = new Temporary(expVisitor.checkExpression(expr).get)
         return (t, insts2 :+ ListGet(a, i, t, ""))
 
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expr.accept(expVisitor).get)
+        val t = new Temporary(expVisitor.checkExpression(expr).get)
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(exp, name) =>
@@ -461,13 +461,13 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       vars: List[VariableDeclaration],
       consts: List[ASTConstant] = List()
   ): Unit = {
-    OberonModule("test", Set(), List(), consts, vars, List(), None).accept(tc)
+    tc.checkModule(OberonModule("test", Set(), List(), consts, vars, List(), None))
   }
 
   // somente para testes
   def reset(): Unit = {
     tc = new TypeChecker()
-    expVisitor = new ExpressionTypeVisitor(tc)
+    expVisitor = new ExpressionTypeChecker(tc)
     Temporary.reset
     LabelGenerator.reset
   }
