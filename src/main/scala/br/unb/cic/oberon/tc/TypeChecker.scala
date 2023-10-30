@@ -103,7 +103,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
 
     case PointerAccessExpression(name) => pointerAccessCheck(name)
 
-    case LambdaExpression(args, exp) => lambdaExpressionCheck(args, exp)
+    case LambdaExpression(args, exp) => checkLambdaExpression(args, exp)
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
@@ -145,9 +145,9 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
       })
   }
 
-  def lambdaExpressionCheck(args: List[FormalArg], exp: Expression): T = {
+  def checkLambdaExpression(args: List[FormalArg], exp: Expression): T = {
     typeChecker.env = typeChecker.env.push()
-    args.foreach(a => typeChecker.env.setLocalVariable(a.name, a.argumentType))
+    args.foreach(a => typeChecker.env = typeChecker.env.setLocalVariable(a.name, a.argumentType))
     val argTypes = args.map(a => a.argumentType)
     val expType = checkExpression(exp)
     typeChecker.env = typeChecker.env.pop()
@@ -177,13 +177,6 @@ class TypeChecker {
   val expVisitor = new ExpressionTypeChecker(this)
 
    def checkModule(module: OberonModule): List[(Statement, String)] = {
-//    module.constants.foreach(c =>
-//      env.setGlobalVariable(c.name, c.exp.accept(expVisitor).get)
-//    )
-//    module.variables.foreach(v => env.setGlobalVariable(v.name, v.variableType))
-//    module.procedures.foreach(env.declareProcedure)
-//    module.userTypes.foreach(env.addUserDefinedType) // added G04
-
     env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp).get))
     env = module.variables.foldLeft(env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType))
     env = module.procedures.foldLeft(env)((acc, p) => acc.declareProcedure(p))
@@ -256,8 +249,9 @@ class TypeChecker {
   private def checkVarAssigment(v: String, exp: Expression): T = {
     val result = for {
       varType <- env.lookup(v)
+      varBaseType <- env.baseType(varType)
       expType <- expVisitor.checkExpression(exp)
-    } yield (varType, expType)
+    } yield (varBaseType, expType)
     result match {
       case Some((PointerType(_), NullType)) => List()
       case Some((IntegerType, BooleanType)) => List()
@@ -287,8 +281,8 @@ class TypeChecker {
       expType <- expVisitor.checkExpression(exp)
     } yield (arrType, elementType, expType)
     res match {
-      case Some((t1, IntegerType, t2)) if t1 == t2 => List()
-      case Some((t1, IntegerType, t2)) if t1 != t2 => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Expression $exp doesn't match the array type."))
+      case Some((ArrayType(length, t1), IntegerType, t2)) if t1 == t2 => List()
+      case Some((ArrayType(length, t1), IntegerType, t2)) if t1 != t2 => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Expression $exp doesn't match the array type."))
       case Some((_, t, _)) if t != IntegerType => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"The index expression must be an integer."))
       case None => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Could not compute the types correctly."))
     }

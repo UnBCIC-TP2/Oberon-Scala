@@ -1,14 +1,11 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ir.ast.{
-  Location,
-  Procedure,
-  ReferenceToUserDefinedType,
-  Type,
-  UserDefinedType
-}
+import br.unb.cic.oberon.ir.ast.{Expression, Location, Procedure, ReferenceToUserDefinedType, Statement, Type, UserDefinedType}
+import org.jline.builtins.Completers.CompletionEnvironment
 
 import scala.collection.mutable.{Map, Stack}
+
+case class MetaStmt(f: Environment[Expression] => Statement) extends Statement
 
 /**
  * The environment represents a memory region, which
@@ -138,7 +135,7 @@ class Environment[T](private val top_loc:Int = 0,
     val copyprocedures = procedures.clone() + (procedure.name -> procedure)
     //copyprocedures(procedure.name) = procedure
 
-      new Environment[T](top_loc = this.top_loc,
+    new Environment[T](top_loc = this.top_loc,
         locations = this.locations,
         global = this.global,
         procedures = copyprocedures,
@@ -199,3 +196,4 @@ class Environment[T](private val top_loc:Int = 0,
       else throw new RuntimeException("Variable " + name + " is not defined")
   }
 }
+

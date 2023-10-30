@@ -1,19 +1,18 @@
 package br.unb.cic.oberon.repl
 
 
+import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.ir.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
 import br.unb.cic.oberon.interpreter.Interpreter
-
-
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreTransformer
 import org.jline.console.{CmdDesc, CmdLine, ScriptEngine}
 import org.jline.reader.Completer
 import org.jline.reader.impl.completer.{AggregateCompleter, StringsCompleter}
-import org.jline.reader.Candidate;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
-import org.jline.utils.AttributedString;
+import org.jline.reader.Candidate
+import org.jline.reader.LineReader
+import org.jline.reader.ParsedLine
+import org.jline.utils.AttributedString
 
 import java.lang
 import java.io.File
@@ -31,6 +30,7 @@ class OberonEngine extends ScriptEngine {
   }
 
   val interpreter = new Interpreter
+  var env = new Environment[Expression]
 
   override def getEngineName: String = this.getClass.getSimpleName
   override def getExtensions: java.util.List[String] =
@@ -48,21 +48,21 @@ class OberonEngine extends ScriptEngine {
   }
 
   override def hasVariable(name: String): Boolean =
-    interpreter.env.lookup(name).isDefined
+    env.lookup(name).isDefined
 
   override def put(name: String, value: Object): Unit = {
-    interpreter.env = interpreter.env.setGlobalVariable(name, objectToExpression(value))
+    env = env.setGlobalVariable(name, objectToExpression(value))
   }
 
   override def get(name: String): Object = {
-    val variable = interpreter.env.lookup(name)
+    val variable = env.lookup(name)
     if (variable.isDefined) expressionValue(variable.get).asInstanceOf[Object]
     else null
   }
 
   override def find(name: String): util.Map[String, Object] = {
     if (name == null) {
-      val allVariables = interpreter.env.allVariables()
+      val allVariables = env.allVariables()
       allVariables.map(v => v -> get(v)).toMap.asJava
     } else {
       val filteredVariables = internalFind(name)
@@ -82,7 +82,7 @@ class OberonEngine extends ScriptEngine {
       return
     }
     if (hasVariable(variable)) {
-      interpreter.env=interpreter.env.delVariable(variable)
+      env = env.delVariable(variable)
     }
   }
 
@@ -178,7 +178,7 @@ class OberonEngine extends ScriptEngine {
     )
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
-    interpreter.runInterpreter(coreModule)
+    env =  interpreter.runInterpreter(coreModule)
 
     null
   }
@@ -190,11 +190,11 @@ class OberonEngine extends ScriptEngine {
     val command = ScalaParser.parserREPL(statement)
     command match {
       case v: REPLVarDeclaration =>
-        v.declarations.foldLeft(interpreter.env)((a, b) => interpreter.execVariable(a, b))
+        env = v.declarations.foldLeft(env)((acc, b) => interpreter.declareVariable(acc, b))
       case c: REPLConstant =>
-        interpreter.execConstant(interpreter.env, c.constants)
+        env = interpreter.declareConstant(env, c.constants)
       case u: REPLUserTypeDeclaration =>
-        interpreter.execUserDefinedType(interpreter.env, u.userTypes)
+        env = interpreter.declareUserDefinedType(env, u.userTypes)
       case s: REPLStatement =>
         s.stmt match {
           case AssignmentStmt(des, exp) =>
@@ -206,7 +206,7 @@ class OberonEngine extends ScriptEngine {
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => interpreter.execStatement(interpreter.env, CoreTransformer.reduceToCoreStatement(s))
+          case s: Statement => env = interpreter.executeStatement(env, CoreTransformer.reduceToCoreStatement(s))
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }
@@ -214,7 +214,8 @@ class OberonEngine extends ScriptEngine {
   }
 
   private def expressionValue(exp: Expression): Any = {
-    val result = interpreter.evalExpression(interpreter.env, exp)
+    val (e, result) = interpreter.evalExpression(env, exp)
+    env = e
     result match {
       case v: Value => return v.value
       case _: Undef => return null
@@ -228,7 +229,11 @@ class OberonEngine extends ScriptEngine {
       case s: String => StringValue(s)
       case b: Boolean => BoolValue(b)
       case e: Exception => StringValue(e.getMessage)
-      case e: Expression => interpreter.evalExpression(interpreter.env, e)
+      case e: Expression => {
+        val (env1, exp) = interpreter.evalExpression(env, e)
+        env = env1
+        exp
+      }
       case _ =>
         if (obj != null) println(f"Cannot convert $obj to expression")
         Undef()
@@ -237,8 +242,7 @@ class OberonEngine extends ScriptEngine {
 
   override def execute(closure: Object, args: Object*): Object = ???
 
-  private def internalFind(variable: String): List[String] =
-    interpreter.env.allVariables().filter(v => v.matches(variable)).toList
+  private def internalFind(variable: String): List[String] = env.allVariables().filter(v => v.matches(variable)).toList
 
   def scriptDescription(line: CmdLine): CmdDesc = {
     val out = new CmdDesc

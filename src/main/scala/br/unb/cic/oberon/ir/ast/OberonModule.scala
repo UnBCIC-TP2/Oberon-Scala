@@ -260,7 +260,6 @@ case class CaseStmt(
 ) extends Statement
 case class ExitStmt() extends Statement
 case class NewStmt(varName: String) extends Statement
-case class MetaStmt(f: () => Statement) extends Statement
 
 trait CaseAlternative {
   def accept(v: OberonVisitor): v.T = v.visit(this)

@@ -1,5 +1,6 @@
 package br.unb.cic.oberon.codegen
 
+import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ir.ast._
 import org.objectweb.asm._
@@ -53,10 +54,11 @@ object JVMCodeGenerator extends CodeGenerator[String] {
 
   def generateConstants(constants: List[Constant], cw: ClassWriter): Unit = {
     val interpreter = new Interpreter()
+    val env = new Environment[Expression]()
 
     constants.map {
       case (constant) => 
-        val v = interpreter.evalExpression(interpreter.env, constant.exp)
+        val (_, v) = interpreter.evalExpression(env, constant.exp)
 
       v match {
         case IntValue(value) => {

@@ -1,7 +1,7 @@
 package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ir.ast._
-import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.environment.{Environment, MetaStmt}
 
 import scala.io.Source
 import java.io.{FileOutputStream, FileWriter, PrintWriter}
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable.Map
 
-class StandardLibrary[T](env: Environment[T]) {
+class StandardLibrary[T]() {
 
   def readf(path: String): String = {
     val buffer = Source.fromFile(path)
@@ -56,7 +56,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env: Environment[Expression]) =>
           ReturnStmt(
             IntValue(
               env.lookup(name = "x").get.asInstanceOf[StringValue].value.toInt
@@ -75,7 +75,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             RealValue(
               env.lookup(name = "x").get.asInstanceOf[StringValue].value.toFloat
@@ -92,7 +92,7 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() =>
+    MetaStmt((env) =>
       AssignmentStmt(
         VarAssignment("x"),
         AddExpression(VarExpression("x"), IntValue(1))
@@ -106,7 +106,7 @@ class StandardLibrary[T](env: Environment[T]) {
     None,
     List(),
     List(),
-    MetaStmt(() =>
+    MetaStmt((env) =>
       AssignmentStmt(
         VarAssignment("x"),
         AddExpression(VarExpression("x"), IntValue(-1))
@@ -141,7 +141,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             BoolValue(
               (env.lookup("x").get.asInstanceOf[IntValue].value % 2) != 0
@@ -161,7 +161,7 @@ class StandardLibrary[T](env: Environment[T]) {
 
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             IntValue(
               env.lookup("x").get.asInstanceOf[RealValue].value.ceil.toInt
@@ -180,7 +180,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             IntValue(
               env
@@ -205,7 +205,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             IntValue(
               env
@@ -230,7 +230,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             RealValue(
               env.lookup(name = "x").get.asInstanceOf[IntValue].value.toFloat
@@ -248,7 +248,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             RealValue(
               scala.math.pow(
@@ -269,7 +269,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             RealValue(
               scala.math.sqrt(
@@ -290,7 +290,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(),
     SequenceStmt(
       List(
-        MetaStmt(() =>
+        MetaStmt((env) =>
           ReturnStmt(
             StringValue(
               readf(env.lookup(name = "x").get.asInstanceOf[StringValue].value)
@@ -333,7 +333,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(), // local constants
     List(), // local variables
 
-    MetaStmt(() =>
+    MetaStmt((env) =>
       ReturnStmt(
         StringValue(
           this.writeF(
@@ -375,7 +375,7 @@ class StandardLibrary[T](env: Environment[T]) {
     List(), // local constants
     List(), // local variables
 
-    MetaStmt(() =>
+    MetaStmt((env) =>
       ReturnStmt(
         StringValue(
           appendF(

@@ -524,8 +524,8 @@ class InterpreterTest extends AnyFunSuite {
 
     val result = interpreter.runInterpreter(coreModule)
 
-    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
-    assert(evalArraySubscript(result, "b", 1) == IntValue(10))
+    assert(evalArraySubscript(result, "a", 0)._2 == IntValue(5))
+    assert(evalArraySubscript(result, "b", 1)._2 == IntValue(10))
   }
   
   test("stmt36") {
@@ -537,10 +537,10 @@ class InterpreterTest extends AnyFunSuite {
     assert(coreModule.name == "UserTypeModule")
 
     val result = interpreter.runInterpreter(coreModule)
-    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
-    assert(evalArraySubscript(result, "a", 1) == IntValue(10))
-    assert(evalArraySubscript(result, "b", 0) == IntValue(10))
-    assert(evalArraySubscript(result, "a", 2) == IntValue(25))
+    assert(evalArraySubscript(result, "a", 0)._2 == IntValue(5))
+    assert(evalArraySubscript(result, "a", 1)._2 == IntValue(10))
+    assert(evalArraySubscript(result, "b", 0)._2 == IntValue(10))
+    assert(evalArraySubscript(result, "a", 2)._2 == IntValue(25))
   }
 
   test("stmt37") {
@@ -552,8 +552,8 @@ class InterpreterTest extends AnyFunSuite {
     assert(coreModule.name == "UserTypeModule")
 
     val result = interpreter.runInterpreter(coreModule)
-    assert(evalArraySubscript(result, "a", 0) == IntValue(5))
-    assert(evalArraySubscript(result, "a", 2) == IntValue(25))
+    assert(evalArraySubscript(result, "a", 0)._2 == IntValue(5))
+    assert(evalArraySubscript(result, "a", 2)._2 == IntValue(25))
   }
 
   test("Module A has no imports"){
@@ -619,11 +619,11 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("outroarray").isDefined)
 
 
-    assert(evalArraySubscript(result, "outroarray", 0) == IntValue(1))
-    assert(evalArraySubscript(result, "outroarray", 1) == IntValue(5))
+    assert(evalArraySubscript(result, "outroarray", 0)._2 == IntValue(1))
+    assert(evalArraySubscript(result, "outroarray", 1)._2 == IntValue(5))
 
     for (i <- 0 to 2){
-      assert(evalArraySubscript(result, "array", i) == IntValue(10*(i+1)))
+      assert(evalArraySubscript(result, "array", i)._2 == IntValue(10*(i+1)))
     }
   }
 
@@ -635,9 +635,9 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("i").isDefined)
     assert(result.lookup("arr").isDefined)
 
-    assert(evalArraySubscript(result, "arr", 5) == Undef())
-    assert(evalArraySubscript(result, "arr", 0) == IntValue(1))
-    assert(evalArraySubscript(result, "arr", 9) == IntValue(2))
+    assert(evalArraySubscript(result, "arr", 5)._2 == Undef())
+    assert(evalArraySubscript(result, "arr", 0)._2 == IntValue(1))
+    assert(evalArraySubscript(result, "arr", 9)._2 == IntValue(2))
   }
   
   test("Testing aritmetic37"){
@@ -722,6 +722,6 @@ class InterpreterTest extends AnyFunSuite {
   }
 
 
-  def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): Expression =
+  def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))
 }

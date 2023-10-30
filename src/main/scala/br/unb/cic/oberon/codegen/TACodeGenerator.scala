@@ -240,9 +240,6 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
       case NewStmt(_) =>
         throw new Exception("NewStmt não foi implementado")
-
-      case MetaStmt(_) =>
-        throw new Exception("MetaStmt não foi implementado")
     }
   }
 
