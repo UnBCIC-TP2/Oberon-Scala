@@ -131,7 +131,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         else envt
 
       case WhileStmt(condition, whileStmt) =>
-        while (evalCondition(envt, condition) && exit == false)
+        while (evalCondition(envt, condition) && ! exit)
           envt = executeStatement(envt, whileStmt)
         exit = false
         envt

@@ -291,7 +291,7 @@ class TypeChecker {
   private def checkRecordAssigment(record: Expression, field: String, exp: Expression): T = {
     val res = for {
       fieldAccessType <- expVisitor.fieldAccessCheck(record, field)
-      expType = expVisitor.checkExpression(exp)
+      expType <- expVisitor.checkExpression(exp)
     } yield (fieldAccessType, expType)
     res match {
       case Some((t1, t2)) if t1 == t2 => List()

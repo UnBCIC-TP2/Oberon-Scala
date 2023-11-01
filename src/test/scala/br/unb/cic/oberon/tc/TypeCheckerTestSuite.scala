@@ -1267,8 +1267,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     assert(typeCheckerErrors.length == 1)
   }
 
-  //TODO: (rbonifacio) Integrating the code broke this test case.
-  ignore("Test EAssignment") {
+  test("Test EAssignment") {
     val visitor = new TypeChecker()
     visitor.env = visitor.env.addUserDefinedType(
       UserDefinedType(
