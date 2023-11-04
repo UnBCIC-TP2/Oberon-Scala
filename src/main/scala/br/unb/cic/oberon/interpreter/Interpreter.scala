@@ -278,7 +278,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
     var envt = environment
-    //args.foreach(formal => )
+    args.foreach(formal => declareVariable(envt,VariableDeclaration(formal.name,formal.argumentType)))
     val exp1 = evalExpression(envt,exp)._2
     (envt,exp1)
   }
