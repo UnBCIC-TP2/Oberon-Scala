@@ -189,7 +189,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     env1
   }
 
-
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
       case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
@@ -272,8 +271,16 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
+    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
+  }
+
+  def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
+    var envt = environment
+    //args.foreach(formal => )
+    val exp1 = evalExpression(envt,exp)._2
+    (envt,exp1)
   }
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
