@@ -67,6 +67,13 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
+  
+  def declareParameter(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
+    environment.baseType(variable.variableType) match {
+      case Some(ArrayType(length, baseType)) => environment.setLocalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
+      case _ => environment.setLocalVariable(variable.name, Undef())
+    }
+  }
 
   def declareUserDefinedType(environment : Environment[Expression], userType: UserDefinedType): Environment[Expression] = {
     environment.addUserDefinedType(userType)
@@ -278,9 +285,9 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
     var envt = environment
-    args.foreach(formal => declareVariable(envt,VariableDeclaration(formal.name,formal.argumentType)))
-    val exp1 = evalExpression(envt,exp)._2
-    (envt,exp1)
+    args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
+    val (envt1,exp1) = evalExpression(envt,exp)
+    (envt1,exp1)
   }
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
