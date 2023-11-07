@@ -10,8 +10,11 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
     var args: List[FormalArg] = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType)) //(x:Integer)
-    val exp = LambdaExpression(args,AddExpression(VarExpression("y"),VarExpression("x"))) //x+10
+    val operation = AddExpression(VarExpression("x"),VarExpression("y"))
+    val exp = LambdaExpression(args,operation) //x+10
     val (env1,exp1) = interpreter.evalExpression(env,exp)
-    assert(exp1 == AddExpression(VarExpression("y"),VarExpression("x")))
+    assert(exp1 == IntValue(11))
   }
 }
+// val ex: (x: Integer, y: Integer) => x+y
+//ex(2,3)
