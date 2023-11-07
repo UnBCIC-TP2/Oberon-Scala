@@ -9,10 +9,9 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
   test("Test eval on simple values") {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
-    var args: List[FormalArg] = List(ParameterByValue("x",IntegerType))
-    env = interpreter.setLocalVariable(env,"x", IntValue(0))
-    val exp = LambdaExpression(args,AddExpression(IntValue(10),VarExpression("x")))
+    var args: List[FormalArg] = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType)) //(x:Integer)
+    val exp = LambdaExpression(args,AddExpression(VarExpression("y"),VarExpression("x"))) //x+10
     val (env1,exp1) = interpreter.evalExpression(env,exp)
-    assert(exp1 == IntValue(10))
+    assert(exp1 == AddExpression(VarExpression("y"),VarExpression("x")))
   }
 }
