@@ -73,7 +73,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case Some(ArrayType(length, baseType)) => environment.setLocalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
       case _ => environment.setLocalVariable(variable.name, Undef())
     }
-  }
+  } 
 
   def declareUserDefinedType(environment : Environment[Expression], userType: UserDefinedType): Environment[Expression] = {
     environment.addUserDefinedType(userType)
@@ -278,11 +278,12 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
-    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp)
+    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp, values)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
   }
 
+  
   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
     var envt = environment
     args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
