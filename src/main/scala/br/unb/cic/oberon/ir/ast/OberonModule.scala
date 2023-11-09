@@ -171,17 +171,13 @@ case object NullValue extends Value {
 
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
-case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType)
-    extends Value { type T = ListBuffer[Expression] }
-case class ArraySubscript(arrayBase: Expression, index: Expression)
-    extends Expression
+case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
+case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
-case class FieldAccessExpression(exp: Expression, name: String)
-    extends Expression
+case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class PointerAccessExpression(name: String) extends Expression
 case class VarExpression(name: String) extends Expression
-case class FunctionCallExpression(name: String, args: List[Expression])
-    extends Expression
+case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left: Expression, right: Expression) extends Expression
 case class NEQExpression(left: Expression, right: Expression) extends Expression
 case class GTExpression(left: Expression, right: Expression) extends Expression
@@ -190,17 +186,15 @@ case class GTEExpression(left: Expression, right: Expression) extends Expression
 case class LTEExpression(left: Expression, right: Expression) extends Expression
 case class AddExpression(left: Expression, right: Expression) extends Expression
 case class SubExpression(left: Expression, right: Expression) extends Expression
-case class MultExpression(left: Expression, right: Expression)
-    extends Expression
+case class MultExpression(left: Expression, right: Expression) extends Expression
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
 case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
-case class LambdaExpression(args: List[FormalArg], exp: Expression)
-    extends Value
+case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Value
 
-case class LambdaApp(LambdaExpression: LambdaExpression, exp: List[Expression]) extends Expression
+case class LambdaApplication(LambdaExpression: LambdaExpression, exp: List[Expression]) extends Expression
     //app lamda (exp,exp)
 /* Statements */
 trait Statement {

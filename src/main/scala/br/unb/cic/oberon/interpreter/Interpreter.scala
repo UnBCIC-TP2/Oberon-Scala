@@ -278,11 +278,21 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
-    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp, values)
+    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp)
+    case LamdaApplication(lambdaExp, listExp) => evalLambdaApplication(environment,lambdaExp, listExp)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
   }
 
+  def evalLambdaApplication(environment: Environment[Expression], lambdaExp: LambdaExpression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
+    var envt = environment 
+    val (envt1,exp1) = evalLambdaExpression(envt,exp)
+    listExp.foreach(values => envt = envt.setVariable(variaveis,values)) 
+    args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
+    val (envt1,exp1) = evalExpression(envt,exp)
+    (envt1,exp1)
+    //depois a gente faz isso com mais calma olhando o env
+  }
   
   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
     var envt = environment
