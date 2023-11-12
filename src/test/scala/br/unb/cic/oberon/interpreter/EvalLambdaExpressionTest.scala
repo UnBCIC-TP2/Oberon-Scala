@@ -14,7 +14,9 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     var env = new Environment[Expression]()
     var args: List[FormalArg] = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType)) //(x:Integer)
     val operation = AddExpression(VarExpression("x"),VarExpression("y"))
-    val exp = LambdaExpression(args,operation) //x+10
+    val lambdaexp = LambdaExpression(args,operation) //x+10
+    val listexp = List(IntValue(5),IntValue(6))
+    val exp = LambdaApplication(lambdaexp,listexp)
     val (env1,exp1) = interpreter.evalExpression(env,exp)
     assert(exp1 == IntValue(11))
   }

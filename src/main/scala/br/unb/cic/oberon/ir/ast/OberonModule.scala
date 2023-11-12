@@ -192,9 +192,16 @@ case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
 case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
-case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Value {type T = Char}
+case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Value {
+  type T = (List[FormalArg],Expression)
+  def value: T = {
+    val args = this.args
+    val exp = this.exp
+    (args,exp)
+  }
+}
 
-case class LambdaApplication(LambdaExpression: LambdaExpression, exp: List[Expression]) extends Expression
+case class LambdaApplication(lambdaExp: LambdaExpression, listExp: List[Expression]) extends Expression
     //app lamda (exp,exp)
 /* Statements */
 trait Statement {

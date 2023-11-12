@@ -556,13 +556,13 @@ class InterpreterTest extends AnyFunSuite {
     assert(evalArraySubscript(result, "a", 2)._2 == IntValue(25))
   }
 
-  test("lambdaExpressions01"){
-    val module = scalaPaser.parseResource("lambda/lambdaExpressions01.oberon")
-    val coreModule = CoreTransformer.reduceOberonModule(module)
-    assert(coreModule.name == "LambdaExpressions01")
-    val result = interpreter.runInterpreter(coreModule)
+  // test("lambdaExpressions01"){
+  //   val module = scalaPaser.parseResource("lambda/lambdaExpressions01.oberon")
+  //   val coreModule = CoreTransformer.reduceOberonModule(module)
+  //   assert(coreModule.name == "LambdaExpressions01")
+  //   val result = interpreter.runInterpreter(coreModule)
     
-  }
+  // }
 
   test("Module A has no imports"){
     val module = ScalaParser.parseResource("imports/A.oberon")

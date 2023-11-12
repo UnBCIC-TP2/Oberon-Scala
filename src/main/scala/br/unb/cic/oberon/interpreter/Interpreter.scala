@@ -286,8 +286,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
   def evalLambdaApplication(environment: Environment[Expression], lambdaExp: LambdaExpression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
     var (envt,exp) = evalLambdaExpression(environment,lambdaExp.args,lambdaExp.exp)
-    var variables = envt.allVariables().mkString("")
-    listExp.foreach(values => envt = envt.setVariable(variables,values)) 
+    var variables = envt.allLocalVariables.toList.zip(listExp)
+    variables.foreach{
+      case (variable,value) => envt = envt.setVariable(variable,value)
+    }
     val (envt1,exp1) = evalExpression(envt,exp)
     (envt1,exp1)
   }
