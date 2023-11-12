@@ -20,9 +20,18 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     val (env1,exp1) = interpreter.evalExpression(env,exp)
     assert(exp1 == IntValue(11))
   }
-  
+
 //a : (x: int, y: int) => x + y
   test("Test eval on arithmetic expressions (sub and div)") {
+    val interpreter = new Interpreter()
+    var env = new Environment[Expression]()
+    var args: List[FormalArg] = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType)) //(x:Integer)
+    val operation = SubExpression(VarExpression("x"),VarExpression("y"))
+    val lambdaexp = LambdaExpression(args,operation) 
+    val listexp = List(IntValue(9),IntValue(4))
+    val exp = LambdaApplication(lambdaexp,listexp)
+    val (env1,exp1) = interpreter.evalExpression(env,exp)
+    assert(exp1 == IntValue(5))
   }
 
   test("Test eval on boolean expressions ('and' and 'or')") {
