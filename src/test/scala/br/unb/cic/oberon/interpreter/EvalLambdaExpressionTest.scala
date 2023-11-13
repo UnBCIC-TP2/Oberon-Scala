@@ -13,13 +13,13 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     val args = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType))
     val listexp = List(IntValue(5),IntValue(6))
 
-    //Add Operation
+    //Addition 
     val addition = AddExpression(VarExpression("x"),VarExpression("y"))
     var lambdaexp = LambdaExpression(args,addition)
     val (env1,exp1) = interpreter.evalExpression(env,LambdaApplication(lambdaexp,listexp))
     assert(exp1 == IntValue(11))
 
-    //Mult Operation
+    //Multiplication
     val multiplication = MultExpression(VarExpression("x"), VarExpression("y"))
     lambdaexp = LambdaExpression(args,multiplication)
     val (env2,exp2) = interpreter.evalExpression(env,LambdaApplication(lambdaexp,listexp))
@@ -52,22 +52,21 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     var args = List(ParameterByValue("x",BooleanType), ParameterByValue("y",BooleanType))
     val listexp = List(BoolValue(true),BoolValue(false))
 
-    //Or operation
+    //OR
     val or = OrExpression(VarExpression("x"),VarExpression("y"))
     var lambdaexp = LambdaExpression(args,or) 
     val (env1,exp1) = interpreter.evalExpression(env,LambdaApplication(lambdaexp,listexp))
     assert(exp1 == BoolValue(true))
 
-    //And Operation
+    //AND
     val and = AndExpression(VarExpression("x"),VarExpression("y"))
     lambdaexp = LambdaExpression(args,and)
     val (env2,exp2) = interpreter.evalExpression(env,LambdaApplication(lambdaexp,listexp))
     assert(exp2 == BoolValue(false))
   }
 
-  //Ideia: adicionar teste de foreach para lambda expression
-  //Acho que vai precisar adicionar novas expressions na ast e no parser
   test("Test eval lambda expression on 'foreach'"){
-    
+    //Ideia: adicionar teste de foreach para lambda expression
+    //Acho que vai precisar adicionar novas expressions na ast e no parser
   }
 }
