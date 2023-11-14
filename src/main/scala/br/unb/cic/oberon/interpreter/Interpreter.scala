@@ -289,46 +289,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
     (envt,exp)
   }
-
-//  def updateEnvironmentWithExpression(environment : Environment[Expression],exp1: Expression,listExp:List[Expression] ): (Environment[Expression],_ = {
-    
-//     var (env2,exp2) = evalExpression(enviroment.push, exp1)
-    
-//     exp2 match{
-//       case LambdaExpression(args,exp3) => {
-//         env3 = env.push()
-
-//         //associar args com listExp
-//         var variables = envt.allLocalVariables.toList.zip(listExp)
-//        variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
-
-//         evalExpression(env,exp3)
-//       }
-//       _ => (throw new RuntimeException)
-      
-    } 
-    
-    
-    // val mappedArgs = procedure.args.zip(args).map(pair => pair match {
-    //   case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
-    //   case (ParameterByReference(_, _), _) => throw new RuntimeException
-    //   case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp)._2)
-    // })
-    // var envt = environment.push() // after that, we can "push", to indicate a procedure call.
-    // mappedArgs.foreach(pair => pair match {
-    //   case (ParameterByReference(name, _), exp: Location) => envt = envt.setParameterReference(name, exp)
-    //   case (ParameterByReference(_, _), _) => throw new RuntimeException
-    //   case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
-	  // case _ => throw new RuntimeException
-    // })
-    // procedure.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
-    // procedure.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
-
-    // envt
-  // }
-
-  // def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
-  //   val 
+ 
+  // def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = { 
   //   var (envt,exp) = evalExpression(environment.push(),expression)
   //   var variables = envt.allLocalVariables.toList.zip(listExp)
   //   variables.foreach{
@@ -339,24 +301,24 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   // } 
 
   def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
-    var (env2,exp2) = evalExpression(enviroment.push, exp1)
+    var (envt,exp) = evalExpression(environment.push, expression)
     
-    exp2 match{
-      case LambdaExpression(args,exp3) => {
+    exp match{
+      case LambdaExpression(args,exp1) => {
         //associar args com listExp
         var variables = envt.allLocalVariables.toList.zip(listExp)
         variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
-
-        var(envt4,exp4) = evalExpression(envt,exp3)
-        (env4.pop(),exp4)
+        var (envt1,exp2) = evalExpression(envt,exp1)
+        (envt1.pop(),exp2)
         
       }
-    
-      _ => {
-        env2 = env2.pop() 
+      
+      case _ => {
+        envt = envt.pop() 
         throw new RuntimeException
       }
-  } 
+  }
+} 
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
     val variable = environment.lookup(name)
