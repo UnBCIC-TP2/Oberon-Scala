@@ -284,21 +284,21 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     // TODO PointerAccessExpression
   }
 
-  def evalLambdaApplication(environment: Environment[Expression], exp: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
-    var (envt,exp) = evalLambdaExpression(environment,lambdaExp.args,lambdaExp.exp)
+   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
+    var envt = environment
+    args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
+    (envt,exp)
+  }
+
+  def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
+    var (envt,exp) = evalExpression(environment,expression)
     var variables = envt.allLocalVariables.toList.zip(listExp)
     variables.foreach{
       case (variable,value) => envt = envt.setVariable(variable,value)
     }
     val (envt1,exp1) = evalExpression(envt,exp)
     (envt1,exp1)
-  }
-  
-  def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
-    var envt = environment
-    args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
-    (envt,exp)
-  }
+  } 
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
     val variable = environment.lookup(name)
