@@ -290,14 +290,72 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     (envt,exp)
   }
 
+//  def updateEnvironmentWithExpression(environment : Environment[Expression],exp1: Expression,listExp:List[Expression] ): (Environment[Expression],_ = {
+    
+//     var (env2,exp2) = evalExpression(enviroment.push, exp1)
+    
+//     exp2 match{
+//       case LambdaExpression(args,exp3) => {
+//         env3 = env.push()
+
+//         //associar args com listExp
+//         var variables = envt.allLocalVariables.toList.zip(listExp)
+//        variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
+
+//         evalExpression(env,exp3)
+//       }
+//       _ => (throw new RuntimeException)
+      
+    } 
+    
+    
+    // val mappedArgs = procedure.args.zip(args).map(pair => pair match {
+    //   case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
+    //   case (ParameterByReference(_, _), _) => throw new RuntimeException
+    //   case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp)._2)
+    // })
+    // var envt = environment.push() // after that, we can "push", to indicate a procedure call.
+    // mappedArgs.foreach(pair => pair match {
+    //   case (ParameterByReference(name, _), exp: Location) => envt = envt.setParameterReference(name, exp)
+    //   case (ParameterByReference(_, _), _) => throw new RuntimeException
+    //   case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
+	  // case _ => throw new RuntimeException
+    // })
+    // procedure.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
+    // procedure.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
+
+    // envt
+  // }
+
+  // def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
+  //   val 
+  //   var (envt,exp) = evalExpression(environment.push(),expression)
+  //   var variables = envt.allLocalVariables.toList.zip(listExp)
+  //   variables.foreach{
+  //     case (variable,value) => envt = envt.setVariable(variable,value)
+  //   }
+  //   var (envt1,exp1) = evalExpression(envt,exp)
+  //   (envt1.pop(),exp1)
+  // } 
+
   def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
-    var (envt,exp) = evalExpression(environment,expression)
-    var variables = envt.allLocalVariables.toList.zip(listExp)
-    variables.foreach{
-      case (variable,value) => envt = envt.setVariable(variable,value)
-    }
-    val (envt1,exp1) = evalExpression(envt,exp)
-    (envt1,exp1)
+    var (env2,exp2) = evalExpression(enviroment.push, exp1)
+    
+    exp2 match{
+      case LambdaExpression(args,exp3) => {
+        //associar args com listExp
+        var variables = envt.allLocalVariables.toList.zip(listExp)
+        variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
+
+        var(envt4,exp4) = evalExpression(envt,exp3)
+        (env4.pop(),exp4)
+        
+      }
+    
+      _ => {
+        env2 = env2.pop() 
+        throw new RuntimeException
+      }
   } 
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
