@@ -67,8 +67,8 @@ trait ExpressionParser extends BasicParsers {
     }
   // def lambdaApplicationParser: Parser[Expression] = 
   //   qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
-  //     case name ~ None          => LambdaApplication(LambdaExpression(args,argumentsParser), argumentsParser)
-  //     case name ~ Some(argList) => LambdaApplication(LambdaExpression(args,argumentsParser), argumentsParser)
+  //     case name ~ None          => LambdaApplication(LambdaExpression(args,argList), argList)
+  //     case name ~ Some(argList) => LambdaApplication(LambdaExpression(args,argList), argList)
   //   }
   // def lambdaExpressionParser: Parser[Value] =
     
