@@ -1,5 +1,6 @@
 package br.unb.cic.oberon.interpreter
 
+import scala.collection.mutable.ListBuffer
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
@@ -73,8 +74,11 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
     var args = List(ParameterByValue("x",IntegerType))
-    val listexp = ListBuffer(IntValue(1),IntValue(2),IntValue(3))
+    // val values = ListBuffer(IntValue(1),IntValue(2),IntValue(3))
+    // val arrayType = ArrayType(3,IntegerType)
+    // val arrayValue = ArrayValue(values,arrayType)
 
     //Map
+
   }
 }

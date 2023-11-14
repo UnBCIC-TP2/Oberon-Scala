@@ -65,15 +65,13 @@ trait ExpressionParser extends BasicParsers {
       case name ~ None          => FunctionCallExpression(name, List())
       case name ~ Some(argList) => FunctionCallExpression(name, argList)
     }
-  // def lambdaExpressionParser: Parser[Value] =
-  //   qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
-  //     case name ~ None          => LambdaExpression(args,argumentsParser)
-  //     case name ~ Some(argList) => LambdaExpression(args,argumentsParser)
-  //   }
   // def lambdaApplicationParser: Parser[Expression] = 
   //   qualifiedName ~ ("(" ~> opt(argumentsParser) <~ ")") ^^ {
   //     case name ~ None          => LambdaApplication(LambdaExpression(args,argumentsParser), argumentsParser)
   //     case name ~ Some(argList) => LambdaApplication(LambdaExpression(args,argumentsParser), argumentsParser)
+  //   }
+  // def lambdaExpressionParser: Parser[Value] =
+    
   //   }
   def expValueParser: Parser[Expression] =
     real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
