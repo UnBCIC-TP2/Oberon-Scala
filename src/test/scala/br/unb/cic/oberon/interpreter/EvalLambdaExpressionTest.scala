@@ -65,8 +65,16 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     assert(exp2 == BoolValue(false))
   }
 
-  test("Test eval lambda expression on 'foreach'"){
+  test("Test eval lambda expression on 'foreach' and 'map'"){
     //Ideia: adicionar teste de foreach para lambda expression
     //Acho que vai precisar adicionar novas expressions na ast e no parser
+    //ex: val a: List = List(1,2,3)
+    //a.map(x => x+2)
+    val interpreter = new Interpreter()
+    var env = new Environment[Expression]()
+    var args = List(ParameterByValue("x",IntegerType))
+    val listexp = ListBuffer(IntValue(1),IntValue(2),IntValue(3))
+
+    //Map
   }
 }
