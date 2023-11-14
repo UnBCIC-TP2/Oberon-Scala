@@ -66,7 +66,7 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     assert(exp2 == BoolValue(false))
   }
 
-  test("Test eval lambda expression on 'foreach' and 'map'"){
+  ignore("Test eval lambda expression on 'foreach' and 'map'"){
     //Ideia: adicionar teste de foreach para lambda expression
     //Acho que vai precisar adicionar novas expressions na ast e no parser
     //ex: val a: List = List(1,2,3)

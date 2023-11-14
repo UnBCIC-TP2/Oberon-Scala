@@ -201,8 +201,10 @@ case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Valu
   }
 }
 
-case class LambdaApplication(lambdaExp: LambdaExpression, listExp: List[Expression]) extends Expression
+case class LambdaApplication(exp: Expression, listExp: List[Expression]) extends Expression
     //app lamda (exp,exp)
+
+    
 /* Statements */
 trait Statement {
   val label = Statement.getLabel()
