@@ -8,8 +8,8 @@ VAR
 
 BEGIN
     x := (a: INTEGER, b: INTEGER) => a + b
-    r := x(10,2)
+    r := (x)(2,3)
 
 END
 
-END LambdaExpressionsTC01.
+END LambdaExpressionsIT01.

@@ -289,37 +289,22 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
     (envt,exp)
   }
- 
-  // def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = { 
-  //   var (envt,exp) = evalExpression(environment.push(),expression)
-  //   var variables = envt.allLocalVariables.toList.zip(listExp)
-  //   variables.foreach{
-  //     case (variable,value) => envt = envt.setVariable(variable,value)
-  //   }
-  //   var (envt1,exp1) = evalExpression(envt,exp)
-  //   (envt1.pop(),exp1)
-  // } 
-
   
   def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
-    var (envt,exp) = evalExpression(environment.push, expression)
-    
     expression match{
-      case LambdaExpression(args,exp) => {
-        //associar args com listExp
-        var variables = envt.allLocalVariables.toList.zip(listExpression)
-        variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
-        var (envt1,exp1) = evalExpression(envt,exp)
-        (envt1.pop,exp1)
-        
-      }
-      
-      case _ => {
-        envt = envt.pop()
-        throw new RuntimeException("It is not a Lambda Expression")
-      }
-  }
-} 
+        case LambdaExpression(args,exp) => {
+          var (envt,exp) = evalExpression(environment.push, expression)
+          //associar args com listExp
+          val variables = envt.allLocalVariables.toList.zip(listExpression)
+          variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
+          var (envt1,exp1) = evalExpression(envt,exp)
+          (envt1.pop,exp1)        
+        }
+        case _ => {
+          throw new RuntimeException("It is not a Lambda Expression")
+        }
+    }
+  } 
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
     val variable = environment.lookup(name)

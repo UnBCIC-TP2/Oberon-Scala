@@ -1,0 +1,14 @@
+MODULE LambdaExpressionsIT03;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
+VAR
+    x : ld;
+    r : INTEGER;
+
+BEGIN
+    x := (a: INTEGER, b: INTEGER) => (a + b + 10) < 30;
+    r := (x)(10,9);
+END
+
+END LambdaExpressionsIT03.
