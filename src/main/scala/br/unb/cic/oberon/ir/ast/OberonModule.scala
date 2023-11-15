@@ -310,6 +310,7 @@ case class RecordType(variables: List[VariableDeclaration]) extends Type
 case class ArrayType(length: Int, baseType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
 case class LambdaType(argsTypes: List[Type], returnType: Type) extends Type
+case class LambdaAppType(expType: Type, listExpType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type
 
