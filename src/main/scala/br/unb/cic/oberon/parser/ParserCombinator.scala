@@ -66,44 +66,7 @@ trait ExpressionParser extends BasicParsers {
       case name ~ Some(argList) => FunctionCallExpression(name, argList)
     }
 
-  // x := (a: INTEGER, b: INTEGER) => a + b
-  def lambdaExpressionParser: Parser[Value] = 
-    ("(" ~> argumentsParser <~ ")") ~ "=>" ~ (expressionParser)  ~ ";" ^^ {
-      case  ~ None => LambdaExpression(argList,exp)
-      case  ~ Some(Value) => 
-    }
-
-
-  // r := (x)(2,3)
-  def lambdaApplicationParser: Parser[Expression] = 
-      ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
-      case  ~ None    => LambdaApplication(Expression, argList)
-      case  ~ Some(Expression) => LambdaApplication(Expression, argList)
-    }
-
-//     p1 ~ p2 // sequencing: must match p1 followed by p2
-//     p1 | p2 // alternation: must match either p1 or p2, with preference given to p1
-//     p1.?    // optionality: may match p1 or not
-//     p1.*    // repetition: matches any number of repetitions of p1e operador "^^" (double-caret) e é usado para transformar o resultado de um parser.
-// A sintaxe básica é a seguinte:
-// parser1 ^^ { case result1 => transform(result1) }
-// Aqui, parser1 é um parser que analisa algum input, e { case result1 => transform(result1) } é uma função que será chamada se o parser1 tiver sucesso na análise. A função transform é usada para modificar ou extrair informações do resultado analisado.
-
-// No Scala parser, o símbolo "^" é frequentemente utilizado para combinar parsers sequenciais. Ele é chamado d
-// Por exemplo, se você tiver um parser que analisa um número inteiro e desejar multiplicar o resultado por 2, você pode fazer algo assim:
-// import scala.util.parsing.combinator.RegexParsers
-
-// object MyParser extends RegexParsers {
-//   def integer: Parser[Int] = """-?\d+""".r ^^ { _.toInt * 2 }
-
-//   def main(args: Array[String]): Unit = {
-//     val result = parseAll(integer, "42")
-//     println(result) // Resultado deve ser Success(84)
-//   }
-// }
-
-
-
+    
   def expValueParser: Parser[Expression] =
     real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
@@ -332,6 +295,52 @@ trait OberonParserFull extends StatementParser {
         }
       }
   )
+  
+  // def procedureParser: Parser[Procedure] =
+    // "PROCEDURE" ~ identifier ~ ("(" ~> formalArgs <~ ")") ~ procedureTypeParser ~ ";" ~ listOpt(
+    //   constantParser
+    // ) ~ listOpt(
+    //   varDeclarationParser
+    // ) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ {
+    //   case _ ~ name ~ args ~ procedureType ~ _ ~ constants ~ variables ~ statements ~ endName => {
+    //     if (name != endName)
+    //       throw new Exception(
+    //         s"Procedure name ($name) doesn't match the end identifier ($endName)"
+    //       )
+    //     Procedure(
+    //       name,
+    //       args,
+    //       procedureType,
+    //       constants,
+    //       variables,
+    //       statements
+    //     )
+    //   }
+    // }
+  
+  // LambdaExpression Parser
+  // x := (a: INTEGER, b: INTEGER) => a + b;
+  def lambdaExpressionParser: Parser[Value] = 
+      identifier ~ ":=" ~ "(" ~> opt(formalArgs) <~ ")" ~ "=>" ~ (expressionParser)  ~ ";" ^^ {
+      case _ ~ args ~ userTypeParser ~ _ ~ expressions => {
+        
+      }
+      case formalArgs ~ None => LambdaExpression(List(),expression)
+      case expression ~ Some(Value) => LambdaExpression(args,expression) 
+    }
+
+
+  // r := (x)(2,3);
+  def lambdaApplicationParser: Parser[Expression] = 
+      ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
+      case argList    ~ None             => LambdaApplication(Expression, List())
+      case expression ~ Some(Expression) => LambdaApplication(Expression, argList)
+    }
+
+//     p1 ~ p2 // sequencing: must match p1 followed by p2
+//     p1 | p2 // alternation: must match either p1 or p2, with preference given to p1
+//     p1.?    // optionality: may match p1 or not
+//     p1.*    // repetition: matches any number of repetitions of p1e operador "^^" (double-caret) e é usado para transformar o resultado de um parser.
 
   // Final Parsers
 
