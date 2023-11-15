@@ -69,16 +69,16 @@ trait ExpressionParser extends BasicParsers {
   // x := (a: INTEGER, b: INTEGER) => a + b
   def lambdaExpressionParser: Parser[Value] = 
     ("(" ~> argumentsParser <~ ")") ~ "=>" ~ (expressionParser)  ~ ";" ^^ {
-      case exp ~ None => LambdaExpression(argList,exp)
-      case exp ~ Some(Value) => 
+      case  ~ None => LambdaExpression(argList,exp)
+      case  ~ Some(Value) => 
     }
 
 
   // r := (x)(2,3)
   def lambdaApplicationParser: Parser[Expression] = 
       ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
-      case identifier ~ None    => LambdaApplication(Expression, argList)
-      case name ~ Some(Expression) => LambdaApplication(Expression, argList)
+      case  ~ None    => LambdaApplication(Expression, argList)
+      case  ~ Some(Expression) => LambdaApplication(Expression, argList)
     }
 
 //     p1 ~ p2 // sequencing: must match p1 followed by p2
