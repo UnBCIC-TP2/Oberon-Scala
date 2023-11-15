@@ -300,22 +300,23 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   //   (envt1.pop(),exp1)
   // } 
 
-  def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExp: List[Expression]) : (Environment[Expression], Expression) = {
+  
+  def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
     var (envt,exp) = evalExpression(environment.push, expression)
     
-    exp match{
-      case LambdaExpression(args,exp1) => {
+    expression match{
+      case LambdaExpression(args,exp) => {
         //associar args com listExp
-        var variables = envt.allLocalVariables.toList.zip(listExp)
+        var variables = envt.allLocalVariables.toList.zip(listExpression)
         variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
-        var (envt1,exp2) = evalExpression(envt,exp1)
-        (envt1.pop(),exp2)
+        var (envt1,exp1) = evalExpression(envt,exp)
+        (envt1.pop,exp1)
         
       }
       
       case _ => {
-        envt = envt.pop() 
-        throw new RuntimeException
+        envt = envt.pop()
+        throw new RuntimeException("It is not a Lambda Expression")
       }
   }
 } 
