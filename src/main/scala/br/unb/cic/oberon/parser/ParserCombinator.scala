@@ -324,7 +324,7 @@ trait OberonParserFull extends StatementParser {
   // exemplo 1: (a: INTEGER, b: INTEGER) => a + b; 
   def lambdaExpressionParser: Parser[Value] = 
       "(" ~> formalArgs <~ ")" ~ "=>" ~ expressionParser ~ ";" ^^ {        
-        case args ~ expression ~ expression ~ Some(Value) => LambdaExpression(args,expression)
+        case args ~ expression ~ expression ~ Some(Value) => LambdaExpression(args,exp)
     }
 
 
@@ -333,7 +333,7 @@ trait OberonParserFull extends StatementParser {
   def lambdaApplicationParser: Parser[Expression] = 
       ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
       case argList    ~ None => LambdaApplication(expression, List())
-      case expression ~ Some(Expression) => LambdaApplication(expression, argList)
+      case expression ~ Some(Expression) => LambdaApplication(expression, listExpressions)
     }
 
 //     p1 ~ p2 // sequencing: must match p1 followed by p2
