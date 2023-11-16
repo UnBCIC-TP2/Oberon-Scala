@@ -216,7 +216,7 @@ trait OberonParserFull extends StatementParser {
     }
       | "RECORD" ~> varDeclarationParser <~ "END" ^^ RecordType
       | ("POINTER" ~ "TO") ~> (typeParser | userTypeParser) ^^ PointerType
-      // | ("LAMBDA" ~ "->" ~ formalArgs ~ ":" ~ returnType) ^^ LambdaType   
+      | ("LAMBDA" ~ "->" ~ formalArgs ~ ":" ~ returnType) ^^ LambdaType   
   )
   
   def userTypeDeclarationTerm: Parser[UserDefinedType] =
@@ -322,19 +322,19 @@ trait OberonParserFull extends StatementParser {
   
   // LambdaExpression Parser
   // exemplo 1: (a: INTEGER, b: INTEGER) => a + b; 
-  // def lambdaExpressionParser: Parser[Value] = 
-  //     "(" ~> formalArgs <~ ")" ~ "=>" ~ expressionParser ~ ";" ^^ {        
-  //       case args ~ expression ~ expression ~ Some(Value) => LambdaExpression(args,expression)
-  //   }
+  def lambdaExpressionParser: Parser[Value] = 
+      "(" ~> formalArgs <~ ")" ~ "=>" ~ expressionParser ~ ";" ^^ {        
+        case args ~ expression ~ expression ~ Some(Value) => LambdaExpression(args,expression)
+    }
 
 
   // // caso 1: (x)(2,3);
   // // caso 2: ((a: INTEGER, b: INTEGER) => a + b)(2,3)
-  // def lambdaApplicationParser: Parser[Expression] = 
-  //     ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
-  //     case argList    ~ None => LambdaApplication(expression, List())
-  //     case expression ~ Some(Expression) => LambdaApplication(expression, argList)
-  //   }
+  def lambdaApplicationParser: Parser[Expression] = 
+      ("(" ~> identifier <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ~ ";" ^^  {
+      case argList    ~ None => LambdaApplication(expression, List())
+      case expression ~ Some(Expression) => LambdaApplication(expression, argList)
+    }
 
 //     p1 ~ p2 // sequencing: must match p1 followed by p2
 //     p1 | p2 // alternation: must match either p1 or p2, with preference given to p1
