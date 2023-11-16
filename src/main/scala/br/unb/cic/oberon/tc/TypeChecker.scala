@@ -105,7 +105,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
 
     case LambdaExpression(args, exp) => checkLambdaExpression(args, exp)
 
-    // case LambdaApplication(expression,listExpression) => checkLambdaApplication(expression,listExpression)
+    case LambdaApplication(expression,listExpression) => checkLambdaApplication(expression,listExpression)
 
   }
 
@@ -147,17 +147,16 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
         case _                    => None
       })
   }
-  // def checkLambdaApplication(expression: Expression, listExpression: List[Expression]): T = {
-  //   typeChecker.env = typeChecker.env.push()
-  //   listExpression.foreach(a => )
-  //   val listExpType = listExpression.map(a => a.argumentType)
-  //   val expType = checkExpression(exp)
-  //   typeChecker.env = typeChecker.env.pop()
-  //   expType match {
-  //     case None => None
-  //     case _    => Some(LambdaAppType(expType, listExpType))
-  //   }
-  // }
+  def checkLambdaApplication(expression: Expression, listExpression: List[Expression]): T = {
+    typeChecker.env = typeChecker.env.push()
+    val listExpType = listExpression.map(exp => checkExpression(exp)).flatten
+    val expType = checkExpression(expression)
+    typeChecker.env = typeChecker.env.pop()
+    expType match {
+      case None => None
+      case _    => Some(LambdaAppType(expType.get, listExpType))
+    }
+  }
 
   def checkLambdaExpression(args: List[FormalArg], exp: Expression): T = {
     typeChecker.env = typeChecker.env.push()

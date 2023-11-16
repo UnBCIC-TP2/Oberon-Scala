@@ -7,8 +7,8 @@ VAR
     r : INTEGER;
 
 BEGIN
-    x := (a: INTEGER, b: INTEGER) => a + b
-    r := (x)(2,3)
+    x := (a: INTEGER, b: INTEGER) => a + b;
+    r := (x)(2,3);
 
 END
 
