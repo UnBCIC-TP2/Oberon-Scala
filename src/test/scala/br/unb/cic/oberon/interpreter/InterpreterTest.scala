@@ -204,7 +204,7 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
-  ignore("Testing interpreter on lambdaExpressionsIT01 program") {
+  test("Testing interpreter on lambdaExpressionsIT01 program") {
     val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT01.oberon")
     val coreModule = CoreTransformer.reduceOberonModule(module)
     assert(coreModule.name == "LambdaExpressionsIT01")
