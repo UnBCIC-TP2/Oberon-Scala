@@ -216,7 +216,7 @@ trait OberonParserFull extends StatementParser {
     }
       | "RECORD" ~> varDeclarationParser <~ "END" ^^ RecordType
       | ("POINTER" ~ "TO") ~> (typeParser | userTypeParser) ^^ PointerType
-      // | ("LAMBDA" ~ "->") ~> formalArgs <~ ":" ~> (typeParser | userTypeParser) ^^ LambdaType   
+      //| ("LAMBDA" ~ "->") ~> ("(" ~> lambdaTypes <~ ")") ~ ":" ~ (typeParser | userTypeParser) ^^ LambdaType   
   )
   
   def userTypeDeclarationTerm: Parser[UserDefinedType] =
@@ -320,10 +320,10 @@ trait OberonParserFull extends StatementParser {
     //   }
     // }
   
-  // LambdaExpression Parser
-  // exemplo 1: (a: INTEGER, b: INTEGER) => a + b; 
+  //LambdaExpression Parser
+  //exemplo 1: (a: INTEGER, b: INTEGER) => a + b; 
   // def lambdaExpressionParser: Parser[Value] = 
-  //     "(" ~> formalArgs <~ ")" ~ "=>" ~ expressionParser ~ ";" ^^ {        
+  //     ("(" ~> formalArgs <~ ")") ~ "=>" ~> expressionParser ^^ {       
   //       case args ~ expression  => LambdaExpression(args,expression)
   //   }
 
