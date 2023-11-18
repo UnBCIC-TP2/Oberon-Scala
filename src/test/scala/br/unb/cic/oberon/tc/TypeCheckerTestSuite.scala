@@ -1635,4 +1635,13 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     assert(res.size == 1)
   }
 
+  test("Test lambda expression application") {
+    val visitor = new TypeChecker()
+    val module =
+      ScalaParser.parseResource("lambda/lambdaExpressionsIT01.oberon")
+    val res = visitor.checkModule(module)
+
+    assert(res.isEmpty)
+  }
+
 }
