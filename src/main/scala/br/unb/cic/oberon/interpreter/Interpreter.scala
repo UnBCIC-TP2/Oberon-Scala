@@ -291,6 +291,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
   
   def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
+    val (envt8,varAssigned) = evalExpression(environment,expression)
+
     expression match{
         case LambdaExpression(args,exp) => {
           var (envt,exp) = evalExpression(environment.push, expression)
@@ -301,7 +303,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
           (envt1.pop,exp1)        
         }
         case _ => {
-          throw new RuntimeException("It is not a Lambda Expression")
+          throw new RuntimeException(s"It is not a Lambda Expression: ${varAssigned}" +
+            s" Listexp: $listExpression , Expression: $expression")
         }
     }
   } 

@@ -532,22 +532,23 @@ class ParserVisitor {
       exp = NotExpression(exp)
     }
 
-    // override def visitLambdaApplication(
-    //   ctx: OberonParser.LambdaApplicationContext
-    // ): Unit = {
-    //   val listExpressions = new ListBuffer[Expression]
-    //   ctx
-    //      .expression()
-    //      .listExpressions()
-    //      .forEach(e => {
-    //       e.accept(this)
-    //       args += exp
-    //     })
-    //   val visitor = new ExpressionVisitor()
-    //   ctx.expression.accept(visitor)
-    //   val listExp = listExpressions.toList
-    //   exp = LambdaApplication(visitor.exp,listExp)
-    // }
+    override def visitLambdaApplication(
+      ctx: OberonParser.LambdaApplicationContext
+    ): Unit = {
+      val args = new ListBuffer[Expression]
+      val visitor = new ExpressionVisitor()
+      ctx
+         .arguments()
+         .expression()
+         .asScala
+         .map(e => {
+          e.accept(visitor)
+          args += visitor.exp
+         })
+      ctx.expression.accept(visitor)
+      val listExp = args.toList
+      exp = LambdaApplication(visitor.exp,listExp)
+    }
     
     override def visitLambdaExpression(
         ctx: OberonParser.LambdaExpressionContext

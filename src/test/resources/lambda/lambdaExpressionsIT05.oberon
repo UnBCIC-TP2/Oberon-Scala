@@ -9,7 +9,7 @@ VAR
 
 BEGIN
     x := (a: INTEGER, b: INTEGER, c: BOOLEAN) => ((a + b) >= 10) && c;
-    r := (x)(1,2,true);
+    r := (x)(1,2,True)
 END
 
 END LambdaExpressionsIT05.

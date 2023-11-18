@@ -82,7 +82,7 @@ expression
  | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                  #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
  | '(' formals? ')' '=>' expression                                                       #LambdaExpression
- | '('expression ')' '(' arguments  ')'                                                   #LambdaApplication
+ | '('expression ')' '(' arguments? ')'                                                   #LambdaApplication
  ;
 
 qualifiedName
