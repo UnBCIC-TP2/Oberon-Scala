@@ -8,7 +8,7 @@ VAR
 
 BEGIN
     x := (a: INTEGER) => a >= 10;
-    r := (x)(11);
+    r := (x)(11)
 END
 
 END LambdaExpressionsIT06.

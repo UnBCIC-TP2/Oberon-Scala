@@ -8,7 +8,7 @@ VAR
 
 BEGIN
     x := (a: INTEGER, b: INTEGER) => (a + b + 10) < 30;
-    r := (x)(10,9);
+    r := (x)(10,9)
 END
 
 END LambdaExpressionsIT03.
