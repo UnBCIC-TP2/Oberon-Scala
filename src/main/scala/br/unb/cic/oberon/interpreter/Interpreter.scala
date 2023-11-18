@@ -304,7 +304,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         }
         case _ => {
           throw new RuntimeException(s"It is not a Lambda Expression: ${varAssigned}" +
-            s" Listexp: $listExpression , Expression: $expression")
+            s" Listexp: $listExpression , Expression: $expression is there a: ${envt8.allLocalVariables.mkString(", ")}")
         }
     }
   } 

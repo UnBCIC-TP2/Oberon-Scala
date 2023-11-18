@@ -328,20 +328,19 @@ trait OberonParserFull extends StatementParser {
   //   }
 
 
-  // // caso 1: (x)(2,3);
-  // // caso 2: ((a: INTEGER, b: INTEGER) => a + b)(2,3)
-  // def lambdaApplicationParser: Parser[Expression] = 
-  //     ("(" ~> identifier <~ ")") ~ ("(" ~> argumentsParser <~ ")") ^^  {
-  //     case name => LambdaApplication(name, List())
-  //     case expression ~ Some(Expression) => LambdaApplication(expression, listExpressions)
-  //   }
+  // caso 1: (x)(2,3);
+  // caso 2: ((a: INTEGER, b: INTEGER) => a + b)(2,3)
+  def lambdaApplicationParser: Parser[Expression] = 
+      ("(" ~> expressionParser <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ^^  {
+      case expression ~ None => LambdaApplication(expression, List())
+      case expression ~ Some(arguments) => LambdaApplication(expression, arguments)
+    }
 
 //     p1 ~ p2 // sequencing: must match p1 followed by p2
 //     p1 | p2 // alternation: must match either p1 or p2, with preference given to p1
 //     p1.?    // optionality: may match p1 or not
 //     p1.*    // repetition: matches any number of repetitions of p1e operador "^^" (double-caret) e é usado para transformar o resultado de um parser.
 
-  // Final Parsers
 
   def importParser: Parser[Set[String]] =
     listOpt("IMPORT" ~> rep(identifier <~ ";")) ^^ { a => a.toSet }
