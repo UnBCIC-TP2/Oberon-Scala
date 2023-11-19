@@ -9,7 +9,7 @@ import br.unb.cic.oberon.ir.ast.{
   EQExpression,
   GTEExpression,
   LTEExpression,
-  LTExpression
+  LTExpression,
 }
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -1635,12 +1635,24 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
     assert(res.size == 1)
   }
 
-  test("Test lambda expression application") {
+  test("Test valid lambda expression application") {
     val visitor = new TypeChecker()
     val module =
       ScalaParser.parseResource("lambda/lambdaExpressionsIT01.oberon")
     val res = visitor.checkModule(module)
     assert(res.isEmpty)
+  }
+
+   test("Test assignment to lambda application statement") {
+    val visitor = new TypeChecker()
+    val stmt = AssignmentStmt("r", LambdaApplication(VarExpression("a"),List(IntValue(4))))
+    val stmt1 = AssignmentStmt("a", LambdaExpression(List(ParameterByValue("x",IntegerType)),AddExpression(VarExpression("x"),IntValue(5))))
+
+    visitor.env = visitor.env.setGlobalVariable("r",IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("a", LambdaType(List(IntegerType),IntegerType))
+
+    assert(visitor.checkStmt(stmt).size == 0)
+    assert(visitor.checkStmt(stmt1).size == 0)
   }
 
 }
