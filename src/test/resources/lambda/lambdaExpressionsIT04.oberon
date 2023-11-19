@@ -7,8 +7,8 @@ VAR
     r : BOOLEAN;
 
 BEGIN
-    x := (a: BOOLEAN) => a || false;
-    r := (x)(true)
+    x := (a: BOOLEAN) => a || False;
+    r := (x)(True)
 END
 
 END LambdaExpressionsIT04.

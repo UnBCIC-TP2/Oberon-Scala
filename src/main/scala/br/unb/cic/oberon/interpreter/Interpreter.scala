@@ -287,24 +287,33 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
     var envt = environment
     args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
-    (envt,exp)
+    (envt,LambdaExpression(args,exp))
   }
   
   def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
-    val (envt8,varAssigned) = evalExpression(environment,expression)
+    var (env,lambdaExp) = evalExpression(environment.push,expression)
 
-    expression match{
-        case LambdaExpression(args,exp) => {
-          var (envt,exp) = evalExpression(environment.push, expression)
-          //associar args com listExp
+    (lambdaExp) match{
+        case (LambdaExpression(args,exp)) => {
+          var (envt,_) = evalExpression(env,lambdaExp)
           val variables = envt.allLocalVariables.toList.zip(listExpression)
           variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
           var (envt1,exp1) = evalExpression(envt,exp)
-          (envt1.pop,exp1)        
+          (envt1.pop,exp1)
         }
+
+        // case (_, LambdaExpression(args,exp)) => {
+        //   var (envt,exp) = evalExpression(environment.push, expression)
+        //   //associar args com listExp
+        //   val variables = envt.allLocalVariables.toList.zip(listExpression)
+        //   variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
+        //   var (envt1,exp1) = evalExpression(envt,exp)
+        //   (envt1.pop,exp1)        
+        // }
+
         case _ => {
-          throw new RuntimeException(s"It is not a Lambda Expression: ${varAssigned}" +
-            s" Listexp: $listExpression , Expression: $expression is there a: ${envt8.allLocalVariables.mkString(", ")}")
+          env = env.pop
+          throw new RuntimeException(s"It is not a Lambda Expression")
         }
     }
   } 
