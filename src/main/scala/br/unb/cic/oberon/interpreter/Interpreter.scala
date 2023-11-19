@@ -290,26 +290,17 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     (envt,LambdaExpression(args,exp))
   }
   
-  def evalLambdaApplication(environment: Environment[Expression], expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
-    var (env,lambdaExp) = evalExpression(environment.push,expression)
+  def evalLambdaApplication(environment: Environment[Expression], Expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
+    var (env,expression) = evalExpression(environment.push,Expression)
 
-    (lambdaExp) match{
+    (expression) match{
         case (LambdaExpression(args,exp)) => {
-          var (envt,_) = evalExpression(env,lambdaExp)
+          var (envt,_) = evalExpression(env,expression)
           val variables = envt.allLocalVariables.toList.zip(listExpression)
           variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
           var (envt1,exp1) = evalExpression(envt,exp)
           (envt1.pop,exp1)
         }
-
-        // case (_, LambdaExpression(args,exp)) => {
-        //   var (envt,exp) = evalExpression(environment.push, expression)
-        //   //associar args com listExp
-        //   val variables = envt.allLocalVariables.toList.zip(listExpression)
-        //   variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
-        //   var (envt1,exp1) = evalExpression(envt,exp)
-        //   (envt1.pop,exp1)        
-        // }
 
         case _ => {
           env = env.pop
