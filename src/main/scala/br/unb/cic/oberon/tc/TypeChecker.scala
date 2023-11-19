@@ -269,6 +269,7 @@ class TypeChecker {
       case Some((PointerType(_), NullType)) => List()
       case Some((IntegerType, BooleanType)) => List()
       case Some((BooleanType, IntegerType)) => List()
+      case Some((t1,LambdaAppType(LambdaType(_,t2),_))) if t1==t2 => List()
       case Some((t1, t2)) if t1 == t2 => List()
       case Some((t1, t2)) if t1 != t2 => List((AssignmentStmt(VarAssignment(v), exp), s"Assignment between different types: $v, $exp"))
       case None => if(! env.lookup(v).isDefined) List((AssignmentStmt(VarAssignment(v), exp), s"Variable $v not declared")) else List((AssignmentStmt(VarAssignment(v), exp), s"Expression $exp is ill typed"))
