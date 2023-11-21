@@ -25,6 +25,8 @@ import State._
  * a runtime exception might be thrown.
  */
 class Interpreter {
+  type IResult[A] = State[Environment[Expression], A]
+
   type T = Unit
 
   var exit = false
@@ -247,61 +249,64 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     printStream = new PrintStream(new NullPrintStream())
   }
 
-  def evalExpression(exp: Expression): State[Environment[Expression], Expression] = for stateValue <- exp match {
-    case IntValue(v) => (environment, IntValue(v))
-    case RealValue(v) => (environment, RealValue(v))
-    case CharValue(v) => (environment, CharValue(v))
-    case BoolValue(v) => (environment, BoolValue(v))
-    case StringValue(v) => (environment, StringValue(v))
-    case NullValue => (environment, NullValue)
-    case Undef() => (environment, Undef())
-    case VarExpression(name) => evalVarExpression(environment, name)
+  def evalExpression(exp: Expression): IResult[Expression] = for { stateValue <- exp match {
+    // so com IResult ta dando erro, mas colocando o State[Environment[Expression], Expression] ta funcionando
+    case IntValue(v) => State[Environment[Expression], Expression] {environment => (environment, IntValue(v))}
+    case RealValue(v) => IResult[Expression] {environment => (environment, RealValue(v))}
+    case CharValue(v) => IResult[Expression] {environment => (environment, CharValue(v))}
+    case BoolValue(v) => IResult[Expression] {environment => (environment, BoolValue(v))}
+    case StringValue(v) => IResult[Expression] {environment => (environment, StringValue(v))}
+    case NullValue => IResult[Expression] {environment => (environment, NullValue)}
+    case Undef() => IResult[Expression] {environment => (environment, Undef())}
+    case VarExpression(name) => evalVarExpression(name)
     //TODO eval array
     //case ArrayValue(v, t) =>
-    case ArraySubscript(a, i) => (environment, evalArraySubscript(environment, ArraySubscript(a, i)))
+    case ArraySubscript(a, i) => evalArraySubscript(environment, ArraySubscript(a, i))
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
     case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
-    case ModExpression(left, right) => modularExpression(environment, left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
-    case EQExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
-    case NEQExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
-    case GTExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
-    case LTExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
-    case GTEExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
-    case LTEExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
-    case NotExpression(exp) => (environment, BoolValue(!(evalExpression(environment, exp)._2).asInstanceOf[Value].value.asInstanceOf[Boolean]))
-    case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
-    case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
-    case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
+    case ModExpression(left, right) => modularExpression(left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
+    case EQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
+    case NEQExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
+    case GTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 > v2))
+    case LTExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 < v2))
+    case GTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 >= v2))
+    case LTEExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1 <= v2))
+    case NotExpression(exp) => for { expression <- evalExpression(exp) } yield BoolValue(!expression.asInstanceOf[Value].value.asInstanceOf[Boolean])
+    case AndExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
+    case OrExpression(left, right) => binExpression(left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
+    case FunctionCallExpression(name, args) => evalFunctionCall(name, args)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
+    }
   } yield stateValue
 
-  def evalVarExpression(environment: Environment[Expression], name: String) = {
-    val variable = environment.lookup(name)
+  def evalVarExpression(name: String): IResult[Expression] = for {
+    env <- get[Environment[Expression]]
+    variable = env.lookup(name)
+  } yield 
     if (variable.isEmpty) throw new NoSuchElementException(f"Variable $name is not defined")
-    (environment, environment.lookup(name).get)
-  }
+    else variable.get
 
-  def evalArraySubscript(environment : Environment[Expression], arraySubscript: ArraySubscript): Expression = {
-    val array = evalExpression(environment, arraySubscript.arrayBase)._2
-    val idx = evalExpression(environment, arraySubscript.index)._2
-
-    (array, idx) match {
+  def evalArraySubscript(arraySubscript: ArraySubscript): IResult[Expression] = for {
+    array <- evalExpression(arraySubscript.arrayBase)
+    idx <- evalExpression(arraySubscript.index)
+    // nao sei se funciona direito colocar o match na frente do yield
+  } yield (array, idx) match {
       case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
       case _ => throw new RuntimeException
     }
-  }
 
-  def evalFunctionCall(environment : Environment[Expression], name: String, args: List[Expression]): (Environment[Expression], Expression) = {
-    val procedure = environment.findProcedure(name)
-    var env1 = updateEnvironmentWithProcedureCall(procedure, args, environment)
-    env1 = executeStatement(env1, procedure.stmt)
-    val returnValue = env1.lookup(Values.ReturnKeyWord)
-    env1 = env1.pop()
-    (env1, returnValue.get)
-  }
+  def evalFunctionCall(name: String, args: List[Expression]): IResult[Expression] =  for {
+    env <- get[Environment[Expression]]
+    procedure = env.findProcedure(name)
+    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args))
+    _ <- modify[Environment[Expression]](executeStatement(procedure.stmt))
+    env <- get[Environment[Expression]]
+    returnValue = env.lookup(Values.ReturnKeyWord)
+    _ <- modify[Environment[Expression]](_.pop())
+  } yield returnValue
 
   /**
    * Eval an arithmetic expression on Numbers
@@ -313,7 +318,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    *         evaluating left and right to reduce them to
    *         numbers.
    */
-  def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): State[Environment[Expression], Expression] = for {
+  def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): IResult[Expression] = for {
       vl <- evalExpression(left)
       vr <- evalExpression(right)
   } yield (fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
@@ -329,12 +334,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    *         evaluating left and right to reduce them to
    *         numbers.
    */
-  def modularExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Modular, Modular) => Modular): (Environment[Expression], Expression) = {
-    val vl = evalExpression(environment, left)._2.asInstanceOf[Modular]
-    val vr = evalExpression(environment, right)._2.asInstanceOf[Modular]
-
-    (environment, fn(vl, vr))
-  }
+  def modularExpression(left: Expression, right: Expression, fn: (Modular, Modular) => Modular): IResult[Expression] = for {
+    vl <- evalExpression(left)
+    vr <- evalExpression(right)
+  } yield fn(vl.asInstanceOf[Modular], vr.asInstanceOf[Modular])
 
 
   /**
@@ -347,11 +350,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    *              the "result" visitor attribute the value we compute
    *              after applying this function.
    */
-  def binExpression(environment : Environment[Expression], left: Expression, right: Expression, fn: (Value, Value) => Expression): (Environment[Expression], Expression) = {
-    val v1 = evalExpression(environment, left)._2.asInstanceOf[Value]
-    val v2 = evalExpression(environment, right)._2.asInstanceOf[Value]
-    (environment, fn(v1, v2))
-  }
+  def binExpression(left: Expression, right: Expression, fn: (Value, Value) => Expression): IResult[Expression] = for {
+    v1 <- evalExpression(left)
+    v2 <- evalExpression(right)
+  } yield fn(v1.asInstanceOf[Value], v2.asInstanceOf[Value])
 }
 
 class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}
