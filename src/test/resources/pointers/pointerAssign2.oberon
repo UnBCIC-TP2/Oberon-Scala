@@ -1,0 +1,12 @@
+MODULE pointerAssign;
+
+VAR
+    a : POINTER TO REAL;
+    b : POINTER TO POINTER TO REAL;
+
+BEGIN
+    a^ := 10.5;
+    b^ := a
+END
+
+END pointerAssign.

@@ -2942,7 +2942,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 //Testing the oberon pointerDecl1 code
   test("Testing the oberon pointerDecl1 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerDecl1.oberon")
+    val module = ScalaParser.parseResource("pointers/pointerDecl1.oberon")
 
     assert(module.variables.size == 5)
     assert(
@@ -2969,7 +2969,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Testing the oberon pointerDecl2 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerDecl2.oberon")
+    val module = ScalaParser.parseResource("pointers/pointerDecl2.oberon")
 
     assert(module.variables.size == 2)
     assert(
@@ -2989,7 +2989,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
   // Testing the oberon pointerAssign1 code
   test("Testing the oberon pointerAssign1 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerAssign1.oberon")
+    val module = ScalaParser.parseResource("pointers/pointerAssign1.oberon")
 
     // test if there are 5 statements in stmts list
     module.stmt.getOrElse(None) match {
@@ -3023,7 +3023,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Testing the oberon pointerAssign2 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerAssign2.oberon")
+    val module = ScalaParser.parseResource("pointers/recordAssign1.oberon")
 
     // conferir a contagem de statement
     module.stmt.getOrElse(None) match {
@@ -3063,7 +3063,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test("Testing the oberon pointerAssign3 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerAssigner3.oberon")
+    val module = ScalaParser.parseResource("pointers/pointerAssign2.oberon")
 
     assert(module.variables.size == 3)
     assert(
@@ -3103,7 +3103,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test(testName = "Testing the oberon pointerOps1 code") {
-    val module = ScalaParser.parseResource("Pointers/pointerOps1.oberon")
+    val module = ScalaParser.parseResource("pointers/pointerOps1.oberon")
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
@@ -3126,7 +3126,7 @@ class ParserTestSuite extends AbstractTestSuite {
   }
 
   test(testName = "Testing the oberon LinkedList code") {
-    val module = ScalaParser.parseResource("Pointers/linkedList.oberon")
+    val module = ScalaParser.parseResource("pointers/linkedList.oberon")
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
 
@@ -3184,7 +3184,7 @@ class ParserTestSuite extends AbstractTestSuite {
 
   test(testName = "Testing the module PointerNewStatement") {
     val module =
-      ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+      ScalaParser.parseResource("pointers/pointerNewStatement.oberon")
     assert(module.name == "PointerNewStatement")
 
     assert(module.stmt.isDefined)

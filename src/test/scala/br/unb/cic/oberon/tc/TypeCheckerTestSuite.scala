@@ -1556,7 +1556,7 @@ class TypeCheckerTestSuite extends AbstractTestSuite {
 
   test("Type checker for the new stmt") {
     val module =
-      ScalaParser.parseResource("Pointers/pointerNewStatement.oberon")
+      ScalaParser.parseResource("pointers/pointerNewStatement.oberon")
     assert(module.name == "PointerNewStatement")
 
     assert(module.stmt.isDefined)

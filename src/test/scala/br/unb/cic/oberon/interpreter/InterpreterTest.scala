@@ -721,6 +721,80 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("answer") == Some(IntValue(217)))
   }
 
+  test(testName = "Testing pointer assignment: pointerAssign1") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign1.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(IntValue(1)))
+    assert(result.lookup("b") == Some(RealValue(9.5)))
+    assert(result.lookup("c") == Some(CharValue('c')))
+    assert(result.lookup("d") == Some(BoolValue(true)))
+    assert(result.lookup("e") == Some(StringValue("Hello.")))
+
+  }
+
+  test(testName = "Testing pointer assignment: pointerAssign2") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign2.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(RealValue(10.5)))
+    assert(result.lookup("b") == Some(RealValue(10.5)))
+
+  }
+
+  test(testName = "Testing pointer assignment: pointerAssign3") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign3.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(RealValue(10.5)))
+    assert(result.lookup("b") == Some(RealValue(10.5)))
+
+  }
+
+  test(testName = "Testing pointer assignment: pointerAssign4") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign4.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(RealValue(9.5)))
+    assert(result.lookup("b") == Some(RealValue(9.5)))
+    assert(result.lookup("c") == Some(RealValue(9.5)))
+  }
+
+  test(testName = "Testing pointer assignment: pointerAssign5") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign5.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(RealValue(7.8)))
+    assert(result.lookup("b") == Some(RealValue(7.8)))
+
+  }
+
+
 
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))

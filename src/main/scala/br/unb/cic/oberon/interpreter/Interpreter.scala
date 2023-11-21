@@ -100,8 +100,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         designator match {
           case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp)._2)
           case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
+          case PointerAssignment(name) => ???
           case RecordAssignment(_, _) => ???
-          case PointerAssignment(_) => ???
         }
         envt
 
