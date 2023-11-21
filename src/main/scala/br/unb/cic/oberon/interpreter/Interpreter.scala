@@ -23,6 +23,7 @@ import scala.language.{existentials, postfixOps}
  * a runtime exception might be thrown.
  */
 class Interpreter {
+
   type T = Unit
 
   var exit = false
@@ -75,7 +76,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def declareProcedure(environment : Environment[Expression], procedure: Procedure): Environment[Expression] = {
     environment.declareProcedure(procedure)
   }
-
 
 
   def executeStatement(environment : Environment[Expression], stmt: Statement): Environment[Expression] = {
@@ -145,9 +145,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
             values.foreach(value => {
               envt = envt.setLocalVariable(v, evalExpression(envt, value)._2)
               envt = executeStatement(envt, stmt)
-              //               val assignment = AssignmentStmt(VarAssignment(v), value)
-              //               val stmts = SequenceStmt(List(assignment, stmt))
-              //               stmts.accept(this)
             })
             envt = envt.pop()
           }
@@ -168,6 +165,11 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
+
+      case AssertTrueStmt(exp: Expression) =>
+        var envteste = envt
+        if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
+        envteste
     }
   }
 
@@ -225,6 +227,17 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     environment
   }
 
+  def updateEnvironmentWithTest(test: Test, environment: Environment[Expression]): Environment[Expression] = {
+    var envt = environment.push() // indicates a test.
+
+    test.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
+    test.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
+
+    envt
+  }
+
+
+  
   /*
    * This method is mostly useful for testing purposes.
    * That is, here we are considering testability a
@@ -237,9 +250,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   /*
    * the same here.
    */
-  def setLocalVariable(env: Environment[Expression], name: String, exp: Expression): Environment[Expression] = {
+  def setLocalVariable(env: Environment[Expression], name: String, exp: Expression): Environment[Expression] =
     env.setLocalVariable(name, exp)
-  }
 
   def setTestEnvironment() = {
     printStream = new PrintStream(new NullPrintStream())
@@ -285,7 +297,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def evalArraySubscript(environment : Environment[Expression], arraySubscript: ArraySubscript): Expression = {
     val array = evalExpression(environment, arraySubscript.arrayBase)._2
     val idx = evalExpression(environment, arraySubscript.index)._2
-
     (array, idx) match {
       case (ArrayValue(values: ListBuffer[Expression], _), IntValue(v)) => values(v)
       case _ => throw new RuntimeException
@@ -331,7 +342,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def modularExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Modular, Modular) => Modular): (Environment[Expression], Expression) = {
     val vl = evalExpression(environment, left)._2.asInstanceOf[Modular]
     val vr = evalExpression(environment, right)._2.asInstanceOf[Modular]
-
     (environment, fn(vl, vr))
   }
 

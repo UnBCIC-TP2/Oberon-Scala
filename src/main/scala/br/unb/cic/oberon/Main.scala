@@ -6,7 +6,7 @@ import br.unb.cic.oberon.codegen.{
   PaigesBasedGenerator
 }
 import br.unb.cic.oberon.interpreter._
-import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
@@ -15,7 +15,7 @@ import org.rogach.scallop.exceptions
 import java.nio.file.{Files, Paths, Path}
 import java.util.Base64
 
-object Main extends App {
+object Main extends App with Oberon2ScalaParser {
 
   object conf extends ScallopConf(args) {
     version("Oberon 0.1.1-SNAPSHOT")
@@ -85,7 +85,7 @@ object Main extends App {
 
   private def compile() {
     val content = Files.readString(conf.compile.inputPath.get.get)
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     conf.compile.backend.get.get match {
       case "c" => {
@@ -107,7 +107,7 @@ object Main extends App {
 
   private def interpret() = {
     val content = Files.readString(conf.interpreter.inputPath.get.get)
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     val interpreter = new Interpreter()
     val result = interpreter.runInterpreter(module)
@@ -115,7 +115,7 @@ object Main extends App {
 
   private def typeCheck() = {
     val content = Files.readString(conf.tc.inputPath.get.get)
-    val module = ScalaParser.parse(content)
+    val module = parseAbs(parse(oberonParser,content))
 
     val visitor = new TypeChecker()
     val errors = visitor.checkModule(module)

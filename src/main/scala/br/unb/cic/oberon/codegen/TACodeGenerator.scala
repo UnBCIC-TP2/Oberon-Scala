@@ -452,13 +452,14 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
       case None => insts1
     }
-  }
+  } 
+
 
   def load_vars(
       vars: List[VariableDeclaration],
       consts: List[ASTConstant] = List()
   ): Unit = {
-    tc.checkModule(OberonModule("test", Set(), List(), consts, vars, List(), None))
+    tc.checkModule(OberonModule("test", Set(), List(), consts, vars, List(), List(), None))
   }
 
   // somente para testes

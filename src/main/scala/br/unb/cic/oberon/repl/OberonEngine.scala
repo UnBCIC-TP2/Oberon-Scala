@@ -179,7 +179,6 @@ class OberonEngine extends ScriptEngine {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     env =  interpreter.runInterpreter(coreModule)
-
     null
   }
 
@@ -352,7 +351,6 @@ class OberonEngine extends ScriptEngine {
         "WHILE",
         "WITH"
       )
-
       for (v <- keywordList) {
         candidates.add(
           new Candidate(

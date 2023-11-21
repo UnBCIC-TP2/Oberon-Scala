@@ -1,0 +1,25 @@
+MODULE procedureTest08;
+
+TEST firstTest ("teste");
+      VAR base, x: INTEGER;
+      BEGIN
+          IF (x < 13) THEN
+                base := 2
+          END;
+          assert_error()
+      END firstTest
+
+TEST secondTest ("segundo teste");
+    VAR x: INTEGER;
+    BEGIN
+        x := 3;
+        IF (x = 3) THEN
+            x := 9
+        END;
+        write(x)
+    END secondTest
+BEGIN
+      write(2)
+END
+
+END procedureTest08.

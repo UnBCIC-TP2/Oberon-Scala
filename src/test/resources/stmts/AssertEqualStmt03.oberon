@@ -1,0 +1,7 @@
+MODULE AssertEqualModule;
+
+BEGIN
+    assert_eq("test",2)
+END
+
+END AssertEqualModule.

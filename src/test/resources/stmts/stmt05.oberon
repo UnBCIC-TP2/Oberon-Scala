@@ -7,7 +7,7 @@ VAR
 BEGIN
  x := 5;
  y := 100;
- WHILE(x < y) DO
+ WHILE (x < y) DO
    x := x * x
  END;
  write(x)

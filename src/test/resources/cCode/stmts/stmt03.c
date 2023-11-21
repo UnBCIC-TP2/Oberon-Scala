@@ -10,6 +10,7 @@ int main() {
     scanf("%d", &max);
     if (x > max) {
         max = x;
+        x = 0;
     }
     printf("%d\n", max);
 }
