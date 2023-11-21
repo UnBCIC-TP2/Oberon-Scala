@@ -1,0 +1,11 @@
+Module pwAz21cl;
+
+VAR
+ N : LONGINT;
+
+BEGIN
+ N := (((1) / 1) * 1 * (2.7) / (4 - 1 / 1 * 1 * 92) / 2.73) / (1 - 52 * 87) - 1 - 475 + 0
+
+END
+
+END pwAz21cl.
