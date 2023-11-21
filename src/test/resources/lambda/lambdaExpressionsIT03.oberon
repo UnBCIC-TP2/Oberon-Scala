@@ -4,7 +4,7 @@ TYPE
    ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
 VAR
     x : ld;
-    r : INTEGER;
+    r : BOOLEAN;
 
 BEGIN
     x := (a: INTEGER, b: INTEGER) => (a + b + 10) < 30;
