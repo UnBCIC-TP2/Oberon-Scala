@@ -97,6 +97,7 @@ sealed class ModuleMerger(val loader: ModuleLoader) {
       constants,
       variables,
       procedures,
+      // None
       Some(stmt)
     )
   }
