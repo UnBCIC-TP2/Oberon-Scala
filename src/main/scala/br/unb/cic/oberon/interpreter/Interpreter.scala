@@ -9,6 +9,8 @@ import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import scala.collection.mutable.ListBuffer
 import scala.io.StdIn
 import scala.language.{existentials, postfixOps}
+import cats.data.State
+import State._
 
 /**
  * The interpreter visitor first updates the
@@ -245,7 +247,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     printStream = new PrintStream(new NullPrintStream())
   }
 
-  def evalExpression(environment: Environment[Expression], exp: Expression): (Environment[Expression], Expression) = exp match {
+  def evalExpression(exp: Expression): State[Environment[Expression], Expression] = for stateValue <- exp match {
     case IntValue(v) => (environment, IntValue(v))
     case RealValue(v) => (environment, RealValue(v))
     case CharValue(v) => (environment, CharValue(v))
@@ -257,10 +259,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     //TODO eval array
     //case ArrayValue(v, t) =>
     case ArraySubscript(a, i) => (environment, evalArraySubscript(environment, ArraySubscript(a, i)))
-    case AddExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1+v2)
-    case SubExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1-v2)
-    case MultExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1*v2)
-    case DivExpression(left, right) => arithmeticExpression(environment, left, right, (v1: Number, v2: Number) => v1/v2)
+    case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
+    case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
+    case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
+    case DivExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1/v2)
     case ModExpression(left, right) => modularExpression(environment, left, right, (v1: Modular, v2: Modular) => v1.mod(v2))
     case EQExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 == v2))
     case NEQExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1 != v2))
@@ -274,7 +276,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
-  }
+  } yield stateValue
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
     val variable = environment.lookup(name)
@@ -311,11 +313,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    *         evaluating left and right to reduce them to
    *         numbers.
    */
-  def arithmeticExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Number, Number) => Number): (Environment[Expression], Expression) = {
-    val (_, vl) = evalExpression(environment, left)
-    val (_, vr) = evalExpression(environment, right)
-    (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
-  }
+  def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): State[Environment[Expression], Expression] = for {
+      vl <- evalExpression(left)
+      vr <- evalExpression(right)
+  } yield (fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
 
 
   /**
