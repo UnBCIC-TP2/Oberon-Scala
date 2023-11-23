@@ -1,0 +1,12 @@
+MODULE pointerAssign;
+
+VAR
+  a : POINTER TO INTEGER;
+  b : INTEGER;
+
+BEGIN
+    a^ := b;
+    b := 5
+END
+
+END pointerAssign.

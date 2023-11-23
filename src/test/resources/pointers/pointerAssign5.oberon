@@ -5,6 +5,8 @@ VAR
     b : POINTER TO POINTER TO REAL;
 
 BEGIN
+    NEW(a);
+    NEW(b);
     b^ := a;
     a^ := 10.5;
     b^^ := 7.8

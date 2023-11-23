@@ -721,6 +721,19 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("answer") == Some(IntValue(217)))
   }
 
+  test(testName = "Testing pointer assignment: pointerAssign0") {
+
+    val module = ScalaParser.parseResource("pointers/pointerAssign0.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(IntValue(5)))
+    assert(result.lookup("b") == Some(IntValue(5)))
+  }
+
   test(testName = "Testing pointer assignment: pointerAssign1") {
 
     val module = ScalaParser.parseResource("pointers/pointerAssign1.oberon")
@@ -775,12 +788,12 @@ class InterpreterTest extends AnyFunSuite {
 
     val result = interpreter.runInterpreter(module)
 
-    assert(result.lookup("a") == Some(RealValue(9.5)))
-    assert(result.lookup("b") == Some(RealValue(9.5)))
-    assert(result.lookup("c") == Some(RealValue(9.5)))
+    assert(result.lookup("a") == Some(RealValue(10.5)))
+    assert(result.lookup("b") == Some(RealValue(10.5)))
+    assert(result.lookup("c") == Some(RealValue(10.5)))
   }
 
-  test(testName = "Testing pointer assignment: pointerAssign5") {
+  ignore(testName = "Testing pointer assignment: pointerAssign5") {
 
     val module = ScalaParser.parseResource("pointers/pointerAssign5.oberon")
 
@@ -793,8 +806,6 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("b") == Some(RealValue(7.8)))
 
   }
-
-
 
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))

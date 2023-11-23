@@ -64,6 +64,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def declareVariable(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
     environment.baseType(variable.variableType) match {
       case Some(ArrayType(length, baseType)) => environment.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
+      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name, NullValue)
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -100,7 +101,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         designator match {
           case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp)._2)
           case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
-          case PointerAssignment(name) => ???
+          case PointerAssignment(pointerName) => envt = pointerAssignment(envt, pointerName, exp)
           case RecordAssignment(_, _) => ???
         }
         envt
@@ -168,6 +169,13 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
+
+
+
+
+      case NewStmt(name) => {
+        envt.createLocationForGlobalPointer(name, NullValue)
+      }
     }
   }
 
@@ -223,6 +231,26 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case _ => throw new RuntimeException
     }
     environment
+  }
+
+  def pointerAssignment(envt: Environment[Expression], pointerName: String, exp: Expression): Environment[Expression] = {
+
+    exp match {
+      case VarExpression(name) => {
+        val loc = envt.pointsTo(name)
+        envt.setGlobalPointer(pointerName, loc.get)
+      } case _ => {
+
+        if(envt.pointsTo(pointerName).get == Location(-1)) {
+          // valor default para location: -1
+          throw new RuntimeException("Pointer " + pointerName + " is null")
+        }
+
+        val value = evalExpression(envt, exp)._2
+
+        envt.setVariable(pointerName, value)
+      }
+    }
   }
 
   /*

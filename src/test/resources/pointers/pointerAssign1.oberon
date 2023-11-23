@@ -8,6 +8,11 @@ VAR
   e : POINTER TO STRING;
 
 BEGIN
+    NEW(a);
+    NEW(b);
+    NEW(c);
+    NEW(d);
+    NEW(e);
     a^ := 1;
     b^ := 9.5;
     c^ := 'c';
