@@ -82,7 +82,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
 
 
-  def executeStatement(environment : Environment[Expression], stmt: Statement): Environment[Expression] = {
+  def executeStatement(stmt: Statement): IResult[Unit] = {
     // we first check if we have encountered a return stmt.
     // if so, we should not execute any other statement
     // of a sequence of stmts. Whenever we encounter a
@@ -194,7 +194,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
+  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): IResult[Unit] = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
       case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
@@ -250,18 +250,17 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
   def evalExpression(exp: Expression): IResult[Expression] = for { stateValue <- exp match {
-    // so com IResult ta dando erro, mas colocando o State[Environment[Expression], Expression] ta funcionando
-    case IntValue(v) => State[Environment[Expression], Expression] {environment => (environment, IntValue(v))}
-    case RealValue(v) => IResult[Expression] {environment => (environment, RealValue(v))}
-    case CharValue(v) => IResult[Expression] {environment => (environment, CharValue(v))}
-    case BoolValue(v) => IResult[Expression] {environment => (environment, BoolValue(v))}
-    case StringValue(v) => IResult[Expression] {environment => (environment, StringValue(v))}
-    case NullValue => IResult[Expression] {environment => (environment, NullValue)}
-    case Undef() => IResult[Expression] {environment => (environment, Undef())}
+    case IntValue(v) => pure(IntValue(v))
+    case RealValue(v) => pure(RealValue(v)) 
+    case CharValue(v) => pure(CharValue(v))
+    case BoolValue(v) => pure(BoolValue(v))
+    case StringValue(v) => pure(StringValue(v))
+    case NullValue => pure(NullValue)
+    case Undef() => pure(Undef())
     case VarExpression(name) => evalVarExpression(name)
     //TODO eval array
     //case ArrayValue(v, t) =>
-    case ArraySubscript(a, i) => evalArraySubscript(environment, ArraySubscript(a, i))
+    case ArraySubscript(a, i) => evalArraySubscript(ArraySubscript(a, i))
     case AddExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1+v2)
     case SubExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1-v2)
     case MultExpression(left, right) => arithmeticExpression(left, right, (v1: Number, v2: Number) => v1*v2)
@@ -301,8 +300,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def evalFunctionCall(name: String, args: List[Expression]): IResult[Expression] =  for {
     env <- get[Environment[Expression]]
     procedure = env.findProcedure(name)
-    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args))
-    _ <- modify[Environment[Expression]](executeStatement(procedure.stmt))
+    _ <- updateEnvironmentWithProcedureCall(procedure, args)
+    _ <- executeStatement(procedure.stmt)
     env <- get[Environment[Expression]]
     returnValue = env.lookup(Values.ReturnKeyWord)
     _ <- modify[Environment[Expression]](_.pop())
