@@ -1,0 +1,21 @@
+MODULE LambdaTest01;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER): INTEGER
+
+VAR
+    x : ld;
+    r: INTEGER;
+
+TEST lambdaTest ("Testing LambdaApplication");
+    BEGIN
+        x := (a: INTEGER, b: INTEGER) => (a+b);
+        r := (x)(1,1)
+        assert_eq(r,2)
+    END lambdaTest
+      
+BEGIN
+    write("Test Succeeded")
+END
+
+END LambdaTest01.

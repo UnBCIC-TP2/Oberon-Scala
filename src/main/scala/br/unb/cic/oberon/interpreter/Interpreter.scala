@@ -58,6 +58,28 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     }
   }
 
+def runInterpreter(module: OberonModule, Test: String): Environment[Expression] = {
+    // set up the global declarations
+    val env1 = module.userTypes.foldLeft(new Environment[Expression]())((a, b) => declareUserDefinedType(a, b))
+    val env2 = module.constants.foldLeft(env1)((a, b) => declareConstant(a, b))
+    val env3 = module.variables.foldLeft(env2)((a, b) => declareVariable(a, b))
+    val env4 = module.procedures.foldLeft(env3)((a, b) => declareProcedure(a, b))
+    val env5 = module.tests.foldLeft(env4)((a,b) => declareTest(a,b))
+
+    // execute the statement if it is defined.
+    // remember, module.stmt is an Option[Statement].
+    if (module.stmt.isDefined) {
+      val env6 = setupStandardLibraries(env5)
+      executeStatement(env6, module.stmt.get)
+    }
+    else {
+      env5
+    }
+  }
+
+  def declareTest(environment: Environment[Expression], test: Test): Environment[Expression] = {
+    environment.declareTest(test)
+  }
   def declareConstant(environment : Environment[Expression], constant: Constant): Environment[Expression] = {
     environment.setGlobalVariable(constant.name, constant.exp)
   }

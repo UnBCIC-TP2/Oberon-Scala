@@ -140,6 +140,12 @@ trait ExpressionParser extends CompositeParsers {
     case None ~ b => LambdaExpression(List(), b)
   }
 
+  def lambdaApplicationParser: Parser[Expression] = 
+      ("(" ~> expressionParser <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ^^  {
+      case expression ~ None => LambdaApplication(expression, List())
+      case expression ~ Some(arguments) => LambdaApplication(expression, arguments)
+    }
+
   def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
   def fieldAccessTerm: Parser[Expression => Expression] = "." ~ identifier ^^ { case _ ~ b => FieldAccessExpression(_, b) }

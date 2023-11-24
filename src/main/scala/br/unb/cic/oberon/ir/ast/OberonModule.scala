@@ -57,6 +57,7 @@ case class Test(modifier: String,
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
+
 /* formal argument definition */
 sealed trait FormalArg {
   def accept(v: OberonVisitor): v.T = v.visit(this)

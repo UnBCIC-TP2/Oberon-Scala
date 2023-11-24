@@ -1677,6 +1677,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     assert(visitor.checkStmt(stmt).size == 0)
     assert(visitor.checkStmt(stmt1).size == 0)
+   }  
   test("Test assert true statement (true)") {
     val visitor = new TypeChecker()
     val module = parseResource("stmts/AssertTrueStmt01.oberon")
@@ -1744,5 +1745,4 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     assert(res.size == 0)
   }
 
-}
 }
