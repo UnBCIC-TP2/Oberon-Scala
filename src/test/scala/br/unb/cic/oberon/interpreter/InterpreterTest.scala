@@ -837,12 +837,21 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     interpreter.runInterpreter(coreModule)
   }
+  test("Testing Arithmetic Lambda - New Parser"){
+    val module = parseResource("lambda/lambdaExpressionsIT07.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("r").isDefined)
+    assert(result.lookup("r") == Some(IntValue(2)))
+  }
 
   test("Testing Arithmetic LambdaApplication Test"){
     val module = parseResource("lambda/lambdaTest01.oberon")
     
     val coreModule = CoreTransformer.reduceOberonModule(module)
-    interpreter.runInterpreter(coreModule, "TEST")
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("r").isDefined)
   }
         // x := (a: INTEGER, b: INTEGER) => (a+b);
         // r := (x)(1,1);

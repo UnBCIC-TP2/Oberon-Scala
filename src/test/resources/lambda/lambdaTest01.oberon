@@ -10,7 +10,7 @@ VAR
 TEST lambdaTest ("Testing LambdaApplication");
         BEGIN
             x := (a: INTEGER, b: INTEGER) => a + b;
-            r := (x)(1,1)
+            r := (x)(1,1);
             assert_eq(r,2)
         END lambdaTest
       

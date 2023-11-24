@@ -141,16 +141,16 @@ trait ExpressionParser extends CompositeParsers {
   }
 
   def lambdaApplicationParser: Parser[Expression] = 
-      ("(" ~> expressionParser <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")") ^^  {
+      (("(" ~> expressionParser <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")")) ^^  {
       case expression ~ None => LambdaApplication(expression, List())
-      case expression ~ Some(arguments) => LambdaApplication(expression, arguments)
+      case expression ~ Some(argList) => LambdaApplication(expression, argList)
     }
 
   def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
   def fieldAccessTerm: Parser[Expression => Expression] = "." ~ identifier ^^ { case _ ~ b => FieldAccessExpression(_, b) }
 
-  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")"
+  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | lambdaApplicationParser |  "(" ~> expressionParser <~ ")"
 
   def complexTerm: Parser[Expression] = (
     "~" ~> factor ^^ NotExpression
@@ -218,7 +218,7 @@ trait StatementParser extends ExpressionParser {
     val realBlock = SequenceStmt(List(stmt, accumulator))
     ForStmt(init, condition, realBlock)
   }
-
+// | (":=" ~> (("(" ~> expressionParser <~ ")") ~ ("(" ~> rep("," ~> expressionParser) <~ ")"))) ^^ {case expression ~ args => LambdaApplication(expression,args)}
   def statementParser: Parser[Statement] = (
     designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => AssignmentStmt(des, expression) }
       | "readReal" ~> ("(" ~> identifier <~ ")") ^^ ReadRealStmt
@@ -246,7 +246,7 @@ trait StatementParser extends ExpressionParser {
       | "LOOP" ~> multStatementParser <~ "END" ^^ LoopStmt
       | "RETURN" ~> expressionParser ^^ ReturnStmt
       | "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
-      | identifier ~ ("(" ~> listOpt(argumentsParser) <~ ")") ^^ { case id ~ args => ProcedureCallStmt(id, args) }
+      | identifier ~ ("(" ~> listOpt(argumentsParser) <~ ")") ^^ { case id ~ args => ProcedureCallStmt(id, args) } 
       | "EXIT" ^^ { _ => ExitStmt() }
     );
 
