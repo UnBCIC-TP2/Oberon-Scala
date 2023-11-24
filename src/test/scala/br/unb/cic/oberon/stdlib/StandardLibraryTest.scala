@@ -138,14 +138,12 @@ class StandardLibraryTest extends AnyFunSuite {
     val result = interpreter.runInterpreter(module)
 
     assert(result.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
-
   }
 
   ignore("Test for the WRITEFILE function") {
     val module = ScalaParser.parseResource("stdlib/WRITEFILETest.oberon")
 
     assert(module.name == "WRITEFILETest")
-
 
 
     val result = interpreter.runInterpreter(module)
@@ -166,7 +164,6 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "APPENDFILETest")
 
 
-
     val result = interpreter.runInterpreter(module)
 
     assert(result.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
@@ -179,13 +176,14 @@ class StandardLibraryTest extends AnyFunSuite {
 
   }
 
+
   test(testName = "Test for the STRINGTOINT function") {
     val module = ScalaParser.parseResource("stdlib/STRINGTOINTTest.oberon")
 
     assert(module.name == "STRINGTOINTTest")
 
 
-     val result = interpreter.runInterpreter(module)
+    val result = interpreter.runInterpreter(module)
 
     assert(result.lookup("y") == Some(IntValue(-8)))
     assert(result.lookup("z") == Some(IntValue(2)))

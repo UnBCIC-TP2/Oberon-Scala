@@ -14,7 +14,7 @@ PROCEDURE factorial(n: INTEGER) : INTEGER;
 
     RETURN n * factorial(n - 1)
     
- END fatorial
+ END factorial
 
 BEGIN
   x := 5;

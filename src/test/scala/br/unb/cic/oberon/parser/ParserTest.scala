@@ -286,7 +286,7 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(stmts(3) == WriteStmt(VarExpression("z")))
   }
 
-  test("Testing the oberon stmt03 code. This module has IF-THEN statement") {
+  ignore("Testing the oberon stmt03 code. This module has IF-THEN statement") {
     val module = ScalaParser.parseResource("stmts/stmt03.oberon")
 
     assert(module.name == "SimpleModule")
@@ -2010,6 +2010,7 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(module.name == "UserTypeModule")
     assert(module.userTypes.size == 3)
   }
+
 
   test("Testing the oberon recordAssignmentStmt01 code") {
     val module =

@@ -1,0 +1,16 @@
+MODULE procedureTest07;
+
+VAR
+  base, count : INTEGER;
+
+TEST firstTest ("teste");
+      VAR base: INTEGER;
+      BEGIN
+          base := "a";
+          assert_error()
+      END firstTest
+BEGIN
+      write(2)
+END
+
+END procedureTest07.

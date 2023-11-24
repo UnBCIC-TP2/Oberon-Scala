@@ -102,15 +102,8 @@ class ParserVisitor {
       .map(t => visitUserDefinedType(t))
     val block = visitModuleBlock(ctx.block())
 
-    module = OberonModule(
-      name.getText,
-      submodules,
-      userTypes,
-      constants,
-      variables,
-      procedures,
-      block
-    )
+
+    module = OberonModule(name.getText, submodules, userTypes, constants, variables, procedures,List(), block)
   }
 
   /** Visit a block declaration. If the block context is null, we return None.

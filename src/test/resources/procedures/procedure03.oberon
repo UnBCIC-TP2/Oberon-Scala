@@ -5,7 +5,7 @@ VAR
 
 PROCEDURE factorial(i: INTEGER) : INTEGER;
  BEGIN
-   IF(i = 1)
+   IF (i = 1)
    THEN
      RETURN 1
    END;
