@@ -199,6 +199,16 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
         var envteste = envt
         if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
         envteste
+      
+      case AssertEqualStmt(left:Expression, right: Expression) =>
+        var envteste = envt
+        if(!(evalCondition(envteste, left) == evalCondition(envteste,right))) throw new Exception("Not Equal Condition")
+        envteste
+
+      case AssertNotEqualStmt(left: Expression, right: Expression) =>
+        var envteste = envt
+        if(evalCondition(envteste, left) == evalCondition(envteste,right)) throw new Exception("Equal Condition")
+        envteste
     }
   }
 

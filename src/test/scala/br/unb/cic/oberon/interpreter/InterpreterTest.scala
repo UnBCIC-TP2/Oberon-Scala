@@ -798,7 +798,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
-    //assert(interpreter.runInterpreter(coreModule, "TEST") == ())
+    assert(interpreter.runInterpreter(coreModule, "TEST") == ())
   }
 
 
