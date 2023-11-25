@@ -195,20 +195,25 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
 
-      case AssertTrueStmt(exp: Expression) =>
-        var envteste = envt
-        if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
-        envteste
-      
+      case TestCallStmt(name) =>
+        callTest(envt,name) 
+        
+
       case AssertEqualStmt(left:Expression, right: Expression) =>
         var envteste = envt
-        if(!(evalCondition(envteste, left) == evalCondition(envteste,right))) throw new Exception("Not Equal Condition")
+        if(evalCondition(envteste, left) != evalCondition(envteste,right)) throw new Exception("Not Equal Condition")
         envteste
 
       case AssertNotEqualStmt(left: Expression, right: Expression) =>
         var envteste = envt
         if(evalCondition(envteste, left) == evalCondition(envteste,right)) throw new Exception("Equal Condition")
         envteste
+      
+      case AssertTrueStmt(exp: Expression) =>
+        var envteste = envt
+        if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
+        envteste
+      
     }
   }
 
@@ -375,6 +380,16 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
     val returnValue = env1.lookup(Values.ReturnKeyWord)
     env1 = env1.pop()
     (env1, returnValue.get)
+  }
+
+  def callTest(environment: Environment[Expression], test: String): (Environment[Expression]) = {
+    val Test = environment.findTest(test)
+    var env1 = updateEnvironmentWithTest(Test,environment)
+    env1 = executeStatement(env1,Test.stmt)
+    //val returnValue = env1.lookup(Values.ReturnKeyWord)
+    env1 = env1.pop()
+    //(env1, returnValue.get)
+    env1
   }
 
   /**

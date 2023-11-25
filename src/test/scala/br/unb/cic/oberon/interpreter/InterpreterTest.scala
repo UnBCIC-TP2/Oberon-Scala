@@ -790,7 +790,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val thrown = intercept[Exception] {
       interpreter.runInterpreter(coreModule)
     }
-    assert(thrown.getMessage() == "Exception thrown from assert")
+    assert(thrown.getMessage() == ("Exception thrown from assert"))
   }
 
   ignore("Testing Test interpreter1") {
@@ -824,7 +824,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     val thrown = intercept[Exception] {
-      interpreter.runInterpreter(coreModule)
+      interpreter.runInterpreter(coreModule, "TEST")
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
 
