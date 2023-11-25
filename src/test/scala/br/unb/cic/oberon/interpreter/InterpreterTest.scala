@@ -901,6 +901,9 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
     assert(result.lookup("r").isDefined)
+    assert(result.findTest("lambdaTest") != None)
+    assert(result.findTest("lambdaTest").description == StringValue("Testing LambdaApplication - Addition"))
+    //assert(result.findTest("lambdaTest").stmt == Some(IntValue(1)))
     //assert(result.lookup("r") == Some(IntValue(2)))
   }
 
@@ -910,6 +913,8 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
     assert(result.lookup("r").isDefined)
+    assert(result.findTest("lambdaTest") != None)
+    assert(result.findTest("lambdaTest").description == StringValue("Testing LambdaApplication - Boolean Operation"))
   }
 
   test(testName = "Testing boolean32"){
