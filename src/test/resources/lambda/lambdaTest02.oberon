@@ -1,0 +1,21 @@
+MODULE LambdaTest02;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
+   
+VAR
+    x : ld;
+    r : BOOLEAN;
+
+TEST lambdaTest ("Testing LambdaApplication - Boolean Operation");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a + b < 10;
+            r := (x)(10,1);
+            assert_eq(r,False)
+        END lambdaTest
+      
+BEGIN
+    write("Test Succeeded")
+END
+
+END LambdaTest02.

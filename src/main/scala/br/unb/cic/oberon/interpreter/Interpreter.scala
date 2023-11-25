@@ -52,6 +52,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     if (module.stmt.isDefined) {
       val env5 = setupStandardLibraries(env4)
       executeStatement(env5, module.stmt.get)
+
     }
     else {
       env4
