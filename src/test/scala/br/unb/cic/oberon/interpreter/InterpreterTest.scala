@@ -903,6 +903,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("r").isDefined)
     assert(result.findTest("lambdaTest") != None)
     assert(result.findTest("lambdaTest").description == StringValue("Testing LambdaApplication - Addition"))
+    //assert(result.findTest("lambdaTest").variables == None)
     //assert(result.findTest("lambdaTest").stmt == Some(IntValue(1)))
     //assert(result.lookup("r") == Some(IntValue(2)))
   }

@@ -69,12 +69,19 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
+    var env6 = env5
     if (module.stmt.isDefined) {
-      val env6 = setupStandardLibraries(env5)
-      executeStatement(env6, module.stmt.get)
+      env6 = setupStandardLibraries(env5)
+      env6 = executeStatement(env6, module.stmt.get)
     }
+
+    if (!(module.tests.isEmpty)) {
+      module.tests.foreach(test => env6 = executeStatement(env6,test.stmt))
+      env6
+    }
+
     else {
-      env5
+      env6
     }
   }
 
@@ -386,7 +393,7 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
   def callTest(environment: Environment[Expression], test: String): (Environment[Expression]) = {
     val Test = environment.findTest(test)
     var env1 = updateEnvironmentWithTest(Test,environment)
-    env1 = executeStatement(env1,Test.stmt)
+    env1 = executeStatement(env1, Test.stmt)
     //val returnValue = env1.lookup(Values.ReturnKeyWord)
     env1 = env1.pop()
     //(env1, returnValue.get)
