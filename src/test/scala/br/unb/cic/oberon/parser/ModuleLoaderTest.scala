@@ -30,7 +30,7 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     )
   }
 
-  test("Testing if the ModuleLoader imports a file") {
+  test("ModuleLoader loads a file with no imports") {
     val module = ResourceModuleLoader.loadAndMerge("imports/A.oberon")
 
     val expected = makeModule(
@@ -41,12 +41,12 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
-  test("Testing if the ModuleLoader loads an import recursively") {
+  test("ModuleLoader loads a file with a simple import") {
     val module = ResourceModuleLoader.loadAndMerge("imports/B.oberon")
 
     val expected = makeModule(
       name = "B",
-      variables = List(VariableDeclaration("x", IntegerType)),
+      variables = List(VariableDeclaration("x", IntegerType)), // TODO: add prefix 'A' to x
       stmt = Some(
         SequenceStmt(
           List(
@@ -58,4 +58,87 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
+  test("ModuleLoader accepts aliases in files") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/F.oberon")
+
+    val expected = makeModule(
+      name = "F",
+      variables = List(VariableDeclaration("x", IntegerType)), // TODO: add prefix 'alias' to x
+      stmt = Some(
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("alias::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  ignore("ModuleLoader accepts two files that import from a common third file") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/M.oberon")
+
+    val expected = makeModule(
+      name = "M",
+      variables = List(VariableDeclaration("B::A::x", IntegerType), VariableDeclaration("L::A::x", IntegerType)),
+      stmt = Some(
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("B::A::x")),
+            WriteStmt(VarExpression("L::A::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  test("ModuleLoader imports variables with the same name from different files") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/D.oberon")
+
+    val expected = makeModule(
+      name = "D",
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("x", IntegerType)), // TODO: add prefixes 'A' and 'C' to x
+      stmt = Some(
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("A::x")),
+            WriteStmt(VarExpression("C::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  ignore("ModuleLoader deals with transitive imports") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
+
+    val expected = makeModule(
+      name = "I",
+      variables = List(VariableDeclaration("B::A::x", IntegerType)),
+      stmt = Some(
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("B::A::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  test("ModuleLoader throws error with cyclic imports") {
+    val thrown = intercept[Exception] {
+      val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
+    }
+    assert(thrown.getMessage.length > 0)
+  }
+
+  test("ModuleLoader throws error when IMPORT is declared empty") {
+    val thrown = intercept[Exception] {
+      val module = ResourceModuleLoader.loadAndMerge("imports/E.oberon")
+    }
+    assert(thrown.getMessage.length > 0)
+  }
 }

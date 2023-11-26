@@ -1,0 +1,9 @@
+MODULE L;
+
+IMPORT A;
+
+BEGIN
+    write(A::x)
+END
+
+END L.
