@@ -3,8 +3,9 @@ package br.unb.cic.oberon
 import br.unb.cic.oberon.codegen.{
   CodeGenerator,
   JVMCodeGenerator,
-  PaigesBasedGenerator
+  PaigesBasedGenerator,
 }
+import br.unb.cic.oberon.codegen.TACodeGenerator
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.tc.TypeChecker
@@ -56,7 +57,7 @@ object Main extends App with Oberon2ScalaParser {
       )
       val backend = choice(
         name = "backend",
-        choices = Seq("llvm", "c", "jvm"),
+        choices = Seq("llvm", "c", "jvm", "tac"),
         default = Some("c"),
         descr = "Which backend to compile to",
         argName = "backend"
@@ -101,6 +102,12 @@ object Main extends App with Oberon2ScalaParser {
       }
       case "llvm" => {
         Files.writeString(conf.compile.outputPath.get.get, "LLVM :)")
+      }
+      case "tac" => {
+        val tacCode = TACodeGenerator.generateCode(module)
+        Files.writeString(
+          conf.compile.outputPath.get.get,
+          tacCode.map(_.toString).mkString("\n"))
       }
     }
   }
