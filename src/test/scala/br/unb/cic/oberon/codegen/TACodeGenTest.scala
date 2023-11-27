@@ -6,6 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TACodeTest extends AnyFunSuite {
 
+  // Test for generating TACode for addition between constants
   test("Generate add between constants") {
 
     TACodeGenerator.reset
@@ -23,6 +24,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for addition between add and constant
   test("Generate add between add and constant") {
 
     TACodeGenerator.reset
@@ -41,6 +43,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for addition between odd constants
   test("Generate add between adds") {
 
     TACodeGenerator.reset
@@ -63,6 +66,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for a complex operation involving multiple expressions
   test("Testing complex operation 2") {
 
     TACodeGenerator.reset
@@ -89,6 +93,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for a complex boolean expression
   test("Testing complex operation 3") {
 
     TACodeGenerator.reset
@@ -129,6 +134,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the NotExpression
   test("Testing NotExpression") {
 
     TACodeGenerator.reset
@@ -156,6 +162,7 @@ class TACodeTest extends AnyFunSuite {
     <=
    */
 
+  // Test for generating TACode for the EQExpression
   test("Testing EQ") {
 
     TACodeGenerator.reset
@@ -176,6 +183,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the NEQExpression
   test("Testing NEQ") {
 
     TACodeGenerator.reset
@@ -196,6 +204,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the LTExpression
   test("Testing LT") {
 
     TACodeGenerator.reset
@@ -213,6 +222,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the GTExpression
   test("Testing GT") {
 
     TACodeGenerator.reset
@@ -230,6 +240,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the GTEExpression
   test("Testing GTE") {
 
     TACodeGenerator.reset
@@ -250,6 +261,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for the LTEExpression
   test("Testing LTE") {
 
     TACodeGenerator.reset
@@ -270,6 +282,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for VarExpression
   test("Testing VarExpression") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -283,6 +296,7 @@ class TACodeTest extends AnyFunSuite {
     assert(t == ops)
   }
 
+  // Test for generating TACode for ArraySubscript
   test("Testing ArraySubscript") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
@@ -298,6 +312,8 @@ class TACodeTest extends AnyFunSuite {
     )    
     assert(list == ops)
   }
+
+  // Test for generating TACode for PointerAccessExpression
   test("Testing PointerAccessExpression") {
     TACodeGenerator.reset
     val list_var =
@@ -316,7 +332,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Assignment Statements
+  // Test for generating TACode for Var Assignment
   test("Testing Var Assignment") {
     TACodeGenerator.reset
 
@@ -337,6 +353,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for Array Assignment
   test("Testing Array Assignment") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
@@ -358,6 +375,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  // Test for generating TACode for Pointer Assignment
   test("Testing Pointer Assignment") {
     TACodeGenerator.reset
     val list_var =
@@ -676,4 +694,8 @@ test("testing Record Usage") {
     assert(list == ops)
 
   }
+
 }
+
+
+
