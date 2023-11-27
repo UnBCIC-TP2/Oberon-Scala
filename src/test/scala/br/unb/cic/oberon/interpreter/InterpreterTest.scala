@@ -7,6 +7,7 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.parser.{Oberon2ScalaParser, ScalaParser}
 import br.unb.cic.oberon.transformations.CoreTransformer
 import org.scalatest.funsuite.AnyFunSuite
+import scala.collection.mutable.ListBuffer
 
 class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
@@ -924,6 +925,19 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("z") == Some(BoolValue(false)))
     assert(result.lookup("w") == Some(BoolValue(true)))
   }
+
+  test("Testing LambdaApplication on Array"){
+    val module = parseResource("lambda/lambdaTest03.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTestArray_A").description == StringValue("Testing LambdaApplication on Array - First Test"))
+    assert(result.findTest("lambdaTestArray_B").description == StringValue("Testing LambdaApplication on Array - Second Test"))
+    assert(result.findTest("lambdaTestArray_C").description == StringValue("Testing LambdaApplication on Array - Third Test"))
+    assert(result.findTest("lambdaTestArray_D").description == StringValue("Testing LambdaApplication on Array - Fourth Test"))
+    assert(result.lookup("vector") == Some(ArrayValue(ListBuffer(IntValue(36), IntValue(25), IntValue(6), IntValue(51)),ArrayType(4,IntegerType))))
+  }
+
 
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")
