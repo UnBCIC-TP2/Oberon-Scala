@@ -1745,4 +1745,29 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     assert(res.size == 0)
   }
 
+  test("Test testsuit Lambda Application - Arithmetic") {
+    val visitor = new TypeChecker()
+    val module = parseResource("lambda/lambdaTest01.oberon")
+
+    assert(module.name == "LambdaTest01")
+    assert(module.tests.size == 4)
+    assert(module.stmt.isDefined)
+
+    val res = visitor.checkModule(module)
+
+    assert(res.size == 0)
+  }
+
+  test("Test testsuit Lambda Application - Boolean") {
+    val visitor = new TypeChecker()
+    val module = parseResource("lambda/lambdaTest02.oberon")
+
+    assert(module.name == "LambdaTest02")
+    assert(module.tests.size == 4)
+    assert(module.stmt.isDefined)
+
+    val res = visitor.checkModule(module)
+
+    assert(res.size == 0)
+  }
 }

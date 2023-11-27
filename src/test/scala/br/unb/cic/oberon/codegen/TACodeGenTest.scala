@@ -89,8 +89,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  //Teste ignorado porque sequencialmente ele alterna entre erros e acertos no testing
-  ignore("Testing complex operation 3") {
+  test("Testing complex operation 3") {
 
     TACodeGenerator.reset
     val expr = OrExpression(
