@@ -5,17 +5,37 @@ TYPE
    
 VAR
     x : ld;
-    r : INTEGER;
+    r, y, z, w : INTEGER;
 
-TEST lambdaTest ("Testing LambdaApplication - Addition");
+TEST lambdaTestM ("Testing LambdaApplication - Addition");
         BEGIN
             x := (a: INTEGER, b: INTEGER) => a + b;
             r := (x)(1,1);
             assert_eq(r,2)
-        END lambdaTest
-      
+        END lambdaTestM
+
+TEST lambdaTestm ("Testing LambdaApplication - Subtraction");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a - b;
+            y := (x)(7,2);
+            assert_eq(y,5)
+        END lambdaTestm
+    
+TEST lambdaTestx ("Testing LambdaApplication - Multiplication");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a * b;
+            z := (x)(4,4);
+            assert_eq(z,16)
+        END lambdaTestx
+
+TEST lambdaTestd ("Testing LambdaApplication - Division");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a / b;
+            w := (x)(40,5);
+            assert_eq(w,8)
+        END lambdaTestd
 BEGIN
-    write("Test Succeeded")
+    write("Tests Succeeded")
 END
 
 END LambdaTest01.

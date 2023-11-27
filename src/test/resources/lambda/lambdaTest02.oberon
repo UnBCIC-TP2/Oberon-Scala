@@ -5,17 +5,38 @@ TYPE
    
 VAR
     x : ld;
-    r : BOOLEAN;
+    r, y, z, w : BOOLEAN;
 
-TEST lambdaTest ("Testing LambdaApplication - Boolean Operation");
+TEST lambdaTestT ("Testing LambdaApplication - Boolean Operation True");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a + b > 10;
+            r := (x)(10,1);
+            assert_eq(r,True)
+        END lambdaTestT
+
+TEST lambdaTestF ("Testing LambdaApplication - Boolean Operation False");
         BEGIN
             x := (a: INTEGER, b: INTEGER) => a + b < 10;
-            r := (x)(10,1);
-            assert_eq(r,False)
-        END lambdaTest
-      
+            y := (x)(10,1);
+            assert_eq(y,False)
+        END lambdaTestF
+
+TEST lambdaTestAnd ("Testing LambdaApplication - AND Operation");
+        BEGIN
+            x := (a: BOOLEAN, b: BOOLEAN) => a && b;
+            z := (x)(True,False);
+            assert_eq(z,False)
+        END lambdaTestAnd
+
+TEST lambdaTestOr ("Testing LambdaApplication - OR Operation");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a || b;
+            w := (x)(True,False);
+            assert_eq(w,True)
+        END lambdaTestOr
+
 BEGIN
-    write("Test Succeeded")
+    write("Tests Succeeded")
 END
 
 END LambdaTest02.

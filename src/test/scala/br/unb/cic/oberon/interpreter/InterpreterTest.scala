@@ -900,12 +900,14 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
-    assert(result.lookup("r").isDefined)
-    assert(result.findTest("lambdaTest") != None)
-    assert(result.findTest("lambdaTest").description == StringValue("Testing LambdaApplication - Addition"))
-    //assert(result.findTest("lambdaTest").variables == None)
-    //assert(result.findTest("lambdaTest").stmt == Some(IntValue(1)))
-    //assert(result.lookup("r") == Some(IntValue(2)))
+    assert(result.findTest("lambdaTestM").description == StringValue("Testing LambdaApplication - Addition"))
+    assert(result.findTest("lambdaTestm").description == StringValue("Testing LambdaApplication - Subtraction"))
+    assert(result.findTest("lambdaTestx").description == StringValue("Testing LambdaApplication - Multiplication"))
+    assert(result.findTest("lambdaTestd").description == StringValue("Testing LambdaApplication - Division"))
+    assert(result.lookup("r") == Some(IntValue(2)))
+    assert(result.lookup("y") == Some(IntValue(5)))
+    assert(result.lookup("z") == Some(IntValue(16)))
+    assert(result.lookup("w") == Some(IntValue(8)))
   }
 
   test("Testing Boolean LambdaApplication Test"){
@@ -913,9 +915,14 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
-    assert(result.lookup("r").isDefined)
-    assert(result.findTest("lambdaTest") != None)
-    assert(result.findTest("lambdaTest").description == StringValue("Testing LambdaApplication - Boolean Operation"))
+    assert(result.findTest("lambdaTestT").description == StringValue("Testing LambdaApplication - Boolean Operation True"))
+    assert(result.findTest("lambdaTestF").description == StringValue("Testing LambdaApplication - Boolean Operation False"))
+    assert(result.findTest("lambdaTestAnd").description == StringValue("Testing LambdaApplication - AND Operation"))
+    assert(result.findTest("lambdaTestOr").description == StringValue("Testing LambdaApplication - OR Operation"))
+    assert(result.lookup("r") == Some(BoolValue(true)))
+    assert(result.lookup("y") == Some(BoolValue(false)))
+    assert(result.lookup("z") == Some(BoolValue(false)))
+    assert(result.lookup("w") == Some(BoolValue(true)))
   }
 
   test(testName = "Testing boolean32"){
