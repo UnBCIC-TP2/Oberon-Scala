@@ -695,6 +695,116 @@ test("testing Record Usage") {
 
   }
 
+  test("Testing OrExpression") {
+    TACodeGenerator.reset
+    val expr = OrExpression(BoolValue(true), BoolValue(false))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // (true or false)
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(OrOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, "")
+    )
+
+    assert(list == ops)
+  }
+
+  test("Testing AndExpression") {
+    TACodeGenerator.reset
+    val expr = AndExpression(BoolValue(true), BoolValue(false))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // (true and false)
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(AndOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, "")
+    )
+
+    assert(list == ops)
+  }
+
+  test("Testing MultExpression") {
+    TACodeGenerator.reset
+    val expr = MultExpression(IntValue(3), IntValue(3))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // 3 * 3
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(MulOp(Constant("3", IntegerType), Constant("3", IntegerType), t0, ""))
+
+    assert(list == ops)
+  }
+
+  test("Testing DivExpression") {
+    TACodeGenerator.reset
+    val expr = DivExpression(IntValue(2), IntValue(2))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // 2 / 2
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(DivOp(Constant("2", IntegerType), Constant("2", IntegerType), t0, ""))
+
+    assert(list == ops)
+  }
+
+  test("Testing SubExpression") {
+    TACodeGenerator.reset
+    val expr = SubExpression(IntValue(1), IntValue(1))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // 1 - 1
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(SubOp(Constant("1", IntegerType), Constant("1", IntegerType), t0, ""))
+
+    assert(list == ops)
+  }
+
+ test("Testing ModExpression") {
+    TACodeGenerator.reset
+    val expr = ModExpression(IntValue(4), IntValue(2))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // 4 % 2
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0, false)
+    val ops = List(RemOp(Constant("4", IntegerType), Constant("2", IntegerType), t0, ""))
+
+    assert(list == ops)
+  }
+
+  test("testing Exit statement") {
+    TACodeGenerator.reset()
+    val exitstmt = ExitStmt()
+    val list = TACodeGenerator.generateStatement(exitstmt, List())
+
+    val ops = List(Exit(""))
+
+    assert(list == ops)
+  }
+
+  test("testing Return statement") {
+    TACodeGenerator.reset()
+    val returnstmt = ReturnStmt(IntValue(5))
+    val list = TACodeGenerator.generateStatement(returnstmt, List())
+
+    val ops = List(Return(Constant("5", IntegerType), ""))
+
+    assert(list == ops)
+  }
+
+  test("testing Write statement") {
+    TACodeGenerator.reset()
+    val writestmt = WriteStmt(IntValue(1))
+    val list = TACodeGenerator.generateStatement(writestmt, List())
+
+    val ops = List(Write(Constant("1", IntegerType), ""))
+
+    assert(list == ops)
+  }
+  
 }
 
 
