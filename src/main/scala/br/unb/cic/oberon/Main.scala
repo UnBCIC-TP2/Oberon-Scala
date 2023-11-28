@@ -7,6 +7,8 @@ import br.unb.cic.oberon.codegen.{
 }
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.ModuleLoader
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
@@ -106,8 +108,10 @@ object Main extends App with Oberon2ScalaParser {
   }
 
   private def interpret() = {
-    val content = Files.readString(conf.interpreter.inputPath.get.get)
-    val module = parseAbs(parse(oberonParser,content))
+    // val content = Files.readString(conf.interpreter.inputPath.get.get)
+    // val module = ScalaParser.parse(content)
+    val filepath = conf.interpreter.inputPath.get.get.toString
+    val module = ModuleLoader.loadAndMerge(filepath)
 
     val interpreter = new Interpreter()
     val result = interpreter.runInterpreter(module)

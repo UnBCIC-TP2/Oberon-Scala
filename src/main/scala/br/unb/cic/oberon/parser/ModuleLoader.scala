@@ -6,6 +6,8 @@ import br.unb.cic.oberon.util.Resources
 import scala.io.Source
 import scala.reflect.io.Path
 
+import java.nio.file.{Files, Paths => JavaPaths, Path => JavaPath}
+
 /** Loads/Parses a module along with the whole tree of imported modules. By
   * default, modules are loaded from file paths, so if you want to load them
   * from resources, you can mix ContentFromResource like this: `val loader = new
@@ -63,7 +65,9 @@ class ModuleLoader {
 
 sealed trait ContentFromResource extends ModuleLoader {
   protected override def getContent(resource: Path): String =
+  {
     Resources.getContent(resource.path)
+  }
 }
 
 /** Merges the modules loaded by a ModuleLoader into one big module */
