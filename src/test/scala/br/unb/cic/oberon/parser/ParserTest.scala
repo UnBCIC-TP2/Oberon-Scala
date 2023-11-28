@@ -2991,10 +2991,10 @@ class ParserTestSuite extends AbstractTestSuite {
   test("Testing the oberon pointerAssign1 code") {
     val module = ScalaParser.parseResource("pointers/pointerAssign1.oberon")
 
-    // test if there are 5 statements in stmts list
+    // test if there are 10 statements in stmts list
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 5)
-      case _                  => fail("This module should have 5 statements!")
+      case SequenceStmt(stmt) => assert(stmt.length == 10)
+      case _                  => fail("This module should have 10 statements!")
     }
 
     val epsilon = 1e-2f
@@ -3003,19 +3003,34 @@ class ParserTestSuite extends AbstractTestSuite {
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
     assert(
-      stmts.head == new AssignmentStmt(PointerAssignment("a"), IntValue(1))
+      stmts.head == new NewStmt("a")
     )
     assert(
-      stmts(1) === new AssignmentStmt(PointerAssignment("b"), RealValue(9.5))
+      stmts(1) == new NewStmt("b")
     )
     assert(
-      stmts(2) == new AssignmentStmt(PointerAssignment("c"), CharValue('c'))
+      stmts(2) == new NewStmt("c")
     )
     assert(
-      stmts(3) == new AssignmentStmt(PointerAssignment("d"), BoolValue(true))
+      stmts(3) == new NewStmt("d")
     )
     assert(
-      stmts(4) == new AssignmentStmt(
+      stmts(4) == new NewStmt("e")
+    )
+    assert(
+      stmts(5) == new AssignmentStmt(PointerAssignment("a"), IntValue(1))
+    )
+    assert(
+      stmts(6) === new AssignmentStmt(PointerAssignment("b"), RealValue(9.5))
+    )
+    assert(
+      stmts(7) == new AssignmentStmt(PointerAssignment("c"), CharValue('c'))
+    )
+    assert(
+      stmts(8) == new AssignmentStmt(PointerAssignment("d"), BoolValue(true))
+    )
+    assert(
+      stmts(9) == new AssignmentStmt(
         PointerAssignment("e"),
         StringValue("Hello.")
       )
@@ -3065,41 +3080,31 @@ class ParserTestSuite extends AbstractTestSuite {
   test("Testing the oberon pointerAssign3 code") {
     val module = ScalaParser.parseResource("pointers/pointerAssign2.oberon")
 
-    assert(module.variables.size == 3)
+    assert(module.variables.size == 2)
     assert(
-      module.variables.head == VariableDeclaration("a", PointerType(RealType))
-    )
-    assert(
-      module.variables(1) == VariableDeclaration(
-        "b",
-        PointerType(ReferenceToUserDefinedType("pointerA"))
-      )
-    )
-    assert(
-      module.variables(2) == VariableDeclaration(
-        "c",
-        PointerType(PointerType(IntegerType))
-      )
+      module.variables.head == VariableDeclaration("a", PointerType(RealType)),
+      module.variables(1) == VariableDeclaration("b", PointerType(PointerType(RealType)))
     )
 
     // conferir a contagem de statement
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 2)
-      case _                  => fail("This module should have 2 statements!")
+      case SequenceStmt(stmt) => assert(stmt.length == 3)
+      case _                  => fail("This module should have 3 statements!")
     }
-
-    // verificar com o grupo numeros
-    assert(module.userTypes.size == 1)
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
     // opção IDE de convert to block expression - real value
     assert(
-      stmts.head == new AssignmentStmt(PointerAssignment("a"), RealValue(10.5))
+      stmts.head == new NewStmt("a"),
     )
     assert(
-      stmts(1) == new AssignmentStmt(PointerAssignment("b"), VarExpression("a"))
+      stmts(1) == new AssignmentStmt(PointerAssignment("a"), RealValue(10.5)),
     )
+    assert(
+      stmts(2) == new AssignmentStmt(PointerAssignment("b"), VarExpression("a"))
+    )
+
   }
 
   test(testName = "Testing the oberon pointerOps1 code") {
