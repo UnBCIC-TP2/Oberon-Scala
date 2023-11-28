@@ -66,20 +66,26 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
     assert(exp2 == BoolValue(false))
   }
 
-  ignore("Test eval lambda expression on Array") {
+  test("Test eval lambda expression on Composite Operations") {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
-    var args = List(ParameterByValue("x",BooleanType), ParameterByValue("y",BooleanType))
-    val listexp = List(IntValue(1), IntValue(4))
+    var args = List(ParameterByValue("x",RealType), ParameterByValue("y",RealType), ParameterByValue("z", RealType))
+    val listexp = List(RealValue(10), RealValue(9), RealValue(8))
 
     //First Test
-    var arr = ArrayValue(ListBuffer(IntValue(0),IntValue(0)), ArrayType(2, IntegerType)) 
-    // val or = OrExpression(VarExpression("x"),VarExpression("y"))
-    // var lambdaexp = LambdaExpression(args,or) 
-    // val (env1,exp1) = interpreter.evalExpression(env,LambdaApplication(lambdaexp,listexp))
-    // assert(exp1 == BoolValue(true))
+    val sumxy = AddExpression(VarExpression("x"), VarExpression("y"))
+    val mult_xy_z = MultExpression(sumxy, VarExpression("z"))
+    val lambdaexp = LambdaExpression(args, mult_xy_z)
+    val (env1, exp1) = interpreter.evalExpression(env, LambdaApplication(lambdaexp, listexp))
+    assert(exp1 == RealValue(152.0))
 
     //Second Test
+    val subxy = SubExpression(VarExpression("x"), VarExpression("y"))
+    val div_xyz = DivExpression(subxy, VarExpression("z"))
+    val lambdaexp2 = LambdaExpression(args, div_xyz)
+    val (env2, exp2) = interpreter.evalExpression(env, LambdaApplication(lambdaexp2, listexp))
+    assert(exp2 == RealValue(0.125))
+
   }
 
 

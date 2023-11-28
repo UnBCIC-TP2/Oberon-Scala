@@ -1,0 +1,36 @@
+MODULE LambdaTest04;
+
+TYPE
+  intArray = ARRAY 3 OF INTEGER
+  ld = LAMBDA -> (INTEGER, INTEGER, INTEGER): INTEGER
+
+VAR
+  mediaTurma : intArray;
+  x: ld;
+  v: INTEGER;
+  media_simples: INTEGER;
+
+TEST lambdaTestForeach ("Testing LambdaApplication on Array-Foreach");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER, c: INTEGER) => (a + b + c) / 3;
+            mediaTurma[0] := (x)(4,5,3);
+            mediaTurma[1] := (x)(8,9,7);
+            mediaTurma[2] := (x)(3,5,10);
+
+            media_simples := 0;
+
+            FOREACH v IN mediaTurma
+                media_simples := media_simples + v
+            END;
+
+            media_simples := media_simples / 3;
+
+            write(media_simples)
+
+    END lambdaTestForeach
+
+BEGIN
+  write("Test Succeeded")
+END
+
+END LambdaTest04.
