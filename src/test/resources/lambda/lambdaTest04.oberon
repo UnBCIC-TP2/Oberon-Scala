@@ -25,6 +25,14 @@ TEST lambdaTestForeach ("Testing LambdaApplication on Array-Foreach");
 
             media_simples := media_simples / 3;
 
+            assert_eq(mediaTurma[0], 4)
+
+            assert_eq(mediaTurma[1], 8)
+
+            assert_eq(mediaTurma[2], 6)
+
+            assert_eq(media_simples, 6)
+
             write(media_simples)
 
     END lambdaTestForeach
