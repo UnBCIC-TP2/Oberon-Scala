@@ -111,6 +111,36 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
+  test("ModuleLoader with 'interpreter_factorial01.oberon'") {
+    val module = ResourceModuleLoader.loadAndMerge("procedures/interpreter_factorial01.oberon")
+
+    val expected_stmt = Some(
+      SequenceStmt(
+          List(
+              AssignmentStmt("y",IntValue(1)),
+              ForStmt(AssignmentStmt(
+                  "x",IntValue(5)),
+                  GTExpression(VarExpression("x"),IntValue(1)),
+                  SequenceStmt(
+                      List(
+                          AssignmentStmt("y",MultExpression(VarExpression("y"),VarExpression("x"))),
+                          AssignmentStmt("x",SubExpression(VarExpression("x"),IntValue(1)))
+                      )
+                  )
+              ),
+              WriteStmt(VarExpression("y"))
+          )
+      )
+  )
+
+    val expected = makeModule(
+      name = "SimpleModule",
+      variables = List(VariableDeclaration("x", IntegerType), VariableDeclaration("y", IntegerType)),
+      stmt = expected_stmt
+    )
+    assert(module == expected)
+  }
+
   ignore("ModuleLoader deals with transitive imports") {
     val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
 
