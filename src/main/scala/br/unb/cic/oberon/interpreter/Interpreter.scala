@@ -250,13 +250,13 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
   def evalExpression(exp: Expression): IResult[Expression] = for { stateValue <- exp match {
-    case IntValue(v) => pure(IntValue(v))
-    case RealValue(v) => pure(RealValue(v)) 
-    case CharValue(v) => pure(CharValue(v))
-    case BoolValue(v) => pure(BoolValue(v))
-    case StringValue(v) => pure(StringValue(v))
-    case NullValue => pure(NullValue)
-    case Undef() => pure(Undef())
+    case IntValue(v) => State[Environment[Expression], Expression] {env => (env, IntValue(v))}
+    case RealValue(v) => State[Environment[Expression], Expression] {env => (env, RealValue(v))}
+    case CharValue(v) => State[Environment[Expression], Expression] {env => (env, CharValue(v))}
+    case BoolValue(v) => State[Environment[Expression], Expression] {env => (env, BoolValue(v))}
+    case StringValue(v) => State[Environment[Expression], Expression] {env => (env, StringValue(v))}
+    case NullValue => State[Environment[Expression], Expression] {env => (env, NullValue)}
+    case Undef() => State[Environment[Expression], Expression] {env => (env, Undef())}
     case VarExpression(name) => evalVarExpression(name)
     //TODO eval array
     //case ArrayValue(v, t) =>
@@ -305,7 +305,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     env <- get[Environment[Expression]]
     returnValue = env.lookup(Values.ReturnKeyWord)
     _ <- modify[Environment[Expression]](_.pop())
-  } yield returnValue
+  } yield returnValue.get
 
   /**
    * Eval an arithmetic expression on Numbers
@@ -320,7 +320,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def arithmeticExpression(left: Expression, right: Expression, fn: (Number, Number) => Number): IResult[Expression] = for {
       vl <- evalExpression(left)
       vr <- evalExpression(right)
-  } yield (fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
+  } yield fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number])
 
 
   /**
