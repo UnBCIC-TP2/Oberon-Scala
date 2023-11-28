@@ -92,6 +92,7 @@ sealed class ModuleMerger(val loader: ModuleLoader) {
     val constants = subtree.flatMap(_.constants)
     val variables = subtree.flatMap(_.variables)
     val procedures = subtree.flatMap(_.procedures)
+    val tests = subtree.flatMap(_.tests)
     val stmt = concatStmts(List(module).flatMap(_.stmt))
 
     OberonModule(
