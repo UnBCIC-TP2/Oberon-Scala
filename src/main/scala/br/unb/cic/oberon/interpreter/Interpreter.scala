@@ -234,16 +234,16 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    * That is, here we are considering testability a
    * design concern.
    */
-  def setGlobalVariable(env: Environment[Expression], name: String, exp: Expression): Environment[Expression] = {
-    env.setGlobalVariable(name, exp)
-  }
+  def setGlobalVariable(name: String, exp: Expression): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.setGlobalVariable(name, exp))
+  } yield ()
 
   /*
    * the same here.
    */
-  def setLocalVariable(env: Environment[Expression], name: String, exp: Expression): Environment[Expression] = {
-    env.setLocalVariable(name, exp)
-  }
+  def setLocalVariable(name: String, exp: Expression): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.setLocalVariable(name, exp))
+  } yield ()
 
   def setTestEnvironment() = {
     printStream = new PrintStream(new NullPrintStream())
