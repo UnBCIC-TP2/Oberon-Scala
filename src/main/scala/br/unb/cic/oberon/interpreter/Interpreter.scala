@@ -194,11 +194,11 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): IResult[Unit] = {
-    val mappedArgs = procedure.args.zip(args).map(pair => pair match {
+  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment: Environment[Expression]): Environment[Expression] = {
+      val mappedArgs = procedure.args.zip(args).map(pair => pair match {
       case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(environment, exp)._2)
+      case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(exp).runA(environment).value) // we are not saving modifications to the environment here, not sure how to do it in a map
     })
     var envt = environment.push() // after that, we can "push", to indicate a procedure call.
     mappedArgs.foreach(pair => pair match {
@@ -300,7 +300,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def evalFunctionCall(name: String, args: List[Expression]): IResult[Expression] =  for {
     env <- get[Environment[Expression]]
     procedure = env.findProcedure(name)
-    _ <- updateEnvironmentWithProcedureCall(procedure, args)
+    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args, _))
     _ <- executeStatement(procedure.stmt)
     env <- get[Environment[Expression]]
     returnValue = env.lookup(Values.ReturnKeyWord)
