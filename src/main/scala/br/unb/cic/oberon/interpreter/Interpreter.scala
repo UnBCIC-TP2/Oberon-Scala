@@ -82,7 +82,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
 
 
-  def executeStatement(stmt: Statement): IResult[Unit] = {
+  def executeStatement(stmt: Statement): IResult[Unit] = for {
     // we first check if we have encountered a return stmt.
     // if so, we should not execute any other statement
     // of a sequence of stmts. Whenever we encounter a
@@ -93,46 +93,47 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     // we should also stop the execution of a block of
     // statements within a any kind of repeat statement.
 
-    var envt = environment
+    envt <- get[Environment[Expression]]
 
-    if (exit || environment.lookup(Values.ReturnKeyWord).isDefined) {
-      return environment
-    }
+    _ <- if (exit || envt.lookup(Values.ReturnKeyWord).isDefined) State[Environment[Expression], Unit] {env => (env, ())} else
     // otherwise, we pattern-match on the current stmt.
     stmt match {
       case AssignmentStmt(designator, exp) =>
         designator match {
-          case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp)._2)
-          case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
+          case VarAssignment(name) => for {
+            expr <- evalExpression(exp)
+            _ <- modify[Environment[Expression]](_.setVariable(name, expr))
+          } yield ()
+          case ArrayAssignment(array, index) => for {_ <- arrayAssignment(array, index, exp)} yield ()
           case RecordAssignment(_, _) => ???
           case PointerAssignment(_) => ???
         }
-        envt
 
       case SequenceStmt(stmts) =>
+        // acho que da pra usar flatTraverse nesse caso
         stmts.foreach(s => envt = executeStatement(envt, s))
         envt
 
-      case ReadRealStmt(name) =>
-        envt = envt.setVariable(name, RealValue(StdIn.readLine().toFloat))
-        envt
+      case ReadRealStmt(name) => for {
+        _ <- modify[Environment[Expression]](_.setVariable(name, RealValue(StdIn.readLine().toFloat)))
+      } yield ()
 
-      case ReadIntStmt(name) =>
-        envt = envt.setVariable(name, IntValue(StdIn.readLine().toInt))
-        envt
+      case ReadIntStmt(name) => for {
+        _ <- modify[Environment[Expression]](_.setVariable(name, IntValue(StdIn.readLine().toInt)))
+      } yield ()
 
-      case ReadCharStmt(name) =>
-        envt = envt.setVariable(name, CharValue(StdIn.readLine().charAt(0)))
-        envt
+      case ReadCharStmt(name) => for {
+        _ <- modify[Environment[Expression]](_.setVariable(name, CharValue(StdIn.readLine().charAt(0))))
+      } yield ()
 
-      case WriteStmt(exp) =>
-        printStream.println(evalExpression(envt, exp))
-        envt
+      case WriteStmt(exp) => for {
+        expr <- evalExpression(exp)
+      } yield printStream.println(expr)
 
-      case IfElseStmt(condition, thenStmt, elseStmt) =>
-        if (evalCondition(envt, condition)) executeStatement(envt, thenStmt)
-        else if (elseStmt.isDefined) executeStatement(envt, elseStmt.get)
-        else envt
+      case IfElseStmt(condition, thenStmt, elseStmt) => for {
+        cond <- evalCondition(condition)
+        _ <- if (cond) executeStatement(thenStmt) else if (elseStmt.isDefined) executeStatement(elseStmt.get) else State[Environment[Expression], Unit] {env => (env, ())}
+      } yield ()
 
       case WhileStmt(condition, whileStmt) =>
         while (evalCondition(envt, condition) && ! exit)
@@ -160,20 +161,22 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         envt
       case ExitStmt() =>
         exit = true
-        envt
+        State[Environment[Expression], Unit] {env => (env, ())}
 
-      case ReturnStmt(exp: Expression) =>
-        setReturnExpression(envt, evalExpression(envt, exp)._2)
+      case ReturnStmt(exp: Expression) => for {
+        expr <- evalExpression(exp)
+        _ <- setReturnExpression(expr)
+      } yield ()
 
-      case MetaStmt(f) => {
-        val s = f(envt)
-        executeStatement(envt, s)
-      }
+      case MetaStmt(f) => for {
+        _ <- executeStatement(f(envt))
+      } yield ()
 
-      case ProcedureCallStmt(name, args) =>
-        callProcedure(name, args, envt)
+      case ProcedureCallStmt(name, args) => for {
+        _ <- callProcedure(name, args)
+      } yield ()
     }
-  }
+  } yield ()
 
 
   /*
@@ -182,16 +185,17 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    * in the local variables, assigning
    * "return" -> exp.
    */
-  private def setReturnExpression(environment : Environment[Expression], exp: Expression): Environment[Expression] =
-    environment.setLocalVariable(Values.ReturnKeyWord, exp)
+  private def setReturnExpression(exp: Expression): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.setLocalVariable(Values.ReturnKeyWord, exp))
+  } yield ()
 
-  def callProcedure(name: String, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
-    val procedure = environment.findProcedure(name)
-    var env1 = updateEnvironmentWithProcedureCall(procedure, args, environment)
-    env1 = executeStatement(env1, procedure.stmt)
-    env1 = env1.pop()
-    env1
-  }
+  def callProcedure(name: String, args: List[Expression]): IResult[Unit] = for {
+    env <- get[Environment[Expression]]
+    procedure = env.findProcedure(name)
+    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args, _))
+    _ <- executeStatement(procedure.stmt)
+    _ <- modify[Environment[Expression]](_.pop())
+  } yield ()
 
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment: Environment[Expression]): Environment[Expression] = {
@@ -214,19 +218,17 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
 
-  def evalCondition(environment : Environment[Expression], expression: Expression): Boolean = {
-    evalExpression(environment, expression)._2.asInstanceOf[BoolValue].value
-  }
+  def evalCondition(expression: Expression): IResult[Boolean] = for {
+    condition <- evalExpression(expression)
+  } yield condition.asInstanceOf[BoolValue].value
 
-  def arrayAssignment(environment: Environment[Expression], baseExp: Expression, indexExp: Expression, exp: Expression): Environment[Expression] = {
-    val array = evalExpression(environment, baseExp)._2
-    val index = evalExpression(environment, indexExp)._2
-
-    (array, index) match {
-      case (ArrayValue(values, _), IntValue(v)) => values(v) = evalExpression(environment, exp)._2
+  def arrayAssignment(baseExp: Expression, indexExp: Expression, exp: Expression): IResult[Unit] = for {
+    array <- evalExpression(baseExp)
+    index <- evalExpression(indexExp)
+    expr <- evalExpression(exp)
+  } yield (array, index) match {
+      case (ArrayValue(values, _), IntValue(v)) => values(v) = expr
       case _ => throw new RuntimeException
-    }
-    environment
   }
 
   /*
