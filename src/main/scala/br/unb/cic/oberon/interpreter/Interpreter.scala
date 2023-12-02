@@ -34,10 +34,8 @@ class Interpreter {
 
   var printStream: PrintStream = new PrintStream(System.out)
 
-  def run(module: OberonModule): Environment[Expression] = {
-    environment = new Environment[Expression]()
-    runInterpreter(module).runS(environment).value
-  }
+  def run(module: OberonModule): Environment[Expression] =
+    runInterpreter(module).runS(new Environment[Expression]()).value
 
   def setupStandardLibraries(): IResult[Unit] = for {
     _ <- get[Environment[Expression]]
@@ -178,10 +176,9 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
         _ <- callProcedure(name, args)
       } yield ()
 
-      case AssertTrueStmt(exp: Expression) =>
-        var envteste = envt
-        if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
-        envteste
+      case AssertTrueStmt(exp: Expression) => for {
+        assert <- evalCondition(exp)
+      } yield if (!assert) throw new Exception("Exception thrown from assert") else ()
     }
   } yield ()
 
@@ -238,14 +235,12 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
       case _ => throw new RuntimeException
   }
 
-  def updateEnvironmentWithTest(test: Test, environment: Environment[Expression]): Environment[Expression] = {
-    var envt = environment.push() // indicates a test.
+  def updateEnvironmentWithTest(test: Test): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.push())
 
-    test.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
-    test.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
-
-    envt
-  }
+    _ <- test.constants.traverse(c => for {_ <- modify[Environment[Expression]](_.setLocalVariable(c.name, c.exp))} yield ())
+    _ <- test.variables.traverse(v => for {_ <- modify[Environment[Expression]](_.setLocalVariable(v.name, Undef()))} yield ())
+  } yield ()
 
 
   
