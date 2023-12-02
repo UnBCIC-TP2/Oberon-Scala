@@ -5,6 +5,7 @@ import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ir.ast._
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
+import cats.data.State
 
 import java.io.PrintStream
 import java.util.Base64
@@ -58,7 +59,7 @@ object JVMCodeGenerator extends CodeGenerator[String] {
 
     constants.map {
       case (constant) => 
-        val (_, v) = interpreter.evalExpression(env, constant.exp)
+        val v = interpreter.evalExpression(constant.exp).runA(env).value
 
       v match {
         case IntValue(value) => {

@@ -22,6 +22,8 @@ import java.util.Collections
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
+import cats.implicits._
+import cats.data.State
 
 class OberonEngine extends ScriptEngine {
   object Format extends Enumeration {
@@ -178,7 +180,7 @@ class OberonEngine extends ScriptEngine {
     )
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
-    env =  interpreter.runInterpreter(coreModule)
+    env =  interpreter.run(coreModule)
     null
   }
 
@@ -189,11 +191,11 @@ class OberonEngine extends ScriptEngine {
     val command = ScalaParser.parserREPL(statement)
     command match {
       case v: REPLVarDeclaration =>
-        env = v.declarations.foldLeft(env)((acc, b) => interpreter.declareVariable(acc, b))
+        env = v.declarations.traverse(b => for {_ <- interpreter.declareVariable(b)} yield ()).runS(env).value
       case c: REPLConstant =>
-        env = interpreter.declareConstant(env, c.constants)
+        env = interpreter.declareConstant(c.constants).runS(env).value
       case u: REPLUserTypeDeclaration =>
-        env = interpreter.declareUserDefinedType(env, u.userTypes)
+        env = interpreter.declareUserDefinedType(u.userTypes).runS(env).value
       case s: REPLStatement =>
         s.stmt match {
           case AssignmentStmt(des, exp) =>
@@ -205,7 +207,7 @@ class OberonEngine extends ScriptEngine {
               case VarAssignment(name) =>
                 put(name, exp)
             }
-          case s: Statement => env = interpreter.executeStatement(env, CoreTransformer.reduceToCoreStatement(s))
+          case s: Statement => env = interpreter.executeStatement(CoreTransformer.reduceToCoreStatement(s)).runS(env).value
         }
       case e: REPLExpression => return expressionValue(e.exp)
     }
@@ -213,7 +215,7 @@ class OberonEngine extends ScriptEngine {
   }
 
   private def expressionValue(exp: Expression): Any = {
-    val (e, result) = interpreter.evalExpression(env, exp)
+    val (e, result) = interpreter.evalExpression(exp).run(env).value
     env = e
     result match {
       case v: Value => return v.value
@@ -229,7 +231,7 @@ class OberonEngine extends ScriptEngine {
       case b: Boolean => BoolValue(b)
       case e: Exception => StringValue(e.getMessage)
       case e: Expression => {
-        val (env1, exp) = interpreter.evalExpression(env, e)
+        val (env1, exp) = interpreter.evalExpression(e).run(env).value
         env = env1
         exp
       }
