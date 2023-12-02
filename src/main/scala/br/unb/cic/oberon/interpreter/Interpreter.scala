@@ -11,6 +11,7 @@ import scala.io.StdIn
 import scala.language.{existentials, postfixOps}
 import cats.data.State
 import State._
+import cats.implicits._
 
 /**
  * The interpreter visitor first updates the
@@ -93,6 +94,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     // we should also stop the execution of a block of
     // statements within a any kind of repeat statement.
 
+    // essas funcoes do state monad n precisa explicitar o tipo do state, depois volto pra limpar o codigo
     envt <- get[Environment[Expression]]
 
     _ <- if (exit || envt.lookup(Values.ReturnKeyWord).isDefined) State[Environment[Expression], Unit] {env => (env, ())} else
@@ -110,9 +112,8 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         }
 
       case SequenceStmt(stmts) =>
-        // acho que da pra usar flatTraverse nesse caso
-        stmts.foreach(s => envt = executeStatement(envt, s))
-        envt
+        // as stmts is a List[Statement], we can use traverse_ to execute all statements in order, saving them in a State monad
+        stmts.traverse_(executeStatement)
 
       case ReadRealStmt(name) => for {
         _ <- modify[Environment[Expression]](_.setVariable(name, RealValue(StdIn.readLine().toFloat)))
@@ -134,31 +135,32 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         cond <- evalCondition(condition)
         _ <- if (cond) executeStatement(thenStmt) else if (elseStmt.isDefined) executeStatement(elseStmt.get) else State[Environment[Expression], Unit] {env => (env, ())}
       } yield ()
+      
+      case WhileStmt(condition, whileStmt) => for {
+        cond <- evalCondition(condition)
+        // nao sei se funciona
+        _ <- (for {
+          _ <- executeStatement(whileStmt)
+          cond <- evalCondition(condition)
+        } yield (cond && !exit)).whileM_(pure(cond && !exit))
+      } yield exit = false
 
-      case WhileStmt(condition, whileStmt) =>
-        while (evalCondition(envt, condition) && ! exit)
-          envt = executeStatement(envt, whileStmt)
-        exit = false
-        envt
-
-      case ForEachStmt(v, exp, stmt) =>
-        val (env, valArray) = evalExpression(envt, exp)
-        envt = env
-        valArray match {
-          case ArrayValue(values, _) => {
-            envt = envt.push()
-            values.foreach(value => {
-              envt = envt.setLocalVariable(v, evalExpression(envt, value)._2)
-              envt = executeStatement(envt, stmt)
-              //               val assignment = AssignmentStmt(VarAssignment(v), value)
-              //               val stmts = SequenceStmt(List(assignment, stmt))
-              //               stmts.accept(this)
-            })
-            envt = envt.pop()
-          }
+      case ForEachStmt(v, exp, stmt) => for {
+        valArray <- evalExpression(exp)
+        _ <- valArray match {
+          case ArrayValue(values, _) => for {
+            _ <- modify[Environment[Expression]](_.push())
+            _ <- values.toList.traverse(value => for {
+              expr <- evalExpression(value)
+              _ <- modify[Environment[Expression]](_.setLocalVariable(v, expr))
+              _ <- executeStatement(stmt)
+            } yield ())
+            _ <- modify[Environment[Expression]](_.pop())
+          } yield ()
           case _ => throw new RuntimeException("erro.... melhorar")
         }
-        envt
+      } yield ()
+
       case ExitStmt() =>
         exit = true
         State[Environment[Expression], Unit] {env => (env, ())}
