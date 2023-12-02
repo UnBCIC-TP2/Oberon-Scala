@@ -2,30 +2,32 @@ package br.unb.cic.oberon.ir.ast
 
 import br.unb.cic.oberon.visitor.OberonVisitor
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.interpreter.Interpreter
+
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
 /** Abstract representation of an Oberon Module
-  *
-  * Here we use an object-oriented decomposition to represent Oberon concepts as
-  * Scala classes and traits.
-  *
-  * The use of case classes here are handy, mostly because we can use case case
-  * classes in pattern matching, and they also provide useful methods (such as
-  * equality).
-  *
-  * Traits offers an interesting approach for software composition, besides OO
-  * inheritance.
-  */
-case class OberonModule(
-    name: String,
-    submodules: Set[String],
-    userTypes: List[UserDefinedType],
-    constants: List[Constant],
-    variables: List[VariableDeclaration],
-    procedures: List[Procedure],
-    stmt: Option[Statement]
-) {
+ *
+ * Here we use an object-oriented decomposition to represent
+ * Oberon concepts as Scala classes and traits.
+ *
+ * The use of case classes here are handy, mostly because we
+ * can use case case classes in pattern matching, and they also
+ * provide useful methods (such as equality).
+ *
+ * Traits offers an interesting approach for software composition,
+ * besides OO inheritance.
+ */
+case class OberonModule(name: String,
+                        submodules: Set[String],
+                        userTypes: List[UserDefinedType],
+                        constants: List[Constant],
+                        variables: List[VariableDeclaration],
+                        procedures: List[Procedure],
+                        tests: List[Test],
+                        stmt: Option[Statement]
+                       ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
@@ -41,6 +43,17 @@ case class Procedure(
     variables: List[VariableDeclaration],
     stmt: Statement
 ) {
+  def accept(v: OberonVisitor): v.T = v.visit(this)
+}
+
+/* test declaration definition*/
+case class Test(modifier: String,
+                name: String,
+                description: StringValue,
+                constants: List[Constant],
+                variables: List[VariableDeclaration],
+                stmt: Statement
+                ) {
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
@@ -231,6 +244,7 @@ case class ReadCharStmt(varName: String) extends Statement
 case class WriteStmt(expression: Expression) extends Statement
 case class ProcedureCallStmt(name: String, args: List[Expression])
     extends Statement
+case class TestCallStmt(name: String) extends Statement
 case class IfElseStmt(
     condition: Expression,
     thenStmt: Statement,
@@ -260,6 +274,11 @@ case class CaseStmt(
 ) extends Statement
 case class ExitStmt() extends Statement
 case class NewStmt(varName: String) extends Statement
+case class MetaStmt(f: () => Statement) extends Statement
+case class AssertTrueStmt(exp: Expression) extends Statement
+case class AssertEqualStmt(left: Expression, right: Expression) extends Statement
+case class AssertNotEqualStmt(left: Expression, right: Expression) extends Statement
+case class AssertError() extends Statement
 
 trait CaseAlternative {
   def accept(v: OberonVisitor): v.T = v.visit(this)

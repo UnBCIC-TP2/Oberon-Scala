@@ -177,6 +177,11 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
       case ProcedureCallStmt(name, args) => for {
         _ <- callProcedure(name, args)
       } yield ()
+
+      case AssertTrueStmt(exp: Expression) =>
+        var envteste = envt
+        if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
+        envteste
     }
   } yield ()
 
@@ -233,6 +238,17 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
       case _ => throw new RuntimeException
   }
 
+  def updateEnvironmentWithTest(test: Test, environment: Environment[Expression]): Environment[Expression] = {
+    var envt = environment.push() // indicates a test.
+
+    test.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
+    test.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
+
+    envt
+  }
+
+
+  
   /*
    * This method is mostly useful for testing purposes.
    * That is, here we are considering testability a

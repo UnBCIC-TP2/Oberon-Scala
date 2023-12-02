@@ -15,6 +15,7 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
       constants: List[Constant] = List(),
       variables: List[VariableDeclaration] = List(),
       procedures: List[Procedure] = List(),
+      tests: List[Test] = List(),
       stmt: Option[Statement] = None
   ): OberonModule = {
     OberonModule(
@@ -24,6 +25,7 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
       constants,
       variables,
       procedures,
+      tests,
       stmt
     )
   }

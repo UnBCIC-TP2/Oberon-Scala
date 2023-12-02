@@ -45,6 +45,7 @@ class StandardLibrary[T]() {
       stringToInt,
       stringToFloat
     ),
+    List(),
     None
   )
 

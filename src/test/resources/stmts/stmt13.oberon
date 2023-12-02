@@ -8,7 +8,6 @@ BEGIN
 
     FOR y := x TO y < 100 DO
         y := y * y
-
     END;
     
     write(y)
