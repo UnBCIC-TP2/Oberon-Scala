@@ -34,52 +34,52 @@ class Interpreter {
 
   var printStream: PrintStream = new PrintStream(System.out)
 
-
-  def setupStandardLibraries(environment: Environment[Expression]): Environment[Expression] = {
-    var temp = environment
-    val lib = new StandardLibrary[Expression]()
-    for(p <- lib.stdlib.procedures) {
-      temp = temp.declareProcedure(p)
-    }
-    temp
+  def run(module: OberonModule): Environment[Expression] = {
+    environment = new Environment[Expression]()
+    runInterpreter(module).runS(environment).value
   }
 
-def runInterpreter(module: OberonModule): Environment[Expression] = {
+  def setupStandardLibraries(): IResult[Unit] = for {
+    _ <- get[Environment[Expression]]
+    lib = new StandardLibrary[Expression]()
+    _ <- lib.stdlib.procedures.traverse(declareProcedure)
+  } yield ()
+
+def runInterpreter(module: OberonModule): IResult[Unit] = for {
     // set up the global declarations
-    val env1 = module.userTypes.foldLeft(new Environment[Expression]())((a, b) => declareUserDefinedType(a, b))
-    val env2 = module.constants.foldLeft(env1)((a, b) => declareConstant(a, b))
-    val env3 = module.variables.foldLeft(env2)((a, b) => declareVariable(a, b))
-    val env4 = module.procedures.foldLeft(env3)((a, b) => declareProcedure(a, b))
+    _ <- module.userTypes.traverse(declareUserDefinedType)
+    _ <- module.constants.traverse(declareConstant)
+    _ <- module.variables.traverse(declareVariable)
+    _ <- module.procedures.traverse(declareProcedure)
 
     // execute the statement if it is defined.
     // remember, module.stmt is an Option[Statement].
-    if (module.stmt.isDefined) {
-      val env5 = setupStandardLibraries(env4)
-      executeStatement(env5, module.stmt.get)
+    _ <- if (module.stmt.isDefined) for {
+      _ <- setupStandardLibraries()
+      _ <- executeStatement(module.stmt.get)
+    } yield ()
+    else State[Environment[Expression], Unit] {env => (env, ())}
+  } yield ()
+
+  def declareConstant(constant: Constant): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.setGlobalVariable(constant.name, constant.exp))
+  } yield ()
+
+  def declareVariable(variable: VariableDeclaration): IResult[Unit] = for {
+    environment <- get[Environment[Expression]]
+    _ <- environment.baseType(variable.variableType) match {
+      case Some(ArrayType(length, baseType)) => for {_ <- modify[Environment[Expression]](_.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType))))} yield ()
+      case _ => for {_ <- modify[Environment[Expression]](_.setGlobalVariable(variable.name, Undef()))} yield ()
     }
-    else {
-      env4
-    }
-  }
+  } yield ()
 
-  def declareConstant(environment : Environment[Expression], constant: Constant): Environment[Expression] = {
-    environment.setGlobalVariable(constant.name, constant.exp)
-  }
+  def declareUserDefinedType(userType: UserDefinedType): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.addUserDefinedType(userType))
+  } yield ()
 
-  def declareVariable(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
-    environment.baseType(variable.variableType) match {
-      case Some(ArrayType(length, baseType)) => environment.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
-      case _ => environment.setGlobalVariable(variable.name, Undef())
-    }
-  }
-
-  def declareUserDefinedType(environment : Environment[Expression], userType: UserDefinedType): Environment[Expression] = {
-    environment.addUserDefinedType(userType)
-  }
-
-  def declareProcedure(environment : Environment[Expression], procedure: Procedure): Environment[Expression] = {
-    environment.declareProcedure(procedure)
-  }
+  def declareProcedure(procedure: Procedure): IResult[Unit] = for {
+    _ <- modify[Environment[Expression]](_.declareProcedure(procedure))
+  } yield ()
 
 
 
