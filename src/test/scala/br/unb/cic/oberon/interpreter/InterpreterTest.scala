@@ -948,6 +948,32 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("media_simples") == Some(IntValue(6)))
   }
 
+  test("Testing LambdaApplication - Bee1038Real"){
+    val module = parseResource("lambda/lambdaTest05.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Bee1038Real").description == StringValue("Testing LambdaApplication on bee1038"))
+    assert(result.lookup("banknotesValues") == Some(ArrayValue(ListBuffer(RealValue(2.5), RealValue(3.5), RealValue(4.5)),ArrayType(3,RealType))))
+    assert(result.lookup("amount_jp") == Some(RealValue(15.0)))
+    assert(result.lookup("amount_rb") == Some(RealValue(10.5)))
+    assert(result.lookup("amount_wm") == Some(RealValue(40.5)))
+  }
+
+  test("Testing LambdaApplication - Bee1038RealDollar"){
+    val module = parseResource("lambda/lambdaTest05.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Bee1038RealDollar").description == StringValue("Testing LambdaApplication on bee1038 - Dollar Conversion"))
+    assert(result.lookup("dollarValues") == Some(ArrayValue(ListBuffer(RealValue(12.3), RealValue(17.22), RealValue(22.14)),ArrayType(3,RealType))))
+  }
+
+  test("Testing LambdaApplication - Wrong Assignment"){
+    val module = parseResource("lambda/lambdaTest06.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val thrown = intercept[Exception]{interpreter.runInterpreter(coreModule, "lambdaTest")}
+    assert(thrown.getMessage() == "Exception thrown from assert")
+  }
 
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")

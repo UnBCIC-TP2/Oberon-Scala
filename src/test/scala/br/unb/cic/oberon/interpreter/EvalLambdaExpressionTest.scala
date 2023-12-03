@@ -88,6 +88,26 @@ class EvalLambdaExpressionTest extends AnyFunSuite {
 
   }
 
+  test("Test eval lambda expression on Composite Operations - 2") {
+    val interpreter = new Interpreter()
+    var env = new Environment[Expression]()
+    var arr = ArrayValue(ListBuffer(RealValue(2.5), RealValue(3.5)),ArrayType(2,RealType))
+    var args = List(ParameterByValue("x",IntegerType), ParameterByValue("y",IntegerType))
+    val listexp = List(IntValue(4), IntValue(2))
+
+    val mult_xy = MultExpression(arr.value(0), VarExpression("y"))
+    val lambdaexp = LambdaExpression(args, mult_xy)
+    val (env1, exp1) = interpreter.evalExpression(env, LambdaApplication(lambdaexp, listexp))
+    assert(exp1 == RealValue(5.0))
+
+    //Second Test
+    val mult_xy2 = MultExpression(arr.value(1), VarExpression("x"))
+    val lambdaexp2 = LambdaExpression(args, mult_xy2)
+    val (env2, exp2) = interpreter.evalExpression(env, LambdaApplication(lambdaexp2, listexp))
+    assert(exp2 == RealValue(14.0))
+
+  }
+
 
   ignore("Test eval lambda expression on 'foreach' and 'map'"){
     //Ideia: adicionar teste de foreach para lambda expression
