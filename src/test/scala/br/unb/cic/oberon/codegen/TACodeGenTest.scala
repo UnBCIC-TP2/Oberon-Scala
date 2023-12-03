@@ -500,7 +500,7 @@ class TACodeTest extends AnyFunSuite {
 
     assert(list == ops)
   }
-
+  
   test("Testing WhileStmt-LTExpression") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -814,7 +814,7 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0)
     val t1 = new Temporary(IntegerType, 1)
-    val expr = TACodeGenerator.generateExpression(MultExpression(IntValue(4), MultExpression(IntValue(2), IntValue(2))), List())
+    val (t, expr) = TACodeGenerator.generateExpression(MultExpression(IntValue(4), MultExpression(IntValue(2), IntValue(2))), List())
     val offset = Constant(expr.toString, IntegerType)
 
     val ops = List(
@@ -841,7 +841,7 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0)
     val t1 = new Temporary(IntegerType, 1)
-    val expr = TACodeGenerator.generateExpression(MultExpression(IntValue(4), SubExpression(MultExpression(IntValue(6), IntValue(8)), IntValue(3))), List())
+    val (t, expr) = TACodeGenerator.generateExpression(MultExpression(IntValue(4), SubExpression(MultExpression(IntValue(6), IntValue(8)), IntValue(3))), List())
     val offset = Constant(expr.toString, IntegerType)
 
     val ops = List(
@@ -868,7 +868,7 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0)
     val t1 = new Temporary(IntegerType, 1)
-    val expr = TACodeGenerator.generateExpression(MultExpression(IntValue(4), DivExpression(IntValue(6), IntValue(2))), List())
+    val (t, expr) = TACodeGenerator.generateExpression(MultExpression(IntValue(4), DivExpression(IntValue(6), IntValue(2))), List())
     val offset = Constant(expr.toString, IntegerType)
 
     val ops = List(
@@ -895,7 +895,7 @@ class TACodeTest extends AnyFunSuite {
         AddExpression(IntValue(1), VarExpression("var2"))
     )
     val list = TACodeGenerator.generateStatement(stmt, List())
-    val expr = TACodeGenerator.generateExpression(MultExpression(IntValue(4), VarExpression("var1")), List())
+    val (t, expr) = TACodeGenerator.generateExpression(MultExpression(IntValue(4), VarExpression("var1")), List())
     val offset = Constant(expr.toString, IntegerType)
 
     TACodeGenerator.reset
