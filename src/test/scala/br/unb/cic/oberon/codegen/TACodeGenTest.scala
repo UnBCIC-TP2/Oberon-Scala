@@ -500,6 +500,90 @@ class TACodeTest extends AnyFunSuite {
 
     assert(list == ops)
   }
+
+    test("Testing IfElse-NEQExpression") {
+    TACodeGenerator.reset
+
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    val condition = NEQExpression(IntValue(0), IntValue(0))
+    val thenStmt = AssignmentStmt(
+      VarAssignment("var"),
+      AddExpression(IntValue(1), IntValue(2))
+    )
+    val elseStmt = None
+    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
+    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+
+    TACodeGenerator.reset
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val ops = List(
+      EqJump(Constant("0", IntegerType), Constant("0", IntegerType), l1, ""),
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+      NOp(l1)
+    )
+    // if(1!=1){var = 1 + 2}
+    assert(list == ops)
+  }
+
+  test("Testing IfElse-GTExpression") {
+    TACodeGenerator.reset
+
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    val condition = GTExpression(IntValue(2), IntValue(1))
+    val thenStmt = AssignmentStmt(
+      VarAssignment("var"),
+      MultExpression(IntValue(1), IntValue(2))
+    )
+    val elseStmt = None
+    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
+    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+
+    TACodeGenerator.reset
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val ops = List(
+      LTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""),
+      MulOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+      NOp(l1)
+    )
+    // if(2>1){var = 1 * 2}
+    assert(list == ops)
+  }
+
+  test("Testing IfElse-LTExpression") {
+    TACodeGenerator.reset
+
+    val list_var = List(VariableDeclaration("var", IntegerType))
+    TACodeGenerator.load_vars(list_var)
+    val condition = LTExpression(IntValue(2), IntValue(1))
+    val thenStmt = AssignmentStmt(
+      VarAssignment("var"),
+      MultExpression(IntValue(1), IntValue(2))
+    )
+    val elseStmt = None
+    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
+    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
+
+    TACodeGenerator.reset
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val l1 = LabelGenerator.generateLabel
+    val ops = List(
+      GTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""),
+      MulOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+      NOp(l1)
+    )
+    // if(2<1){var = 1 * 2}
+    assert(list == ops)
+  }
   
   test("Testing WhileStmt-LTExpression") {
     TACodeGenerator.reset
@@ -529,6 +613,8 @@ class TACodeTest extends AnyFunSuite {
     // while(var < 5){var = var + 1}
     assert(list == ops)
   }
+
+
 
 
   test("Testing procedure sum(var1,var2)") {
@@ -1104,90 +1190,6 @@ class TACodeTest extends AnyFunSuite {
     // while (lista1[1] > lista2[10]) {lista1[1] = lista1[1] - lista2[3]}
     assert(list == ops)
 
-  }
-
-  test("Testing IfElse-NEQExpression") {
-    TACodeGenerator.reset
-
-    val list_var = List(VariableDeclaration("var", IntegerType))
-    TACodeGenerator.load_vars(list_var)
-    val condition = NEQExpression(IntValue(0), IntValue(0))
-    val thenStmt = AssignmentStmt(
-      VarAssignment("var"),
-      AddExpression(IntValue(1), IntValue(2))
-    )
-    val elseStmt = None
-    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
-    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
-
-    TACodeGenerator.reset
-
-    val t0 = new Temporary(IntegerType, 0, true)
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(
-      EqJump(Constant("0", IntegerType), Constant("0", IntegerType), l1, ""),
-      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
-      NOp(l1)
-    )
-    // if(1!=1){var = 1 + 2}
-    assert(list == ops)
-  }
-
-  test("Testing IfElse-GTExpression") {
-    TACodeGenerator.reset
-
-    val list_var = List(VariableDeclaration("var", IntegerType))
-    TACodeGenerator.load_vars(list_var)
-    val condition = GTExpression(IntValue(2), IntValue(1))
-    val thenStmt = AssignmentStmt(
-      VarAssignment("var"),
-      MultExpression(IntValue(1), IntValue(2))
-    )
-    val elseStmt = None
-    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
-    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
-
-    TACodeGenerator.reset
-
-    val t0 = new Temporary(IntegerType, 0, true)
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(
-      LTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""),
-      MulOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
-      NOp(l1)
-    )
-    // if(2>1){var = 1 * 2}
-    assert(list == ops)
-  }
-
-  test("Testing IfElse-LTExpression") {
-    TACodeGenerator.reset
-
-    val list_var = List(VariableDeclaration("var", IntegerType))
-    TACodeGenerator.load_vars(list_var)
-    val condition = LTExpression(IntValue(2), IntValue(1))
-    val thenStmt = AssignmentStmt(
-      VarAssignment("var"),
-      MultExpression(IntValue(1), IntValue(2))
-    )
-    val elseStmt = None
-    val ifElseStmt = IfElseStmt(condition, thenStmt, elseStmt)
-    val list = TACodeGenerator.generateStatement(ifElseStmt, List())
-
-    TACodeGenerator.reset
-
-    val t0 = new Temporary(IntegerType, 0, true)
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(
-      GTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""),
-      MulOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      CopyOp(t0, Name("var", IntegerType), ""),
-      NOp(l1)
-    )
-    // if(2<1){var = 1 * 2}
-    assert(list == ops)
   }
 
 }
