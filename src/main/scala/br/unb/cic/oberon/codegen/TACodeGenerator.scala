@@ -477,15 +477,20 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     val arrayType = array match {
       case Name(_, ArrayType(_, baseType)) => baseType
     }
-    val index1 = index match {
+    
+    var index1 = index match {
       case IntValue(value) => value
+      case (_) => ""
     }
 
-    val offset = typeByteSize.getOrElse(arrayType, 0) * index1
-
-
-    Constant(offset.toString, IntegerType)
-
+    if (index1.isInstanceOf[Int]) {
+      val offset = typeByteSize.getOrElse(arrayType, 0) * index1.asInstanceOf[Int]
+      Constant(offset.toString, IntegerType)
+    } else {
+      val offset = MultExpression(IntValue(typeByteSize.getOrElse(arrayType, 0)), index)
+      val list = generateExpression(offset, List())
+      Constant(list.toString, IntegerType)
+    }
   }
 
   private def getRecordOffset(record: Name, field: String): Constant = {
