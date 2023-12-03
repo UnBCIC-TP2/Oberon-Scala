@@ -6,10 +6,12 @@ TYPE
 VAR
     x : ld;
     r : INTEGER;
+    arr: ARRAY 2 OF INTEGER;
 
 BEGIN
-    x := (a: INTEGER, b: INTEGER) => a + b;
-    r := (x)(1,1)
+    arr[0] := 2;
+    x := (a: INTEGER, b: INTEGER) => arr[a] + b;
+    r := (x)(0,0)
 END
 
 END LambdaExpressionsIT07.

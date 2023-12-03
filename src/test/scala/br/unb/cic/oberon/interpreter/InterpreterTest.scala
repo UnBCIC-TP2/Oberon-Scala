@@ -896,6 +896,39 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("r") == Some(IntValue(2)))
   }
 
+  test("Testing Fibonacci 10 - Lambda Expression - New Parser"){
+    val module = parseResource("lambda/lambdaExpressionsIT08.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("fib").isDefined)
+    val fib_array =  result.lookup("fib").get
+    fib_array match {
+      case ArrayValue(values,arrayType) => {
+      assert(fib_array == ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), IntValue(55)),ArrayType(10,IntegerType)))
+      assert(values(0) == IntValue(1))
+      assert(values(1) == IntValue(1))
+      assert(values(2) == IntValue(2))
+      assert(values(3) == IntValue(3))
+      assert(values(4) == IntValue(5))
+      assert(values(5) == IntValue(8))
+      assert(values(6) == IntValue(13))
+      assert(values(7) == IntValue(21))
+      assert(values(8) == IntValue(34))
+      assert(values(9) == IntValue(55))
+    }
+  }
+  }
+
+  test("Testing Invalid Lambda Application on Lambda Expressions"){
+    val module = parseResource("lambda/lambdaExpressionsIT09.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val thrown = intercept[Exception]{interpreter.runInterpreter(coreModule, "TEST")}
+    assert(!thrown.getMessage().isEmpty)
+    
+  }
+
   test("Testing Arithmetic LambdaApplication Test"){
     val module = parseResource("lambda/lambdaTest01.oberon")
     

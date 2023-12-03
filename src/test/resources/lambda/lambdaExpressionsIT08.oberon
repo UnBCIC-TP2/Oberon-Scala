@@ -1,0 +1,27 @@
+MODULE LambdaExpressionsIT08;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+   
+VAR
+    x : ld;
+    fib: ARRAY 10 OF INTEGER;
+
+BEGIN
+    fib[0] := 1;
+    fib[1] := 1;
+
+    x := (a: INTEGER) => fib[a] + fib[a-1];
+    
+    fib[2] := (x)(1);
+    fib[3] := (x)(2);
+    fib[4] := (x)(3);
+    fib[5] := (x)(4);
+    fib[6] := (x)(5);
+    fib[7] := (x)(6);
+    fib[8] := (x)(7);
+    fib[9] := (x)(8)
+
+END
+
+END LambdaExpressionsIT08.
