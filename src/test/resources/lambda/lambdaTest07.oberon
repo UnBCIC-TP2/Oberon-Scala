@@ -1,0 +1,86 @@
+MODULE LambdaTest07;
+
+TYPE
+  ld = LAMBDA -> (INTEGER): INTEGER
+
+VAR
+  fib20 : ARRAY 20 OF INTEGER;
+  fib100 : ARRAY 100 OF INTEGER; 
+  x : ld;
+  i : INTEGER;
+
+
+TEST lambdaTest_Fibonacci20 ("Testing LambdaApplication on Fibonacci Sequence - 20");
+        BEGIN
+            
+            fib20[0] := 1;
+            fib20[1] := 1;
+
+            x := (a: INTEGER) => (fib20[a] + fib20[a-1]);
+
+            i := 2;
+
+            LOOP
+                fib20[i] := (x)(i-1);
+                INC(i);
+                IF i = 20 THEN EXIT END;
+            END
+
+            assert_eq(fib20[0],1);
+            assert_eq(fib20[1],1);
+            assert_eq(fib20[2],2);
+            assert_eq(fib20[3],3);
+            assert_eq(fib20[4],5);
+            assert_eq(fib20[5],8);
+            assert_eq(fib20[6],13);
+            assert_eq(fib20[7],21);
+            assert_eq(fib20[8],34);
+            assert_eq(fib20[9],55);
+            assert_eq(fib20[10],89);
+            assert_eq(fib20[11],144);
+            assert_eq(fib20[12],233);
+            assert_eq(fib20[13],377);
+            assert_eq(fib20[14],610);
+            assert_eq(fib20[15],987);
+            assert_eq(fib20[16],1597);
+            assert_eq(fib20[17],2584);
+            assert_eq(fib20[18],4181);
+            assert_eq(fib20[19],6765);
+
+            write("This is the Fibonacci sequence of 20 numbers")
+
+        END lambdaTest_Fibonacci20;
+
+TEST lambdaTest_Fibonacci100 ("Testing LambdaApplication on FIbonacci Sequence - 100");
+        BEGIN
+            
+            fib100[0] := 1;
+            fib100[1] := 1;
+
+            x := (a: INTEGER) => (fib100[a] + fib100[a-1]);
+
+            i := 2;
+
+            LOOP
+                fib100[i] := (x)(i-1);
+                INC(i);
+                IF i = 100 THEN EXIT END;
+            END;
+
+            assert_eq(fib100[19], 6765);
+            assert_eq(fib100[29],832040);
+            assert_eq(fib100[39],102334155);
+            assert_eq(fib100[49],12586269025);
+            assert_eq(fib100[59],1548008755920);
+            assert_eq(fib100[69],190392490709135);
+            assert_eq(fib100[99],354224848179261915075);
+
+            write("Testing random numbers for Fibonacci sequence of 100 numbers")
+
+        END lambdaTest_Fibonacci100;
+
+BEGIN
+  write("Tests Succeeded")
+END
+
+END LambdaTest07.
