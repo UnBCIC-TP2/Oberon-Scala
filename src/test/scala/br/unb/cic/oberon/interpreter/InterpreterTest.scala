@@ -1008,7 +1008,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
-   ignore("Testing LambdaApplication - Fibonacci Sequences"){
+   test("Testing LambdaApplication - Fibonacci Sequences"){
     val module = parseResource("lambda/lambdaTest07.oberon")
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
