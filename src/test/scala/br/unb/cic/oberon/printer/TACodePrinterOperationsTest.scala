@@ -1,45 +1,29 @@
 package br.unb.cic.oberon.printer
 
-
 import br.unb.cic.oberon.ir.ast.{BooleanType, IntegerType}
 import br.unb.cic.oberon.ir.tac._
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
 
+class TACodePrinterOperationsTest extends AnyFunSuite {
 
-/**
- * Tests for TACodePrinter
- * This tests should see with the printer is correctly handling TAC abstraction
- */
-class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
-
-  /**
-   * Doc document always begin with a line break
-   * bl = break line
-   */
   private val bl = "\n"
 
-  /**
-   * Temporary addresses instanced for test purpose
-   */
   val t0 = new Temporary(BooleanType, 0, true)
   val t1 = new Temporary(BooleanType, 1, true)
   val t2 = new Temporary(BooleanType, 2, true)
   val t3 = new Temporary(BooleanType, 3, true)
   val t4 = new Temporary(BooleanType, 4, true)
 
-  override def beforeEach() = {}
-
-  test("test print for add expressions") {
+  test("Print 'Add' expressions") {
 
     val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
     val expectedOutput = bl + "t0 = 1 + 2"
 
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(tacDocumentToPrint.equals(expectedOutput))
+    assertResult(expectedOutput)(tacDocumentToPrint)
   }
 
-  test("test print for more than one add expressions in sequence") {
+  test("Print multiple 'Add' expressions in sequence") {
 
     val ops = List(
       AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, "L1"),
@@ -50,11 +34,11 @@ class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
     val expectedOutput = bl + s"L1:$bl  t0 = 1 + 2" + bl + "t1 = 3 + 4" + bl + "t2 = t0 + t1"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
 
-    assert(tacDocumentToPrint.equals(expectedOutput))
+    assertResult(expectedOutput)(tacDocumentToPrint)
 
   }
 
-  test("testing different operations in sequence (MulOp, DivOp, SubOp)") {
+  test("Print different operations in sequence (MulOp, DivOp, SubOp)") {
 
     val ops = List(
       MulOp(Constant("2", IntegerType), Constant("2", IntegerType), t0, ""),
@@ -69,11 +53,11 @@ class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
     val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
 
-    assert(tacDocumentToPrint.equals(expectedOutput))
+    assertResult(expectedOutput)(tacDocumentToPrint)
 
   }
 
-  test("testing AndOp, NotOp and OrOp with prettier printer") {
+  test("Print 'AndOp', 'NotOp', and 'OrOp' operations with prettier printer") {
 
     val ops = List(
       AndOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, ""),
@@ -91,11 +75,11 @@ class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
 
     val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp + bl + fourthOp + bl + fifthOp
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(tacDocumentToPrint.equals(expectedOutput))
+    assertResult(expectedOutput)(tacDocumentToPrint)
 
   }
 
-  test("testing copy op with prettier printer") {
+  test("Print 'MoveOp' with prettier printer") {
 
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
@@ -108,7 +92,7 @@ class TACodePrinterOperationsTest extends AnyFunSuite with BeforeAndAfterEach {
 
     val expectedOutput = bl + firstOp + bl + secondOp
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(tacDocumentToPrint.equals(expectedOutput))
+    assertResult(expectedOutput)(tacDocumentToPrint)
 
   }
 

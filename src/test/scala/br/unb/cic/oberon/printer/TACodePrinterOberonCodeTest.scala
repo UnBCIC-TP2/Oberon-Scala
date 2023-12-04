@@ -3,10 +3,9 @@ package br.unb.cic.oberon.printer
 import br.unb.cic.oberon.codegen.TACodeGenerator
 import br.unb.cic.oberon.ir.ast.{AddExpression, BooleanType, GTExpression, IntValue, LTExpression}
 import br.unb.cic.oberon.ir.tac.Temporary
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
 
-class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
+class TACodePrinterOberonCodeTest extends AnyFunSuite {
 
   private val bl = "\n"
 
@@ -16,7 +15,7 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
   val t3 = new Temporary(BooleanType, 3, true)
   val t4 = new Temporary(BooleanType, 4, true)
 
-  test("Print add between two constants") {
+  test("Print 'Add' expression between two constants") {
 
     val expr = AddExpression(IntValue(1), IntValue(2))
     val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
@@ -24,11 +23,10 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
     val expectedOutput = bl + "t0 = 1 + 2"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
 
-    assert(expectedOutput == tacDocumentToPrint)
-
+    assertResult(expectedOutput)(tacDocumentToPrint)
   }
 
-  test("Testing LT") {
+  test("Print 'LT' expression") {
 
     // (1 < 2)
     val expr = LTExpression(IntValue(1), IntValue(2))
@@ -37,11 +35,10 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
     val expectedOutput = bl + "t0 = SLT 1 2"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
 
-    assert(expectedOutput == tacDocumentToPrint)
-
+    assertResult(expectedOutput)(tacDocumentToPrint)
   }
 
-  test("Testing GT") {
+  test("Print 'GT' expression") {
 
     // (1 > 2)
     val expr = GTExpression(IntValue(1), IntValue(2))
@@ -50,10 +47,7 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
     val expectedOutput = bl + "t0 = SLT 2 1"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
 
-    assert(tacDocumentToPrint == expectedOutput)
-
+    assertResult(expectedOutput)(tacDocumentToPrint)
   }
-
-
 
 }
