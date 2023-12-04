@@ -316,7 +316,68 @@ object CoreTransformer {
         stmt = Some(stmtcore)
       )
     }
-  }
+    // TODO Alterar a função para lidar com expressões dentro de enxpressões
+    // TODO Ver artigo compartilhado pelo professor no teams
+    def reduceExpressionToProcedure(exp: Expression): Expression = exp match {
+        case LambdaExpression(lis_args, expression) => 
+          Procedure(
+            name = "lambda",
+            args = lis_args,
+            returnType = None,
+            constants = List(),
+            variables = List(),
+            stmt = ReturnStmt(expression)
+          )
+        case Brackets(exp) => reduceExpressionToProcedure(exp)
+        case ArraySubscript(exp1, exp2) =>
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case FieldAccessExpression(exp, name) => reduceExpressionToProcedure(exp)
+        case EQExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case NEQExpression(exp1, exp2) =>
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case GTExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case LTExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case GTEExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case LTEExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case AddExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case SubExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case MultExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case DivExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case OrExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case AndExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case ModExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case NotExpression(exp1, exp2) => 
+          reduceExpressionToProcedure(exp1)
+          reduceExpressionToProcedure(exp2)
+        case _ => exp
+    }
+  } 
 
   object CoreChecker {
     def stmtCheck(stmt: Statement): Boolean =
