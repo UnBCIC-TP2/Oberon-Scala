@@ -17,42 +17,14 @@ TEST lambdaTest_Fibonacci20 ("Testing LambdaApplication on Fibonacci Sequence - 
             fib20[1] := 1;
 
             x := (a: INTEGER) => (fib20[a-1] + fib20[a-2]);
+            
+            i := 2;
 
-            fib20[2] := (x)(2);
-
-            fib20[3] := (x)(3);
-
-            fib20[4] := (x)(4);
-
-            fib20[5] := (x)(5);
-
-            fib20[6] := (x)(6);
-
-            fib20[7] := (x)(7);
-
-            fib20[8] := (x)(8);
-
-            fib20[9] := (x)(9);
-
-            fib20[10] := (x)(10);
-
-            fib20[11] := (x)(11);
-
-            fib20[12] := (x)(12);
-
-            fib20[13] := (x)(13);
-
-            fib20[14] := (x)(14);
-
-            fib20[15] := (x)(15);
-
-            fib20[16] := (x)(16);
-
-            fib20[17] := (x)(17);
-
-            fib20[18] := (x)(18);
-
-            fib20[19] := (x)(19);
+            LOOP
+              IF i = 20 THEN EXIT END;
+              fib20[i] := (x)(i);
+              i := i + 1
+            END;
 
             assert_eq(fib20[0],1);
             assert_eq(fib20[1],1);
@@ -87,82 +59,13 @@ TEST lambdaTest_Fibonacci40 ("Testing LambdaApplication on Fibonacci Sequence - 
 
             x := (a: INTEGER) => (fib40[a-1] + fib40[a-2]);
 
-            fib40[2] := (x)(2);
+            i := 2;
 
-            fib40[3] := (x)(3);
-
-            fib40[4] := (x)(4);
-
-            fib40[5] := (x)(5);
-
-            fib40[6] := (x)(6);
-
-            fib40[7] := (x)(7);
-
-            fib40[8] := (x)(8);
-
-            fib40[9] := (x)(9);
-
-            fib40[10] := (x)(10);
-
-            fib40[11] := (x)(11);
-
-            fib40[12] := (x)(12);
-
-            fib40[13] := (x)(13);
-
-            fib40[14] := (x)(14);
-
-            fib40[15] := (x)(15);
-
-            fib40[16] := (x)(16);
-
-            fib40[17] := (x)(17);
-
-            fib40[18] := (x)(18);
-
-            fib40[19] := (x)(19);
-
-            fib40[20] := (x)(20);
-
-            fib40[21] := (x)(21);
-
-            fib40[22] := (x)(22);
-
-            fib40[23] := (x)(23);
-
-            fib40[24] := (x)(24);
-
-            fib40[25] := (x)(25);
-
-            fib40[26] := (x)(26);
-
-            fib40[27] := (x)(27);
-
-            fib40[28] := (x)(28);
-
-            fib40[29] := (x)(29);
-
-            fib40[30] := (x)(30);
-
-            fib40[31] := (x)(31);
-
-            fib40[32] := (x)(32);
-
-            fib40[33] := (x)(33);
-
-            fib40[34] := (x)(34);
-
-            fib40[35] := (x)(35);
-
-            fib40[36] := (x)(36);
-
-            fib40[37] := (x)(37);
-
-            fib40[38] := (x)(38);
-
-            fib40[39] := (x)(39);
-
+            LOOP
+              IF i = 40 THEN EXIT END;
+              fib40[i] := (x)(i);
+              i := i + 1
+            END;
 
             assert_eq(fib40[19], 6765);
             assert_eq(fib40[29], 832040);

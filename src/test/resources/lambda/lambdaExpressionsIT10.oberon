@@ -1,0 +1,25 @@
+MODULE LambdaExpressionsIT10;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+   
+VAR
+    x : ld;
+    i : INTEGER;
+    val : INTEGER;
+
+BEGIN
+    x := (b: INTEGER) => b * (b-1);
+    
+    val := 1;
+    i := 6;
+
+    LOOP
+        IF i <= 1 THEN EXIT END;
+        val := val * (x)(i);
+        i := i - 2
+    END
+
+END
+
+END LambdaExpressionsIT10.
