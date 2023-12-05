@@ -1,124 +1,130 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ir.ast.{NEQExpression, _}
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
 class ExpressionTypeChecker(val typeChecker: TypeChecker) {
-  type T = Option[Type]
+   type T = Option[Type]
 
+   /* Tem a função de pegar o tipo.
+   Caso não esteja definido retorna None, caso contrário retorna o tipo encontrado. */
    def checkType(t: Type): Option[Type] = t match {
-    case UndefinedType => None
-    case _             => typeChecker.env.baseType(t)
-  }
+      case UndefinedType => None
+      case _             => typeChecker.env.baseType(t)
+   }
 
-  def checkExpression(exp: Expression): Option[Type] =
-     computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
+   // Pergunta: A expressão [typeChecker.env.baseType(t)], pode ser substituída por checkType(t)?
+   def checkExpression(exp: Expression): Option[Type] =
+      computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
 
-  def computeGeneralExpressionType(exp: Expression): Option[Type] = exp match {
-    case Brackets(exp)       => checkExpression(exp)
-    case IntValue(_)         => Some(IntegerType)
-    case RealValue(_)        => Some(RealType)
-    case CharValue(_)        => Some(CharacterType)
-    case BoolValue(_)        => Some(BooleanType)
-    case StringValue(_)      => Some(StringType)
-    case NullValue           => Some(NullType)
-    case Undef()             => None
-    case VarExpression(name) => typeChecker.env.lookup(name)
-    case EQExpression(left, right) =>
-      computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
+   // Função Monadificável
+   def computeGeneralExpressionType(exp: Expression): Option[Type] = exp match {
+      case Brackets(exp)       => checkExpression(exp)
+      // Retorna os tipos nativos
+      case IntValue(_)         => Some(IntegerType)
+      case RealValue(_)        => Some(RealType)
+      case CharValue(_)        => Some(CharacterType)
+      case BoolValue(_)        => Some(BooleanType)
+      case StringValue(_)      => Some(StringType)
+      case NullValue           => Some(NullType)
+      case Undef()             => None
+
+      /* Verifica se a variável avaliada já foi definida anteriormente, 
+      se não for definida retorna None. A mensagem de erro é retornada pelo checkStmt*/
+      case VarExpression(name) => typeChecker.env.lookup(name)
+      case EQExpression(left, right) => computeBinExpressionType(
+         left,
+         right,
+         List(IntegerType, RealType, BooleanType),
+         BooleanType
       )
-    case NEQExpression(left, right) =>
-      computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
+      case NEQExpression(left, right) => computeBinExpressionType(
+         left,
+         right,
+         List(IntegerType, RealType, BooleanType),
+         BooleanType
       )
-    case GTExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case LTExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case GTEExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case LTEExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case AddExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case SubExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case MultExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case DivExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case AndExpression(left, right) =>
-      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    case OrExpression(left, right) =>
-      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    case FunctionCallExpression(name, args) => {
-      try {
-        val procedure = typeChecker.env.findProcedure(name)
+      case GTExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case LTExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case GTEExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case LTEExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case AddExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case SubExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case MultExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case DivExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case AndExpression(left, right) =>
+         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      case OrExpression(left, right) =>
+         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      // Verifica se os argumentos da função são do tipo esperado pela definição dela.
+      case FunctionCallExpression(name, args) => {
+         try {
+            val procedure = typeChecker.env.findProcedure(name)
 
-        if (args.length != procedure.args.length) {
-          return None
-        }
+            if (args.length != procedure.args.length) {
+               return None
+            }
 
-        val givenArgumentTypes = args.map(arg => checkExpression(arg))
-        val neededArgumentTypes = procedure.args.map(_.argumentType)
+            val givenArgumentTypes = args.map(arg => checkExpression(arg))
+            val neededArgumentTypes = procedure.args.map(_.argumentType)
 
-        val areArgTypesWrong = givenArgumentTypes
-          .zip(neededArgumentTypes)
-          .map({
-            case (Some(givenType), neededType) if givenType == neededType =>
-              Some(givenType)
-            case _ => None
-          })
-          .contains(None)
+            val areArgTypesWrong = givenArgumentTypes
+               .zip(neededArgumentTypes)
+               .map({
+                  case (Some(givenType), neededType) if givenType == neededType =>
+                  Some(givenType)
+                  case _ => None
+               })
+               .contains(None)
 
-        if (areArgTypesWrong) {
-          None
-        } else {
-          Some(procedure.returnType.getOrElse(NullType))
-        }
-      } catch {
-        case _: NoSuchElementException => None
-      }
+            if (areArgTypesWrong) {
+               None
+            } else {
+               Some(procedure.returnType.getOrElse(NullType))
+            }
+         } catch {
+            case _: NoSuchElementException => None
+         }
     }
-    case ArrayValue(values, arrayType) =>
-      if (
-        values.isEmpty || values
-          .forall(v => checkExpression(v).get == arrayType.baseType)
-      ) {
-        Some(arrayType)
-      } else None
+      // Verifica se todos os elementos da array são do tipo esperado.
+      case ArrayValue(values, arrayType) =>
+         if (values.isEmpty || values.forall(v => checkExpression(v).get == arrayType.baseType)) 
+            {Some(arrayType)
+         } else None
+      
+      // Verifica um elemento especificado pelo index da array
+      case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
+      // Verifica se o objeto/expressão tem o atributo indicado
+      case FieldAccessExpression(exp, attributeName) =>
+         fieldAccessCheck(exp, attributeName)
+      // Verifica se o nome passado possui um endereço/ponteiro definido.
+      // Ser definido significa que o nome foi utilizado para atribuir algo anteriormente.
+      // OBS: O endereço deve possuir algo com tipo válido. 
+      case PointerAccessExpression(name) => pointerAccessCheck(name)
+      // 
+      case LambdaExpression(args, exp) => checkLambdaExpression(args, exp)
+   }
 
-    case ArraySubscript(array, index) => arrayElementAccessCheck(array, index)
-
-    case FieldAccessExpression(exp, attributeName) =>
-      fieldAccessCheck(exp, attributeName)
-
-    case PointerAccessExpression(name) => pointerAccessCheck(name)
-
-    case LambdaExpression(args, exp) => checkLambdaExpression(args, exp)
-  }
-
-  def arrayElementAccessCheck(array: Expression, index: Expression): T = {
+   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
     (checkExpression(array), checkExpression(index)) match {
-      case (Some(ArrayType(_, UndefinedType)), _) =>
-        None
-      case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
-        Some(typeElements)
+      case (Some(ArrayType(_, UndefinedType)), _) => None
+      case (Some(ArrayType(_, typeElements)), Some(IntegerType)) => Some(typeElements)
       case _ => None
     }
-  }
+   }
 
-  def fieldAccessCheck(exp: Expression, attributeName: String): T = {
+   def fieldAccessCheck(exp: Expression, attributeName: String): T = {
     checkExpression(exp) match {
-      case Some(ReferenceToUserDefinedType(userTypeName)) =>
+      case Some(ReferenceToUserDefinedType(userTypeName)) => {
         typeChecker.env.lookupUserDefinedType(userTypeName) match {
           case Some(UserDefinedType(_, RecordType(variables))) =>
             variables
@@ -126,13 +132,16 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
               .map(_.variableType)
           case _ => None
         }
-        case Some(RecordType(variables)) => variables.find(v => v.name.equals(attributeName)).map(_.variableType).orElse(None)
-        case _ => None
       }
-  }
+      case Some(RecordType(variables)) => {
+        val attribute = variables.find(v => v.name.equals(attributeName))
+        if (attribute.isDefined) Some(attribute.get.variableType) else None
+      }
+      case _ => None
+    }
+   }
 
-
-  def pointerAccessCheck(name: String) = {
+   def pointerAccessCheck(name: String) = {
     typeChecker.env
       .lookup(name)
       .flatMap(t => checkType(t))
@@ -140,40 +149,46 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
         case PointerType(varType) => Some(varType)
         case _                    => None
       })
-  }
+   }
 
-  def checkLambdaExpression(args: List[FormalArg], exp: Expression): T = {
+   // Verificar o impacto dos monads nesta parte
+   def checkLambdaExpression(args: List[FormalArg], exp: Expression): T = {
     typeChecker.env = typeChecker.env.push()
     args.foreach(a => typeChecker.env = typeChecker.env.setLocalVariable(a.name, a.argumentType))
     val argTypes = args.map(a => a.argumentType)
     val expType = checkExpression(exp)
+    // O pop retorna a stack do Environment sem o elemento do topo
     typeChecker.env = typeChecker.env.pop()
     expType match {
       case None => None
       case _    => Some(LambdaType(argTypes, expType.get))
     }
-  }
+   }
 
-  def computeBinExpressionType[A](
+   // Faz a verificação de tipos para comparações lógicas/binárias
+   def computeBinExpressionType[A](
       left: Expression,
       right: Expression,
       expected: List[Type],
       result: Type
-  ): Option[Type] = {
-    val t1 = checkExpression(left)
-    val t2 = checkExpression(right)
-    if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
-    else None
-  }
+    ): Option[Type] = {
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      /* Verifica se os tipos são iguais
+         Em seguida, é verificado se o tipo do primeiro elemento está na lista de tipos esperados*/
+      if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
+      else None
+    }
 }
 
 class TypeChecker {
   type T = List[(Statement, String)]
 
+  // O Environment está sendo usado como uma variável global (deveria ser local/temp.)
   var env = new Environment[Type]()
   val expVisitor = new ExpressionTypeChecker(this)
 
-   def checkModule(module: OberonModule): List[(Statement, String)] = {
+  def checkModule(module: OberonModule): List[(Statement, String)] = {
     env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp).get))
     env = module.variables.foldLeft(env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType))
     env = module.procedures.foldLeft(env)((acc, p) => acc.declareProcedure(p))
@@ -195,7 +210,8 @@ class TypeChecker {
     errors
   }
 
-   def checkStmt(stmt: Statement): List[(Statement, String)] = stmt match {
+  // Responsável por retornar as mensagens de erro
+  def checkStmt(stmt: Statement): List[(Statement, String)] = stmt match {
     case AssignmentStmt(_, _)    => checkAssignment(stmt)
     case IfElseStmt(_, _, _)     => visitIfElseStmt(stmt)
     case WhileStmt(_, _)         => visitWhileStmt(stmt)
@@ -227,7 +243,6 @@ class TypeChecker {
     case WriteStmt(exp) =>
       if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
-    case AssertTrueStmt(exp) => visitAssertStmt(stmt)
     case NewStmt(varName) =>
       env.lookup(varName) match {
         case Some(PointerType(_)) => List()
@@ -235,7 +250,6 @@ class TypeChecker {
       }
     case _ => throw new RuntimeException("Statement not part of Oberon-Core")
   }
-
 
   private def checkAssignment(stmt: Statement): T = stmt match {
     case AssignmentStmt(VarAssignment(v), exp) => checkVarAssigment(v, exp)
@@ -298,8 +312,6 @@ class TypeChecker {
     }
   }
 
-
-
   private def visitIfElseStmt(stmt: Statement) = stmt match {
     case IfElseStmt(condition, thenStmt, elseStmt) =>
       var errorList = checkStmt(thenStmt)
@@ -338,16 +350,6 @@ class TypeChecker {
       List((forEachStmt, "invalid types in the foreach statement"))
     }
     res ++ checkStmt(forEachStmt.stmt)
-  }
-
-  private def visitAssertStmt(stmt: Statement) = stmt match {
-    case AssertTrueStmt(condition) =>
-      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
-      if (expVisitor.checkExpression(condition).contains(BooleanType)) {
-        errorList
-      } else {
-        (stmt, s"Expression $condition does not have a boolean type") :: errorList
-      }
   }
   private def visitExitStmt(): T = List()
 
