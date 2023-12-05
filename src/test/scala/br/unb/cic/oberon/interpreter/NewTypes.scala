@@ -24,7 +24,7 @@ class NewTypesTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("b") == Some(IntValue(2.toInt))) // FOR TO x
     assert(result.lookup("h") == Some(IntValue(8.toInt))) // FOR TO x
@@ -62,7 +62,7 @@ class NewTypesTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
     assert(result.lookup("x") == Some(IntValue(5000))) // FOR TO x
   }
 
@@ -78,7 +78,7 @@ class NewTypesTest extends AnyFunSuite {
 
     assert(module.name == "SimpleModule")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
     assert(result.lookup("x") == Some(RealValue(26.500000005.toFloat))) // FOR TO x
   }
 }

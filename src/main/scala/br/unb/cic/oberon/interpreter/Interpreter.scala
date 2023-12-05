@@ -136,11 +136,10 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
       
       case WhileStmt(condition, whileStmt) => for {
         cond <- evalCondition(condition)
-        // nao sei se funciona
-        _ <- (for {
-          _ <- executeStatement(whileStmt)
-          cond <- evalCondition(condition)
-        } yield (cond && !exit)).whileM_(pure(cond && !exit))
+        _ <- if (cond && !exit) for {
+            _ <- executeStatement(whileStmt)
+            _ <- executeStatement(stmt)
+            } yield () else for {_ <- get[Environment[Expression]]} yield exit = true
       } yield exit = false
 
       case ForEachStmt(v, exp, stmt) => for {
@@ -264,14 +263,14 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     printStream = new PrintStream(new NullPrintStream())
   }
 
-  def evalExpression(exp: Expression): IResult[Expression] = for { stateValue <- exp match {
-    case IntValue(v) => State[Environment[Expression], Expression] {env => (env, IntValue(v))}
-    case RealValue(v) => State[Environment[Expression], Expression] {env => (env, RealValue(v))}
-    case CharValue(v) => State[Environment[Expression], Expression] {env => (env, CharValue(v))}
-    case BoolValue(v) => State[Environment[Expression], Expression] {env => (env, BoolValue(v))}
-    case StringValue(v) => State[Environment[Expression], Expression] {env => (env, StringValue(v))}
-    case NullValue => State[Environment[Expression], Expression] {env => (env, NullValue)}
-    case Undef() => State[Environment[Expression], Expression] {env => (env, Undef())}
+  def evalExpression(exp: Expression): IResult[Expression] = exp match {
+    case IntValue(v) => pure(IntValue(v))
+    case RealValue(v) => pure(RealValue(v))
+    case CharValue(v) => pure(CharValue(v))
+    case BoolValue(v) => pure(BoolValue(v))
+    case StringValue(v) => pure(StringValue(v))
+    case NullValue => pure(NullValue)
+    case Undef() => pure(Undef())
     case VarExpression(name) => evalVarExpression(name)
     //TODO eval array
     //case ArrayValue(v, t) =>
@@ -293,8 +292,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     case FunctionCallExpression(name, args) => evalFunctionCall(name, args)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
-    }
-  } yield stateValue
+  }
 
   def evalVarExpression(name: String): IResult[Expression] = for {
     env <- get[Environment[Expression]]
