@@ -1008,14 +1008,22 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(thrown.getMessage() == "Exception thrown from assert")
   }
 
-   ignore("Testing LambdaApplication - Fibonacci Sequences"){
+   test("Testing LambdaApplication - Fibonacci Sequences"){
     val module = parseResource("lambda/lambdaTest07.oberon")
     val coreModule = CoreTransformer.reduceOberonModule(module)
     val result = interpreter.runInterpreter(coreModule, "lambdaTest")
     assert(result.findTest("lambdaTest_Fibonacci20").description == StringValue("Testing LambdaApplication on Fibonacci Sequence - 20"))
-    //assert(result.lookup("fib20") == Some(ArrayValue(ListBuffer(RealValue(12.3), RealValue(17.22), RealValue(22.14)),ArrayType(3,RealType))))
-    assert(result.findTest("lambdaTest_Fibonacci100").description == StringValue("Testing LambdaApplication on Fibonacci Sequence - 20"))
-    //assert(result.lookup("fib100") == Some(ArrayValue(ListBuffer(RealValue(12.3), RealValue(17.22), RealValue(22.14)),ArrayType(3,RealType))))
+    
+    assert(result.lookup("fib20") == Some(ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), 
+    IntValue(55), IntValue(89), IntValue(144), IntValue(233), IntValue(377), IntValue(610), 
+    IntValue(987), IntValue(1597), IntValue(2584), IntValue(4181), IntValue(6765)),ArrayType(20,IntegerType))))
+    
+    assert(result.findTest("lambdaTest_Fibonacci40").description == StringValue("Testing LambdaApplication on Fibonacci Sequence - 40"))
+    
+    assert(result.lookup("fib40") == Some(ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), IntValue(55), IntValue(89), 
+    IntValue(144), IntValue(233), IntValue(377), IntValue(610), IntValue(987), IntValue(1597), IntValue(2584), IntValue(4181), IntValue(6765), IntValue(10946), IntValue(17711), IntValue(28657), IntValue(46368), IntValue(75025), 
+    IntValue(121393), IntValue(196418), IntValue(317811), IntValue(514229), IntValue(832040), IntValue(1346269), IntValue(2178309), 
+    IntValue(3524578), IntValue(5702887), IntValue(9227465), IntValue(14930352), IntValue(24157817), IntValue(39088169), IntValue(63245986), IntValue(102334155)),ArrayType(40,IntegerType))))
   }
 
   test(testName = "Testing boolean32"){

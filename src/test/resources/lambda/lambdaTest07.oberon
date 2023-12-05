@@ -5,7 +5,7 @@ TYPE
 
 VAR
   fib20 : ARRAY 20 OF INTEGER;
-  fib100 : ARRAY 100 OF INTEGER; 
+  fib40 : ARRAY 40 OF INTEGER; 
   x : ld;
   i : INTEGER;
 
@@ -16,15 +16,43 @@ TEST lambdaTest_Fibonacci20 ("Testing LambdaApplication on Fibonacci Sequence - 
             fib20[0] := 1;
             fib20[1] := 1;
 
-            x := (a: INTEGER) => (fib20[a] + fib20[a-1]);
+            x := (a: INTEGER) => (fib20[a-1] + fib20[a-2]);
 
-            i := 2;
+            fib20[2] := (x)(2);
 
-            LOOP
-              fib20[i] := (x)(i-1);
-              INC(i);
-              IF (i = 20) THEN EXIT
-            END;
+            fib20[3] := (x)(3);
+
+            fib20[4] := (x)(4);
+
+            fib20[5] := (x)(5);
+
+            fib20[6] := (x)(6);
+
+            fib20[7] := (x)(7);
+
+            fib20[8] := (x)(8);
+
+            fib20[9] := (x)(9);
+
+            fib20[10] := (x)(10);
+
+            fib20[11] := (x)(11);
+
+            fib20[12] := (x)(12);
+
+            fib20[13] := (x)(13);
+
+            fib20[14] := (x)(14);
+
+            fib20[15] := (x)(15);
+
+            fib20[16] := (x)(16);
+
+            fib20[17] := (x)(17);
+
+            fib20[18] := (x)(18);
+
+            fib20[19] := (x)(19);
 
             assert_eq(fib20[0],1);
             assert_eq(fib20[1],1);
@@ -51,34 +79,98 @@ TEST lambdaTest_Fibonacci20 ("Testing LambdaApplication on Fibonacci Sequence - 
 
         END lambdaTest_Fibonacci20
 
-TEST lambdaTest_Fibonacci100 ("Testing LambdaApplication on FIbonacci Sequence - 100");
+TEST lambdaTest_Fibonacci40 ("Testing LambdaApplication on Fibonacci Sequence - 40");
         BEGIN
             
-            fib100[0] := 1;
-            fib100[1] := 1;
+            fib40[0] := 1;
+            fib40[1] := 1;
 
-            x := (a: INTEGER) => (fib100[a] + fib100[a-1]);
+            x := (a: INTEGER) => (fib40[a-1] + fib40[a-2]);
 
-            i := 2;
+            fib40[2] := (x)(2);
 
-            LOOP
-                fib100[i] := (x)(i-1);
-                INC(i);
-                IF (i = 100) THEN EXIT
-            END;
-    
+            fib40[3] := (x)(3);
 
-            assert_eq(fib100[19], 6765);
-            assert_eq(fib100[29],832040);
-            assert_eq(fib100[39],102334155);
-            assert_eq(fib100[49],12586269025);
-            assert_eq(fib100[59],1548008755920);
-            assert_eq(fib100[69],190392490709135);
-            assert_eq(fib100[99],354224848179261915075);
+            fib40[4] := (x)(4);
 
-            write("Testing random numbers for Fibonacci sequence of 100 numbers")
+            fib40[5] := (x)(5);
 
-        END lambdaTest_Fibonacci100
+            fib40[6] := (x)(6);
+
+            fib40[7] := (x)(7);
+
+            fib40[8] := (x)(8);
+
+            fib40[9] := (x)(9);
+
+            fib40[10] := (x)(10);
+
+            fib40[11] := (x)(11);
+
+            fib40[12] := (x)(12);
+
+            fib40[13] := (x)(13);
+
+            fib40[14] := (x)(14);
+
+            fib40[15] := (x)(15);
+
+            fib40[16] := (x)(16);
+
+            fib40[17] := (x)(17);
+
+            fib40[18] := (x)(18);
+
+            fib40[19] := (x)(19);
+
+            fib40[20] := (x)(20);
+
+            fib40[21] := (x)(21);
+
+            fib40[22] := (x)(22);
+
+            fib40[23] := (x)(23);
+
+            fib40[24] := (x)(24);
+
+            fib40[25] := (x)(25);
+
+            fib40[26] := (x)(26);
+
+            fib40[27] := (x)(27);
+
+            fib40[28] := (x)(28);
+
+            fib40[29] := (x)(29);
+
+            fib40[30] := (x)(30);
+
+            fib40[31] := (x)(31);
+
+            fib40[32] := (x)(32);
+
+            fib40[33] := (x)(33);
+
+            fib40[34] := (x)(34);
+
+            fib40[35] := (x)(35);
+
+            fib40[36] := (x)(36);
+
+            fib40[37] := (x)(37);
+
+            fib40[38] := (x)(38);
+
+            fib40[39] := (x)(39);
+
+
+            assert_eq(fib40[19], 6765);
+            assert_eq(fib40[29], 832040);
+            assert_eq(fib40[39], 102334155);
+          
+            write("Testing random numbers for Fibonacci sequence of 40 numbers")
+
+        END lambdaTest_Fibonacci40
 
 BEGIN
   write("Tests Succeeded")
