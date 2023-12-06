@@ -1048,6 +1048,24 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("val2") == Some(IntValue(39916800)))
     
   }
+
+  test("Testing LambdaApplication - Composite Operations"){
+    val module = parseResource("lambda/lambdaTest09.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Composite").description == StringValue("Testing LambdaApplication on Composite Operations I"))
+    
+    assert(result.lookup("val") == Some(IntValue(16)))
+
+    assert(result.findTest("lambdaTest_CompositeII").description == StringValue("Testing LambdaApplication on Composite Operations II"))
+    
+    assert(result.lookup("val2") == Some(IntValue(8)))
+
+    assert(result.findTest("lambdaTest_CompositeIII").description == StringValue("Testing LambdaApplication on Composite Operations III"))
+    
+    assert(result.lookup("val3") == Some(IntValue(48)))
+    
+  }
   
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")

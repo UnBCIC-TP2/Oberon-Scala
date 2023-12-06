@@ -1,0 +1,49 @@
+MODULE LambdaTest09;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+   ld2 = LAMBDA -> (INTEGER, INTEGER) : INTEGER
+   
+VAR
+    x: ld;
+    r: ld2;
+    val, val2, val3 : INTEGER;
+
+TEST lambdaTest_Composite ("Testing LambdaApplication on Composite Operations I");
+        BEGIN
+            r := (a: INTEGER, b: INTEGER) => a * b;
+            x := (c: INTEGER) => c * ((r)(2,2+2));
+
+            val := (x)(2);
+
+            assert_eq(val, 16)
+
+        END lambdaTest_Composite
+
+TEST lambdaTest_CompositeII ("Testing LambdaApplication on Composite Operations II");
+        BEGIN
+            r := (a: INTEGER, b: INTEGER) => a / b;
+            x := (c: INTEGER) => c * ((r)(4+4,4));
+
+            val2 := (x)(4);
+
+            assert_eq(val2, 8)
+
+        END lambdaTest_CompositeII
+
+TEST lambdaTest_CompositeIII ("Testing LambdaApplication on Composite Operations III");
+        BEGIN
+            x := (a: INTEGER) => a * (a-1);
+            r := (b: INTEGER, c: INTEGER) => (c*b) * ((x)(3));
+
+            val3 := (r)(4,2);
+
+            assert_eq(val3, 48)
+
+        END lambdaTest_CompositeIII
+
+BEGIN
+  write("Tests Succeeded")
+END
+
+END LambdaTest09.
