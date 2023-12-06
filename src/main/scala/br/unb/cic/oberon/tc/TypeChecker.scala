@@ -3,7 +3,11 @@ package br.unb.cic.oberon.tc
 import br.unb.cic.oberon.ir.ast.{NEQExpression, _}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
+import cats.data.ContT
 
+case class ExpT(exp: Expression, typeName: Option[Type])
+trait Constraint
+case class HasAdd() extends Constraint
 class ExpressionTypeChecker(val typeChecker: TypeChecker) {
   type T = Option[Type]
 
@@ -15,9 +19,9 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
   def checkExpression(exp: Expression): Option[Type] =
      computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
 
-  def computeGeneralExpressionType(exp: Expression): Option[Type] = exp match {
+  def computeGeneralExpressionType(exp: Expression): (List[Constraint], ExpT)= exp match {
     case Brackets(exp)       => checkExpression(exp)
-    case IntValue(_)         => Some(IntegerType)
+    case IntValue(e)         => (List(HasAdd()), ExpT(IntValue(e), Some(IntegerType)) )
     case RealValue(_)        => Some(RealType)
     case CharValue(_)        => Some(CharacterType)
     case BoolValue(_)        => Some(BooleanType)
