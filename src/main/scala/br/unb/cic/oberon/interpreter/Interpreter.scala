@@ -411,27 +411,27 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
    *         numbers.
    */
   def arithmeticExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Number, Number) => Number): (Environment[Expression], Expression) = {
-    val (_, vl) = evalExpression(environment, left)
-    val (_, vr) = evalExpression(environment, right)
-    (vl,vr) match{
-      case (VarExpression(_),VarExpression(_)) => {
-         val (_, vl2) = evalExpression(environment, vl)
-         val (_, vr2) = evalExpression(environment, vr)
-        (environment, fn(vl2.asInstanceOf[Number], vr2.asInstanceOf[Number]))
-      }
-      case (VarExpression(_),_) => {
-        val (_, vl2) = evalExpression(environment, vl)
-        (environment, fn(vl2.asInstanceOf[Number], vr.asInstanceOf[Number]))
-      }
-       case (_,VarExpression(_)) => {
-        val (_, vr2) = evalExpression(environment, vr)
-        (environment, fn(vl.asInstanceOf[Number], vr2.asInstanceOf[Number]))
-      }
-       case (_,_) => {
-        (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
-      }   
-    }
-    // (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
+    val (_, vl) = evalExpression(environment,evalExpression(environment, left)._2)
+    val (_, vr) = evalExpression(environment,evalExpression(environment, right)._2)
+    // (vl,vr) match{
+    //   case (VarExpression(_),VarExpression(_)) => {
+    //      val (_, vl2) = evalExpression(environment, vl)
+    //      val (_, vr2) = evalExpression(environment, vr)
+    //     (environment, fn(vl2.asInstanceOf[Number], vr2.asInstanceOf[Number]))
+    //   }
+    //   case (VarExpression(_),_) => {
+    //     val (_, vl2) = evalExpression(environment, vl)
+    //     (environment, fn(vl2.asInstanceOf[Number], vr.asInstanceOf[Number]))
+    //   }
+    //    case (_,VarExpression(_)) => {
+    //     val (_, vr2) = evalExpression(environment, vr)
+    //     (environment, fn(vl.asInstanceOf[Number], vr2.asInstanceOf[Number]))
+    //   }
+    //    case (_,_) => {
+    //     (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
+    //   }   
+    // }
+    (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
   }
 
 
