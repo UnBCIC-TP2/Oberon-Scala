@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.Map
 
 class ParserCombinatorTestSuite
-    extends AbstractTestSuite
+  extends AbstractTestSuite
     with Oberon2ScalaParser {
   test("Testing Int Parser") {
     assert(IntValue(123) == parseAbs(parse(int, "123"))) // positive number
@@ -79,7 +79,7 @@ class ParserCombinatorTestSuite
     assert(BoolValue(false) == parseAbs(parse(expressionParser, "False")))
     assert(NullValue == parseAbs(parse(expressionParser, "NIL")))
     assert(
-      Brackets(StringValue("testao")) == parseAbs(
+      StringValue("testao") == parseAbs(
         parse(expressionParser, "(\"testao\")")
       )
     )
@@ -107,7 +107,7 @@ class ParserCombinatorTestSuite
         DivExpression(
           DivExpression(
             MultExpression(
-              Brackets(DivExpression(IntValue(16), IntValue(4))),
+              DivExpression(IntValue(16), IntValue(4)),
               RealValue(-35.2)
             ),
             IntValue(-4)
@@ -121,8 +121,8 @@ class ParserCombinatorTestSuite
       AndExpression(
         MultExpression(
           MultExpression(
-            DivExpression(Brackets(IntValue(16)), IntValue(4)),
-            Brackets(DivExpression(RealValue(-35.2), IntValue(-4)))
+            DivExpression(IntValue(16), IntValue(4)),
+            DivExpression(RealValue(-35.2), IntValue(-4))
           ),
           IntValue(3)
         ),
@@ -269,11 +269,9 @@ class ParserCombinatorTestSuite
     // IF THEN ELSE
     assert(
       IfElseStmt(
-        Brackets(
           GTExpression(
             MultExpression(IntValue(2), IntValue(5)),
             FunctionCallExpression("teste", List(IntValue(1)))
-          )
         ),
         new AssignmentStmt(
           ArrayAssignment(
@@ -465,17 +463,17 @@ class ParserCombinatorTestSuite
         ReturnStmt(AddExpression(VarExpression("a"), VarExpression("b")))
       )
         == parseAbs(
-          parse(
-            procedureParser,
-            """
-        PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
-        BEGIN 
-            RETURN a + b 
-        END 
+        parse(
+          procedureParser,
+          """
+        PROCEDURE addFunc (a, b: INTEGER): INTEGER;
+        BEGIN
+            RETURN a + b
+        END
         addFunc
         """
-          )
         )
+      )
     )
 
     val thrown = intercept[Exception] {
@@ -483,10 +481,10 @@ class ParserCombinatorTestSuite
         parse(
           procedureParser,
           """
-            PROCEDURE addFunc (a, b: INTEGER): INTEGER; 
-            BEGIN 
-                RETURN a + b 
-            END 
+            PROCEDURE addFunc (a, b: INTEGER): INTEGER;
+            BEGIN
+                RETURN a + b
+            END
             addFun
             """
         )

@@ -48,10 +48,7 @@ class ArithmeticTestSuite extends AnyFunSuite {
 
     val interpreter = new Interpreter()
     val env = new Environment[Expression]()
-    //val expVisitor = new EvalExpressionVisitor(interpreter)
-
     val (_, res) = interpreter.evalExpression(env, m)
-
     assert(expected == res)
 
   }

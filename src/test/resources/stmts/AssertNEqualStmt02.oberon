@@ -1,0 +1,7 @@
+MODULE AssertNEqualModule;
+
+BEGIN
+    assert_ne(1,1)
+END
+
+END AssertNEqualModule.

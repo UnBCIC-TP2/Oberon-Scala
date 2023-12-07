@@ -40,12 +40,10 @@ class NewTypesTest extends AnyFunSuite {
     assert(result.lookup("f") == Some(IntValue(6))) // FOR TO x
     assert(result.lookup("m") == Some(IntValue(13))) // FOR TO x
     assert(result.lookup("z") == Some(IntValue(24))) // FOR TO x
-    
     assert(result.lookup("c") == Some(IntValue(3))) // FOR TO x
     assert(result.lookup("j") == Some(IntValue(10))) // FOR TO x
     assert(result.lookup("k") == Some(IntValue(11))) // FOR TO x
     assert(result.lookup("x") == Some(IntValue(24))) // FOR TO x
-    
     assert(result.lookup("d") == Some(RealValue(4.5.toFloat))) // FOR TO x
     assert(result.lookup("i") == Some(RealValue(9.5.toFloat))) // FOR TO x
     assert(result.lookup("o") == Some(RealValue(15.5.toFloat))) // FOR TO x
@@ -79,7 +77,6 @@ class NewTypesTest extends AnyFunSuite {
     val module = ScalaParser.parse(content)
 
     assert(module.name == "SimpleModule")
-
 
     val result = interpreter.runInterpreter(module)
     assert(result.lookup("x") == Some(RealValue(26.500000005.toFloat))) // FOR TO x

@@ -1,0 +1,12 @@
+MODULE ProcedureIgnore;
+
+IGNORE firstTest ("The first test suite");
+      BEGIN
+          assert(False)
+      END firstTest
+      
+BEGIN
+      write("oi")
+END
+
+END ProcedureIgnore.

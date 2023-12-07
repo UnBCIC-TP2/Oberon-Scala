@@ -13,9 +13,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val bFalse = BoolValue(false)
 
     assert(visitor.checkExpression(val10) == Some(IntegerType))
-
     assert(visitor.checkExpression(bTrue) == Some(BooleanType))
-
     assert(visitor.checkExpression(bFalse) == Some(BooleanType))
   }
 

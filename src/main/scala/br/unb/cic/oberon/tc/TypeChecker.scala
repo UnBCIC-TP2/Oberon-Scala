@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.ast.{NEQExpression, _}
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -12,7 +12,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
     case _             => typeChecker.env.baseType(t)
   }
 
-   def checkExpression(exp: Expression): Option[Type] =
+  def checkExpression(exp: Expression): Option[Type] =
      computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
 
   def computeGeneralExpressionType(exp: Expression): Option[Type] = exp match {
@@ -118,7 +118,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
 
   def fieldAccessCheck(exp: Expression, attributeName: String): T = {
     checkExpression(exp) match {
-      case Some(ReferenceToUserDefinedType(userTypeName)) => {
+      case Some(ReferenceToUserDefinedType(userTypeName)) =>
         typeChecker.env.lookupUserDefinedType(userTypeName) match {
           case Some(UserDefinedType(_, RecordType(variables))) =>
             variables
@@ -126,14 +126,11 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
               .map(_.variableType)
           case _ => None
         }
+        case Some(RecordType(variables)) => variables.find(v => v.name.equals(attributeName)).map(_.variableType).orElse(None)
+        case _ => None
       }
-      case Some(RecordType(variables)) => {
-        val attribute = variables.find(v => v.name.equals(attributeName))
-        if (attribute.isDefined) Some(attribute.get.variableType) else None
-      }
-      case _ => None
-    }
   }
+
 
   def pointerAccessCheck(name: String) = {
     typeChecker.env
@@ -230,6 +227,7 @@ class TypeChecker {
     case WriteStmt(exp) =>
       if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
+    case AssertTrueStmt(exp) => visitAssertStmt(stmt)
     case NewStmt(varName) =>
       env.lookup(varName) match {
         case Some(PointerType(_)) => List()
@@ -340,6 +338,16 @@ class TypeChecker {
       List((forEachStmt, "invalid types in the foreach statement"))
     }
     res ++ checkStmt(forEachStmt.stmt)
+  }
+
+  private def visitAssertStmt(stmt: Statement) = stmt match {
+    case AssertTrueStmt(condition) =>
+      val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
+      if (expVisitor.checkExpression(condition).contains(BooleanType)) {
+        errorList
+      } else {
+        (stmt, s"Expression $condition does not have a boolean type") :: errorList
+      }
   }
   private def visitExitStmt(): T = List()
 
