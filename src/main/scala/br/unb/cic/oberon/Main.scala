@@ -1,19 +1,16 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.codegen.{
-  CodeGenerator,
-  JVMCodeGenerator,
-  PaigesBasedGenerator,
-}
+import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
 import br.unb.cic.oberon.codegen.TACodeGenerator
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+import br.unb.cic.oberon.printer.TACodePrinter
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
 
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.{Files, Path, Paths}
 import java.util.Base64
 
 object Main extends App with Oberon2ScalaParser {
@@ -105,9 +102,8 @@ object Main extends App with Oberon2ScalaParser {
       }
       case "tac" => {
         val tacCode = TACodeGenerator.generateCode(module)
-        Files.writeString(
-          conf.compile.outputPath.get.get,
-          tacCode.map(_.toString).mkString("\n"))
+        val formattedTacCode = TACodePrinter.getTacDocumentStringFormatted(tacCode)
+        Files.writeString(conf.compile.outputPath.get.get, formattedTacCode)
       }
     }
   }
