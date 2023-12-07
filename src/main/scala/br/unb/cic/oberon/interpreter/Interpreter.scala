@@ -64,7 +64,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
   } yield ()
 
   def declareVariable(variable: VariableDeclaration): IResult[Unit] = for {
-    environment <- get[Environment[Expression]]
+    environment <- get
     _ <- environment.baseType(variable.variableType) match {
       case Some(ArrayType(length, baseType)) => for {_ <- modify[Environment[Expression]](_.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType))))} yield ()
       case _ => for {_ <- modify[Environment[Expression]](_.setGlobalVariable(variable.name, Undef()))} yield ()
@@ -92,8 +92,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     // we should also stop the execution of a block of
     // statements within a any kind of repeat statement.
 
-    // essas funcoes do state monad n precisa explicitar o tipo do state, depois volto pra limpar o codigo
-    envt <- get[Environment[Expression]]
+    envt <- get
 
     _ <- if (exit || envt.lookup(Values.ReturnKeyWord).isDefined) State[Environment[Expression], Unit] {env => (env, ())} else
     // otherwise, we pattern-match on the current stmt.
@@ -110,7 +109,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
         }
 
       case SequenceStmt(stmts) =>
-        // as stmts is a List[Statement], we can use traverse_ to execute all statements in order, saving them in a State monad
+        // as stmts is a List[Statement], we can use traverse_ to execute all statements in order, saving the resulting env in a State monad
         stmts.traverse_(executeStatement)
 
       case ReadRealStmt(name) => for {
@@ -195,30 +194,28 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
   def callProcedure(name: String, args: List[Expression]): IResult[Unit] = for {
     env <- get[Environment[Expression]]
     procedure = env.findProcedure(name)
-    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args, _))
+    _ <- updateEnvironmentWithProcedureCall(procedure, args)
     _ <- executeStatement(procedure.stmt)
     _ <- modify[Environment[Expression]](_.pop())
   } yield ()
 
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment: Environment[Expression]): Environment[Expression] = {
-      val mappedArgs = procedure.args.zip(args).map(pair => pair match {
-      case (ParameterByReference(_, _), VarExpression(name2)) => (pair._1, environment.pointsTo(name2).get)
+  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): IResult[Unit] = for {
+      mappedArgs <- procedure.args.zip(args).traverse(pair => pair match {
+      case (ParameterByReference(_, _), VarExpression(name2)) => for {env <- get[Environment[Expression]] ; loc: Expression = env.pointsTo(name2).get} yield (pair._1, loc)
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      case (ParameterByValue(_, _), exp) => (pair._1, evalExpression(exp).runA(environment).value) // we are not saving modifications to the environment here, not sure how to do it in a map
+      case (ParameterByValue(_, _), exp) => for {expr <- evalExpression(exp)} yield (pair._1, expr)
     })
-    var envt = environment.push() // after that, we can "push", to indicate a procedure call.
-    mappedArgs.foreach(pair => pair match {
-      case (ParameterByReference(name, _), exp: Location) => envt = envt.setParameterReference(name, exp)
+    _ <- modify[Environment[Expression]](_.push()) // after that, we can "push", to indicate a procedure call.
+    _ <- mappedArgs.traverse(pair => pair match {
+      case (ParameterByReference(name, _), exp: Location) => for {_ <- modify[Environment[Expression]](_.setParameterReference(name, exp))} yield ()
       case (ParameterByReference(_, _), _) => throw new RuntimeException
-      case (ParameterByValue(name, _), exp: Expression) => envt = envt.setLocalVariable(name, exp)
+      case (ParameterByValue(name, _), exp: Expression) => for {_ <- modify[Environment[Expression]](_.setLocalVariable(name, exp))} yield ()
 	  case _ => throw new RuntimeException
     })
-    procedure.constants.foreach(c => envt = envt.setLocalVariable(c.name, c.exp))
-    procedure.variables.foreach(v => envt = envt.setLocalVariable(v.name, Undef()))
-
-    envt
-  }
+    _ <- procedure.constants.traverse(declareConstant)
+    _ <- procedure.variables.traverse(declareVariable)
+  } yield ()
 
 
   def evalCondition(expression: Expression): IResult[Boolean] = for {
@@ -313,7 +310,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
   def evalFunctionCall(name: String, args: List[Expression]): IResult[Expression] =  for {
     env <- get[Environment[Expression]]
     procedure = env.findProcedure(name)
-    _ <- modify[Environment[Expression]](updateEnvironmentWithProcedureCall(procedure, args, _))
+    _ <- updateEnvironmentWithProcedureCall(procedure, args)
     _ <- executeStatement(procedure.stmt)
     env <- get[Environment[Expression]]
     returnValue = env.lookup(Values.ReturnKeyWord)
