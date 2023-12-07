@@ -335,26 +335,23 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
-    case LambdaExpression(args,exp) => evalLambdaExpression(environment,args,exp)
+    case LambdaExpression(args,exp) => (environment,LambdaExpression(args,exp))
     case LambdaApplication(exp, listExp) => evalLambdaApplication(environment,exp, listExp)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
   }
-
-   def evalLambdaExpression(environment: Environment[Expression], args: List[FormalArg], exp: Expression): (Environment[Expression],Expression) = {
-    var envt = environment
-    args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
-    (envt,LambdaExpression(args,exp))
-  }
   
   def evalLambdaApplication(environment: Environment[Expression], Expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
-    var (env,expression) = evalExpression(environment.push,Expression)
+    var (env,expression) = evalExpression(environment,Expression)
 
     (expression) match{
         case (LambdaExpression(args,exp)) => {
-          var (envt,_) = evalExpression(env,expression)
-          val variables = envt.allLocalVariables.toList.zip(listExpression)
-          variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
+          var envt = env.push()
+          //args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
+          //var mappedArgs = args.zip(listExpression)
+          //val variables = envt.allLocalVariables.toList.zip(listExpression)
+          args.zip(listExpression).foreach{case (ParameterByValue(variable, _),value) => envt = envt.setLocalVariable(variable,evalExpression(envt,value)._2)}
+          //variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
           var (envt1,exp1) = evalExpression(envt,exp)
           (envt1.pop,exp1)
         }
@@ -411,26 +408,11 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
    *         numbers.
    */
   def arithmeticExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Number, Number) => Number): (Environment[Expression], Expression) = {
-    val (_, vl) = evalExpression(environment,evalExpression(environment, left)._2)
-    val (_, vr) = evalExpression(environment,evalExpression(environment, right)._2)
-    // (vl,vr) match{
-    //   case (VarExpression(_),VarExpression(_)) => {
-    //      val (_, vl2) = evalExpression(environment, vl)
-    //      val (_, vr2) = evalExpression(environment, vr)
-    //     (environment, fn(vl2.asInstanceOf[Number], vr2.asInstanceOf[Number]))
-    //   }
-    //   case (VarExpression(_),_) => {
-    //     val (_, vl2) = evalExpression(environment, vl)
-    //     (environment, fn(vl2.asInstanceOf[Number], vr.asInstanceOf[Number]))
-    //   }
-    //    case (_,VarExpression(_)) => {
-    //     val (_, vr2) = evalExpression(environment, vr)
-    //     (environment, fn(vl.asInstanceOf[Number], vr2.asInstanceOf[Number]))
-    //   }
-    //    case (_,_) => {
-    //     (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
-    //   }   
-    // }
+    val (_, vl) = evalExpression(environment,left)
+    val (_, vr) = evalExpression(environment,right)
+    // val (_, vl) = evalExpression(environment,evalExpression(environment,left)._2)
+    // val (_, vr) = evalExpression(environment,evalExpression(environment,right)._2)
+    
     (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
   }
 
