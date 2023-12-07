@@ -347,11 +347,7 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
     (expression) match{
         case (LambdaExpression(args,exp)) => {
           var envt = env.push()
-          //args.foreach(formal => envt = declareParameter(envt, VariableDeclaration(formal.name,formal.argumentType)))
-          //var mappedArgs = args.zip(listExpression)
-          //val variables = envt.allLocalVariables.toList.zip(listExpression)
           args.zip(listExpression).foreach{case (ParameterByValue(variable, _),value) => envt = envt.setLocalVariable(variable,evalExpression(envt,value)._2)}
-          //variables.foreach{case (variable,value) => envt = envt.setVariable(variable,value)}
           var (envt1,exp1) = evalExpression(envt,exp)
           (envt1.pop,exp1)
         }
@@ -410,8 +406,6 @@ def runInterpreter(module: OberonModule, Test: String): Environment[Expression] 
   def arithmeticExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Number, Number) => Number): (Environment[Expression], Expression) = {
     val (_, vl) = evalExpression(environment,left)
     val (_, vr) = evalExpression(environment,right)
-    // val (_, vl) = evalExpression(environment,evalExpression(environment,left)._2)
-    // val (_, vr) = evalExpression(environment,evalExpression(environment,right)._2)
     
     (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
   }
