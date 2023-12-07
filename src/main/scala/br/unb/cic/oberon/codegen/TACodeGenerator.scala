@@ -29,7 +29,8 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t, insts1) = generateExpression(exp, insts)
         designator match {
           case VarAssignment(varName) =>
-            val v = Name(varName, expVisitor.checkExpression(exp).get)
+            // Mudado aqui também
+            val v = Name(varName, expVisitor.checkExpression(exp)._2.typeName.get)
             insts1 :+ CopyOp(t, v, "")
           case ArrayAssignment(array, index) =>
             val (a, insts2) = generateExpression(array, insts1)
@@ -279,14 +280,14 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         return (Constant("Null", NullType), insts)
 
       case VarExpression(name) =>
-        return (Name(name, expVisitor.checkExpression(expr).get), insts)
+        return (Name(name, expVisitor.checkExpression(expr)._2.typeName.get), insts)
 
       case AddExpression(left, right) =>
         val (t, l, r, insts2) = generateBinaryExpression(
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr)._2.typeName.get
         )
         return (t, insts2 :+ AddOp(l, r, t, ""))
 
@@ -295,7 +296,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr)._2.typeName.get
         )
         return (t, insts2 :+ SubOp(l, r, t, ""))
 
@@ -304,7 +305,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr)._2.typeName.get
         )
         return (t, insts2 :+ MulOp(l, r, t, ""))
 
@@ -313,7 +314,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr)._2.typeName.get
         )
 
         return (t, insts2 :+ DivOp(l, r, t, ""))
@@ -403,11 +404,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expVisitor.checkExpression(expr).get)
+        val t = new Temporary(expVisitor.checkExpression(expr)._2.typeName.get)
         return (t, insts2 :+ ArrayGet(a, i, t, ""))
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expVisitor.checkExpression(expr).get)
+        val t = new Temporary(expVisitor.checkExpression(expr)._2.typeName.get)
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(record, field) =>
