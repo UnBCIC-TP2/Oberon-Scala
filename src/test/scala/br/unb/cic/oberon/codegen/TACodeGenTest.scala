@@ -6,8 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TACodeTest extends AnyFunSuite {
 
-  // Test for generating TACode for addition between constants
-  test("Generate add between constants") {
+  test("Test for generating TACode for add between constants") {
 
     TACodeGenerator.reset
     val expr = AddExpression(IntValue(1), IntValue(2))
@@ -24,8 +23,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for addition between add and constant
-  test("Generate add between add and constant") {
+  test("Test for generating TACode for addition between add and constant") {
 
     TACodeGenerator.reset
     val expr =
@@ -43,8 +41,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for addition between odd constants
-  test("Generate add between adds") {
+  test("Test for generating TACode for addition between odd constants") {
 
     TACodeGenerator.reset
     val expr = AddExpression(
@@ -66,8 +63,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for a complex operation involving multiple expressions
-  test("Testing complex operation 2") {
+  test("Test for generating TACode for a complex operation involving multiple expressions") {
 
     TACodeGenerator.reset
     val expr = SubExpression(
@@ -93,8 +89,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for a complex boolean expression
-  test("Testing complex operation 3") {
+  test("Test for generating TACode for a complex boolean expression") {
 
     TACodeGenerator.reset
     val expr = OrExpression(
@@ -134,8 +129,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the NotExpression
-  test("Testing NotExpression") {
+  test("Test for generating TACode for the NotExpression") {
 
     TACodeGenerator.reset
     val expr = NotExpression(BoolValue(true))
@@ -162,8 +156,7 @@ class TACodeTest extends AnyFunSuite {
     <=
    */
 
-  // Test for generating TACode for the EQExpression
-  test("Testing EQ") {
+  test("Test for generating TACode for the EQExpression") {
 
     TACodeGenerator.reset
     val expr = EQExpression(IntValue(1), IntValue(2))
@@ -183,8 +176,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the NEQExpression
-  test("Testing NEQ") {
+  test("Test for generating TACode for the NEQExpression") {
 
     TACodeGenerator.reset
     val expr = NEQExpression(IntValue(1), IntValue(2))
@@ -204,8 +196,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the LTExpression
-  test("Testing LT") {
+  test("Test for generating TACode for the LTExpression") {
 
     TACodeGenerator.reset
     val expr = LTExpression(IntValue(1), IntValue(2))
@@ -222,8 +213,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the GTExpression
-  test("Testing GT") {
+  test("Test for generating TACode for the GTExpression") {
 
     TACodeGenerator.reset
     val expr = GTExpression(IntValue(1), IntValue(2))
@@ -240,8 +230,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the GTEExpression
-  test("Testing GTE") {
+  test("Test for generating TACode for the GTEExpression") {
 
     TACodeGenerator.reset
     val expr = GTEExpression(IntValue(1), IntValue(2))
@@ -261,8 +250,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for the LTEExpression
-  test("Testing LTE") {
+  test("Test for generating TACode for the LTEExpression") {
 
     TACodeGenerator.reset
     val expr = LTEExpression(IntValue(1), IntValue(2))
@@ -283,7 +271,7 @@ class TACodeTest extends AnyFunSuite {
   }
 
   // Test for generating TACode for VarExpression
-  test("Testing VarExpression") {
+  test("Test for generating TACode for VarExpression") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType))
     TACodeGenerator.load_vars(list_var)
@@ -296,8 +284,7 @@ class TACodeTest extends AnyFunSuite {
     assert(t == ops)
   }
 
-  // Test for generating TACode for ArraySubscript
-  test("Testing ArraySubscript") {
+  test("Test for generating TACode for ArraySubscript") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -313,8 +300,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for PointerAccessExpression
-  test("Testing PointerAccessExpression") {
+  test("Test for generating TACode for PointerAccessExpression") {
     TACodeGenerator.reset
     val list_var =
       List(VariableDeclaration("pointer", PointerType(IntegerType)))
@@ -332,8 +318,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for Var Assignment
-  test("Testing Var Assignment") {
+  test("Test for generating TACode for Var Assignment") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -353,8 +338,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for Array Assignment
-  test("Testing Array Assignment") {
+  test("Test for generating TACode for Array Assignment") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -375,8 +359,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for Pointer Assignment
-  test("Testing Pointer Assignment") {
+  test("Test for generating TACode for Pointer Assignment") {
     TACodeGenerator.reset
     val list_var =
       List(VariableDeclaration("pointer", PointerType(IntegerType)))
@@ -397,8 +380,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for IFElse-EQExpression
-  test("Testing IfElse-EQExpression") {
+  test("Test for generating TACode for IFElse-EQExpression") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -427,7 +409,7 @@ class TACodeTest extends AnyFunSuite {
   }
 
   // Test for generating TACode for IFElse-BooleanExpression
-  test("Testing IfElse-BooleanExpression") {
+  test("Test for generating TACode for IFElse-BooleanExpression") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -472,8 +454,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  // Test for generating TACode for IFElse-NotExpression
-  test("Testing IfElse-NotExpression") {
+  test("Test for generating TACode for IFElse-NotExpression") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType))
     TACodeGenerator.load_vars(list_var)
@@ -501,7 +482,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-    test("Testing IfElse-NEQExpression") {
+    test("Test for generating TACode for IfElse-NEQExpression") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -529,7 +510,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing IfElse-GTExpression") {
+  test("Test for generating TACode for IfElse-GTExpression") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -557,7 +538,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing IfElse-LTExpression") {
+  test("Test for generating TACode for IfElse-LTExpression") {
     TACodeGenerator.reset
 
     val list_var = List(VariableDeclaration("var", IntegerType))
@@ -585,7 +566,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
   
-  test("Testing WhileStmt-LTExpression") {
+  test("Test for generating TACode for WhileStmt-LTExpression") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType))
     TACodeGenerator.load_vars(list_var)
@@ -614,10 +595,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-
-
-
-  test("Testing procedure sum(var1,var2)") {
+  test("Test for generating TACode for procedure sum(var1,var2)") {
     TACodeGenerator.reset()
     Temporary.reset()
     val list_var = List(VariableDeclaration("var1", IntegerType), VariableDeclaration("var2", IntegerType))
@@ -639,7 +617,7 @@ class TACodeTest extends AnyFunSuite {
     )
     assert(list == ops)
   }
-  test("testing procedure sub(1+2,1+1)") {
+  test("Test for generating TACode for procedure sub(1+2,1+1)") {
 
     val procedureName = "sub"
     val procedureCallStmt = ProcedureCallStmt(procedureName, List(AddExpression(IntValue(1), IntValue(2)),
@@ -659,7 +637,7 @@ class TACodeTest extends AnyFunSuite {
     assert(ops == list)
   }
 
-  test("testing RecordAssignment") {
+  test("Test for generating TACode for RecordAssignment") {
     TACodeGenerator.reset()
     val userTypeName = "date"
     val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
@@ -678,7 +656,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing RecordAssignment 2") {
+  test("Test for generating TACode for RecordAssignment 2") {
     TACodeGenerator.reset()
     val userTypeName = "date"
     val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
@@ -700,7 +678,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing RecordAssignment 3") {
+  test("Test for generating TACode for RecordAssignment 3") {
     TACodeGenerator.reset()
     val userTypeName = "date"
     val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("month", IntegerType))
@@ -719,7 +697,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing RecordAssignment offset com array") {
+  test("Test for generating TACode for RecordAssignment offset com array") {
     TACodeGenerator.reset()
     val userTypeName = "date"
     val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType))
@@ -738,7 +716,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing Record Usage") {
+  test("Test for generating TACode for Record Usage") {
     TACodeGenerator.reset()
     val userTypeName = "date"
     val typeVariables = List(VariableDeclaration("day", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)), VariableDeclaration("month", IntegerType))
@@ -759,7 +737,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing New statement") {
+  test("Test for generating TACode for New statement") {
     TACodeGenerator.reset()
     val list_var = List(VariableDeclaration("p", PointerType(IntegerType)))
 
@@ -775,7 +753,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing OrExpression") {
+  test("Test for generating TACode for OrExpression") {
     TACodeGenerator.reset
     val expr = OrExpression(BoolValue(true), BoolValue(false))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -789,7 +767,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing AndExpression") {
+  test("Test for generating TACode for AndExpression") {
     TACodeGenerator.reset
     val expr = AndExpression(BoolValue(true), BoolValue(false))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -803,7 +781,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing MultExpression") {
+  test("Test for generating TACode for MultExpression") {
     TACodeGenerator.reset
     val expr = MultExpression(IntValue(3), IntValue(3))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -816,7 +794,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing DivExpression") {
+  test("Test for generating TACode for DivExpression") {
     TACodeGenerator.reset
     val expr = DivExpression(IntValue(2), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -829,7 +807,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing SubExpression") {
+  test("Test for generating TACode for SubExpression") {
     TACodeGenerator.reset
     val expr = SubExpression(IntValue(1), IntValue(1))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -842,7 +820,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
- test("Testing ModExpression") {
+ test("Test for generating TACode for ModExpression") {
     TACodeGenerator.reset
     val expr = ModExpression(IntValue(4), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
@@ -855,7 +833,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing Exit statement") {
+  test("Test for generating TACode for Exit statement") {
     TACodeGenerator.reset()
     val exitstmt = ExitStmt()
     val list = TACodeGenerator.generateStatement(exitstmt, List())
@@ -865,7 +843,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing Return statement") {
+  test("Test for generating TACode for Return statement") {
     TACodeGenerator.reset()
     val returnstmt = ReturnStmt(IntValue(5))
     val list = TACodeGenerator.generateStatement(returnstmt, List())
@@ -876,7 +854,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("testing Write statement") {
+  test("Test for generating TACode for Write statement") {
     TACodeGenerator.reset()
     val writestmt = WriteStmt(IntValue(1))
     val list = TACodeGenerator.generateStatement(writestmt, List())
@@ -886,7 +864,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Testing Array Assignment With Expressions (index) 1") {
+  test("Test for generating TACode for Array Assignment With Expressions (index) 1") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -913,7 +891,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Assignment With Expressions (index) 2") {
+  test("Test for generating TACode for Array Assignment With Expressions (index) 2") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -939,7 +917,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Assignment With Expressions (index) 3") {
+  test("Test for generating TACode for Array Assignment With Expressions (index) 3") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("pointer", PointerType(IntegerType)), VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -968,7 +946,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Assignment With Variables 1") {
+  test("Test for generating TACode for Array Assignment With Variables 1") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var1", IntegerType), 
         VariableDeclaration("var2", IntegerType),
@@ -997,7 +975,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Assignment With Variables 2") {
+  test("Test for generating TACode for Array Assignment With Variables 2") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var1", BooleanType), 
         VariableDeclaration("var2", BooleanType),
@@ -1023,7 +1001,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Operations With Variables 1") {
+  test("Test for generating TACode for Array Operations With Variables 1") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -1049,7 +1027,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Operations With Variables 2") {
+  test("Test for generating TACode for Array Operations With Variables 2") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)))
     TACodeGenerator.load_vars(list_var)
@@ -1077,7 +1055,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Array Operations With Variables 3") {
+  test("Test for generating TACode for Array Operations With Variables 3") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType), 
                         VariableDeclaration("lista1", ArrayType(4, IntegerType)),
@@ -1109,7 +1087,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Loops With Array Operations 1") {
+  test("Test for generating TACode for Loops With Array Operations 1") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType),
                         VariableDeclaration("lista", ArrayType(4, IntegerType))
@@ -1148,7 +1126,7 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
-  test("Testing Loops With Array Operations 2") {
+  test("Test for generating TACode for Loops With Array Operations 2") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("lista1", ArrayType(4, IntegerType)),
                         VariableDeclaration("lista2", ArrayType(4, IntegerType))
