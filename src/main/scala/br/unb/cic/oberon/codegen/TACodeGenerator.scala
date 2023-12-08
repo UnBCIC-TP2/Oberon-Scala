@@ -473,24 +473,19 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
     }
   }
 
-  private def getArrayOffset(array: Address, index: Expression): Address = {
+private def getArrayOffset(array: Address, index: Expression): Address = {
     val arrayType = array match {
       case Name(_, ArrayType(_, baseType)) => baseType
     }
-    
-    var index1 = index match {
+    val index1 = index match {
       case IntValue(value) => value
-      case (_) => ""
     }
 
-    if (index1.isInstanceOf[Int]) {
-      val offset = typeByteSize.getOrElse(arrayType, 0) * index1.asInstanceOf[Int]
-      Constant(offset.toString, IntegerType)
-    } else {
-      val offset = MultExpression(IntValue(typeByteSize.getOrElse(arrayType, 0)), index)
-      val (t, list) = generateExpression(offset, List())
-      Constant(list.toString, IntegerType)
-    }
+    val offset = typeByteSize.getOrElse(arrayType, 0) * index1
+
+
+    Constant(offset.toString, IntegerType)
+
   }
   private def getRecordOffset(record: Name, field: String): Constant = {
     val variables: List[VariableDeclaration] = record.t.asInstanceOf[RecordType].variables
