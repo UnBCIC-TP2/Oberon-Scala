@@ -1005,6 +1005,33 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
+  ignore("Test for generating TACode for Array Assignments with Array Element") {
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("lista1", ArrayType(4, IntegerType)),
+                        VariableDeclaration("lista2", ArrayType(4, IntegerType))
+    )
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(
+        ArrayAssignment(VarExpression("lista1"), ArraySubscript(VarExpression("lista2"), IntValue(1))),
+        IntValue(2)
+    )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0)
+    val t1 = new Temporary(IntegerType, 1)
+
+    val ops = List(
+        ArrayGet(Name("lista2", ArrayType(4, IntegerType)), Constant("1", IntegerType), t0, ""),
+        MulOp(Constant("4", IntegerType), t0, t1, ""),
+        ArraySet(Constant("1", IntegerType), t1, Name("lista", ArrayType(4, IntegerType)), "")
+    )
+
+    // Lista1[Lista2[1]] = 2
+    assert(list == ops)
+  }
+  
   test("Test for generating TACode for Array Operations With Variables 1") {
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("var", IntegerType), VariableDeclaration("lista", ArrayType(4, IntegerType)))
