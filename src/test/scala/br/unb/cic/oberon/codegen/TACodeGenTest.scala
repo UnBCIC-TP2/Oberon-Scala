@@ -1028,7 +1028,7 @@ class TACodeTest extends AnyFunSuite {
         ArraySet(Constant("1", IntegerType), t1, Name("lista", ArrayType(4, IntegerType)), "")
     )
 
-    // Lista1[Lista2[1]] = 2
+    // Lista1[Lista2[1]] = 1
     assert(list == ops)
   }
   
