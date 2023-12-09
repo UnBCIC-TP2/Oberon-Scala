@@ -1201,4 +1201,53 @@ class TACodeTest extends AnyFunSuite {
 
   }
 
+  test("Test for generating TACode for double") {
+    TACodeGenerator.reset
+    val expr = RealValue(1.0)
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    Temporary.reset
+    val ops = Constant("1.0", RealType)
+    // 1.0
+
+    assert(t == ops)
+  }
+
+  ignore("Test for generating TACode for add between constants (Double)") {
+    TACodeGenerator.reset
+    val expr = AddExpression(RealValue(1.0), RealValue(2.0))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+    // 1.0 + 2.0
+
+    Temporary.reset
+    val t0 = new Temporary(RealType, 0, true)
+    val ops = List(
+      AddOp(Constant("1.0", RealType), Constant("2.0", RealType), t0, "")
+    )
+    // t0 = 1.0 + 2.0
+
+    assert(list == ops)
+  }
+
+  ignore("Test for generating TACode for Array Assignment (Double)") {
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(
+      ArrayAssignment(VarExpression("lista"), RealValue(1)),
+      AddExpression(RealValue(2.0), RealValue(3.0))
+    )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    TACodeGenerator.reset
+    val t0 = new Temporary(RealType, 0)
+    val ops = List(
+      AddOp(Constant("2.0", RealType), Constant("3.0", RealType), t0, ""),
+      ArraySet(t0, Constant("4", IntegerType), Name("lista", ArrayType(4,IntegerType)), "")
+    )    
+    // lista[1.0] = 2.0 + 3.0
+    assert(list == ops)
+  }
+  
 }
