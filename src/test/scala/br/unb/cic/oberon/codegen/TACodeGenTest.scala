@@ -1249,5 +1249,58 @@ class TACodeTest extends AnyFunSuite {
     // lista[1.0] = 2.0 + 3.0
     assert(list == ops)
   }
+
+  test("Test for generating TACode for procedure div(1.0, 2.0) (Double)") {
+
+    TACodeGenerator.reset()
+    Temporary.reset()
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val procedureName = "div"
+    val procedureCallStmt = ProcedureCallStmt(procedureName, List(RealValue(1.0), RealValue(2.0)))
+    val list = TACodeGenerator.generateStatement(procedureCallStmt, List())
+
+    Temporary.reset()
+    val t0 = new Temporary(RealType, 0, true)
+    val t1 = new Temporary(RealType, 1, true)
+    val ops = List(
+      MoveOp(Constant("1.0", RealType), t0, ""),
+      MoveOp(Constant("2.0", RealType), t1, ""),
+      Param(t0, ""),
+      Param(t1, ""),
+      Call("div", 2, "")
+    )
+
+    // div(1.0, 2.0)
+    assert(ops == list)
+  }
+
+  test("Test for generating TACode for procedure div(lista[1], lista[2])") {
+
+    TACodeGenerator.reset()
+    Temporary.reset()
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val procedureName = "div"
+    val argsExps = List(ArraySubscript(VarExpression("lista"), IntValue(1)), ArraySubscript(VarExpression("lista"), IntValue(2)))
+    val procedureCallStmt = ProcedureCallStmt(procedureName, argsExps)
+    val list = TACodeGenerator.generateStatement(procedureCallStmt, List())
+
+    Temporary.reset()
+    val t0 = new Temporary(IntegerType, 0, true)
+    val t1 = new Temporary(IntegerType, 1, true)
+    val ops = List(
+      ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("1", IntegerType), t0, ""),
+      ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t1, ""),
+      Param(t0, ""),
+      Param(t1, ""),
+      Call("div", 2, "")
+    )
+
+    // div(lista[1], lista[2])
+    assert(ops == list)
+  }
   
 }
