@@ -1302,5 +1302,27 @@ class TACodeTest extends AnyFunSuite {
     // div(lista[1], lista[2])
     assert(ops == list)
   }
+
+  ignore("Test for generating TACode for Pointer Assignment (Double)") {
+    
+    TACodeGenerator.reset
+    val list_var =
+      List(VariableDeclaration("pointer", PointerType(RealType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(
+      PointerAssignment("pointer"),
+      AddExpression(RealValue(2), RealValue(3))
+    )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    val t0 = new Temporary(RealType, 0, true)
+    val ops = List(
+      AddOp(Constant("2", RealType), Constant("3", RealType), t0, ""),
+      SetPointer(t0, Name("pointer", LocationType), "")
+    )
+    // *pointer = 2.0 + 3.0
+    assert(list == ops)
+  }
   
 }
