@@ -1,7 +1,8 @@
 package br.unb.cic.oberon.codegen
 
-import jdk.internal.org.objectweb.asm.{ClassVisitor, FieldVisitor}
+//import jdk.internal.org.objectweb.asm.{ClassVisitor, FieldVisitor}
 import jdk.internal.org.objectweb.asm.Opcodes._;
+import org.objectweb.asm.{ClassVisitor, FieldVisitor}
 
 class ClassVisitorTest(version: Integer) extends ClassVisitor(version) {
   var numberOfTotalFields: Integer = 0;

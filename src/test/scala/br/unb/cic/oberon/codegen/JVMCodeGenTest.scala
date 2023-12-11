@@ -8,7 +8,7 @@ import java.nio.file.{Files, Paths}
 import java.util.Base64
 
 import jdk.internal.org.objectweb.asm.Opcodes._
-import jdk.internal.org.objectweb.asm._
+import org.objectweb.asm._
 import java.io.File
 
 class JVMCodeGenTest extends AnyFunSuite with Oberon2ScalaParser{
