@@ -5,9 +5,16 @@ import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 import cats.data.ContT
 
-case class ExpT(exp: Expression, typeName: Option[Type])
+case class ExpT(exp: Expression, typeName: List[Option[Type]])
 trait Constraint
-case class HasAdd() extends Constraint
+
+case class HasAdd(type1: Option[Type], type2: Option[Type]) extends Constraint
+case class HasSub(type1: Option[Type], type2: Option[Type]) extends Constraint
+case class HasEq(type1: Option[Type], type2: Option[Type]) extends Constraint
+case class HasOrd(type1: Option[Type], type2: Option[Type]) extends Constraint
+case class HasProduct(type1: Option[Type], type2: Option[Type]) extends Constraint
+case class HasDiv(type1: Option[Type], type2: Option[Type]) extends Constraint 
+
 class ExpressionTypeChecker(val typeChecker: TypeChecker) {
   type T = Option[Type]
 
@@ -16,55 +23,69 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
     case _             => typeChecker.env.baseType(t)
   }
 
-  def checkExpression(exp: Expression): (List[Constraint], ExpT) =
-    computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t)) match {
-      case None => (List(), ExpT(exp, None))
-      case Some(t) => (List(), ExpT(exp, Some(t)))
-     }
-  def computeGeneralExpressionType(exp: Expression): Option[Type]= exp match {
-    case Brackets(e)         => checkExpression(e)._2.typeName
-    case IntValue(_)         => Some(IntegerType)
-    case RealValue(_)        => Some(RealType)
-    case CharValue(_)        => Some(CharacterType)
-    case BoolValue(_)        => Some(BooleanType)
-    case StringValue(_)      => Some(StringType)
-    case NullValue           => Some(NullType)
-    case Undef()             => None
-    case VarExpression(name) => typeChecker.env.lookup(name)
+  def checkExpression(exp: Expression): Option[Type] =
+    (lista, expt) = computeGeneralExpressionType(exp)
+    expt.typeName
+  def computeGeneralExpressionType(exp: Expression): (List[Constraint], ExpT)= exp match {
+    case Brackets(e)         => 
+      val optype = checkExpression(e)
+      (List(), ExpT(Brackets(e), List(optype)))
+    case IntValue(v)         => (List(), ExpT(IntValue(v), List(Some(IntegerType))))
+    case RealValue(v)        => (List(), ExpT(RealValue(v), List(Some(RealType))))
+    case CharValue(v)        => (List(), ExpT(CharValue(v), List(Some(CharacterType))))
+    case BoolValue(v)        => (List(), ExpT(BoolValue(v) ,List(Some(BooleanType))))
+    case StringValue(v)      => (List(), ExpT(StringValue(v), List(Some(StringType))))
+    case NullValue           => (List(), ExpT(NullValue, List(Some(NullType))))
+    case Undef()             => (List() ,ExpT(Undef(), List(None)))
+    case VarExpression(name) => 
+      val optype = typeChecker.env.lookup(name)
+      (List(), ExpT(VarExpression(name), List(optype)))
     case EQExpression(left, right) =>
-      computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
-      )
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasEq(t1, t2)), ExpT(EQExpression(left, right), List(t1, t2) ))
     case NEQExpression(left, right) =>
-      computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
-      )
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasEq(t1, t2)), ExpT(NEQExpression(left, right), List(t1, t2) ))
     case GTExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasOrd(t1, t2)), ExpT(GTExpression(left, right), List(t1, t2)))
     case LTExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasOrd(t1, t2), HasEq(t1, t2)), ExpT(LTExpression(left, right), List(t1, t2)))
     case GTEExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasOrd(t1, t2), HasEq(t1, t2)), ExpT(GTEExpression(left, right), List(t1, t2)))
     case LTEExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasOrd(t1, t2), HasEq(t1, t2)), ExpT(LTEExpression(left, right), List(t1, t2)))
     case AddExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasAdd(t1, t2)), ExpT(AddExpression(left, right), List(t1, t2)))
     case SubExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasSub(t1, t2)), ExpT(SubExpression(left, right), List(t1, t2)))
     case MultExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasProduct(t1, t2)), ExpT(MultExpression(left, right), List(t1, t2)))
     case DivExpression(left, right) =>
-      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasDiv(t1, t2)), ExpT(DivExpression(left, right), List(t1, t2)))
     case AndExpression(left, right) =>
-      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      val t1 = computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      (List(), ExpT(AndExpression(left, right), List(t1)))
     case OrExpression(left, right) =>
-      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      val t1 = computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      (List(), ExpT(OrExpression(left, right), List(t1)))
     case FunctionCallExpression(name, args) => {
       try {
         val procedure = typeChecker.env.findProcedure(name)
@@ -166,8 +187,8 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
       expected: List[Type],
       result: Type
   ): Option[Type] = {
-    val t1 = checkExpression(left)._2.typeName
-    val t2 = checkExpression(right)._2.typeName
+    val t1 = checkExpression(left)
+    val t2 = checkExpression(right)
     if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
     else None
   }
