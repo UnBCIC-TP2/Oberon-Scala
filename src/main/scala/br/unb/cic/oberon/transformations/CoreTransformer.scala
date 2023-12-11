@@ -34,7 +34,7 @@ object CoreTransformer {
           BoolValue(true),
           reduceToCoreStatement(stmt, caseIdGenerator, addedVariables)
         )
-
+      // condition --> expression
       case RepeatUntilStmt(condition, stmt) =>
         WhileStmt(
           BoolValue(true),
@@ -43,7 +43,7 @@ object CoreTransformer {
               List(
                 reduceToCoreStatement(stmt, caseIdGenerator, addedVariables),
                 reduceToCoreStatement(
-                  IfElseStmt(condition, ExitStmt(), None),
+                  IfElseStmt(reduceExpressionToProcedure(condition), ExitStmt(), None),
                   caseIdGenerator,
                   addedVariables
                 )
@@ -51,21 +51,21 @@ object CoreTransformer {
             )
           )
         )
-
+      // condition --> expression
       case ForStmt(initStmt, condition, block) =>
         SequenceStmt(
           List(
             reduceToCoreStatement(initStmt, caseIdGenerator, addedVariables),
             WhileStmt(
-              condition,
+              reduceExpressionToProcedure(condition),
               reduceToCoreStatement(block, caseIdGenerator, addedVariables)
             )
           )
         )
-
+      // condition --> expression
       case IfElseIfStmt(condition, thenStmt, elsifStmt, elseStmt) =>
         IfElseStmt(
-          condition,
+          reduceExpressionToProcedure(condition),
           reduceToCoreStatement(thenStmt, caseIdGenerator, addedVariables),
           Some(
             reduceElsifStatement(
@@ -77,26 +77,29 @@ object CoreTransformer {
           )
         )
 
+      // exp --> expression
       case CaseStmt(exp, cases, elseStmt) =>
         reduceCaseStatement(
-          exp,
+          reduceExpressionToProcedure(exp),
           cases,
           elseStmt,
           caseIdGenerator,
           addedVariables
         )
 
+      // condition --> expressioin
       case WhileStmt(condition, stmt) =>
         WhileStmt(
-          condition,
+          reduceExpressionToProcedure(condition),
           reduceToCoreStatement(stmt, caseIdGenerator, addedVariables)
         )
-
+      // left, right --> expression
       case AssertEqualStmt(left, right) =>
-        AssertTrueStmt(EQExpression(left, right))
-
+        AssertTrueStmt(EQExpression(reduceExpressionToProcedure(left), reduceExpressionToProcedure(right)))
+      
+      // left, right --> expression
       case AssertNotEqualStmt(left, right) =>
-        AssertTrueStmt(NEQExpression(left, right))
+        AssertTrueStmt(NEQExpression(reduceExpressionToProcedure(left), reduceExpressionToProcedure(right)))
 
       case AssertError() =>
         AssertTrueStmt(BoolValue(false))
@@ -218,9 +221,10 @@ object CoreTransformer {
                                       addedVariables: ArrayBuffer[VariableDeclaration]
                                     ): Statement =
       elsifStmts match {
+        // currentElsif.condition --> expression
         case currentElsif :: Nil =>
           IfElseStmt(
-            currentElsif.condition,
+            reduceExpressionToProcedure(currentElsif.condition),
             reduceToCoreStatement(
               currentElsif.thenStmt,
               caseIdGenerator,
@@ -230,9 +234,10 @@ object CoreTransformer {
               reduceToCoreStatement(stmt, caseIdGenerator, addedVariables)
             )
           )
+        // currentElsif.condition --> expression        
         case currentElsif :: tail =>
           IfElseStmt(
-            currentElsif.condition,
+            reduceExpressionToProcedure(currentElsif.condition),
             reduceToCoreStatement(
               currentElsif.thenStmt,
               caseIdGenerator,
@@ -328,53 +333,41 @@ object CoreTransformer {
             variables = List(),
             stmt = ReturnStmt(expression)
           )
-        case Brackets(exp) => reduceExpressionToProcedure(exp)
-        case ArraySubscript(exp1, exp2) =>
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case FieldAccessExpression(exp, name) => reduceExpressionToProcedure(exp)
-        case EQExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case NEQExpression(exp1, exp2) =>
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case GTExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case LTExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case GTEExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case LTEExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case AddExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case SubExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case MultExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case DivExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case OrExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case AndExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case ModExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
-        case NotExpression(exp1, exp2) => 
-          reduceExpressionToProcedure(exp1)
-          reduceExpressionToProcedure(exp2)
+        
+        case Brackets(exp) => Brackets(reduceExpressionToProcedure(exp))
+        
+        case ArraySubscript(exp1, exp2) => ArraySubscript(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case FieldAccessExpression(exp, name) => FieldAccessExpression(reduceExpressionToProcedure(exp), name)
+        
+        case EQExpression(exp1, exp2) => EQExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case NEQExpression(exp1, exp2) => NEQExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case GTExpression(exp1, exp2) => GTExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case LTExpression(exp1, exp2) => LTExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case GTEExpression(exp1, exp2) => GTEExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case LTEExpression(exp1, exp2) => LTEExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case AddExpression(exp1, exp2) => AndExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case SubExpression(exp1, exp2) => SubExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case MultExpression(exp1, exp2) => MultExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case DivExpression(exp1, exp2) => DivExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case OrExpression(exp1, exp2) => OrExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case AndExpression(exp1, exp2) => AndExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case ModExpression(exp1, exp2) => ModExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        
+        case NotExpression(exp1, exp2) => NotExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+          
         case _ => exp
     }
   } 
