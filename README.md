@@ -1,8 +1,23 @@
-## Oberon Language
+# Oberon Language
 
 This is an implementation of the Oberon language in Scala.
 
-### Compiling and Testing
+## Requirements to run the project
+
+**Automated Installation Script:**
+- Linux (ubuntu): 
+```
+sh install.sh
+```
+- Windows (powershell):
+
+*PS: The first line is needed to run a remote script the first time*
+```
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser 
+.\install.ps1
+```
+
+## Compiling and Testing
 
    * Compiling
    
@@ -72,7 +87,7 @@ sbt:oberon-lang> test
 sbt:oberon-lang>
 ```
 
-### Building an executable JAR file
+## Building an executable JAR file
 
 In order to generate an executable JAR file, you can run the `sbt assembly` command.
 
