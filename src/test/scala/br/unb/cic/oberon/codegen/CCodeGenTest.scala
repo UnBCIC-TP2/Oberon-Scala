@@ -257,4 +257,8 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee3205_NastyHacks_v_alt.oberon")
   }
 
+  test("C generator for HelloWorld") {
+    testGenerator("stmts/HelloWorld.oberon")
+  }
+
 }
