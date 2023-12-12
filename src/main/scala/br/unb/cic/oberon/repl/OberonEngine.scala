@@ -23,7 +23,6 @@ import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
 import cats.implicits._
-import cats.data.State
 
 class OberonEngine extends ScriptEngine {
   object Format extends Enumeration {

@@ -5,7 +5,6 @@ import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ir.ast._
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
-import cats.data.State
 
 import java.io.PrintStream
 import java.util.Base64
