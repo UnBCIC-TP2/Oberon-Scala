@@ -326,6 +326,12 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             expVisitor.checkExpression(expr).get
           )
 
+          // Check if 'right' is zero
+          right match {
+            case IntValue(0) => throw new RuntimeException("Division by zero")
+            case _ =>
+          }
+
           return (t, insts2 :+ DivOp(l, r, t, ""))
 
         case AndExpression(left, right) =>
