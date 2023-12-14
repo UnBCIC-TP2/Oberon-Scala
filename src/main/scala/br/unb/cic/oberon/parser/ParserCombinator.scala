@@ -140,11 +140,17 @@ trait ExpressionParser extends CompositeParsers {
     case None ~ b => LambdaExpression(List(), b)
   }
 
+  def lambdaApplicationParser: Parser[Expression] = 
+      (("(" ~> expressionParser <~ ")") ~ ("(" ~> opt(argumentsParser) <~ ")")) ^^  {
+      case expression ~ None => LambdaApplication(expression, List())
+      case expression ~ Some(argList) => LambdaApplication(expression, argList)
+    }
+
   def expValueParser: Parser[Expression] = real | int | char | string | bool | "NIL" ^^ (_ => NullValue)
 
   def fieldAccessTerm: Parser[Expression => Expression] = "." ~ identifier ^^ { case _ ~ b => FieldAccessExpression(_, b) }
 
-  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")"
+  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | lambdaApplicationParser |  "(" ~> expressionParser <~ ")"
 
   def complexTerm: Parser[Expression] = (
     "~" ~> factor ^^ NotExpression
@@ -166,6 +172,10 @@ trait ExpressionParser extends CompositeParsers {
     "+" ~ mulTerm ^^ { case _ ~ b => AddExpression(_, b) }
       | "-" ~ mulTerm ^^ { case _ ~ b => SubExpression(_, b) }
     )
+
+  def INCParser: Parser[Expression] = (
+    "INC" ~ "(" ~ expressionParser ~ ")" ^^ {case _ ~ _ ~ b ~ _ => AddExpression(b,IntValue(1))}
+  )
 
   def addTerm: Parser[Expression] = mulTerm ~ rep(addExpParser) ^^ aggregator
 
@@ -212,7 +222,7 @@ trait StatementParser extends ExpressionParser {
     val realBlock = SequenceStmt(List(stmt, accumulator))
     ForStmt(init, condition, realBlock)
   }
-
+// | (":=" ~> (("(" ~> expressionParser <~ ")") ~ ("(" ~> rep("," ~> expressionParser) <~ ")"))) ^^ {case expression ~ args => LambdaApplication(expression,args)}
   def statementParser: Parser[Statement] = (
     designator ~ (":=" ~> expressionParser) ^^ { case des ~ expression => AssignmentStmt(des, expression) }
       | "readReal" ~> ("(" ~> identifier <~ ")") ^^ ReadRealStmt
@@ -237,10 +247,10 @@ trait StatementParser extends ExpressionParser {
       | "FOR" ~> statementParser ~ ("TO" ~> expressionParser <~ "DO") ~ multStatementParser <~ "END" ^^ { case indexes ~ cond ~ stmt => ForStmt(indexes, cond, stmt) }
       | ("FOR" ~> identifier <~ "IN") ~ expressionParser ~ (".." ~> expressionParser <~ "DO") ~ multStatementParser <~ "END" ^^ { case id ~ min ~ max ~ stmt => buildForRangeStmt(id, min, max, stmt) }
       | ("FOREACH" ~> identifier <~ "IN") ~ expressionParser ~ multStatementParser <~ "END" ^^ { case id ~ exp ~ stmt => ForEachStmt(id, exp, stmt) }
-      | "LOOP" ~> multStatementParser <~ "END" ^^ LoopStmt
+      | ("LOOP" ~> multStatementParser <~ "END") ^^ { case stmt => LoopStmt(stmt)}
       | "RETURN" ~> expressionParser ^^ ReturnStmt
       | "CASE" ~> expressionParser ~ ("OF" ~> caseAlternativeParser) ~ rep("|" ~> caseAlternativeParser) ~ optSolver("ELSE" ~> statementParser) <~ "END" ^^ { case exp ~ case1 ~ cases ~ stmt => CaseStmt(exp, List(case1) ++ cases, stmt) }
-      | identifier ~ ("(" ~> listOpt(argumentsParser) <~ ")") ^^ { case id ~ args => ProcedureCallStmt(id, args) }
+      | identifier ~ ("(" ~> listOpt(argumentsParser) <~ ")") ^^ { case id ~ args => ProcedureCallStmt(id, args) } 
       | "EXIT" ^^ { _ => ExitStmt() }
     );
 

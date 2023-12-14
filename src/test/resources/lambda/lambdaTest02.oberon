@@ -1,0 +1,42 @@
+MODULE LambdaTest02;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
+   
+VAR
+    x : ld;
+    r, y, z, w : BOOLEAN;
+
+TEST lambdaTestT ("Testing LambdaApplication - Boolean Operation True");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a + b > 10;
+            r := (x)(10,1);
+            assert_eq(r,True)
+        END lambdaTestT
+
+TEST lambdaTestF ("Testing LambdaApplication - Boolean Operation False");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a + b < 10;
+            y := (x)(10,1);
+            assert_eq(y,False)
+        END lambdaTestF
+
+TEST lambdaTestAnd ("Testing LambdaApplication - AND Operation");
+        BEGIN
+            x := (a: BOOLEAN, b: BOOLEAN) => a && b;
+            z := (x)(True,False);
+            assert_eq(z,False)
+        END lambdaTestAnd
+
+TEST lambdaTestOr ("Testing LambdaApplication - OR Operation");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => a || b;
+            w := (x)(True,False);
+            assert_eq(w,True)
+        END lambdaTestOr
+
+BEGIN
+    write("Tests Succeeded")
+END
+
+END LambdaTest02.

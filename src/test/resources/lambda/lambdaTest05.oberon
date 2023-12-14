@@ -1,0 +1,53 @@
+MODULE LambdaTest05;
+
+TYPE
+  realArray = ARRAY 3 OF REAL
+  ld = LAMBDA -> (REAL, INTEGER): REAL
+
+VAR
+  banknotesValues : realArray;
+  dollarValues: realArray;
+  amount_jp : REAL;
+  amount_rb : REAL;
+  amount_wm : REAL;
+  x: ld;
+
+TEST lambdaTest_Bee1038Real ("Testing LambdaApplication on bee1038");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => (banknotesValues[a] * b);
+            banknotesValues[0] := 2.5;
+            banknotesValues[1] := 3.5;
+            banknotesValues[2] := 4.5;
+            amount_jp := (x)(0,6);
+            amount_rb := (x)(1,3);
+            amount_wm := (x)(2,9);
+
+            assert_eq(amount_jp, 15.0);
+            assert_eq(amount_rb, 10.5);
+            assert_eq(amount_wm, 40.5);
+
+            write("Snacks were bought")
+
+    END lambdaTest_Bee1038Real
+
+TEST lambdaTest_Bee1038RealDollar ("Testing LambdaApplication on bee1038 - Dollar Conversion");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => (banknotesValues[a] * b * 4.92);
+            
+            dollarValues[0] := (x)(0,1);
+            dollarValues[1] := (x)(1,1);
+            dollarValues[2] := (x)(2,1);
+
+            assert_eq(dollarValues[0], 12.3);
+            assert_eq(dollarValues[1], 17.22);
+            assert_eq(dollarValues[2], 22.14);
+
+            write("banknotesValues in Dollar")
+
+    END lambdaTest_Bee1038RealDollar
+
+BEGIN
+  write("Tests Succeeded")
+END
+
+END LambdaTest05.

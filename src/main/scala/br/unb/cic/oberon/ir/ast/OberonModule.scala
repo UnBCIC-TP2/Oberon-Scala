@@ -57,6 +57,7 @@ case class Test(modifier: String,
   def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
+
 /* formal argument definition */
 sealed trait FormalArg {
   def accept(v: OberonVisitor): v.T = v.visit(this)
@@ -184,17 +185,13 @@ case object NullValue extends Value {
 
 case class Location(loc: Int) extends Expression
 case class Brackets(exp: Expression) extends Expression
-case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType)
-    extends Value { type T = ListBuffer[Expression] }
-case class ArraySubscript(arrayBase: Expression, index: Expression)
-    extends Expression
+case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType) extends Value { type T = ListBuffer[Expression] }
+case class ArraySubscript(arrayBase: Expression, index: Expression) extends Expression
 case class Undef() extends Expression
-case class FieldAccessExpression(exp: Expression, name: String)
-    extends Expression
+case class FieldAccessExpression(exp: Expression, name: String) extends Expression
 case class PointerAccessExpression(name: String) extends Expression
 case class VarExpression(name: String) extends Expression
-case class FunctionCallExpression(name: String, args: List[Expression])
-    extends Expression
+case class FunctionCallExpression(name: String, args: List[Expression]) extends Expression
 case class EQExpression(left: Expression, right: Expression) extends Expression
 case class NEQExpression(left: Expression, right: Expression) extends Expression
 case class GTExpression(left: Expression, right: Expression) extends Expression
@@ -203,16 +200,23 @@ case class GTEExpression(left: Expression, right: Expression) extends Expression
 case class LTEExpression(left: Expression, right: Expression) extends Expression
 case class AddExpression(left: Expression, right: Expression) extends Expression
 case class SubExpression(left: Expression, right: Expression) extends Expression
-case class MultExpression(left: Expression, right: Expression)
-    extends Expression
+case class MultExpression(left: Expression, right: Expression) extends Expression
 case class DivExpression(left: Expression, right: Expression) extends Expression
 case class OrExpression(left: Expression, right: Expression) extends Expression
 case class AndExpression(left: Expression, right: Expression) extends Expression
 case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
-case class LambdaExpression(args: List[FormalArg], exp: Expression)
-    extends Expression
+case class LambdaExpression(args: List[FormalArg], exp: Expression) extends Value {
+  type T = (List[FormalArg],Expression)
+  def value: T = {
+    val args = this.args
+    val exp = this.exp
+    (args,exp)
+  }
+}
 
+case class LambdaApplication(exp: Expression, listExp: List[Expression]) extends Expression
+    
 /* Statements */
 trait Statement {
   val label = Statement.getLabel()
@@ -324,6 +328,7 @@ case class RecordType(variables: List[VariableDeclaration]) extends Type
 case class ArrayType(length: Int, baseType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
 case class LambdaType(argsTypes: List[Type], returnType: Type) extends Type
+case class LambdaAppType(expType: Type, listExpType: List[Type]) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type
 

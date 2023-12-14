@@ -1,0 +1,54 @@
+MODULE LambdaTest08;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): INTEGER
+   
+VAR
+    x : ld;
+    i : INTEGER;
+    val, val2 : INTEGER;
+
+TEST lambdaTest_Factorial8 ("Testing LambdaApplication on Factorial - 8");
+        BEGIN
+            
+            x := (a: INTEGER) => a * (a-1);
+            val := 1;
+            i := 8;
+
+            LOOP
+                IF i <= 1 THEN EXIT END;
+                val := val * (x)(i);
+                i := i - 2
+            END;
+
+            assert_eq(val, 40320);
+
+            write("This is 8 factorial")
+
+        END lambdaTest_Factorial8
+
+TEST lambdaTest_Factorial11 ("Testing LambdaApplication on Factorial - 11");
+        BEGIN
+            
+            x := (a: INTEGER) => a * (a-1);
+            val2 := 1;
+            i := 11;
+
+            LOOP
+                IF i <= 1 THEN EXIT END;
+                val2 := val2 * (x)(i);
+                i := i - 2
+            END;
+            
+            assert(val2 > val);
+            assert_eq(val2, 39916800);
+
+            write("This is 11 factorial")
+
+        END lambdaTest_Factorial11
+
+BEGIN
+  write("Tests Succeeded")
+END
+
+END LambdaTest08.

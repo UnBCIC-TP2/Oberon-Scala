@@ -1,0 +1,14 @@
+MODULE LambdaExpressionsIT06;
+
+TYPE
+   ld = LAMBDA -> (INTEGER): BOOLEAN
+VAR
+    x : ld;
+    r : BOOLEAN;
+
+BEGIN
+    x := (a: INTEGER) => a >= 10;
+    r := (x)(11)
+END
+
+END LambdaExpressionsIT06.

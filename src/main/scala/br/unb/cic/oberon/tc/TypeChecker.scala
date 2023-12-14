@@ -104,6 +104,9 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
     case PointerAccessExpression(name) => pointerAccessCheck(name)
 
     case LambdaExpression(args, exp) => checkLambdaExpression(args, exp)
+
+    case LambdaApplication(expression,listExpression) => checkLambdaApplication(expression,listExpression)
+
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
@@ -140,6 +143,16 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
         case PointerType(varType) => Some(varType)
         case _                    => None
       })
+  }
+  def checkLambdaApplication(expression: Expression, listExpression: List[Expression]): T = {
+    typeChecker.env = typeChecker.env.push()
+    val listExpType = listExpression.map(exp => checkExpression(exp)).flatten
+    val expType = checkExpression(expression)
+    typeChecker.env = typeChecker.env.pop()
+    expType match {
+      case None => None
+      case _    => Some(LambdaAppType(expType.get, listExpType))
+    }
   }
 
   def checkLambdaExpression(args: List[FormalArg], exp: Expression): T = {
@@ -254,6 +267,7 @@ class TypeChecker {
       case Some((PointerType(_), NullType)) => List()
       case Some((IntegerType, BooleanType)) => List()
       case Some((BooleanType, IntegerType)) => List()
+      case Some((t1,LambdaAppType(LambdaType(_,t2),_))) if t1==t2 => List()
       case Some((t1, t2)) if t1 == t2 => List()
       case Some((t1, t2)) if t1 != t2 => List((AssignmentStmt(VarAssignment(v), exp), s"Assignment between different types: $v, $exp"))
       case None => if(! env.lookup(v).isDefined) List((AssignmentStmt(VarAssignment(v), exp), s"Variable $v not declared")) else List((AssignmentStmt(VarAssignment(v), exp), s"Expression $exp is ill typed"))

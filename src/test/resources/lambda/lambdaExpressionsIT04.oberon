@@ -1,0 +1,14 @@
+MODULE LambdaExpressionsIT04;
+
+TYPE
+   ld = LAMBDA -> (BOOLEAN): BOOLEAN
+VAR
+    x : ld;
+    r : BOOLEAN;
+
+BEGIN
+    x := (a: BOOLEAN) => a || False;
+    r := (x)(True)
+END
+
+END LambdaExpressionsIT04.
