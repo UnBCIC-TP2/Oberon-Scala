@@ -1303,7 +1303,7 @@ class TACodeTest extends AnyFunSuite {
     assert(ops == list)
   }
 
-  ignore(" Pointer Assignment (Double)") {
+  ignore("Test for generating TACode for Pointer Assignment (Double)") {
     
     TACodeGenerator.reset
     val list_var = List(VariableDeclaration("pointer", PointerType(RealType)))
@@ -1333,5 +1333,24 @@ class TACodeTest extends AnyFunSuite {
       TACodeGenerator.generateExpression(expr, List())
     }
   }
+
+  test("Test for generating TACode for Record field access of non-record types") {
+    TACodeGenerator.reset()
+    val expr = FieldAccessExpression(IntValue(10), "field")
+    assertThrows[RuntimeException] {
+      TACodeGenerator.generateExpression(expr, List())
+    }
+  }
+
+  test("est for generating TACode for Division by zero") {
+    TACodeGenerator.reset()
+    // Test division with the right operand being a constant zero
+    val expr = DivExpression(IntValue(5), IntValue(0))
+    // Expect an RuntimeException to be thrown
+    assertThrows[RuntimeException] {
+      TACodeGenerator.generateExpression(expr, List())
+    }
+  }
+
 
 }
