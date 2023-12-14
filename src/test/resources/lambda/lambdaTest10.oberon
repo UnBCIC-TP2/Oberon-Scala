@@ -1,0 +1,45 @@
+MODULE LambdaTest10;
+
+TYPE
+  ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
+  ld2 = LAMBDA -> (INTEGER, INTEGER): INTEGER
+
+VAR
+  sallary, iterator : INTEGER;
+  price, sallary_after : ARRAY 4 OF INTEGER;
+  can_bought: ld;
+  remainder: ld2;
+
+
+TEST lambdaTest_CompositeArray ("Testing LambdaApplication on problem solving in Arrays");
+        BEGIN
+
+            price[0] := 10;
+            price[1] := 20;
+            price[2] := 30;
+            price[3] := 40;
+
+            remainder := (a: INTEGER, b: INTEGER) => (price[a] * b);
+            can_bought := (c: INTEGER, d: INTEGER) => (price[c] * d) < sallary;
+            
+            sallary := 100;
+
+            iterator := 0;
+
+            LOOP
+                IF iterator > 3 THEN EXIT END;
+                assert_eq((can_bought)(iterator,1),True);
+                sallary_after[iterator] := sallary - ((remainder)(iterator,1));
+                iterator := iterator + 1
+            END;
+
+            write("Tests according to user's sallary")
+
+    END lambdaTest_CompositeArray
+
+
+BEGIN
+  write("Tests Succeeded")
+END
+
+END LambdaTest10.
