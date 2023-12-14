@@ -1306,9 +1306,8 @@ class TACodeTest extends AnyFunSuite {
   ignore(" Pointer Assignment (Double)") {
     
     TACodeGenerator.reset
-    val list_var =
-      List(VariableDeclaration("pointer", PointerType(RealType)))
-    TACodeGenerator.load_vars(list_var)Test for generating TACode for
+    val list_var = List(VariableDeclaration("pointer", PointerType(RealType)))
+    TACodeGenerator.load_vars(list_var)
 
     val stmt = AssignmentStmt(
       PointerAssignment("pointer"),
