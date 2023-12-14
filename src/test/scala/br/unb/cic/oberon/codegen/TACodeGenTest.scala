@@ -1342,7 +1342,7 @@ class TACodeTest extends AnyFunSuite {
     }
   }
 
-  test("est for generating TACode for Division by zero") {
+  test("Test for generating TACode for Division by zero") {
     TACodeGenerator.reset()
     // Test division with the right operand being a constant zero
     val expr = DivExpression(IntValue(5), IntValue(0))
