@@ -1303,12 +1303,12 @@ class TACodeTest extends AnyFunSuite {
     assert(ops == list)
   }
 
-  ignore("Test for generating TACode for Pointer Assignment (Double)") {
+  ignore(" Pointer Assignment (Double)") {
     
     TACodeGenerator.reset
     val list_var =
       List(VariableDeclaration("pointer", PointerType(RealType)))
-    TACodeGenerator.load_vars(list_var)
+    TACodeGenerator.load_vars(list_var)Test for generating TACode for
 
     val stmt = AssignmentStmt(
       PointerAssignment("pointer"),
@@ -1324,5 +1324,15 @@ class TACodeTest extends AnyFunSuite {
     // *pointer = 2.0 + 3.0
     assert(list == ops)
   }
-  
+
+  ignore("Test for generating TACode for Handle out-of-bounds array access") {
+    TACodeGenerator.reset()
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+    val expr = ArraySubscript(VarExpression("lista"), IntValue(5)) // Index out of bounds
+    assertThrows[IndexOutOfBoundsException] {
+      TACodeGenerator.generateExpression(expr, List())
+    }
+  }
+
 }
