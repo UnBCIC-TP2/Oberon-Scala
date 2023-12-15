@@ -4,6 +4,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.ir.ast._
 
 import java.nio.file.{Files, Paths}
@@ -1538,5 +1539,52 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
         ),
       "Case must be transformed to IfElseStmt using new variable"
     )
+  }
+  
+  test("Test reduceLambdaToProcedure 1 - Lambda declared in const") {
+    // val path = Paths.get(
+    //   getClass.getClassLoader.getResource("lambda/lambdaExpressions01.oberon").toURI
+    // )
+
+    // assert(path != null)
+
+    // val content = String.join("\n", Files.readAllLines(path))
+    // val module = parseAbs(parse(oberonParser,content))
+    // val coreModule = CoreTransformer.reduceOberonModule(module)
+    val module = OberonModule(
+      name = "fds",
+      submodules = Set(),
+      userTypes = List(),
+      constants = List(Constant("x", LambdaExpression(List(ParameterByValue("x", IntegerType)), AddExpression(VarExpression("x"), IntValue(10))))),
+      variables = List(),
+      procedures = List(),
+      tests = List(),
+      stmt = None
+    )
+    // val module = ScalaParser.parseResource("lambda/lambdaExpressions01.oberon")
+    val newModule = CoreTransformer.reduceLambdaToProcedure(module)
+    // println(newModule)
+    // val newModule = CoreTransformer.reduceOberonModule(module)
+    
+    // val x = newModule.constants(0)
+    // val y = newModule.constants(1)
+
+    // assert(x == Procedure(
+    //               name = "lambda",
+    //               args = List(ParameterByValue("a", IntegerType)),
+    //               returnType = None,
+    //               constants = List(),
+    //               variables = List(),
+    //               stmt = ReturnStmt(AddExpression(VarExpression("a"), IntValue(10)))
+    // ))
+    
+    // assert(y == Procedure(
+    //               name = "lambda",
+    //               args = List(ParameterByValue("a", IntegerType), ParameterByValue("b", IntegerType)),
+    //               returnType = None,
+    //               constants = List(),
+    //               variables = List(),
+    //               stmt = ReturnStmt(AddExpression(VarExpression("a"), VarExpression("b")))
+    // ))
   }
 }
