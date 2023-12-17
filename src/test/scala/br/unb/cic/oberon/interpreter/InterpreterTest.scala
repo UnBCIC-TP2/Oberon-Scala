@@ -807,6 +807,19 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
+  test(testName = "Testing procedure and pointer: procedure_pointer1") {
+
+    val module = ScalaParser.parseResource("pointers/procedure_pointer1.Oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a") == Some(RealValue(1.5)))
+    assert(result.lookup("b") == Some(RealValue(1.5)))
+  }
+
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))
 }

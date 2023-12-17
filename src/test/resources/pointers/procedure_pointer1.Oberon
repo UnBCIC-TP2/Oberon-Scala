@@ -1,0 +1,22 @@
+MODULE pointerAssign;
+
+VAR
+  a: POINTER TO REAL;
+  b: POINTER TO POINTER TO REAL;
+
+PROCEDURE EditPointerValue(VAR ptr: POINTER TO REAL);
+BEGIN
+    ptr^ := 1.5
+END EditPointerValue
+
+BEGIN
+  NEW(a);
+  NEW(b);
+
+  a^ := 7.8;
+  b^ := a;
+
+  EditPointerValue(a)
+END
+
+END pointerAssign.

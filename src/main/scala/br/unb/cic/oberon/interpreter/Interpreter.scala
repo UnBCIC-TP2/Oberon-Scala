@@ -64,7 +64,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def declareVariable(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
     environment.baseType(variable.variableType) match {
       case Some(ArrayType(length, baseType)) => environment.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
-      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name, NullValue)
+      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name)
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -170,12 +170,11 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
 
-
-
-
+        
       case NewStmt(name) => {
         envt.createLocationForGlobalPointer(name, NullValue)
       }
+
     }
   }
 

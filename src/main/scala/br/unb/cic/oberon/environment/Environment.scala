@@ -38,42 +38,6 @@ class Environment[T](private val top_loc:Int = 0,
     )
   }
 
-  def declareGlobalPointer(name: String, value: T): Environment[T] = {
-    // ponteiro sem NEW não tem location, inicia com NULL
-    // global é map para location, qual seria o NULL de location? location(-1)?
-    // alterar esse valor default no Interpreter, pointerAssignment(...)
-    return new Environment[T](top_loc = this.top_loc,
-      locations = this.locations,
-      global = this.global + (name -> BaseLocation(-1)),
-      procedures = this.procedures,
-      userDefinedTypes = this.userDefinedTypes,
-      stack = this.stack
-    )
-  }
-
-  def createLocationForGlobalPointer(name: String, value: T): Environment[T] = {
-
-    if(!global.contains(name)) {
-      throw new RuntimeException("Variable " + name + " is not defined")
-    }
-
-    val newGlobal = global.clone()
-    newGlobal(name) = BaseLocation(this.top_loc)
-
-    val newLocations = locations.clone()
-    newLocations(BaseLocation(this.top_loc)) = value
-
-    return new Environment[T](top_loc = this.top_loc + 1,
-      locations = newLocations,
-      global = newGlobal,
-      procedures = this.procedures,
-      userDefinedTypes = this.userDefinedTypes,
-      stack = this.stack
-    )
-
-  }
-
-
   def addUserDefinedType(userType: UserDefinedType) : Environment[T] = {
     new Environment[T](top_loc = this.top_loc,
     locations = this.locations,
@@ -82,7 +46,6 @@ class Environment[T](private val top_loc:Int = 0,
       userDefinedTypes = this.userDefinedTypes+(this.userDefinedTypeName(userType)-> userType),
       stack = this.stack)
   }
-
 
   def setParameterReference(name: String, loc: Location): Environment[T] = {
     //stack.top += name -> loc
@@ -96,7 +59,6 @@ class Environment[T](private val top_loc:Int = 0,
       userDefinedTypes = this.userDefinedTypes,
       stack = copyStack)
   }
-
 
   def setLocalVariable(name: String, value: T) : Environment[T] = {
 //    top_loc += 1
@@ -117,7 +79,6 @@ class Environment[T](private val top_loc:Int = 0,
         userDefinedTypes = this.userDefinedTypes,
         stack = copyStack)
   }
-
 
   def setVariable(name: String, value: T) : Environment[T] = {
     if(stack.nonEmpty && stack.top.contains(name)) {
@@ -143,26 +104,6 @@ class Environment[T](private val top_loc:Int = 0,
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def setGlobalPointer(name: String, value: Location): Environment[T] = {
-    if(!global.contains(name)) {
-      throw new RuntimeException("Variable " + name + " is not defined")
-    }
-
-    val newGlobal = global.clone()
-    newGlobal(name) = value
-
-    new Environment[T](
-      top_loc = this.top_loc,
-      locations = this.locations,
-      global = newGlobal,
-      procedures = this.procedures,
-      userDefinedTypes = this.userDefinedTypes,
-      stack = this.stack
-    )
-
-  }
-
-
   def pointsTo(name: String): Option[Location] = {
     if (stack.nonEmpty && stack.top.contains(name)) Some(stack.top(name))
     else if (global.contains(name)) Some(global(name))
@@ -184,7 +125,6 @@ class Environment[T](private val top_loc:Int = 0,
 
   def lookupUserDefinedType(name: String): Option[UserDefinedType] =
     userDefinedTypes.get(name)
-
 
   def declareProcedure(procedure: Procedure): Environment[T] = {
     //Unit = procedures(procedure.name) = procedure
@@ -251,5 +191,57 @@ class Environment[T](private val top_loc:Int = 0,
     }
       else throw new RuntimeException("Variable " + name + " is not defined")
   }
+
+  def declareGlobalPointer(name: String): Environment[T] = {
+    return new Environment[T](top_loc = this.top_loc,
+      locations = this.locations,
+      global = this.global + (name -> NullLocation),
+      procedures = this.procedures,
+      userDefinedTypes = this.userDefinedTypes,
+      stack = this.stack
+    )
+  }
+
+  def createLocationForGlobalPointer(name: String, value: T): Environment[T] = {
+
+    if(!global.contains(name)) {
+      throw new RuntimeException("Variable " + name + " is not defined")
+    }
+
+    val newGlobal = global.clone()
+    newGlobal(name) = BaseLocation(this.top_loc)
+
+    val newLocations = locations.clone()
+    newLocations(BaseLocation(this.top_loc)) = value
+
+    return new Environment[T](top_loc = this.top_loc + 1,
+      locations = newLocations,
+      global = newGlobal,
+      procedures = this.procedures,
+      userDefinedTypes = this.userDefinedTypes,
+      stack = this.stack
+    )
+
+  }
+
+  def setGlobalPointer(name: String, value: Location): Environment[T] = {
+    if(!global.contains(name)) {
+      throw new RuntimeException("Variable " + name + " is not defined")
+    }
+
+    val newGlobal = global.clone()
+    newGlobal(name) = value
+
+    new Environment[T](
+      top_loc = this.top_loc,
+      locations = this.locations,
+      global = newGlobal,
+      procedures = this.procedures,
+      userDefinedTypes = this.userDefinedTypes,
+      stack = this.stack
+    )
+
+  }
+
 }
 
