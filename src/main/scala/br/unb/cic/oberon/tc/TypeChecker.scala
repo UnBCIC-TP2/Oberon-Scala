@@ -4,69 +4,75 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
-class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment) {
-   type T = Option[(Environment,Type)]
+import cats.data.State
+import cats.data.Writer
+
+class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[Type]) {
+   type T = State[Environment[Type], Writer[List[String], Type]]
 
 
    /* Tem a função de pegar o tipo.
    Caso não esteja definido retorna None, caso contrário retorna o tipo encontrado. */
-   def checkType(t: Type): Option[(Environment,Type)]  = t match {
+
+   // Trocar os retornos para seguirem a formatação necessária
+   def checkType(t: Type): State[Environment[Type], Writer[List[String], Type]] = t match {
       case UndefinedType => None
-      case _             => typeChecker.env.baseType(t)
+      case _             => env.baseType(t)
    }
 
    // Pergunta: A expressão [typeChecker.env.baseType(t)], pode ser substituída por checkType(t)?
-   def checkExpression(exp: Expression): Option[(Environment,Type)]  =
-      computeGeneralExpressionType(exp).flatMap(t => typeChecker.env.baseType(t))
+   // State[Environment, Writer[List[String], Type]]
+   def checkExpression(exp: Expression, env: Environment[Type]): State[Environment[Type], Writer[List[String], Type]]  =
+      computeGeneralExpressionType(exp, env).flatMap(t => env.baseType(t))
 
    // Função Monadificável
-   def computeGeneralExpressionType(exp: Expression, env: Environment): Option[(Environment,Type)] = exp match {
+   def computeGeneralExpressionType(exp: Expression, env: Environment[Type]): State[Environment[Type], Writer[List[String], Type]] = exp match {
     //   case Brackets(exp)       => checkExpression(exp)
     //   // Retorna os tipos nativos
-      case IntValue(_)         => Some((,IntegerType))
-      case RealValue(_)        => Some(RealType)
-      case CharValue(_)        => Some(CharacterType)
-      case BoolValue(_)        => Some(BooleanType)
-      case StringValue(_)      => Some(StringType)
-      case NullValue           => Some(NullType)
+      case IntValue(_)         => State[Environment[Type], Writer[List[String], Type]] {env => (env, Writer(List(""), IntegerType))}
+      case RealValue(_)        => State(env, Writer(List(""), RealType))
+      case CharValue(_)        => State(env, Writer(List(""), CharacterType))
+      case BoolValue(_)        => State(env, Writer(List(""), BooleanType))
+      case StringValue(_)      => State(env, Writer(List(""), StringType))
+      case NullValue           => State(env, Writer(List(""), NullType))
       case Undef()             => None
 
     //   /* Verifica se a variável avaliada já foi definida anteriormente, 
     //   se não for definida retorna None. A mensagem de erro é retornada pelo checkStmt*/
     //   case VarExpression(name) => typeChecker.env.lookup(name)
-    //   case EQExpression(left, right) => computeBinExpressionType(
-    //      left,
-    //      right,
-    //      List(IntegerType, RealType, BooleanType),
-    //      BooleanType
-    //   )
-    //   case NEQExpression(left, right) => computeBinExpressionType(
-    //      left,
-    //      right,
-    //      List(IntegerType, RealType, BooleanType),
-    //      BooleanType
-    //   )
-    //   case GTExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    //   case LTExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    //   case GTEExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    //   case LTEExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    //   case AddExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    //   case SubExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    //   case MultExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    //   case DivExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    //   case AndExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    //   case OrExpression(left, right) =>
-    //      computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    //   // Verifica se os argumentos da função são do tipo esperado pela definição dela.
+      case EQExpression(left, right) => computeBinExpressionType(
+         left,
+         right,
+         List(IntegerType, RealType, BooleanType),
+         BooleanType
+      )
+      case NEQExpression(left, right) => computeBinExpressionType(
+         left,
+         right,
+         List(IntegerType, RealType, BooleanType),
+         BooleanType
+      )
+      case GTExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case LTExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case GTEExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case LTEExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), BooleanType)
+      case AddExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case SubExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case MultExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case DivExpression(left, right) =>
+         computeBinExpressionType(left, right, List(IntegerType), IntegerType)
+      case AndExpression(left, right) =>
+         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+      case OrExpression(left, right) =>
+         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+    // Verifica se os argumentos da função são do tipo esperado pela definição dela.
     //   case FunctionCallExpression(name, args) => {
     //      try {
     //         val procedure = typeChecker.env.findProcedure(name)
@@ -172,30 +178,44 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment) 
       right: Expression,
       expected: List[Type],
       result: Type
-    ): Option[Type] = {
-      val t1 = checkExpression(left)
-      val t2 = checkExpression(right)
+    ) = for {
+      t1 <- checkExpression(left)
+      t2 <- checkExpression(right)
       /* Verifica se os tipos são iguais
          Em seguida, é verificado se o tipo do primeiro elemento está na lista de tipos esperados*/
-      if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
-      else None
-    }
+    } yield(if (t1.value == t2.value && expected.contains(t1.value)) {
+            t1.mapBoth{(lista, tipo) => t2.mapBoth{(lista2, tipo2) => 
+              val lista3 = lista ++ lista2
+              (lista3, tipo)
+            }.run }
+            }
+            else {
+            t1.mapBoth{(lista, tipo) => t2.mapBoth{(lista2, tipo2) => 
+              val lista3 = lista ++ lista2
+              (lista3, None)
+            }.run }
+            })
 
     def updateEnvironment(nEnv: Environment){
-        
+        env = nEnv
     }
 }
 
-class TypeChecker (var env: Environment){
-  type T = Writer[List[String], Unit]
+class TypeChecker (envPassado: Environment[Type]){
+  var env = envPassado
+  type T = State[Environment[Type], Writer[List[String], Type]]
 
+  // O Environment está sendo passado como argumento da classe, logo ainda é global
+  // porém está explicito na classe. Além disso, todas as mudanças no environment passam
+  // a ser internas.
+  val expVisitor = new ExpressionTypeChecker(this, env)
 
   // O checkModule deverá ser parte do construtor da classe
-  def checkModule(module: OberonModule): /*List[(Statement, String)]*/ Writer[List[String], Unit] = {
-    env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp).get))
-    env = module.variables.foldLeft(env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType))
-    env = module.procedures.foldLeft(env)((acc, p) => acc.declareProcedure(p))
-    env = module.userTypes.foldLeft(env)((acc, t) => acc.addUserDefinedType(t))
+  def checkModule(module: OberonModule): /*List[(Statement, String)]*/ State[Environment[Type], Writer[List[String], Type]] = {
+    expVisitor.updateEnvironment(module.constants.foldLeft(expVisitor.env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp, env).get)))
+    expVisitor.updateEnvironment(module.variables.foldLeft(expVisitor.env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType)))
+    expVisitor.updateEnvironment(module.procedures.foldLeft(expVisitor.env)((acc, p) => acc.declareProcedure(p)))
+    expVisitor.updateEnvironment(module.userTypes.foldLeft(expVisitor.env)((acc, t) => acc.addUserDefinedType(t)))
 
     val errors = module.procedures.flatMap(p => checkProcedure(p))
 
@@ -203,25 +223,21 @@ class TypeChecker (var env: Environment){
     else errors
   }
 
-  def checkProcedure(procedure: Procedure): /*List[(Statement, String)]*/ Writer[List[String], Unit] = {
-    env = env.push()
-    env = procedure.args.foldLeft(env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType))
-    env = procedure.constants.foldLeft(env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp).get))
-    env = procedure.variables.foldLeft(env)((acc, v) => acc.setLocalVariable(v.name, v.variableType))
-
-    // O Environment está sendo passado como argumento da classe, logo ainda é global
-    // porém está explicito na classe.
-    val expVisitor = new ExpressionTypeChecker(this, env)
+  def checkProcedure(procedure: Procedure): /*List[(Statement, String)]*/ State[Environment[Type], Writer[List[String], Type]] = {
+    expVisitor.updateEnvironment(expVisitor.env.push())
+    expVisitor.updateEnvironment(procedure.args.foldLeft(expVisitor.env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType)))
+    expVisitor.updateEnvironment(procedure.constants.foldLeft(expVisitor.env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp, env).get)))
+    expVisitor.updateEnvironment(procedure.variables.foldLeft(expVisitor.env)((acc, v) => acc.setLocalVariable(v.name, v.variableType)))
 
     val errors = checkStmt(procedure.stmt)
 
     // Colocar o Update nesta parte
-    env = env.pop()
+    expVisitor.updateEnvironment(env.pop())
     errors
   }
 
   // Responsável por retornar as mensagens de erro
-  def checkStmt(stmt: Statement): /*List[(Statement, String)]*/ Writer[List[String], Unit] = stmt match {
+  def checkStmt(stmt: Statement): /*List[(Statement, String)]*/ State[Environment[Type], Writer[List[String], Type]] = stmt match {
     case AssignmentStmt(_, _)    => checkAssignment(stmt)
     // case IfElseStmt(_, _, _)     => visitIfElseStmt(stmt)
     // case WhileStmt(_, _)         => visitWhileStmt(stmt)

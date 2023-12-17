@@ -7,7 +7,11 @@ import br.unb.cic.oberon.codegen.{
 }
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.tc.TypeChecker
+import br.unb.cic.oberon.environment.Environment
+
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
@@ -120,7 +124,8 @@ object Main extends App with Oberon2ScalaParser {
 
     // Alterar a instanciação do TypeChecker para fazer o checkModule ser ´parte do construtor
     // Dessa forma, os val visitor e errors passam a ser o mesmo.
-    val visitor = new TypeChecker()
+    val env = new Environment[Type]()
+    val visitor = new TypeChecker(env)()
     val errors = visitor.checkModule(module)
     if (errors.isEmpty) {
       println("The code is correctly typed")
