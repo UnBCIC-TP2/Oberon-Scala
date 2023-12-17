@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.parser
 
-import br.unb.cic.oberon.ir.ast.{OberonModule, SequenceStmt, Statement}
+import br.unb.cic.oberon.ir.ast.{OberonModule, SequenceStmt, Statement, VariableDeclaration, Constant, Procedure}
 import br.unb.cic.oberon.util.Resources
 
 import scala.io.Source
@@ -75,23 +75,23 @@ sealed class ModuleMerger(val loader: ModuleLoader) {
   var merged = Set.empty[String]
 
   // Merge the subtree of `modname`
-  def merge(modname: String): OberonModule = {
+  def merge(modname: String, importPrefix: String = ""): OberonModule = {
     merged += modname
 
     val module = loader.modules(modname)
     val submodules =
       module.submodules.iterator // iterate lazily so `filter` works correctly
         .filterNot(merged contains _) // ignore "already merged" modules
-        .map(merge)
+        .map(submodule => merge(submodule, submodule))
         .toList
 
     val subtree =
       submodules ++ List(module) // The order is important for `stmt`
 
     val userTypes = subtree.flatMap(_.userTypes)
-    val constants = subtree.flatMap(_.constants)
-    val variables = subtree.flatMap(_.variables)
-    val procedures = subtree.flatMap(_.procedures)
+    val constants = subtree.flatMap(adjustConstants(_, importPrefix))
+    val variables = subtree.flatMap(adjustVariables(_, importPrefix))
+    val procedures = subtree.flatMap(adjustProcedures(_, importPrefix))
     val tests = subtree.flatMap(_.tests)
     val stmt = concatStmts(List(module).flatMap(_.stmt))
 
@@ -105,6 +105,21 @@ sealed class ModuleMerger(val loader: ModuleLoader) {
       tests,
       Some(stmt)
     )
+  }
+
+  private def setPrefix(importPrefix: String) =
+    if (importPrefix.nonEmpty) s"$importPrefix::" else ""
+
+  private def adjustConstants(module: OberonModule, importPrefix: String): List[Constant] = {
+    module.constants.map(constant => constant.copy(name = s"${setPrefix(importPrefix)}${constant.name}"))
+  }
+
+  private def adjustVariables(module: OberonModule, importPrefix: String): List[VariableDeclaration] = {
+    module.variables.map(variable => variable.copy(name = s"${setPrefix(importPrefix)}${variable.name}"))
+  }
+
+  private def adjustProcedures(module: OberonModule, importPrefix: String): List[Procedure] = {
+    module.procedures.map(procedure => procedure.copy(name = s"${setPrefix(importPrefix)}${procedure.name}"))
   }
 
   def merge(): OberonModule = merge(loader.main.get)
