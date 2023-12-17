@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ir.ast.{Expression, Location, NullType, NullValue, Procedure, ReferenceToUserDefinedType, Statement, Type, UserDefinedType}
+import br.unb.cic.oberon.ir.ast.{Expression, Location, BaseLocation, NullLocation, NullType, NullValue, Procedure, ReferenceToUserDefinedType, Statement, Type, UserDefinedType}
 import org.jline.builtins.Completers.CompletionEnvironment
 
 import scala.collection.mutable.{Map, Stack}
@@ -30,9 +30,9 @@ class Environment[T](private val top_loc:Int = 0,
 
   def setGlobalVariable(name: String, value: T): Environment[T] = {
     return new Environment[T](top_loc = this.top_loc+1,
-      locations = this.locations+(Location(top_loc)-> value),
-      global = this.global+(name -> Location(top_loc)) ,
-     procedures = this.procedures,
+      locations = this.locations+(BaseLocation(top_loc)-> value),
+      global = this.global+(name -> BaseLocation(top_loc)) ,
+      procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
     )
@@ -44,7 +44,7 @@ class Environment[T](private val top_loc:Int = 0,
     // alterar esse valor default no Interpreter, pointerAssignment(...)
     return new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
-      global = this.global + (name -> Location(-1)),
+      global = this.global + (name -> BaseLocation(-1)),
       procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
@@ -58,10 +58,10 @@ class Environment[T](private val top_loc:Int = 0,
     }
 
     val newGlobal = global.clone()
-    newGlobal(name) = Location(this.top_loc)
+    newGlobal(name) = BaseLocation(this.top_loc)
 
     val newLocations = locations.clone()
-    newLocations(Location(this.top_loc)) = value
+    newLocations(BaseLocation(this.top_loc)) = value
 
     return new Environment[T](top_loc = this.top_loc + 1,
       locations = newLocations,
@@ -109,9 +109,9 @@ class Environment[T](private val top_loc:Int = 0,
     if(copyStack.isEmpty) {
       copyStack.push(Map.empty[String, Location])
     }
-    copyStack.top.addOne(name -> Location(top_loc))
+    copyStack.top.addOne(name -> BaseLocation(top_loc))
     new Environment[T](top_loc = this.top_loc+1,
-        locations = this.locations.addOne(Location(top_loc) -> value),
+        locations = this.locations.addOne(BaseLocation(top_loc) -> value),
         global = this.global,
         procedures = this.procedures,
         userDefinedTypes = this.userDefinedTypes,

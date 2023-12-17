@@ -241,14 +241,18 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         envt.setGlobalPointer(pointerName, loc.get)
       } case _ => {
 
-        if(envt.pointsTo(pointerName).get == Location(-1)) {
-          // valor default para location: -1
-          throw new RuntimeException("Pointer " + pointerName + " is null")
+        envt.pointsTo(pointerName).get match {
+          case BaseLocation(loc) => {
+            val value = evalExpression(envt, exp)._2
+            envt.setVariable(pointerName, value)
+          } case NullLocation => {
+            throw new RuntimeException("Pointer " + pointerName + " is null")
+          } case _ => {
+            throw new RuntimeException("Unexpected location type")
+          }
         }
 
-        val value = evalExpression(envt, exp)._2
 
-        envt.setVariable(pointerName, value)
       }
     }
   }

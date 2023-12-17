@@ -169,7 +169,9 @@ case object NullValue extends Value {
   def value: T = ()
 }
 
-case class Location(loc: Int) extends Expression
+sealed trait Location extends Expression
+case class BaseLocation(loc: Int) extends Location
+case object NullLocation extends Location
 case class Brackets(exp: Expression) extends Expression
 case class ArrayValue(value: ListBuffer[Expression], arrayType: ArrayType)
     extends Value { type T = ListBuffer[Expression] }
