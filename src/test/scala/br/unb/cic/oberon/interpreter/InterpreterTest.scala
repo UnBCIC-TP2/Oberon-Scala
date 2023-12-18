@@ -829,7 +829,33 @@ class InterpreterTest extends AnyFunSuite {
 
     val result = interpreter.runInterpreter(module)
 
+    assert(result.lookup("a.nome") == Some(StringValue("Manuela")));
+    assert(result.lookup("a.idade") == Some(IntValue(23)));
   }
+
+  test(testName = "Testing records: recordAssign2") {
+
+    val module = ScalaParser.parseResource("pointers/recordAssign2.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("a.nome") == Some(StringValue("jurema")));
+    assert(result.lookup("a.especie") == Some(StringValue("vaca")));
+    assert(result.lookup("a.idade") == Some(IntValue(4)));
+    assert(result.lookup("a.peso") == Some(RealValue(40.5)));
+
+    assert(result.lookup("b.nome") == Some(StringValue("carijo")));
+    assert(result.lookup("b.especie") == Some(StringValue("galo")));
+    assert(result.lookup("b.idade") == Some(IntValue(1)));
+    assert(result.lookup("b.peso") == Some(RealValue(9.5)));
+
+    assert(result.lookup("c") == Some(IntValue(4 + 1)));
+
+  }
+
 
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))

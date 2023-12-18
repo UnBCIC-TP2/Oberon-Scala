@@ -64,7 +64,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def declareVariable(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
     environment.baseType(variable.variableType) match {
       case Some(ArrayType(length, baseType)) => environment.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
-      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name, variableType)
+      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name, variableType, NullValue)
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -257,7 +257,14 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   }
 
   def recordAssignment(envt: Environment[Expression], record: Expression, field: String, exp: Expression): Environment[Expression] = {
-    return envt;
+    val value = evalExpression(envt, exp)._2
+
+    record match {
+      case VarExpression(name) => {
+        envt.setVariable(envt.getNameForRecordField(name, field), value)
+      }
+    }
+
   }
 
   /*
@@ -307,6 +314,13 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
+    case FieldAccessExpression(exp, field) => {
+      exp match {
+        case VarExpression(recordName) => {
+          (environment, environment.lookup(environment.getNameForRecordField(recordName, field)).get)
+        }
+      }
+    }
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
   }

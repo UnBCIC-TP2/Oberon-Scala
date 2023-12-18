@@ -1,0 +1,32 @@
+MODULE pointerAssign;
+
+TYPE
+
+    animal = RECORD
+        nome: STRING;
+        especie: STRING;
+        idade: INTEGER;
+        peso: REAL;
+    END
+
+VAR
+    a : POINTER TO animal;
+    b : POINTER TO animal;
+    c : INTEGER;
+
+BEGIN
+    a.nome := "jurema";
+    a.especie := "vaca";
+    a.idade := 4;
+    a.peso := 40.5;
+
+    b.nome := "carijo";
+    b.especie := "galo";
+    b.idade := 1;
+    b.peso := 9.5;
+
+    c := a.idade + b.idade
+
+END
+
+END pointerAssign.

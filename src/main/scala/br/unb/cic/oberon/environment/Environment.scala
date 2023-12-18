@@ -192,9 +192,11 @@ class Environment[T](private val top_loc:Int = 0,
       else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def declareGlobalPointer(pointerName: String, variableType: Type): Environment[T] = {
+  def declareGlobalPointer(pointerName: String, variableType: Type, baseValueForRecords: T): Environment[T] = {
 
     var newGlobal = global.clone();
+    var newLocations = locations.clone();
+    var topLoc = this.top_loc;
 
     variableType match {
       case ReferenceToUserDefinedType(name) => {
@@ -205,7 +207,9 @@ class Environment[T](private val top_loc:Int = 0,
           case RecordType(fields) => {
             fields.foreach {
               case VariableDeclaration(name, variableType) => {
-                newGlobal += (getNameForRecordField(pointerName, name) -> NullLocation)
+                newGlobal += (getNameForRecordField(pointerName, name) -> BaseLocation(topLoc))
+                newLocations += (BaseLocation(topLoc) -> baseValueForRecords)
+                topLoc += 1
               }
               case _ => {
                 throw new RuntimeException("Unknown field type");
@@ -220,8 +224,9 @@ class Environment[T](private val top_loc:Int = 0,
       }
     }
 
-    return new Environment[T](top_loc = this.top_loc,
-      locations = this.locations,
+    return new Environment[T](
+      top_loc = topLoc,
+      locations = newLocations,
       global = newGlobal,
       procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
@@ -271,8 +276,8 @@ class Environment[T](private val top_loc:Int = 0,
 
   }
 
-  private def getNameForRecordField(recordName: String, field: String): String = {
-    return "$" + recordName + "." + field;
+   def getNameForRecordField(recordName: String, field: String): String = {
+    return recordName + "." + field;
   }
 
 }
