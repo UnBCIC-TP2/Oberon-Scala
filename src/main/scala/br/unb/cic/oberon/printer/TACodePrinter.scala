@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, MoveOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SLTUOp, SubOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc.{ line, text }
 
@@ -15,6 +16,7 @@ object TACodePrinter {
 
   private val jumpLine: String = "\n"
   private val tab: String = "  "
+  private val singleTab: String = " "
   private val ifStatement: String = "if"
   private val jumpStatement: String = "jump"
 
@@ -53,8 +55,9 @@ object TACodePrinter {
       case JumpFalse(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == false $jumpStatement $dest")
       case Jump(dest, label) => tac / text(s"$jumpStatement $dest")
       case NotOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = NOT ${handleAddress(s1)}")
-      case MoveOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
+      case CopyOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
       case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
+      case SLTUOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLTU ${handleAddress(s1)} ${handleAddress(s2)}")
       case _ => tac / text("Not implemented in printer")
     }
   }
@@ -85,8 +88,8 @@ object TACodePrinter {
    */
   private def handleConditionalOps(s1: Address, s2: Address, operation: String, destLabel: String, label: String): String = {
     label match {
-      case "" => ifStatement + tab + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
-      case _ => s"$label:" + jumpLine + tab + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
+      case "" => ifStatement + singleTab + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
+      case _ => s"$label:" + jumpLine + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
     }
   }
 
