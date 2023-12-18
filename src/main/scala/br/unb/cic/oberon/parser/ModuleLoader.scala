@@ -22,6 +22,7 @@ class ModuleLoader {
   var modules = Map.empty[String, OberonModule]
   var readFiles =
     Set.empty[String] // TODO: normalize files before putting in the set
+  var isResource = false
 
   // TODO: handle case where `file` does not exist or we can't get the content
   def load(file: Path): Boolean = {
@@ -43,15 +44,20 @@ class ModuleLoader {
     // Load submodules
     module.submodules.map(submodule => {
       val path = file.parent / Path(s"$submodule.oberon")
-      val str_path = JavaPaths.get(path.toAbsolute.toString())
-      // 1° Local
-      // 2° Variável de Ambiente
-      if (Files.exists(str_path)) {
-        println(s"The path $str_path exists.")
+      
+      if (isResource) {
+        load(path)
       } else {
-        println(s"The path $str_path does not exist.")
+        val javaPath = JavaPaths.get(path.toAbsolute.toString())
+
+        if (Files.exists(javaPath)) {
+          load(path)
+        } else {
+          val defaultCachePath = s"${getUserRootDirectory}.oberon"
+          val globalCachePath = Path(sys.env.getOrElse("OBERON_GLOBAL_CACHE", defaultCachePath).toString())
+          load(globalCachePath)
+        }
       }
-      load(path)
     })
     true
   }
@@ -69,11 +75,21 @@ class ModuleLoader {
     content
   }
 
+  private def getUserRootDirectory: String = {
+    val osName = sys.props("os.name").toLowerCase
+    
+    osName match {
+      case os if os.contains("win") => System.getProperty("user.home") + "\\"
+      case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => "~/"
+      case _ => throw new UnsupportedOperationException("Unsupported operating system")
+    }
+  }
 }
 
 sealed trait ContentFromResource extends ModuleLoader {
   protected override def getContent(resource: Path): String =
   {
+    isResource = true
     Resources.getContent(resource.path)
   }
 }
