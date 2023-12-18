@@ -3,7 +3,7 @@ MODULE B;
 IMPORT A;
 
 BEGIN
-    A::x := 56;
+    A::x := 2;
     write(A::x)
 END
 

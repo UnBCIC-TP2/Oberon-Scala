@@ -46,11 +46,12 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
 
     val expected = makeModule(
       name = "B",
-      variables = List(VariableDeclaration("A.x", IntegerType)),
+      variables = List(VariableDeclaration("A::x", IntegerType)),
       stmt = Some(
         SequenceStmt(
           List(
-            WriteStmt(VarExpression("A.x"))
+            AssignmentStmt("A::x", IntValue(2)),
+            WriteStmt(VarExpression("A::x"))
           )
         )
       )
@@ -58,7 +59,7 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
-  ignore("ModuleLoader accepts aliases in files") {
+  ignore("ModuleLoader accepts aliases in files") { // TODO: fix importing aliases
     val module = ResourceModuleLoader.loadAndMerge("imports/F.oberon")
 
     val expected = makeModule(
@@ -75,17 +76,33 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
-  ignore("ModuleLoader accepts two files that import from a common third file") {
+  test("ModuleLoader deals with transitive imports") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
+
+    val expected = makeModule(
+      name = "I",
+      variables = List(VariableDeclaration("B::A::x", IntegerType)),
+      stmt = Some(
+        SequenceStmt(
+          List(
+            WriteStmt(VarExpression("B::A::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  test("ModuleLoader does not repeat declarations of variables that have already been imported") {
     val module = ResourceModuleLoader.loadAndMerge("imports/M.oberon")
 
     val expected = makeModule(
       name = "M",
-      variables = List(VariableDeclaration("B::A::x", IntegerType), VariableDeclaration("L::A::x", IntegerType)),
+      variables = List(VariableDeclaration("B::A::x", IntegerType)),
       stmt = Some(
         SequenceStmt(
           List(
-            WriteStmt(VarExpression("B::A::x")),
-            WriteStmt(VarExpression("L::A::x"))
+            WriteStmt(VarExpression("B::A::x"))
           )
         )
       )
@@ -104,6 +121,24 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
           List(
             WriteStmt(VarExpression("A::x")),
             WriteStmt(VarExpression("C::x"))
+          )
+        )
+      )
+    )
+    assert(module == expected)
+  }
+
+  test("ModuleLoader imports different variables from different files") {
+    val module = ResourceModuleLoader.loadAndMerge("imports/O.oberon")
+
+    val expected = makeModule(
+      name = "O",
+      variables = List(VariableDeclaration("A::x", IntegerType), VariableDeclaration("N::y", IntegerType)),
+      stmt = Some(
+        SequenceStmt(
+          List(
+            AssignmentStmt("A::x", IntValue(3)),
+            AssignmentStmt("N::y", IntValue(4))
           )
         )
       )
@@ -141,26 +176,9 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
     assert(module == expected)
   }
 
-  ignore("ModuleLoader deals with transitive imports") {
-    val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
-
-    val expected = makeModule(
-      name = "I",
-      variables = List(VariableDeclaration("B::A::x", IntegerType)),
-      stmt = Some(
-        SequenceStmt(
-          List(
-            WriteStmt(VarExpression("B::A::x"))
-          )
-        )
-      )
-    )
-    assert(module == expected)
-  }
-
   test("ModuleLoader throws error with cyclic imports") {
     val thrown = intercept[Exception] {
-      val module = ResourceModuleLoader.loadAndMerge("imports/I.oberon")
+      val module = ResourceModuleLoader.loadAndMerge("imports/P.oberon")
     }
     assert(thrown.getMessage.length > 0)
   }

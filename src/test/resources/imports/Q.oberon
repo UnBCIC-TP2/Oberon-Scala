@@ -1,0 +1,13 @@
+MODULE Q;
+
+IMPORT P;
+
+VAR
+    y : INTEGER;
+
+BEGIN
+    write(y)
+    write(P::x)
+END
+
+END Q.

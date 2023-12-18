@@ -1,0 +1,10 @@
+MODULE N;
+
+VAR
+    y : INTEGER;
+
+BEGIN
+    y := 2
+END
+
+END N.
