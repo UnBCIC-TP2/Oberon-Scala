@@ -43,6 +43,14 @@ class ModuleLoader {
     // Load submodules
     module.submodules.map(submodule => {
       val path = file.parent / Path(s"$submodule.oberon")
+      val str_path = JavaPaths.get(path.toAbsolute.toString())
+      // 1° Local
+      // 2° Variável de Ambiente
+      if (Files.exists(str_path)) {
+        println(s"The path $str_path exists.")
+      } else {
+        println(s"The path $str_path does not exist.")
+      }
       load(path)
     })
     true
