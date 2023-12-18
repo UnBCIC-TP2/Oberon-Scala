@@ -174,7 +174,7 @@ STRING
 
 NIL : 'NIL' ;
 
-Id : CharDef (CharDef | Digit | '_')* ;
+Id : CharDef (CharDef | Digit | '_' | '::')* ;
 
 
 repl: varDeclaration #REPLVarDeclaration

@@ -46,11 +46,11 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
 
     val expected = makeModule(
       name = "B",
-      variables = List(VariableDeclaration("A::x", IntegerType)),
+      variables = List(VariableDeclaration("A.x", IntegerType)),
       stmt = Some(
         SequenceStmt(
           List(
-            WriteStmt(VarExpression("A::x"))
+            WriteStmt(VarExpression("A.x"))
           )
         )
       )
