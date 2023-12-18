@@ -64,7 +64,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
   def declareVariable(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
     environment.baseType(variable.variableType) match {
       case Some(ArrayType(length, baseType)) => environment.setGlobalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
-      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name)
+      case Some(PointerType(variableType)) => environment.declareGlobalPointer(variable.name, variableType)
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
@@ -102,7 +102,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
           case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp)._2)
           case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
           case PointerAssignment(pointerName) => envt = pointerAssignment(envt, pointerName, exp)
-          case RecordAssignment(_, _) => ???
+          case RecordAssignment(record, field) => envt = recordAssignment(envt, record, field, exp)
         }
         envt
 
@@ -170,7 +170,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
 
-        
+
       case NewStmt(name) => {
         envt.createLocationForGlobalPointer(name, NullValue)
       }
@@ -254,6 +254,10 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
 
       }
     }
+  }
+
+  def recordAssignment(envt: Environment[Expression], record: Expression, field: String, exp: Expression): Environment[Expression] = {
+    return envt;
   }
 
   /*

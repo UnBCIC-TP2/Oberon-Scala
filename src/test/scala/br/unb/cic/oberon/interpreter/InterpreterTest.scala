@@ -820,6 +820,17 @@ class InterpreterTest extends AnyFunSuite {
     assert(result.lookup("b") == Some(RealValue(1.5)))
   }
 
+  test(testName = "Testing records: recordAssign1") {
+
+    val module = ScalaParser.parseResource("pointers/recordAssign1.oberon")
+
+    assert(module.name == "pointerAssign")
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.runInterpreter(module)
+
+  }
+
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))
 }

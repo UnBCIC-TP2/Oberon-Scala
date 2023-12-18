@@ -1,9 +1,9 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ir.ast.{Expression, Location, BaseLocation, NullLocation, NullType, NullValue, Procedure, ReferenceToUserDefinedType, Statement, Type, UserDefinedType}
+import br.unb.cic.oberon.ir.ast.{ArrayType, ArrayValue, BaseLocation, Expression, Location, NullLocation, NullType, NullValue, Procedure, RecordType, ReferenceToUserDefinedType, Statement, Type, Undef, UserDefinedType, VariableDeclaration}
 import org.jline.builtins.Completers.CompletionEnvironment
 
-import scala.collection.mutable.{Map, Stack}
+import scala.collection.mutable.{ListBuffer, Map, Stack}
 
 case class MetaStmt(f: Environment[Expression] => Statement) extends Statement
 
@@ -192,14 +192,42 @@ class Environment[T](private val top_loc:Int = 0,
       else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
-  def declareGlobalPointer(name: String): Environment[T] = {
+  def declareGlobalPointer(pointerName: String, variableType: Type): Environment[T] = {
+
+    var newGlobal = global.clone();
+
+    variableType match {
+      case ReferenceToUserDefinedType(name) => {
+
+        var userDefinedType = this.userDefinedTypes(name);
+
+        userDefinedType.baseType match {
+          case RecordType(fields) => {
+            fields.foreach {
+              case VariableDeclaration(name, variableType) => {
+                newGlobal += (getNameForRecordField(pointerName, name) -> NullLocation)
+              }
+              case _ => {
+                throw new RuntimeException("Unknown field type");
+              }
+            };
+          } case _ => {
+            newGlobal(pointerName) = NullLocation;
+          }
+        }
+      } case _ => {
+       newGlobal(pointerName) = NullLocation;
+      }
+    }
+
     return new Environment[T](top_loc = this.top_loc,
       locations = this.locations,
-      global = this.global + (name -> NullLocation),
+      global = newGlobal,
       procedures = this.procedures,
       userDefinedTypes = this.userDefinedTypes,
       stack = this.stack
     )
+
   }
 
   def createLocationForGlobalPointer(name: String, value: T): Environment[T] = {
@@ -241,6 +269,10 @@ class Environment[T](private val top_loc:Int = 0,
       stack = this.stack
     )
 
+  }
+
+  private def getNameForRecordField(recordName: String, field: String): String = {
+    return "$" + recordName + "." + field;
   }
 
 }
