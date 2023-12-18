@@ -91,8 +91,8 @@ class ModuleLoader {
     val osName = sys.props("os.name").toLowerCase
     
     osName match {
-      case os if os.contains("win") => s"$basePath\\.oberon\\$submodule\\$submodule.oberon"
-      case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => s"$basePath/.oberon/$submodule/$submodule.oberon"
+      case os if os.contains("win") => s"$basePath\\.oberon\\libs\\$submodule\\$submodule.oberon"
+      case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => s"$basePath/.oberon/libs/$submodule/$submodule.oberon"
       case _ => throw new UnsupportedOperationException("Unsupported operating system")
     }
   }
