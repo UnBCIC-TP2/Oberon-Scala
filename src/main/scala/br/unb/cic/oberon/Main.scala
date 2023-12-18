@@ -125,8 +125,9 @@ object Main extends App with Oberon2ScalaParser {
     // Alterar a instanciação do TypeChecker para fazer o checkModule ser ´parte do construtor
     // Dessa forma, os val visitor e errors passam a ser o mesmo.
     val env = new Environment[Type]()
-    val visitor = new TypeChecker(env)()
+    val visitor = new TypeChecker(env)
     val errors = visitor.checkModule(module)
+    
     if (errors.isEmpty) {
       println("The code is correctly typed")
     } else {
