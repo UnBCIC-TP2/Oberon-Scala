@@ -85,7 +85,7 @@ object TACodePrinter {
    */
   private def handleConditionalOps(s1: Address, s2: Address, operation: String, destLabel: String, label: String): String = {
     label match {
-      case "" => ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
+      case "" => ifStatement + tab + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
       case _ => s"$label:" + jumpLine + tab + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
     }
   }
