@@ -1352,5 +1352,58 @@ class TACodeTest extends AnyFunSuite {
     }
   }
 
+  // Teste para verificar se o TACodeGenerator lança uma exceção ao tentar acessar um array com índice do tipo Double
+  test("Test for generating TACode with invalid Double index for array access") {
+    // Reinicia o estado do TACodeGenerator antes de cada teste
+    TACodeGenerator.reset()
+
+    // Cria uma expressão de acesso a array com um índice do tipo Double
+    val arrayAccessExpr = ArrayAccessExpression(Variable("myArray"), DoubleValue(2.5))
+
+    // Espera que uma exceção do tipo RuntimeException seja lançada durante a geração de código
+    assertThrows[RuntimeException] {
+      // Chama o método do TACodeGenerator que deveria lançar a exceção
+      TACodeGenerator.generateExpression(arrayAccessExpr, List())
+    }
+  }
+
+  // Teste para verificar se o TACodeGenerator lança uma exceção ao tentar acessar um array com índice do tipo Boolean
+  test("Test for generating TACode with invalid Boolean index for array access") {
+    // Reinicia o estado do TACodeGenerator antes de cada teste
+    TACodeGenerator.reset()
+
+    // Cria uma expressão de acesso a array com um índice do tipo Boolean
+    val arrayAccessExpr = ArrayAccessExpression(Variable("myArray"), BoolValue(true))
+
+    // Espera que uma exceção do tipo RuntimeException seja lançada durante a geração de código
+    assertThrows[RuntimeException] {
+      // Chama o método do TACodeGenerator que deveria lançar a exceção
+      TACodeGenerator.generateExpression(arrayAccessExpr, List())
+    }
+  }
+
+  // Teste para verificar a geração de código para um laço for simples
+  test("Test for generating TACode for a simple 'for' loop") {
+    // Reinicia o estado do TACodeGenerator antes de cada teste
+    TACodeGenerator.reset()
+
+    // Cria um laço for simples: for i = 1 to 5 do x = x + i
+    val forLoopStmt = ForStatement(Variable("i"), IntValue(1), IntValue(5), List(AssignmentStatement(Variable("x"), BinaryExpression(Variable("x"), "+", Variable("i")))))
+
+    // Gera o código para o laço for
+    val tacCode = TACodeGenerator.generateStatement(forLoopStmt, List())
+
+    // Verifica se o código gerado corresponde ao esperado
+    assert(tacCode == List(
+      "i = 1",        // Inicialização
+      "L1:",          // Rótulo de início do loop
+      "if i > 5 goto L2",  // Condição de término do loop
+      "x = x + i",    // Corpo do loop
+      "i = i + 1",    // Incremento
+      "goto L1",      // Volta para o início do loop
+      "L2:"           // Rótulo de término do loop
+    ))
+  }
+
 
 }
