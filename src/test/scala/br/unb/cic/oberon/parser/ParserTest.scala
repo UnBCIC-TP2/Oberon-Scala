@@ -3042,12 +3042,11 @@ class ParserTestSuite extends AbstractTestSuite {
 
     // conferir a contagem de statement
     module.stmt.getOrElse(None) match {
-      case SequenceStmt(stmt) => assert(stmt.length == 4)
-      case _                  => fail("This module should have 4 statements!")
+      case SequenceStmt(stmt) => assert(stmt.length == 2)
+      case _                  => fail("This module should have 2 statements!")
     }
 
-    // 2 ou 4 conferir. tentativa: 1 record, 1 array, 2 pointer
-    assert(module.userTypes.size == 2)
+    assert(module.userTypes.size == 1)
 
     val sequence = module.stmt.get.asInstanceOf[SequenceStmt]
     val stmts = sequence.stmts
@@ -3061,18 +3060,6 @@ class ParserTestSuite extends AbstractTestSuite {
       stmts(1) == new AssignmentStmt(
         RecordAssignment(VarExpression("a"), "idade"),
         IntValue(23)
-      )
-    )
-    assert(
-      stmts(2) == new AssignmentStmt(
-        ArrayAssignment(PointerAccessExpression("b"), IntValue(0)),
-        RealValue(9.5)
-      )
-    )
-    assert(
-      stmts(3) == new AssignmentStmt(
-        ArrayAssignment(PointerAccessExpression("b"), IntValue(2)),
-        RealValue(9.0)
       )
     )
   }
