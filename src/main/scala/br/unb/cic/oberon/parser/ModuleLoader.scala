@@ -79,7 +79,7 @@ class ModuleLoader {
   private def getUserRootDirectory: String = {
     val osName = sys.props("os.name").toLowerCase
     val userName = System.getProperty("user.name")
-    
+
     osName match {
       case os if os.contains("win") => System.getProperty("user.home")
       case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => s"/home/$userName"
@@ -89,10 +89,10 @@ class ModuleLoader {
 
   private def buildCacheFilePath(basePath: String, submodule: String): String = {
     val osName = sys.props("os.name").toLowerCase
-    
+
     osName match {
-      case os if os.contains("win") => s"$basePath\\.oberon\\libs\\$submodule\\$submodule.oberon"
-      case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => s"$basePath/.oberon/libs/$submodule/$submodule.oberon"
+      case os if os.contains("win") => s"$basePath\\$submodule\\$submodule.oberon"
+      case os if os.contains("nix") || os.contains("nux") || os.contains("mac") => s"$basePath/$submodule/$submodule.oberon"
       case _ => throw new UnsupportedOperationException("Unsupported operating system")
     }
   }
