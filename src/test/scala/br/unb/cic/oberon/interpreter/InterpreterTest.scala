@@ -863,7 +863,7 @@ class InterpreterTest extends AnyFunSuite {
       List(),
       List[VariableDeclaration](VariableDeclaration("a", PointerType(IntegerType)), VariableDeclaration("b", PointerType(PointerType(IntegerType))), VariableDeclaration("c", IntegerType)),
       List(), Some(SequenceStmt(List[Statement](AssignmentStmt(VarAssignment("c"), IntValue(5)), AssignmentStmt(PointerAssignment("a"), VarExpression("c")),
-      AssignmentStmt(PointerAssignment("b"), VarExpression("a")), AssignmentStmt(PointerAssignment("b", 1), IntValue(3))))))
+      AssignmentStmt(PointerAssignment("b"), VarExpression("a")), AssignmentStmt(PointerAssignment("b", 2), IntValue(3))))))
 
     val result = interpreter.runInterpreter(module)
 
