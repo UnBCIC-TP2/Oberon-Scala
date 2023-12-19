@@ -856,6 +856,19 @@ class InterpreterTest extends AnyFunSuite {
 
   }
 
+  test("Testing multiple pointer indirections") {
+    val module = new OberonModule("SimpleModule",
+      Set(),
+      List(),
+      List(),
+      List[VariableDeclaration](VariableDeclaration("a", PointerType(IntegerType)), VariableDeclaration("b", PointerType(PointerType(IntegerType))), VariableDeclaration("c", IntegerType)),
+      List(), Some(SequenceStmt(List[Statement](AssignmentStmt(VarAssignment("c"), IntValue(5)), AssignmentStmt(PointerAssignment("a"), VarExpression("c")),
+      AssignmentStmt(PointerAssignment("b"), VarExpression("a")), AssignmentStmt(PointerAssignment("b", 1), IntValue(3))))))
+
+    val result = interpreter.runInterpreter(module)
+
+    assert(result.lookup("c") == Some(IntValue(3)))
+  }
 
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
     interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))

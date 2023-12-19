@@ -241,7 +241,7 @@ class TypeChecker {
 
   private def checkAssignment(stmt: Statement): T = stmt match {
     case AssignmentStmt(VarAssignment(v), exp) => checkVarAssigment(v, exp)
-    case AssignmentStmt(PointerAssignment(p), exp) => checkPointerAssigment(p, exp)
+    case AssignmentStmt(PointerAssignment(p, _), exp) => checkPointerAssigment(p, exp)
     case AssignmentStmt(ArrayAssignment(arr, element), exp) => checkArrayAssigment(arr, element, exp)
     case AssignmentStmt(RecordAssignment(record, field), exp) => checkRecordAssigment(record, field, exp)
   }

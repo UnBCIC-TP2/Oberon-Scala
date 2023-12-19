@@ -101,7 +101,7 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
         designator match {
           case VarAssignment(name) => envt = envt.setVariable(name, evalExpression(envt, exp)._2)
           case ArrayAssignment(array, index) => envt = arrayAssignment(envt, array, index, exp)
-          case PointerAssignment(pointerName) => envt = pointerAssignment(envt, pointerName, exp)
+          case PointerAssignment(pointerName, indirections) => envt = pointerAssignment(envt, pointerName, exp, indirections)
           case RecordAssignment(record, field) => envt = recordAssignment(envt, record, field, exp)
         }
         envt
@@ -232,12 +232,12 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     environment
   }
 
-  def pointerAssignment(envt: Environment[Expression], pointerName: String, exp: Expression): Environment[Expression] = {
+  def pointerAssignment(envt: Environment[Expression], pointerName: String, exp: Expression, indirections: Int): Environment[Expression] = {
 
     exp match {
       case VarExpression(name) => {
         val loc = envt.pointsTo(name)
-        envt.setGlobalPointer(pointerName, loc.get)
+        envt.setGlobalPointer(pointerName, envt.dfs(indirections, loc.get))
       } case _ => {
 
         envt.pointsTo(pointerName).get match {

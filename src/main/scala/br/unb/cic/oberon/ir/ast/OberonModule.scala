@@ -279,7 +279,7 @@ case class ArrayAssignment(array: Expression, index: Expression)
     extends Designator
 case class RecordAssignment(record: Expression, field: String)
     extends Designator
-case class PointerAssignment(pointerName: String) extends Designator
+case class PointerAssignment(pointerName: String, indirections: Int = 1) extends Designator
 
 /** User defined types.
   *

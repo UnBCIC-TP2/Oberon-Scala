@@ -117,7 +117,7 @@ trait StatementParser extends ExpressionParser {
       | expressionParser ~ ("." ~> identifier) ^^ { case a ~ b =>
         RecordAssignment(a, b)
       }
-      | identifier <~ "^" ^^ PointerAssignment
+      | identifier <~ "^" ^^ (id => PointerAssignment(id, 1))
       | identifier ^^ VarAssignment
   )
 

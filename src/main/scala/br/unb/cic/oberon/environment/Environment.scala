@@ -276,6 +276,16 @@ class Environment[T](private val top_loc:Int = 0,
 
   }
 
+  def dfs(indirections: Int, loc: Location): Location = {
+    var tmp_loc = loc
+    var tmp_indirections = indirections
+    while (tmp_indirections > 1 && locations(tmp_loc).isInstanceOf[Location]) {
+      tmp_loc = locations(tmp_loc).asInstanceOf[Location]
+      tmp_indirections = tmp_indirections - 1
+    }
+    tmp_loc
+  }
+
    def getNameForRecordField(recordName: String, field: String): String = {
     return recordName + "." + field;
   }

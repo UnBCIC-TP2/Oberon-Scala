@@ -202,7 +202,7 @@ class OberonEngine extends ScriptEngine {
               // TODO: Other types of assignment
               case ArrayAssignment(_, _)  => ???
               case RecordAssignment(_, _) => ???
-              case PointerAssignment(_)   => ???
+              case PointerAssignment(_, _)   => ???
               case VarAssignment(name) =>
                 put(name, exp)
             }

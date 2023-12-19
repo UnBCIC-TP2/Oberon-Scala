@@ -35,7 +35,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             val (i, insts3) = generateExpression(index, insts2)
             return insts3 :+ ListSet(t, i, a, "")
 
-          case PointerAssignment(pointerName) =>
+          case PointerAssignment(pointerName, _) =>
             val p = Name(pointerName, LocationType)
             return insts1 :+ SetPointer(t, p, "")
 

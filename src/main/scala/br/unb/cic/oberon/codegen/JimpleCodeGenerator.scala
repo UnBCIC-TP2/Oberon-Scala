@@ -271,7 +271,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
         case _ => throw new Exception("Record must be a field reference.")
       }
 
-    case PointerAssignment(_) =>
+    case PointerAssignment(_, _) =>
       throw new Exception(
         "Pointers are not yet supported by Jimple code generation."
       )
