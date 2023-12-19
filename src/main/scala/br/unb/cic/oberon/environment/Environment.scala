@@ -214,4 +214,44 @@ class Environment[T](private val top_loc:Int = 0,
     else throw new RuntimeException("Variable " + name + " is not defined")
   }
 
+  def dumpAttributes(): Unit = {
+    println("top_loc: " + top_loc)
+    println("locations:")
+    locations.foreach { case (location, value) =>
+      println(s"  $location: $value")
+    }
+
+    println("global:")
+    global.foreach { case (name, loc) =>
+      println(s"  $name: $loc")
+    }
+
+    println("stack:")
+    stack.zipWithIndex.foreach { case (frame, index) =>
+      println(s"  Frame $index:")
+      frame.foreach { case (name, loc) =>
+        println(s"    $name: $loc")
+      }
+    }
+
+    println("procedures:")
+    procedures.foreach { case (name, procedure) =>
+      println(s"  $name:")
+      //procedure.variables.foreach { case (variableName, loc) =>
+      //  println(s"    $variableName: $loc")
+      //}
+    }
+
+    println("tests:")
+    tests.foreach { case (name, test) =>
+      println(s"  $name: $test")
+    }
+
+    println("userDefinedTypes:")
+    userDefinedTypes.foreach { case (typeName, userType) =>
+      println(s"  $typeName: $userType")
+    }
+  }
+
+
 }
