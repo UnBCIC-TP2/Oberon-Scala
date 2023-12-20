@@ -67,7 +67,7 @@ object JimpleCodePrinter {
       val name : Doc = text(elemento.name)
       val tipo : Doc = text(generateTypeString(elemento.fieldType))
 
-      if ((elemento.modifiers).toString() == "List(PublicModifier, StaticModifier, FinalModifier)") {
+      if ((elemento.modifiers).toString() == "List(PublicModifer, StaticModifier, FinalModifier)") {
           variablesAndConstant = text("public static final ") + tipo + space + name
           if (ConditionPrintClinit == (false)) {
           ConditionPrintClinit = true
@@ -100,7 +100,7 @@ object JimpleCodePrinter {
     MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
     }
 
-    val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}') + Doc.char('\n')
+    val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}')
     jimpleCode.render(1000)
   }
 

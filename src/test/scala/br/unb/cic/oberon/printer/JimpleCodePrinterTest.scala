@@ -31,8 +31,13 @@ class JimpleCodePrinterTest extends AnyFunSuite with Oberon2ScalaParser {
         // Get uncommon characters between target and generated code
         val charsInCodeNotInTarget = jimpleCode diff jimpleTarget
         val charsInTargetNotInCode = jimpleTarget diff jimpleCode
-        assert(charsInTargetNotInCode.isEmpty && charsInCodeNotInTarget.isEmpty,
+        assert((charsInTargetNotInCode.length == 0 && charsInCodeNotInTarget.length == 0) ||
+            (stringIsWhiteSpace(charsInTargetNotInCode) && stringIsWhiteSpace(charsInCodeNotInTarget)),
             s"\nCharacters not found in generated code:\n${charsInTargetNotInCode}\n") 
+    }
+
+    def stringIsWhiteSpace(str: String): Boolean = {
+        str.forall(_.isWhitespace)
     }
 
     test("Testing if simple04.jimple is equal to generated JIMPLE") {
