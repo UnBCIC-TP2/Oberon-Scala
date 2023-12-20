@@ -1,0 +1,24 @@
+public class SimpleModule5 extends java.lang.Object
+{
+    public static final int z;
+    public int abc;
+    public boolean def;
+
+    public void <init>()
+    {
+        SimpleModule5 r0;
+
+        r0 := @this: SimpleModule5;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void <clinit>()
+    {
+        <SimpleModule5: int z> = 50;
+
+        return;
+    }
+}

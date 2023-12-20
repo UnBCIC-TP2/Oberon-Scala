@@ -1,29 +1,24 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{
-  IntValue => OberonIntValue,
-  BoolValue => OberonBoolValue,
-  RealValue => OberonRealValue,
-  CharValue => OberonCharValue,
-  StringValue => OberonStringValue,
-  NullValue => OberonNullValue,
-  AndExpression => OberonAndExpression,
-  OrExpression => OberonOrExpression,
-  NotExpression => OberonNotExpression,
-  AddExpression => OberonAddExpression,
-  SubExpression => OberonSubExpression,
-  MultExpression => OberonMultExpression,
-  DivExpression => OberonDivExpression,
-  ModExpression => OberonModExpression,
-  _
-}
+import br.unb.cic.oberon.ir.ast.{AddExpression => OberonAddExpression, AndExpression => OberonAndExpression, BoolValue => OberonBoolValue, CharValue => OberonCharValue, DivExpression => OberonDivExpression, IntValue => OberonIntValue, ModExpression => OberonModExpression, MultExpression => OberonMultExpression, NotExpression => OberonNotExpression, NullValue => OberonNullValue, OrExpression => OberonOrExpression, RealValue => OberonRealValue, StringValue => OberonStringValue, SubExpression => OberonSubExpression, _}
+import br.unb.cic.oberon.ir.jimple
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.transformations.CoreChecker
 
 import scala.collection.mutable.ListBuffer
+import org.typelevel.paiges.Doc
+import org.typelevel.paiges.Doc._
+
+import scala.util.matching.Regex
+
 
 object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
   override def generateCode(module: OberonModule): ClassDeclaration = {
+
+    if (module.stmt.isDefined && !CoreChecker.checkModule(module))
+      throw new NotOberonCoreException(s"""Cannot interpret non-OberonCore module "${module.name}".""")
+
     val fields = generateFields(module)
     val methodSignatures = generateMethodSignatures(module)
     val methods = generateMethods(module, fields, methodSignatures)

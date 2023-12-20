@@ -1,0 +1,23 @@
+public class SimpleModule11 extends java.lang.Object
+{
+
+    public void <init>()
+    {
+        SimpleModule11 r0;
+
+        r0 := @this: SimpleModule11;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void main(java.lang.String[])
+    {
+        java.lang.String[] r0;
+
+        r0 := @parameter0: java.lang.String[];
+
+        return;
+    }
+}

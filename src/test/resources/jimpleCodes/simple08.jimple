@@ -1,0 +1,30 @@
+public class SimpleModule8 extends java.lang.Object
+{
+    public static final boolean x;
+    public static final boolean y;
+    public static final boolean z;
+    public int abc;
+    public boolean def;
+
+    public void <init>()
+    {
+        SimpleModule8 r0;
+
+        r0 := @this: SimpleModule8;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void <clinit>()
+    {
+        <SimpleModule8: boolean z> = 0;
+
+        <SimpleModule8: boolean y> = 1;
+
+        <SimpleModule8: boolean x> = 0;
+
+        return;
+    }
+}
