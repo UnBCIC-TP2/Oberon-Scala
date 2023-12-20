@@ -162,11 +162,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker) {
   ): Option[Type] = {
     val t1 = checkExpression(left)
     val t2 = checkExpression(right)
-    if (t1 == t2 && expected.contains(t1.getOrElse(None))) {
-      Some(result)
-    } else if (t1 == t2 && List(RealType).contains(t1.getOrElse(None))) {
-      Some(RealType)
-    }
+    if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
     else None
   }
 }
