@@ -37,7 +37,7 @@ object JimpleCodePrinter {
   private val doubleIndentSize: Doc = Doc.spaces(8)
   private val twoLines: Doc = line * 2
 
-  private def generateDoc(module: OberonModule): String = {
+  def generateDoc(module: OberonModule): String = {
     val fields = JimpleCodeGenerator.generateFields(module)
     val methodSignatures = JimpleCodeGenerator.generateMethodSignatures(module)
     val methodsString = JimpleCodeGenerator.generateMethods(module, fields, methodSignatures).toString()
@@ -45,7 +45,7 @@ object JimpleCodePrinter {
     var ConditionPrintClinit: Boolean = false
 
     val moduleName: Doc = Doc.text(module.name)
-    val MainHeader = text("Public Class ") + moduleName + text(" extends java.lang.Object") / Doc.char('{')
+    val MainHeader = text("public class ") + moduleName + text(" extends java.lang.Object") / Doc.char('{')
 
     // Main initialization
     val HasVoid = FindInString("TVoid,main,", methodsString)
@@ -67,13 +67,13 @@ object JimpleCodePrinter {
       val name : Doc = text(elemento.name)
       val tipo : Doc = text(generateTypeString(elemento.fieldType))
 
-      if ((elemento.modifiers).toString() == "List(PublicModifer, StaticModifier, FinalModifier)") {
-          variablesAndConstant = text("Public static final ") + tipo + space + name
+      if ((elemento.modifiers).toString() == "List(PublicModifier, StaticModifier, FinalModifier)") {
+          variablesAndConstant = text("public static final ") + tipo + space + name
           if (ConditionPrintClinit == (false)) {
           ConditionPrintClinit = true
           }
       } else {
-          variablesAndConstant = text("Public ") + tipo + space + name
+          variablesAndConstant = text("public ") + tipo + space + name
       }
 
       VariablesAndConstants = VariablesAndConstants + indentSize + variablesAndConstant + text(";") + Doc.line
@@ -100,7 +100,7 @@ object JimpleCodePrinter {
     MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
     }
 
-    val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}')
+    val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}') + Doc.char('\n')
     jimpleCode.render(1000)
   }
 
