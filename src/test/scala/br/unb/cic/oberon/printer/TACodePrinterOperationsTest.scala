@@ -1,12 +1,10 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.codegen.TACodeGenerator
-import br.unb.cic.oberon.codegen.LabelGenerator
-import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
+import br.unb.cic.oberon.ir.ast.{BooleanType, IntegerType}
 import br.unb.cic.oberon.ir.tac._
 import org.scalatest.funsuite.AnyFunSuite
 
-class TACodePrinterOberonCodeTest extends AnyFunSuite {
+class TACodePrinterOperationsTest extends AnyFunSuite {
 
   private val bl = "\n"
 
@@ -16,379 +14,86 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite {
   val t3 = new Temporary(BooleanType, 3, true)
   val t4 = new Temporary(BooleanType, 4, true)
 
-  test("Print 'Add' expression between two constants") {
-    // Given
-    val expr = AddExpression(IntValue(1), IntValue(2))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
+  test("Print 'Add' expressions") {
 
-    // Expected
+    val ops = List(AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""))
     val expectedOutput = bl + "t0 = 1 + 2"
 
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
     assertResult(expectedOutput)(tacDocumentToPrint)
   }
 
-  test("Print 'Sub' expression between two constants") {
-    // Given
-    val expr = SubExpression(IntValue(1), IntValue(2))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
+  test("Print multiple 'Add' expressions in sequence") {
 
-    // Expected
-    val expectedOutput = bl + "t0 = 1 - 2"
-
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assertResult(expectedOutput)(tacDocumentToPrint)
-  }
-
-  test("Print 'Mult' expression between two constants") {
-    // Given
-    val expr = MultExpression(IntValue(1), IntValue(2))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = 1 * 2"
-    
-    // Then  
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-  }
-
-    test("Print 'Div' expression between two constants") {
-    // Given
-    val expr = DivExpression(IntValue(1), IntValue(2))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = 1 / 2"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-  }
-
-    test("Print 'And' expression between two booleans") {
-    // Given
-    val expr = AndExpression(BoolValue(true), BoolValue(false))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = true && false"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-  }
-
-    test("Print 'Or' expression between two booleans") {
-    // Given
-    val expr = OrExpression(BoolValue(true), BoolValue(false))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = true || false"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-  }
-
-    test("Print 'Rem' expression between two constants") {
-    // Given
-    val expr = ModExpression(IntValue(1), IntValue(2))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = 1 % 2"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'EQJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(EqJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 == 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'NEQJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(NeqJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 != 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'GTJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(GTJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 > 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'GTEJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(GTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 >= 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'LTJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(LTJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 < 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'LTEJump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(LTEJump(Constant("2", IntegerType), Constant("1", IntegerType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if 2 <=> 1 jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'JumpTrue' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(JumpTrue(Constant("false", BooleanType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if false == true jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'JumpFalse' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(JumpFalse(Constant("false", BooleanType), l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"if false == false jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'Jump' to label") {
-    // Given
-    val l1 = LabelGenerator.generateLabel
-    val ops = List(Jump(l1, ""))
-    
-    // Expected
-    val expectedOutput = bl + s"jump $l1"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'Not' for boolean") {
-    // Given
-    val expr = NotExpression(BoolValue(true))
-    val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
-    
-    // Expected
-    val expectedOutput = bl + "t0 = NOT true"
-    
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
-    assert(expectedOutput == tacDocumentToPrint)
-
-    }
-
-    test("Print 'EQExpression' between two constants") {
-    // Given
-    val t0 = new Temporary(IntegerType, 0, true)
-    val t1 = new Temporary(IntegerType, 1, true)
     val ops = List(
-      SubOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      SLTUOp(t0, Constant("1", IntegerType), t1, "")
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, "L1"),
+      AddOp(Constant("3", IntegerType), Constant("4", IntegerType), t1, ""),
+      AddOp(t0, t1, t2, "")
     )
-    
-    // Expected
-    val expectedOutput = bl + "t0 = 1 - 2" + bl + "t1 = SLTU t0 1"
-    
-    // Then
+
+    val expectedOutput = bl + s"L1:$bl  t0 = 1 + 2" + bl + "t1 = 3 + 4" + bl + "t2 = t0 + t1"
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
 
-    }
+    assertResult(expectedOutput)(tacDocumentToPrint)
 
-    test("Print 'NEQExpression' between two constants") {
-    // Given
-    val t0 = new Temporary(IntegerType, 0, true)
-    val t1 = new Temporary(IntegerType, 1, true)
+  }
+
+  test("Print different operations in sequence (MulOp, DivOp, SubOp)") {
+
     val ops = List(
-      SubOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
-      SLTUOp(t0, Constant("1", IntegerType), t1, "")
+      MulOp(Constant("2", IntegerType), Constant("2", IntegerType), t0, ""),
+      DivOp(t0, Constant("3", IntegerType), t1, ""),
+      SubOp(t1, Constant("6", IntegerType), t2, "")
     )
-    
-    // Expected
-    val expectedOutput = bl + "t0 = 1 - 2" + bl + "t1 = SLTU t0 1"
-    
-    // Then
+
+    val firstOp = "t0 = 2 * 2"
+    val secondOp = "t1 = t0 / 3"
+    val thirdOp = "t2 = t1 - 6"
+
+    val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
-    assert(expectedOutput == tacDocumentToPrint)
 
-    }
-
-  test("Print 'LT' expression with positive operands") {
-    // Given
-    val expr = LTExpression(IntValue(1), IntValue(2))
-    val (t, list) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = SLT 1 2"
-
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
     assertResult(expectedOutput)(tacDocumentToPrint)
+
   }
 
-  test("Print 'GT' expression with positive operands") {
-    // Given
-    val expr = GTExpression(IntValue(1), IntValue(2))
-    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+  test("Print 'AndOp', 'NotOp', and 'OrOp' operations with prettier printer") {
 
-    // Expected
-    val expectedOutput = bl + "t0 = SLT 2 1"
-
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
-    assertResult(expectedOutput)(tacDocumentToPrint)
-  }
-
-  test("Print 'ArrayAssignment' statement") {
-    // Given
-    TACodeGenerator.reset
-    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
-    TACodeGenerator.load_vars(list_var)
-
-    val stmt = AssignmentStmt(
-      ArrayAssignment(VarExpression("lista"), IntValue(1)),
-      IntValue(2)
-    )
-    val list = TACodeGenerator.generateStatement(stmt, List())
-
-    // Expected
-    val expectedOutput = bl + "lista[1] = 2"
-
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
-    assertResult(expectedOutput)(tacDocumentToPrint)
-  }
-
-  test("Print 'ArraySubscript' expression") {
-    // Given
-    TACodeGenerator.reset
-    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
-    TACodeGenerator.load_vars(list_var)
-
-    val expr = ArraySubscript(VarExpression("lista"), IntValue(1))
-    val (t, list) = TACodeGenerator.generateExpression(expr, List())
-
-    // Expected
-    val expectedOutput = bl + "t0 = lista[1]"
-
-    // Then
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
-    assertResult(expectedOutput)(tacDocumentToPrint)
-  }
-
-  test("Print 'Loop' with array operations") {
-    // Given
-    TACodeGenerator.reset
-    val t0 = new Temporary(IntegerType, 0)
-    val t1 = new Temporary(IntegerType, 1)
-    val t2 = new Temporary(IntegerType, 2)
-    val t3 = new Temporary(IntegerType, 3)
-    val l1 = LabelGenerator.generateLabel
-    val l2 = LabelGenerator.generateLabel
-    var ops = List(
-        Jump(l1, ""),
-        NOp(l2),
-        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("1", IntegerType), t0, ""),
-        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t1, ""),
-        AddOp(t0, t1, t2, ""),
-        ArraySet(t2, Constant("4", IntegerType), Name("lista", ArrayType(4, IntegerType)), ""),
-        NOp(l1),
-        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("1", IntegerType), t3, ""),
-        LTEJump(t3, Constant("10", IntegerType), l2, "")
+    val ops = List(
+      AndOp(Constant("true", BooleanType), Constant("false", BooleanType), t0, ""),
+      NotOp(Constant("true", BooleanType), t1, ""),
+      AndOp(Constant("true", BooleanType), t1, t2, ""),
+      OrOp(Constant("true", BooleanType), t2, t3, ""),
+      OrOp(t0, t3, t4, "")
     )
 
-    val firstOp = s"jump $l1"
-    val secondOp = s"$l2"
-    val thirdOp = "t0 = lista[1]"
-    val fourthOp = "t1 = lista[2]"
-    val fifthOp = "t2 = t0 + t1"
-    val sixthOp = "lista[1] = t2"
-    val seventhOp = s"$l1"
-    val eighthOp = "t3 = lista[1]"
-    val ninthOp = s"if t3 <=> 10 jump $l2"
-    
-    // Expected
-    val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp + bl + fourthOp + bl + fifthOp +
-                         bl + sixthOp + bl + seventhOp + bl + eighthOp + bl + ninthOp
+    val firstOp = "t0 = true && false"
+    val secondOp = "t1 = NOT true"
+    val thirdOp = "t2 = true && t1"
+    val fourthOp = "t3 = true || t2"
+    val fifthOp = "t4 = t0 || t3"
 
-    // Then
+    val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp + bl + fourthOp + bl + fifthOp
     val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
     assertResult(expectedOutput)(tacDocumentToPrint)
+
+  }
+
+  test("Print 'CopyOp' with prettier printer") {
+
+    val t0 = new Temporary(IntegerType, 0, true)
+    val ops = List(
+      AddOp(Constant("1", IntegerType), Constant("2", IntegerType), t0, ""),
+      CopyOp(t0, Name("var", IntegerType), ""),
+    )
+
+    val firstOp = "t0 = 1 + 2"
+    val secondOp = "var = t0"
+
+    val expectedOutput = bl + firstOp + bl + secondOp
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
+    assertResult(expectedOutput)(tacDocumentToPrint)
+
   }
 
 }
