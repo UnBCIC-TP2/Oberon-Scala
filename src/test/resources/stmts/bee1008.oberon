@@ -1,0 +1,27 @@
+MODULE bee1008;
+
+IMPORT Input, Texts;
+
+VAR
+    numero, horas_trabalhadas: INTEGER;
+    valor_por_hora, valor: REAL;
+
+PROCEDURE Salario;
+BEGIN
+    Input.Int(numero);
+    Input.Int(horas_trabalhadas);
+    Input.Real(valor_por_hora);
+
+    valor := valor_por_hora * horas_trabalhadas;
+
+    Texts.WriteString(Texts.Console, "NUMBER = ");
+    Texts.WriteInt(Texts.Console, numero, 0);
+    Texts.WriteLn(Texts.Console);
+    Texts.WriteString(Texts.Console, "SALARY = U$ ");
+    Texts.WriteReal(Texts.Console, valor, 2);
+    Texts.WriteLn(Texts.Console);
+END Salario;
+
+BEGIN
+    Salario;
+END bee1008.
