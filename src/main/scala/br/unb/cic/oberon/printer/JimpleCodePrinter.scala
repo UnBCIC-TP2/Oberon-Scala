@@ -32,7 +32,7 @@ import scala.util.matching.Regex
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc._
 
-class JimpleCodePrinter(module: OberonModule) {
+object JimpleCodePrinter {
   private val indentSize: Doc = Doc.spaces(4)
   private val doubleIndentSize: Doc = Doc.spaces(8)
   private val twoLines: Doc = line * 2
