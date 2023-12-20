@@ -1,0 +1,22 @@
+MODULE bee1001;
+
+IMPORT Input, Texts;
+
+VAR
+    A, B, X: INTEGER;
+
+PROCEDURE ExtremamenteBasico;
+BEGIN
+    Input.Int(A);
+    Input.Int(B);
+
+    X := A + B;
+
+    Texts.WriteString(Texts.Console, "X = ");
+    Texts.WriteInt(Texts.Console, X, 0);
+    Texts.WriteLn(Texts.Console);
+END ExtremamenteBasico;
+
+BEGIN
+    ExtremamenteBasico;
+END bee1001.

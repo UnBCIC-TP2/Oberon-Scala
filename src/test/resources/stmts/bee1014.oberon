@@ -1,0 +1,23 @@
+MODULE bee1014;
+
+IMPORT Input, Texts;
+
+VAR
+    X: INTEGER;
+    Y, consumo: REAL;
+
+PROCEDURE Consumo;
+BEGIN
+    Input.Int(X);
+    Input.Real(Y);
+
+    consumo := X / Y;
+
+    Texts.WriteReal(Texts.Console, consumo, 3);
+    Texts.WriteString(Texts.Console, " km/l");
+    Texts.WriteLn(Texts.Console);
+END Consumo;
+
+BEGIN
+    Consumo;
+END bee1014.

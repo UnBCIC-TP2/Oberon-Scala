@@ -1,0 +1,22 @@
+MODULE bee1003;
+
+IMPORT Input, Texts;
+
+VAR
+    A, B, soma: INTEGER;
+
+PROCEDURE SomaSimples;
+BEGIN
+    Input.Int(A);
+    Input.Int(B);
+
+    soma := A + B;
+
+    Texts.WriteString(Texts.Console, "SOMA = ");
+    Texts.WriteInt(Texts.Console, soma, 0);
+    Texts.WriteLn(Texts.Console);
+END SomaSimples;
+
+BEGIN
+    SomaSimples;
+END bee1003.
