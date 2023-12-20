@@ -276,7 +276,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case FunctionCallExpression(name, args) =>
         name match {
           case "ODD" =>
-            s"${genExp(args(0))} % 2 == 1"
+            s"${genExp(args.head)} % 2 == 1"
           case _ =>
             val expressions = args.map(arg => text(genExp(arg)))
             val functionArgs = intercalate(Doc.char(',') + space, expressions)
@@ -332,11 +332,11 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def genInc(args: List[Expression], signal: String, indent: Int): Doc = {
     if (args.length == 1) {
       indentation(indent) + textln(
-        s"${genExp(args(0))} = ${genExp(args(0))} ${signal} 1;"
+        s"${genExp(args.head)} = ${genExp(args.head)} ${signal} 1;"
       )
     } else {
       indentation(indent) + textln(
-        s"${genExp(args(0))} = ${genExp(args(0))} ${signal} ${genExp(args(1))};"
+        s"${genExp(args.head)} = ${genExp(args.head)} ${signal} ${genExp(args(1))};"
       )
     }
   }
