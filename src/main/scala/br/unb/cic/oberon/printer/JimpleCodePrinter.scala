@@ -33,77 +33,76 @@ import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc._
 
 class JimpleCodePrinter(module: OberonModule) {
+  private val indentSize: Doc = Doc.spaces(4)
+  private val doubleIndentSize: Doc = Doc.spaces(8)
+  private val twoLines: Doc = line * 2
 
-    private val indentSize: Doc = Doc.spaces(4)
-    private val doubleIndentSize: Doc = Doc.spaces(8)
-    private val twoLines: Doc = line * 2
+  private def generateDoc(module: OberonModule): String = {
+    val fields = JimpleCodeGenerator.generateFields(module)
+    val methodSignatures = JimpleCodeGenerator.generateMethodSignatures(module)
+    val methodsString = JimpleCodeGenerator.generateMethods(module, fields, methodSignatures).toString()
+    
+    var ConditionPrintClinit: Boolean = false
 
-    private def generateDoc(module: OberonModule): String = {
-      val fields = JimpleCodeGenerator.generateFields(module)
-      val methodSignatures = JimpleCodeGenerator.generateMethodSignatures(module)
-      val methodsString = JimpleCodeGenerator.generateMethods(module, fields, methodSignatures).toString()
-      
-      var ConditionPrintClinit: Boolean = false
+    val moduleName: Doc = Doc.text(module.name)
+    val MainHeader = text("Public Class ") + moduleName + text(" extends java.lang.Object") / Doc.char('{')
 
-      val moduleName: Doc = Doc.text(module.name)
-      val MainHeader = text("Public Class ") + moduleName + text(" extends java.lang.Object") / Doc.char('{')
+    // Main initialization
+    val HasVoid = FindInString("TVoid,main,", methodsString)
 
-      // Main initialization
-      val HasVoid = FindInString("TVoid,main,", methodsString)
-
-      val MainTitle =
-        if (HasVoid) {
-            indentSize + text("public void <init>()") / indentSize + Doc.char('{') / doubleIndentSize +
-            moduleName + text(" r0;") + twoLines + doubleIndentSize + text("r0 := @this: ") + moduleName + text(";") +
-            twoLines + doubleIndentSize + text("specialinvoke r0.<java.lang.Object: void <init>()>();") +
-            twoLines + doubleIndentSize + text("return;") + indentSize
-        } else {
-            text("")
-        }
-
-      // Instantiate variables and consts
-      var VariablesAndConstants: Doc = Doc.text("")
-      var variablesAndConstant: Doc = Doc.text("")
-      for (elemento <- fields) {
-        val name : Doc = text(elemento.name)
-        val tipo : Doc = text(generateTypeString(elemento.fieldType))
-
-        if ((elemento.modifiers).toString() == "List(PublicModifer, StaticModifier, FinalModifier)") {
-            variablesAndConstant = text("Public static final ") + tipo + space + name
-            if (ConditionPrintClinit == (false)) {
-            ConditionPrintClinit = true
-            }
-        } else {
-            variablesAndConstant = text("Public ") + tipo + space + name
-        }
-
-        VariablesAndConstants = VariablesAndConstants + indentSize + variablesAndConstant + text(";") + Doc.line
+    val MainTitle =
+      if (HasVoid) {
+          indentSize + text("public void <init>()") / indentSize + Doc.char('{') / doubleIndentSize +
+          moduleName + text(" r0;") + twoLines + doubleIndentSize + text("r0 := @this: ") + moduleName + text(";") +
+          twoLines + doubleIndentSize + text("specialinvoke r0.<java.lang.Object: void <init>()>();") +
+          twoLines + doubleIndentSize + text("return;") + indentSize
+      } else {
+          text("")
       }
 
-      // Go through methods and find list of expressions
-      val ExpressionsListTuple = findExpressions(methodsString)
+    // Instantiate variables and consts
+    var VariablesAndConstants: Doc = Doc.text("")
+    var variablesAndConstant: Doc = Doc.text("")
+    for (elemento <- fields) {
+      val name : Doc = text(elemento.name)
+      val tipo : Doc = text(generateTypeString(elemento.fieldType))
 
-      // Method instantiation
-      var MainMethods: Doc = Doc.text("")
-
-      if (ConditionPrintClinit == true) {
-      MainMethods = MainMethods + twoLines + indentSize + text("public static void <clinit>()") / indentSize + Doc.char('{')
-
-      for(tuple <- ExpressionsListTuple) {
-        var ExpressionDoc = defineStaticExpressionToDoc(tuple)
-        if (ExpressionDoc == Doc.text("")) {
-
-        } else {
-        MainMethods = MainMethods / doubleIndentSize + text("<") + moduleName + text(": ") + ExpressionDoc + Doc.line
-        }
+      if ((elemento.modifiers).toString() == "List(PublicModifer, StaticModifier, FinalModifier)") {
+          variablesAndConstant = text("Public static final ") + tipo + space + name
+          if (ConditionPrintClinit == (false)) {
+          ConditionPrintClinit = true
+          }
+      } else {
+          variablesAndConstant = text("Public ") + tipo + space + name
       }
 
-      MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
-      }
-
-      val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}')
-      jimpleCode.render(1000)
+      VariablesAndConstants = VariablesAndConstants + indentSize + variablesAndConstant + text(";") + Doc.line
     }
+
+    // Go through methods and find list of expressions
+    val ExpressionsListTuple = findExpressions(methodsString)
+
+    // Method instantiation
+    var MainMethods: Doc = Doc.text("")
+
+    if (ConditionPrintClinit == true) {
+    MainMethods = MainMethods + twoLines + indentSize + text("public static void <clinit>()") / indentSize + Doc.char('{')
+
+    for(tuple <- ExpressionsListTuple) {
+      var ExpressionDoc = defineStaticExpressionToDoc(tuple)
+      if (ExpressionDoc == Doc.text("")) {
+
+      } else {
+      MainMethods = MainMethods / doubleIndentSize + text("<") + moduleName + text(": ") + ExpressionDoc + Doc.line
+      }
+    }
+
+    MainMethods = MainMethods + Doc.line + doubleIndentSize + text("return;") / indentSize + Doc.char('}')
+    }
+
+    val jimpleCode = MainHeader / VariablesAndConstants / MainTitle / indentSize + Doc.char('}') + MainMethods / Doc.char('}')
+    jimpleCode.render(1000)
+  }
 
   //Funções auxiliares para o Pretty Print
 
