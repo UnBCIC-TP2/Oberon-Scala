@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
 
   test("Test expression type on simple values") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val bTrue = BoolValue(true)
     val bFalse = BoolValue(false)
@@ -18,7 +18,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression type on add expressions") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val add01 = AddExpression(val10, val20)
@@ -31,7 +31,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression type on sub expressions") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val sub01 = SubExpression(val10, val20)
@@ -44,7 +44,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression type on div expressions") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val sub01 = DivExpression(val10, val20)
@@ -57,7 +57,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression type on mult expressions") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val mult01 = AddExpression(val10, val20)
@@ -70,7 +70,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression type on eq expressions") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val val20 = IntValue(20)
     val eq01 = EQExpression(val10, val20)
@@ -79,7 +79,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
   }
 
   test("Test expression add with boolean values") {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val visitor = new ExpressionTypeChecker(new TypeChecker(new Environment[Type]()))
     val val10 = IntValue(10)
     val valTrue = BoolValue(true)
     val invalidAdd = AddExpression(val10, valTrue)

@@ -126,13 +126,13 @@ object Main extends App with Oberon2ScalaParser {
     // Dessa forma, os val visitor e errors passam a ser o mesmo.
     val env = new Environment[Type]()
     val visitor = new TypeChecker(env)
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(env).value.written
     
     if (errors.isEmpty) {
       println("The code is correctly typed")
     } else {
       println("Type errors detected:")
-      errors.filter(v => (v._2 != "None")).foreach(v => println(v))
+      errors.filter(v => (v != "None")).foreach(v => println(v))
     }
   }
 }

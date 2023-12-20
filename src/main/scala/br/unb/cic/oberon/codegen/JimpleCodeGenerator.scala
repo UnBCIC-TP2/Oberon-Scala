@@ -19,6 +19,7 @@ import br.unb.cic.oberon.ir.ast.{
 }
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.ListBuffer
 
