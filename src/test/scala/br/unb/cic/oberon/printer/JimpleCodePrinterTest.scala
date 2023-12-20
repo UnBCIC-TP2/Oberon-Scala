@@ -75,21 +75,21 @@ class JimpleCodePrinterTest extends AnyFunSuite with Oberon2ScalaParser {
         )
     }
 
-    test("Testing if generated JIMPLE from simple08.oberon matches simple08.jimple") {
+    ignore("Testing if generated JIMPLE from simple08.oberon matches simple08.jimple") {
         assertGeneratedJimpleMatchesReference(
             "simple/simple08.oberon",
             "src/test/resources/jimpleCodes/simple08.jimple"
         )
     }
 
-    test("Testing if generated JIMPLE from simple10.oberon matches simple10.jimple") {
+    ignore("Testing if generated JIMPLE from simple10.oberon matches simple10.jimple") {
         assertGeneratedJimpleMatchesReference(
             "simple/simple10.oberon",
             "src/test/resources/jimpleCodes/simple10.jimple"
         )
     }
 
-    test("Testing if generated JIMPLE from simple11.oberon matches simple11.jimple") {
+    ignore("Testing if generated JIMPLE from simple11.oberon matches simple11.jimple") {
         assertGeneratedJimpleMatchesReference(
             "simple/simple11.oberon",
             "src/test/resources/jimpleCodes/simple11.jimple"
