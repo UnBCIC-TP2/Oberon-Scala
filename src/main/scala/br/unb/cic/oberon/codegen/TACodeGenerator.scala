@@ -9,7 +9,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   private var tc = new TypeChecker()
   private var expVisitor = new ExpressionTypeChecker(tc)
 
-  private val typeByteSize: Map[Type, Int] =
+  val typeByteSize: Map[Type, Int] =
     Map(IntegerType -> 4,
       RealType -> 4
     )
