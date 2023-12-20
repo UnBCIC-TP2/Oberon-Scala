@@ -1,7 +1,8 @@
 package br.unb.cic.oberon.printer
 
+import br.unb.cic.oberon.codegen.TACodeGenerator
 import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SLTUOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SLTUOp, SubOp, ArraySet, ArrayGet, NOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc.{ line, text }
 
@@ -58,6 +59,9 @@ object TACodePrinter {
       case CopyOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
       case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
       case SLTUOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLTU ${handleAddress(s1)} ${handleAddress(s2)}")
+      case ArraySet(s1, offset, listDest, label) => tac / text(s"${handleAddress(listDest)}[${handleArrayOffset(offset, listDest)}] = ${handleAddress(s1)}")
+      case ArrayGet(list, offset, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(list)}[${handleAddress(offset)}]")
+      case NOp(label) => tac / text(label)
       case _ => tac / text("Not implemented in printer")
     }
   }
@@ -91,6 +95,24 @@ object TACodePrinter {
       case "" => ifStatement + singleTab + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
       case _ => s"$label:" + jumpLine + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
     }
+  }
+
+  /**
+   * @param offset to be handled
+   * @param array being assigned
+   */
+  private def handleArrayOffset(offset: Address, array: Address): String = {
+    val offset1 = offset match {
+      case Constant(value, t) => value
+      case _ => throw new IllegalArgumentException(s"Unexpected Address type: $offset")
+    }
+
+    val arrayType = array match {
+      case Name(_, ArrayType(_, baseType)) => baseType
+    }
+
+    val index = offset1.toInt / (TACodeGenerator.typeByteSize.getOrElse(arrayType, 0))
+    s"$index"
   }
 
   /**
