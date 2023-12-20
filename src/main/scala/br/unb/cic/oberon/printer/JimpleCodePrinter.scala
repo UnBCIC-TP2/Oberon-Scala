@@ -1,24 +1,37 @@
 package br.unb.cic.oberon.printer
 
-// import org.typelevel.paiges.Doc
-// import org.typelevel.paiges.Doc.{ line, text }
-
 import br.unb.cic.oberon.codegen.JimpleCodeGenerator
-// import br.unb.cic.oberon.ir.ast.OberonModule
 
-import br.unb.cic.oberon.ir.ast.{AddExpression => OberonAddExpression, AndExpression => OberonAndExpression, BoolValue => OberonBoolValue, CharValue => OberonCharValue, DivExpression => OberonDivExpression, IntValue => OberonIntValue, ModExpression => OberonModExpression, MultExpression => OberonMultExpression, NotExpression => OberonNotExpression, NullValue => OberonNullValue, OrExpression => OberonOrExpression, RealValue => OberonRealValue, StringValue => OberonStringValue, SubExpression => OberonSubExpression, _}
-import br.unb.cic.oberon.ir.jimple
+import br.unb.cic.oberon.ir.ast.{
+  AddExpression => OberonAddExpression,
+  AndExpression => OberonAndExpression,
+  BoolValue => OberonBoolValue,
+  CharValue => OberonCharValue,
+  DivExpression => OberonDivExpression,
+  IntValue => OberonIntValue,
+  ModExpression => OberonModExpression,
+  MultExpression => OberonMultExpression,
+  NotExpression => OberonNotExpression,
+  NullValue => OberonNullValue,
+  OrExpression => OberonOrExpression,
+  RealValue => OberonRealValue,
+  StringValue => OberonStringValue,
+  SubExpression => OberonSubExpression,
+  _
+}
 import br.unb.cic.oberon.ir.jimple._
-import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.tc.{
+  ExpressionTypeChecker,
+  TypeChecker
+  }
 import br.unb.cic.oberon.transformations.CoreChecker
 
+import scala.collection.mutable.ListBuffer
 import scala.util.matching.Regex
 
-import scala.collection.mutable.ListBuffer
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc._
 
-// TODO: Convert this into an object (isolate functionality into a function)
 class JimpleCodePrinter(module: OberonModule) {
 
     private val indentSize: Doc = Doc.spaces(4)
