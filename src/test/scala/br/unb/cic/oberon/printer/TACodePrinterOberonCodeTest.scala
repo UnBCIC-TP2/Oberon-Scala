@@ -314,4 +314,81 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite {
     assertResult(expectedOutput)(tacDocumentToPrint)
   }
 
+  test("Print 'ArrayAssignment' statement") {
+    // Given
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val stmt = AssignmentStmt(
+      ArrayAssignment(VarExpression("lista"), IntValue(1)),
+      IntValue(2)
+    )
+    val list = TACodeGenerator.generateStatement(stmt, List())
+
+    // Expected
+    val expectedOutput = bl + "lista[1] = 2"
+
+    // Then
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
+    assertResult(expectedOutput)(tacDocumentToPrint)
+  }
+
+  test("Print 'ArraySubscript' expression") {
+    // Given
+    TACodeGenerator.reset
+    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
+    TACodeGenerator.load_vars(list_var)
+
+    val expr = ArraySubscript(VarExpression("lista"), IntValue(1))
+    val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    // Expected
+    val expectedOutput = bl + "t0 = lista[1]"
+
+    // Then
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(list)
+    assertResult(expectedOutput)(tacDocumentToPrint)
+  }
+
+  test("Print 'Loop' with array operations") {
+    // Given
+    TACodeGenerator.reset
+    val t0 = new Temporary(IntegerType, 0)
+    val t1 = new Temporary(IntegerType, 1)
+    val t2 = new Temporary(IntegerType, 2)
+    val t3 = new Temporary(IntegerType, 3)
+    val l1 = LabelGenerator.generateLabel
+    val l2 = LabelGenerator.generateLabel
+    var ops = List(
+        Jump(l1, ""),
+        NOp(l2),
+        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("1", IntegerType), t0, ""),
+        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("2", IntegerType), t1, ""),
+        AddOp(t0, t1, t2, ""),
+        ArraySet(t2, Constant("4", IntegerType), Name("lista", ArrayType(4, IntegerType)), ""),
+        NOp(l1),
+        ArrayGet(Name("lista", ArrayType(4, IntegerType)), Constant("1", IntegerType), t3, ""),
+        LTEJump(t3, Constant("10", IntegerType), l2, "")
+    )
+
+    val firstOp = s"jump $l1"
+    val secondOp = s"$l2"
+    val thirdOp = "t0 = lista[1]"
+    val fourthOp = "t1 = lista[2]"
+    val fifthOp = "t2 = t0 + t1"
+    val sixthOp = "lista[1] = t2"
+    val seventhOp = s"$l1"
+    val eighthOp = "t3 = lista[1]"
+    val ninthOp = s"if t3 <=> 10 jump $l2"
+    
+    // Expected
+    val expectedOutput = bl + firstOp + bl + secondOp + bl + thirdOp + bl + fourthOp + bl + fifthOp +
+                         bl + sixthOp + bl + seventhOp + bl + eighthOp + bl + ninthOp
+
+    // Then
+    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(ops)
+    assertResult(expectedOutput)(tacDocumentToPrint)
+  }
+
 }
