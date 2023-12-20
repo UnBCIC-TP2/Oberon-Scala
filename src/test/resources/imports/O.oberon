@@ -1,0 +1,10 @@
+MODULE O;
+
+IMPORT A, N;
+
+BEGIN
+    A::x := 3;
+    N::y := 4
+END
+
+END O.

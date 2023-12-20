@@ -1,0 +1,8 @@
+MODULE K;
+
+IMPORT J;
+
+VAR
+    x : INTEGER;
+
+END K.

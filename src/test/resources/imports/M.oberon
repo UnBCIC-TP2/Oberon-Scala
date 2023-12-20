@@ -1,0 +1,9 @@
+MODULE M;
+
+IMPORT B, L;
+
+BEGIN
+    write(B::A::x)
+END
+
+END M.

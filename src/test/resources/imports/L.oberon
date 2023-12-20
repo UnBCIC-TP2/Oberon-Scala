@@ -1,10 +1,9 @@
-MODULE B;
+MODULE L;
 
 IMPORT A;
 
 BEGIN
-    A::x := 2;
     write(A::x)
 END
 
-END B.
+END L.

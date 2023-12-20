@@ -7,6 +7,8 @@ import br.unb.cic.oberon.codegen.{
 }
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+import br.unb.cic.oberon.parser.ScalaParser
+import br.unb.cic.oberon.parser.ModuleLoader
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
@@ -37,6 +39,12 @@ object Main extends App with Oberon2ScalaParser {
         descr = "Path of the input file",
         argName = "path",
         required = true
+      )
+      val isVerbose = opt[Boolean](
+        name = "verbose",
+        descr = "Dump the environment in end of execution.",
+        argName = "verbose",
+        required = false
       )
       validatePathExists(inputPath)
     }
@@ -106,11 +114,15 @@ object Main extends App with Oberon2ScalaParser {
   }
 
   private def interpret() = {
-    val content = Files.readString(conf.interpreter.inputPath.get.get)
-    val module = parseAbs(parse(oberonParser,content))
+    val filepath = conf.interpreter.inputPath.get.get.toString
+    val module = ModuleLoader.loadAndMerge(filepath)
+    val isVerbose = (conf.interpreter.isVerbose.get.get)
 
     val interpreter = new Interpreter()
     val result = interpreter.runInterpreter(module)
+
+    if (isVerbose)
+        result.dumpAttributes()
   }
 
   private def typeCheck() = {
