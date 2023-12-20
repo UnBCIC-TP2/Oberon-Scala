@@ -22,7 +22,7 @@ int main() {
             ans = ans + x;
         }
         if (x == y) {
-            break; 
+            break;
         }
     }
 }

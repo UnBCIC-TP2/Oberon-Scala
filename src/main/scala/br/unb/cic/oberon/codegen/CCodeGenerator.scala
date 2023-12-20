@@ -40,6 +40,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         ) + Doc.char('}')
       case None => text("int main() {}")
     }
+
     val CCode =
       mainHeader + userDefinedTypes / globalVars / mainDefines + mainProcedures / mainBody
     CCode.render(60)
@@ -256,7 +257,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         }
 
       case ExitStmt() =>
-        textln(indent, "break; ")
+        textln(indent, "break;")
 
       case _ => empty
     }

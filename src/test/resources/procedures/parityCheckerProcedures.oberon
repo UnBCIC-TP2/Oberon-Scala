@@ -1,0 +1,22 @@
+MODULE Parity;
+
+VAR
+  res, oddness : INTEGER;
+
+PROCEDURE parity(number: INTEGER) : INTEGER;
+ BEGIN
+   oddness := number MOD 2;
+   IF (oddness = 1)
+   THEN
+     RETURN 1
+   ELSE
+     RETURN 0
+   END
+ END parity
+
+BEGIN
+ res := parity(5);
+ write(res)
+END
+
+END Parity.

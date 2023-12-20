@@ -25,7 +25,7 @@ int main() {
         ans[i] = aux;
         i = i + 1;
         if (i == 3) {
-            break; 
+            break;
         }
     }
 }

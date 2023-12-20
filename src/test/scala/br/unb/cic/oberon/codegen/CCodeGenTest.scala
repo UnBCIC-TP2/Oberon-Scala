@@ -257,4 +257,20 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee3205_NastyHacks_v_alt.oberon")
   }
 
+  test("C generator for Parity Check with Procedures"){
+    testGenerator("procedures/parityCheckerProcedures.oberon")
+  }
+
+  test("C generator for Parity Check"){
+    testGenerator("simple/parityCheckerSimple.oberon")
+  }
+
+  test("C generator for Progression"){
+    testGenerator("stmts/progression.oberon")
+  }
+
+  test("C generator for Countdown"){
+    testGenerator("stmts/countdown.oberon")
+  }
+
 }

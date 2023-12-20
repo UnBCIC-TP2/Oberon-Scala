@@ -1,0 +1,12 @@
+MODULE countdown;
+
+VAR
+ counter : INTEGER;
+
+BEGIN
+ counter := 10;
+ REPEAT counter := counter - 1 UNTIL counter >= 0;
+ write(counter)
+END
+
+END countdown.

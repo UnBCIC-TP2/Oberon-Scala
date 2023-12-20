@@ -17,7 +17,7 @@ int main() {
         answer = answer + a[i];
         i = i + 1;
         if (i == 3) {
-            break; 
+            break;
         }
     }
     answer = answer % 24;
