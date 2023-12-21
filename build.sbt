@@ -40,10 +40,6 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % 
 
 libraryDependencies += "org.jline" % "jline" % "3.21.0"
 
-libraryDependencies ++= Seq(
-  "com.chuusai" %% "shapeless" % "2.3.3"
-)
-
 Compile / unmanagedResourceDirectories += baseDirectory.value / "target/scala-2.13/src_managed/main/antlr4/"
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
