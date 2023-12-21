@@ -14,39 +14,6 @@ import shapeless.Generic
 import shapeless.everywhere
 import shapeless.Poly1
 
-
-// sealed trait Subunit 
-// case class Company(depts : List[Dept])
-//  case class Employee(person : Person, salary : Salary) extends Subunit
-//  case class Dept(name : String, manager : Employee, subunits : List[Subunit]) extends Subunit
-//   case class Person(name : String, address : String)
-//   case class Salary(salary : Int)
-
-sealed trait Subunit
-sealed trait ShapelessExpression extends Subunit
-class ShapelessOberonModule(consts: List[ShapelessConstant]){
-  override def toString: String = s"Modulo = {Consts: {$consts}}"
-}
-class ShapelessConstant(name: String, exp: ShapelessExpression) extends Subunit{
-  override def toString: String = s"Const: $name, $exp"
-}
-class ShapelessLambdaExpression(args: List[FormalArg], exp: Expression) extends ShapelessExpression{
-  override def toString: String = s"Lambda: $args, $exp"
-  def getArgs: List[FormalArg]= args
-  def getExp: Expression = exp
-}
-class ShapelessProcedure(
-  name: String,
-    args: List[FormalArg],
-    returnType: Option[Type],
-    constants: List[Constant],
-    variables: List[VariableDeclaration],
-    stmt: Statement
-) extends ShapelessExpression{
-  override def toString: String = s"Procedure: $name, $stmt" 
-}
-
-
 object CoreTransformer {
 
   def reduceToCoreStatement(
@@ -332,128 +299,31 @@ object CoreTransformer {
 
     def reduceLambdaToProcedure(module: OberonModule): OberonModule = {
         
-        println(module)
-        // object module2 = {
-        //   constants = module.constants,
-        //   variables = module.variables,
-        //   procedures = module.procedure,
-        //   stmt = module.stmt
-        // }
-        
-        // class ShapelessVariables(variables: List[VariableDeclaration]) extends Subunit
-        // class ShapelessProcedures(procedures: List[Procedure]) extends Subunit
-
-        // val consts: List[ShapelessConstant] = module.constants.map(c => new ShapelessConstant(c.name, ShapelessLambdaExpression(c.exp.args, c.exp.exp)))
-        // val lambda1: ShapelessLambdaExpression = new ShapelessLambdaExpression(List(ParameterByValue("a", IntegerType)), AddExpression(VarExpression("a"), IntValue(10)))
-        // val lambda2: ShapelessLambdaExpression = new ShapelessLambdaExpression(List(ParameterByValue("a", IntegerType),ParameterByValue("b", IntegerType)), AddExpression(VarExpression("a"), VarExpression("b")))
-        // val const1: ShapelessConstant = new ShapelessConstant("x", lambda1)
-        // val const2: ShapelessConstant = new ShapelessConstant("y", lambda2)
-        // val consts: List[ShapelessConstant] =  List(const1, const2)
-        
-        // val consts: Lists[ShapelessConstant] = List(ShapelessConstant("x", ShapelessLambdaExpression(List(ParameterByValue("a", IntegerType)), AddExpression(VarExpression("a"), IntValue(10)))),
-        //                                             ShapelessConstant("x", ShapelessLambdaExpression(List(ParameterByValue("a", IntegerType),ParameterByValue("b", IntegerType)), AddExpression(VarExpression("a"), VarExpression("b")))))
-        // val sModule: ShapelessOberonModule = new ShapelessOberonModule(consts) 
-        // println(sModule)
-
-        // object exePoly extends Poly1{
-        //   implicit def caseConst: Case.Aux[ShapelessConstant, ShapelessConstant] = 
-        //     at[ShapelessConstant]{(const: ShapelessConstant) => ShapelessConstant("y", new ShapelessLambdaExpression(List(), IntValue(10)))}
-        //   implicit def caseLambda: Case.Aux[ShapelessLambdaExpression, ShapelessExpression] =
-        //    at[ShapelessLambdaExpression]{lambda => 
-        //     // new ShapelessProcedure(
-        //     //   name = "lambda",
-        //     //   args = lambda.getArgs,
-        //     //   returnType = None,
-        //     //   constants = List(),
-        //     //   variables = List(),
-        //     //   stmt = ReturnStmt(lambda.getExp) 
-        //     // )
-        //    new ShapelessLambdaExpression(List(), VarExpression("x"))
-        //   }
-        // }
-        
-
-        // val newSModule = everywhere(exePoly)(sModule)
-        // println(newSModule)
-        // object transformLambdaToProcedure extends Poly1 {
-        //   implicit def caseLambda = at[Expression](exp: Expression => 
-        //     exp match{
-        //       case LambdaExpression(lis_args, expression) => 
-        //         Procedure(
-        //           name = "lambda",
-        //           args = lis_args,
-        //           returnType = None,
-        //           constants = List(),
-        //           variables = List(),
-        //           stmt = ReturnStmt(expression)
-        //         )
-        //       case _ => exp
-        //     }
-        //   ) 
-            
-        // } 
-        val module1 = 
-        new ShapelessOberonModule(
-          List(
-            new ShapelessConstant("x",
-              new ShapelessLambdaExpression(
-                List(
-                  new ParameterByValue("a", IntegerType)
-                  ),
-                  new AddExpression(VarExpression("a"), IntValue(10)
+        object transformLambdaToProcedure extends Poly1 {
+          implicit def caseLambda = at[Expression](exp: Expression => 
+            exp match{
+              case LambdaExpression(lis_args, expression) => 
+                Procedure(
+                  name = "lambda",
+                  args = lis_args,
+                  returnType = None,
+                  constants = List(),
+                  variables = List(),
+                  stmt = ReturnStmt(expression)
                 )
-              )
-            ),
-            new ShapelessConstant("y",
-              new ShapelessLambdaExpression(
-                List(
-                  new ParameterByValue("a", IntegerType),
-                  new ParameterByValue("b", IntegerType)
-                ),
-                new AddExpression(VarExpression("a"), VarExpression("b"))
-              )
-            )
-          )
-        )
+              case _ => exp
+            }
+          )     
+        } 
+        
+      
+        val gen = Generic[OberonModule]
 
-      object transform extends Poly1{
-        implicit def case1 = at[ShapelessConstant]((const: ShapelessConstant) => new ShapelessConstant("a", new ShapelessLambdaExpression(List(), VarExpression("a"))))
-      }
-      val afterTransform = everywhere(transform)(module1)
-      println(afterTransform)
-      //   val beforeRaise =
-      // Company(
-      //   List(
-      //     Dept("Research",
-      //       Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
-      //       List(
-      //         Employee(Person("Joost", "Amsterdam"), Salary(1000)),
-      //         Employee(Person("Marlow", "Cambridge"), Salary(2000))
-      //       )
-      //     ),
-      //     Dept("Strategy",
-      //       Employee(Person("Blair", "London"), Salary(100000)),
-      //       List()
-      //     )
-      //   )
-      // )
+        val replaced = everywhere(transformLambdaToProcedure)(gen.to(module))
 
-      //  object raise extends Poly1 {
-      //   implicit def int = at[Person]((p: Person) => Person("vovo", "br"))
-      //   }
-      //  val afterRaise = everywhere(raise)(beforeRaise)
-      //   println(afterRaise)
-
-        // val gen = Generic[OberonModule]
-
-        // val replaced = everywhere(transformLambdaToProcedure)(gen.to(module))
-
-        // val replaced = everywhere(transformLambdaToProcedure)(module)
-
-        // return gen.from(replaced)
-        // println(replaced)
-        // return gen.from(replaced)
-        return module
+        
+        return gen.from(replaced)
+        
     }
 
 

@@ -346,4 +346,3 @@ object ValueConversion {
     charValue.value.toInt
   )
 }
-
