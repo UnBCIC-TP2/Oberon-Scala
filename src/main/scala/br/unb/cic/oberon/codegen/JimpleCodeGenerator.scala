@@ -45,7 +45,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
       Field(
         modifiers = List(PublicModifer, StaticModifier, FinalModifier),
         // Mudado o argumento passado para jimpleType
-        fieldType = jimpleType(visitor.checkExp(constant.exp), module),
+        fieldType = jimpleType(visitor.checkExpression(constant.exp), module),
         name = constant.name
       )
     )
