@@ -50,7 +50,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
       case HasEq(type1, type2) :: tail =>
         newAcc = (type1, type2) match {
           case (Some(t1), Some(t2)) if(t1 == t2) =>
-            if(Eqs.contains(t1)) Some(t1)
+            if(Eqs.contains(t1)) Some(BooleanType)
             else None
           case (_, _)                           => None
         }
