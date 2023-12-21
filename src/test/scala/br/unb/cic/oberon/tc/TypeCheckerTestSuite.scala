@@ -26,8 +26,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
     visitor.env = visitor.env.setGlobalVariable("y", IntegerType)
 
-    assert(visitor.checkStmt(read01) == List())
-    assert(visitor.checkStmt(read02).isEmpty)
+    assert(visitor.checkStmt(read01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(read02).runA(visitor.env).value.written.isEmpty)
   }
 
   test("Test read real statement type checker") {
@@ -36,8 +36,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val read02 = ReadRealStmt("y")
 
     visitor.env = visitor.env.setGlobalVariable("x", RealType)
-    assert(visitor.checkStmt(read01) == List())
-    assert(visitor.checkStmt(read02).size == 1)
+    assert(visitor.checkStmt(read01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(read02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test write statement type checker") {
@@ -45,8 +45,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val write01 = WriteStmt(IntValue(5))
     val write02 = WriteStmt(AddExpression(IntValue(5), BoolValue(false)))
 
-    assert(visitor.checkStmt(write01) == List())
-    assert(visitor.checkStmt(write02).size == 1)
+    assert(visitor.checkStmt(write01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(write02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test assignment statement type checker") {
@@ -58,9 +58,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       AddExpression(IntValue(5), BoolValue(false))
     ) 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test a sequence of statements type checker") {
@@ -77,15 +77,15 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
 
     val seq1 = SequenceStmt(List(stmt01, stmt04))
     val seq2 = SequenceStmt(List(stmt01, stmt05))
 
-    assert(visitor.checkStmt(seq1).size == 0)
-    assert(visitor.checkStmt(seq2).size == 1)
+    assert(visitor.checkStmt(seq1).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(seq2).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test if-else statement type checker (with invalid condition)") {
@@ -94,8 +94,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt02 = IfElseStmt(IntValue(10), stmt01, None)
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test if-else statement type checker (with invalid then-stmt)") {
@@ -103,8 +103,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
     val stmt02 = IfElseStmt(BoolValue(true), stmt01, None)
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
   }
 
   test(
@@ -115,9 +115,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt02 = AssignmentStmt("y", IntValue(10))
     val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
 
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 2)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 2)
   }
 
   test("Test if-else statement type checker") {
@@ -131,13 +131,13 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmt03 = IfElseStmt(BoolValue(true), stmt01, Some(stmt02))
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt03).size == 0)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 0)
   }
 
   test("Test if-else-if statment type checker (invalid condition 'if')") {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(20))
     val stmt02 = AssignmentStmt("z", IntValue(30))
 
@@ -152,13 +152,13 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(IntValue(34), stmt01, list1, None)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt04).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt04).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test else-if statment type checker (invalid condition 'else-if')") {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
@@ -172,15 +172,15 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt04).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt04).runA(visitor.env).value.written.size == 1)
   }
 
   test(
     "Test else-if statment type checker (invalid condition list 'else-if')"
   ) {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
@@ -198,13 +198,13 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt07).size == 2)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt07).runA(visitor.env).value.written.size == 2)
   }
 
   test("Test else-if statment type checker (invalid then-stmt 'else-if')") {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
 
@@ -217,13 +217,13 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt04).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt04).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test if-else-if statment type checker (invalid else-stmt)") {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
     val stmt03 = AssignmentStmt("w", IntValue(20))
@@ -238,16 +238,16 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt03).size == 1)
-    assert(visitor.checkStmt(stmt05).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt05).runA(visitor.env).value.written.size == 1)
   }
 
   test(
     "Test if-else-if statment type checker (invalid then-stmt, 'else-if' then-stmt, 'else-if' invalid condition and else-stmt)"
   ) {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(40))
     val stmt02 = AssignmentStmt("z", IntValue(100))
     val stmt03 = AssignmentStmt("w", IntValue(20))
@@ -261,14 +261,14 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, Some(stmt03))
     )
 
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 1)
-    assert(visitor.checkStmt(stmt07).size == 7)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt07).runA(visitor.env).value.written.size == 7)
   }
 
   test("Test if-else-if statment type checker") {
-    val visitor = new TypeChecker
+    val visitor = new TypeChecker(new Environment[Type]())
     val stmt01 = AssignmentStmt("x", IntValue(15))
     val stmt02 = AssignmentStmt("y", IntValue(5))
 
@@ -282,9 +282,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IfElseIfStmt(BoolValue(true), stmt01, list1, None)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt04).size == 0)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt04).runA(visitor.env).value.written.size == 0)
 
   }
 
@@ -295,8 +295,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(IntValue(10), stmt01)
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test while statement type checker (with invalid stmt)") {
@@ -304,8 +304,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt01 = AssignmentStmt("x", IntValue(10))
 
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test while statement type checker") {
@@ -315,8 +315,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
     val stmt02 = WhileStmt(BoolValue(true), stmt01)
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
   }
 
   test("Test for statement type checker (with invalid init)") {
@@ -329,9 +329,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test for statement type checker (with invalid condition)") {
@@ -345,9 +345,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, IntValue(10), stmt02)
     )
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test for statement type checker (with invalid stmt)") {
@@ -360,9 +360,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test for statement type checker") {
@@ -376,9 +376,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val stmt03 = CoreTransformer.reduceToCoreStatement(
       ForStmt(stmt01, BoolValue(true), stmt02)
     )
-    assert(visitor.checkStmt(stmt01).size == 0)
-    assert(visitor.checkStmt(stmt02).size == 0)
-    assert(visitor.checkStmt(stmt03).size == 0)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 0)
   }
 
   test(
@@ -416,10 +416,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 1)
   }
 
   test(
@@ -457,10 +457,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 1)
   }
 
   test(
@@ -498,10 +498,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 2)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 2)
   }
 
   test(
@@ -539,10 +539,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 2)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 2)
   }
 
   test(
@@ -580,10 +580,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 1)
   }
 
   ignore("Test switch-case statement type checker SimpleCase (Boolean cases)") {
@@ -613,9 +613,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written == List())
   }
 
   test(
@@ -647,9 +647,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 1)
   }
 
   test(
@@ -681,9 +681,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore).size == 2)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written.size == 2)
   }
 
   test("Test switch-case statement type checker RangeCase") {
@@ -719,10 +719,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(stmt02) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written == List())
   }
 
   test("Test switch-case statement type checker SimpleCase") {
@@ -752,9 +752,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val testModuleCore = CoreTransformer.reduceOberonModule(testModule)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(caseElse) == List())
-    assert(visitor.checkModule(testModuleCore) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(caseElse).runA(visitor.env).value.written == List())
+    assert(visitor.checkModule(testModuleCore).runA(visitor.env).value.written == List())
   }
 
   /*
@@ -781,8 +781,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(repeatStmt) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(repeatStmt).runA(visitor.env).value.written == List())
   }
 
   test("Test the type checker of a valid Repeat statement 2") {
@@ -795,8 +795,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(repeatStmt) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(repeatStmt).runA(visitor.env).value.written == List())
   }
 
   test("Test the type checker of a valid Repeat statement 3") {
@@ -807,8 +807,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       RepeatUntilStmt(BoolValue(true), stmt01)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
   }
 
   test("Test a invalid Repeat statement in the type checker") {
@@ -823,12 +823,12 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       RepeatUntilStmt(BoolValue(true), stmt05)
     )
 
-    assert(visitor.checkStmt(stmt01).size == 1)
-    assert(visitor.checkStmt(stmt02).size == 1)
-    assert(visitor.checkStmt(stmt03).size == 2)
-    assert(visitor.checkStmt(stmt04).size == 1)
-    assert(visitor.checkStmt(stmt05).size == 5)
-    assert(visitor.checkStmt(stmt06).size == 5)
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt03).runA(visitor.env).value.written.size == 2)
+    assert(visitor.checkStmt(stmt04).runA(visitor.env).value.written.size == 1)
+    assert(visitor.checkStmt(stmt05).runA(visitor.env).value.written.size == 5)
+    assert(visitor.checkStmt(stmt06).runA(visitor.env).value.written.size == 5)
   }
 
   test("Test the type checker of a valid Repeat statement 4") {
@@ -843,8 +843,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(visitor.checkStmt(stmt01) == List())
-    assert(visitor.checkStmt(repeatStmt) == List())
+    assert(visitor.checkStmt(stmt01).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(repeatStmt).runA(visitor.env).value.written == List())
 
   }
 
@@ -870,7 +870,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       List(stmt01, repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
     allStmts.foreach(stmt => {
-      assert(visitor.checkStmt(stmt).size == 0)
+      assert(visitor.checkStmt(stmt).runA(visitor.env).value.written.size == 0)
     })
   }
 
@@ -894,7 +894,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val allStmts = List(repeatStmt01, repeatStmt02, repeatStmt03, repeatStmt04)
 
     allStmts.foreach(stmt => {
-      assert(visitor.checkStmt(stmt).size == 1)
+      assert(visitor.checkStmt(stmt).runA(visitor.env).value.written.size == 1)
     })
   }
 
@@ -908,7 +908,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("flag", BooleanType)
 
-    assert(visitor.checkStmt(repeatStmt).size == 0)
+    assert(visitor.checkStmt(repeatStmt).runA(visitor.env).value.written.size == 0)
 
   }
 
@@ -923,7 +923,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
 
-    assert(visitor.checkStmt(stmt02).size == 0)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 0)
   }
 
   test("Test a invalid Repeat statement, with a sequence of statements") {
@@ -935,7 +935,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     )
     val stmt02 = SequenceStmt(List(stmt01, repeatStmt, stmt01, repeatStmt))
 
-    assert(visitor.checkStmt(stmt02).size == 4)
+    assert(visitor.checkStmt(stmt02).runA(visitor.env).value.written.size == 4)
   }
 
   test("Test a loop statement, from loop_stmt03") {
@@ -952,7 +952,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val visitor = new TypeChecker(new Environment[Type]())
 
-    val errors = visitor.checkModule(CoreTransformer.reduceOberonModule(module))
+    val errors = visitor.checkModule(CoreTransformer.reduceOberonModule(module)).runA(visitor.env).value.written
 
     assert(errors.size == 0)
   }
@@ -960,7 +960,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test assignment to pointer value") {
     val module = parseResource("stmts/tc_PointerAccessStmt.oberon")
     val visitor = new TypeChecker(new Environment[Type]())
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(errors.size == 0)
   }
@@ -968,7 +968,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test arithmetic operation with pointers") {
     val module = parseResource("stmts/tc_PointerOperation.oberon")
     val visitor = new TypeChecker(new Environment[Type]())
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(errors.size == 0)
   }
@@ -976,16 +976,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test incorrect assignment between pointer and simple type variable") {
     val module = parseResource("stmts/tc_PointerAssignmentWrong.oberon")
     val visitor = new TypeChecker(new Environment[Type]())
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(visitor.env).value.written
 
-    val erro1 = (
-      AssignmentStmt("x", VarExpression("p")),
-      "Assignment between different types: x, VarExpression(p)"
-    )
-    val erro2 = (
-      AssignmentStmt("p", VarExpression("x")),
-      "Assignment between different types: p, VarExpression(x)"
-    )
+    val erro1 = "Assignment between different types: x, VarExpression(p)"
+    val erro2 = "Assignment between different types: p, VarExpression(x)"
     assert(errors.size == 2)
     assert(errors == List(erro1, erro2))
 
@@ -995,15 +989,9 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/tc_PointerOperationWrong.oberon")
 
     val visitor = new TypeChecker(new Environment[Type]())
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(visitor.env).value.written
 
-    val erro1 = (
-      AssignmentStmt(
-        "p",
-        AddExpression(VarExpression("x"), VarExpression("y"))
-      ),
-      "Assignment between different types: p, AddExpression(VarExpression(x),VarExpression(y))"
-    )
+    val erro1 = "Assignment between different types: p, AddExpression(VarExpression(x),VarExpression(y))"
 
     assert(errors.size == 1)
     assert(errors == List(erro1))
@@ -1013,19 +1001,19 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/tc_PointerNull.oberon")
 
     val visitor = new TypeChecker(new Environment[Type]())
-    val errors = visitor.checkModule(module)
+    val errors = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(errors.size == 0)
   }
 
   test("Test array subscript") {
     val visitor = new TypeChecker(new Environment[Type]())
-    visitor.env =visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
-
+    visitor.env = visitor.env.setGlobalVariable("arr", ArrayType(1, IntegerType))
+    
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1036,7 +1024,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), IntValue(0)))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1047,7 +1035,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmt = WriteStmt(ArraySubscript(VarExpression("arr"), BoolValue(false)))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1063,7 +1051,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
         )
       )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.isEmpty)
   }
@@ -1079,7 +1067,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
         )
       )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.isEmpty)
   }
@@ -1100,7 +1088,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmt = WriteStmt(FunctionCallExpression("proc", Nil))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1132,7 +1120,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", List(IntValue(5), BoolValue(true)))
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1154,7 +1142,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", List(IntValue(5)))
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1179,7 +1167,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", Nil)
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1210,7 +1198,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", List(IntValue(5), IntValue(0)))
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1241,7 +1229,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", List(IntValue(0)))
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1272,7 +1260,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       FunctionCallExpression("proc", List(IntValue(5), VarExpression("404")))
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1315,7 +1303,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmts = SequenceStmt(List(stmt01, stmt02, stmt03, stmt04))
 
-    val typeCheckerErrors = visitor.checkStmt(stmts)
+    val typeCheckerErrors = visitor.checkStmt(stmts).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 0)
   }
@@ -1325,7 +1313,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1336,7 +1324,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env.setGlobalVariable("b", IntegerType)
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1347,7 +1335,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env.setGlobalVariable("b", PointerType(UndefinedType))
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1358,7 +1346,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     visitor.env.setGlobalVariable("b", PointerType(IntegerType))
     val stmt = new AssignmentStmt(PointerAssignment("b"), BoolValue(false))
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1372,7 +1360,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       CharValue('a')
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1386,7 +1374,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       CharValue('a')
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1399,7 +1387,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       CharValue('a')
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1413,7 +1401,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       CharValue('a')
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1427,7 +1415,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       CharValue('a')
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1444,7 +1432,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       StringValue("teste")
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1461,7 +1449,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IntValue(8)
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1480,7 +1468,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       RealValue(3.0)
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1505,7 +1493,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       RealValue(3.0)
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1530,7 +1518,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       IntValue(3)
     )
 
-    val typeCheckerErrors = visitor.checkStmt(stmt)
+    val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
   }
@@ -1563,8 +1551,8 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       ReferenceToUserDefinedType("MediaArray")
     )
 
-    assert(visitor.checkStmt(simpleAssignment) == List())
-    assert(visitor.checkStmt(arrayAssigment) == List())
+    assert(visitor.checkStmt(simpleAssignment).runA(visitor.env).value.written == List())
+    assert(visitor.checkStmt(arrayAssigment).runA(visitor.env).value.written == List())
   }
 
   test("Type checker for the new stmt") {
@@ -1576,7 +1564,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val visitor = new TypeChecker(new Environment[Type]())
 
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.isEmpty)
 
@@ -1590,7 +1578,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val visitor = new TypeChecker(new Environment[Type]())
 
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.isEmpty)
   }
@@ -1598,7 +1586,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test valid lambda expression assignment") {
     val visitor = new TypeChecker(new Environment[Type]())
     val module = parseResource("lambda/lambdaExpressionsTC01.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.isEmpty)
   }
@@ -1607,10 +1595,10 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val visitor = new TypeChecker(new Environment[Type]())
 
     val module = parseResource("lambda/lambdaExpressionsTC02.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.size == 1)
-    val msg = res(0)._2
+    val msg = res(0)
     assert(msg.contains("Assignment between different types"))
   }
 
@@ -1618,11 +1606,11 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val visitor = new TypeChecker(new Environment[Type]())
 
     val module = parseResource("lambda/lambdaExpressionsTC03.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
 
     assert(res.size == 1)
-    val msg = res(0)._2
+    val msg = res(0)
     assert(msg.contains("Assignment between different types"))
   }
 
@@ -1630,24 +1618,24 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val visitor = new TypeChecker(new Environment[Type]())
 
     val module = parseResource("lambda/lambdaExpressionsTC04.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
   
     assert(res.size == 1)
-    val msg = res(0)._2
+    val msg = res(0)
     assert(msg.contains("is ill typed"))
   }
 
   test("Test lambda expression assignment to a constant.") {
     val visitor = new TypeChecker(new Environment[Type]())
     val module = parseResource("lambda/lambdaExpressionsTC05.oberon")
-    assert(visitor.checkModule(module).isEmpty)
+    assert(visitor.checkModule(module).runA(visitor.env).value.written.isEmpty)
 
   }
 
   test("Test lambda expression assignment with wrong return type.") {
     val visitor = new TypeChecker(new Environment[Type]())
     val module = parseResource("lambda/lambdaExpressionsTC06.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
 
     assert(res.size == 1)
@@ -1656,7 +1644,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test assert true statement (true)") {
     val visitor = new TypeChecker(new Environment[Type]())
     val module = parseResource("stmts/AssertTrueStmt01.oberon")
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.size == 0)
   }
@@ -1667,7 +1655,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
-    assert(visitor.checkModule(coreModule).size == 0)
+    assert(visitor.checkModule(coreModule).runA(visitor.env).value.written.size == 0)
   }
 
   test("Test assert equal statement (wrong)") {
@@ -1675,7 +1663,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/AssertEqualStmt03.oberon")
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
-    val res = visitor.checkModule(coreModule)
+    val res = visitor.checkModule(coreModule).runA(visitor.env).value.written
 
     assert(res.size == 1)
   }
@@ -1688,7 +1676,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     assert(module.tests.size == 1)
     assert(module.stmt.isDefined)
 
-    val res = visitor.checkModule(module)
+    val res = visitor.checkModule(module).runA(visitor.env).value.written
 
     assert(res.size == 0)
   }
@@ -1698,7 +1686,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("procedures/procedureTest07.oberon")
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
-    val res = visitor.checkModule(coreModule)
+    val res = visitor.checkModule(coreModule).runA(visitor.env).value.written
     assert(res.size == 0)
   }
 
@@ -1707,7 +1695,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("procedures/procedureTest08.oberon")
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
-    val res = visitor.checkModule(coreModule)
+    val res = visitor.checkModule(coreModule).runA(visitor.env).value.written
     assert(res.size == 0)
   }
 
@@ -1716,7 +1704,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val module = parseResource("procedures/procedureTest09.oberon")
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
-    val res = visitor.checkModule(coreModule)
+    val res = visitor.checkModule(coreModule).runA(visitor.env).value.written
     assert(res.size == 0)
   }
 
