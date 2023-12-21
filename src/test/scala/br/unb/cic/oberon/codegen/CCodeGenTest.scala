@@ -314,5 +314,7 @@ class CCodeGenTest extends AnyFunSuite {
   test("pg new") {
     testGenerator("stmts/pgNew.oberon")
   }
-
+  test("bool neg") {
+    testGenerator("stmts/boolNeg.oberon")
+  }
 }
