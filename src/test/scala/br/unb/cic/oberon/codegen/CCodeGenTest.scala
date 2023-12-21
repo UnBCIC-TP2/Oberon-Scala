@@ -273,6 +273,24 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/countdown.oberon")
   }
 
+  test("Fuel") {
+    testGenerator("stmts/beecrowd1017.oberon")
+  }
+  test("avg") {
+    testGenerator("stmts/beecrowd1005.oberon")
+  }
+  test("salary") {
+    testGenerator("stmts/beecrowd1008.oberon")
+  }
+  test("years") {
+    testGenerator("stmts/beecrowd1020.oberon")
+  }
+  test("fuel Consumption") {
+    testGenerator("stmts/beecrowd1014.oberon")
+  }
+  test("salary bonus") {
+    testGenerator("stmts/beecrowd1010.oberon")
+  }
   ignore("C generator for ForSTMT"){
     testGenerator("stmts/forstmt.oberon")
   }
