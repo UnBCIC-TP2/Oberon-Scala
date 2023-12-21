@@ -308,5 +308,11 @@ class CCodeGenTest extends AnyFunSuite {
   test("C generator for Logic AND NOT") {
     testGenerator("stmts/LogicNot.oberon")
   }
+  test("pg normal") {
+    testGenerator("stmts/pgNormal.oberon")
+  }
+  test("pg new") {
+    testGenerator("stmts/pgNew.oberon")
+  }
 
 }
