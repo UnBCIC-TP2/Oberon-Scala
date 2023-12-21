@@ -321,8 +321,7 @@ object CoreTransformer {
         stmt = Some(stmtcore)
       )
     }
-    // TODO Alterar a função para lidar com expressões dentro de enxpressões
-    // TODO Ver artigo compartilhado pelo professor no teams
+
     def reduceExpressionToProcedure(exp: Expression): Expression = exp match {
         case LambdaExpression(lis_args, expression) => 
           Procedure(
@@ -352,7 +351,7 @@ object CoreTransformer {
         
         case LTEExpression(exp1, exp2) => LTEExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
         
-        case AddExpression(exp1, exp2) => AndExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        case AddExpression(exp1, exp2) => AddExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
         
         case SubExpression(exp1, exp2) => SubExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
         
@@ -366,7 +365,7 @@ object CoreTransformer {
         
         case ModExpression(exp1, exp2) => ModExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
         
-        case NotExpression(exp1, exp2) => NotExpression(reduceExpressionToProcedure(exp1), reduceExpressionToProcedure(exp2))
+        case NotExpression(exp1) => NotExpression(reduceExpressionToProcedure(exp1))
           
         case _ => exp
     }
