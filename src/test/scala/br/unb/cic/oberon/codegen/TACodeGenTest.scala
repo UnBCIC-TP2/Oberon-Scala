@@ -930,14 +930,11 @@ class TACodeTest extends AnyFunSuite {
     )
     val list = TACodeGenerator.generateStatement(stmt, List())
 
-
     TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0)
     val t1 = new Temporary(IntegerType, 1)
     val t2 = new Temporary(IntegerType, 2)
     val t3 = new Temporary(IntegerType, 3)
-    val (t, expr) = TACodeGenerator.generateExpression(MultExpression(IntValue(4), DivExpression(IntValue(6), IntValue(2))), List())
-    val offset = Constant(expr.toString, IntegerType)
 
     val ops = List(
         GetValue(Name("pointer", LocationType), t0, ""),
