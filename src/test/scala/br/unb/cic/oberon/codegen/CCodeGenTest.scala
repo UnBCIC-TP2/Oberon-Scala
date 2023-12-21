@@ -273,4 +273,8 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/countdown.oberon")
   }
 
+  ignore("C generator for ForSTMT"){
+    testGenerator("stmts/forstmt.oberon")
+  }
+
 }

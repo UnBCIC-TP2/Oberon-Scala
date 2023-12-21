@@ -238,6 +238,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
           textln(indent, "}")
       case ReturnStmt(exp) =>
         textln(indent, s"return ${genExp(exp)};")
+      case ForStmt(init, condition, stmt) =>
+        textln(indent, s"for ($init; ${genExp(condition)}; $stmt) {") +
+          generateStmt(stmt, indent + indentSize) +
+          textln(indent, "}")
 
       case AssignmentStmt(designator, exp) =>
         designator match {
