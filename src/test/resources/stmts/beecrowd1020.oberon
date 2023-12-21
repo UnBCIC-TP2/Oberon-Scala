@@ -1,0 +1,12 @@
+MODULE years;
+
+VAR
+ days, years : INTEGER;
+
+BEGIN
+ days := 800;
+ years := days / 365;
+ write(years)
+END
+
+END years.

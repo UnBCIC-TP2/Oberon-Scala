@@ -1,0 +1,13 @@
+MODULE years;
+
+VAR
+ distance, fuel, consumption : INTEGER;
+
+BEGIN
+ distance := 800;
+ fuel := 20;
+ consumption := distance / fuel;
+ write(consumption)
+END
+
+END years.

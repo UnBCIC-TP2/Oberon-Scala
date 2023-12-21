@@ -1,0 +1,15 @@
+MODULE salary;
+
+VAR
+ employee, hours, base, salary : INTEGER;
+
+BEGIN
+ employee := 80;
+ hours := 10;
+ base := 4;
+ salary := hours * base;
+ write(employee);
+ write(salary)
+END
+
+END salary.
