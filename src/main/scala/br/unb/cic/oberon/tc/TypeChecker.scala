@@ -89,7 +89,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
 }
 
 
-  def checkExp(exp: Expression): Option[Type] = {
+  def checkExpression(exp: Expression): Option[Type] = {
     val (lista, expt) = computeGeneralExpressionType(exp)
 
     if(lista.nonEmpty) {
@@ -100,7 +100,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
 
   def computeGeneralExpressionType(exp: Expression): (List[Constraint], ExpT)= exp match {
     case Brackets(e)         => 
-      val optype = checkExp(e)
+      val optype = checkExpression(e)
       (List(), ExpT(Brackets(e), optype))
     case IntValue(v)         => (List(), ExpT(IntValue(v), Some(IntegerType)))
     case RealValue(v)        => (List(), ExpT(RealValue(v), Some(RealType)))
@@ -113,13 +113,9 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
       val optype = typeChecker.env.lookup(name)
       (List(), ExpT(VarExpression(name), optype))
     case EQExpression(left, right) =>
-      val ty = computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
-      )
-      (List(), ExpT(EQExpression(left, right), ty))
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
+      (List(HasEq(t1, t2)), ExpT(EQExpression(left, right), None))
     case NEQExpression(left, right) =>
       val ty = computeBinExpressionType(
         left,
@@ -141,20 +137,20 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
       val ty = computeBinExpressionType(left, right, List(IntegerType), BooleanType)
       (List(), ExpT(LTEExpression(left, right), ty))
     case AddExpression(left, right) =>
-      val t1 = checkExp(left)
-      val t2 = checkExp(right)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
       (List(IsNum(t1, t2)), ExpT(AddExpression(left, right), None))
     case SubExpression(left, right) =>
-      val t1 = checkExp(left)
-      val t2 = checkExp(right)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
       (List(IsNum(t1, t2)), ExpT(AddExpression(left, right), None))
     case MultExpression(left, right) =>
-      val t1 = checkExp(left)
-      val t2 = checkExp(right)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
       (List(IsNum(t1, t2)), ExpT(AddExpression(left, right), None))
     case DivExpression(left, right) =>
-      val t1 = checkExp(left)
-      val t2 = checkExp(right)
+      val t1 = checkExpression(left)
+      val t2 = checkExpression(right)
       (List(IsNum(t1, t2)), ExpT(AddExpression(left, right), None))
     case AndExpression(left, right) =>
       val t1 = computeBinExpressionType(left, right, List(BooleanType), BooleanType)
@@ -170,7 +166,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
           return (List() , ExpT(FunctionCallExpression(name, args) ,None))
         }
 
-        val givenArgumentTypes = args.map(arg => checkExp(arg))
+        val givenArgumentTypes = args.map(arg => checkExpression(arg))
         val neededArgumentTypes = procedure.args.map(_.argumentType)
 
         val areArgTypesWrong = givenArgumentTypes
@@ -194,7 +190,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
     case ArrayValue(values, arrayType) =>
       if (
         values.isEmpty || values
-          .forall(v => checkExp(v) == arrayType.baseType)
+          .forall(v => checkExpression(v) == arrayType.baseType)
       ) {
         (List(), ExpT(ArrayValue(values, arrayType), Some(arrayType)))
       } else (List(), ExpT(ArrayValue(values, arrayType), None))
@@ -214,7 +210,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
   }
 
   def arrayElementAccessCheck(array: Expression, index: Expression): T = {
-    (checkExp(array), checkExp(index)) match {
+    (checkExpression(array), checkExpression(index)) match {
       case (Some(ArrayType(_, UndefinedType)), _) =>
         None
       case (Some(ArrayType(_, typeElements)), Some(IntegerType)) =>
@@ -224,7 +220,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
   }
 
   def fieldAccessCheck(exp: Expression, attributeName: String): T = {
-    checkExp(exp) match {
+    checkExpression(exp) match {
       case Some(ReferenceToUserDefinedType(userTypeName)) =>
         typeChecker.env.lookupUserDefinedType(userTypeName) match {
           case Some(UserDefinedType(_, RecordType(variables))) =>
@@ -253,7 +249,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
     typeChecker.env = typeChecker.env.push()
     args.foreach(a => typeChecker.env = typeChecker.env.setLocalVariable(a.name, a.argumentType))
     val argTypes = args.map(a => a.argumentType)
-    val expType = checkExp(exp)
+    val expType = checkExpression(exp)
     typeChecker.env = typeChecker.env.pop()
     expType match {
       case None => None
@@ -267,8 +263,8 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
       expected: List[Type],
       result: Type
   ): Option[Type] = {
-    val t1 = checkExp(left)
-    val t2 = checkExp(right)
+    val t1 = checkExpression(left)
+    val t2 = checkExpression(right)
     if (t1 == t2 && expected.contains(t1.getOrElse(None))) Some(result)
     else None
   }
@@ -281,7 +277,7 @@ class TypeChecker {
   val expVisitor = new ExpressionTypeChecker(this)
 
    def checkModule(module: OberonModule): List[(Statement, String)] = {
-    env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExp(c.exp).get))
+    env = module.constants.foldLeft(env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp).get))
     env = module.variables.foldLeft(env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType))
     env = module.procedures.foldLeft(env)((acc, p) => acc.declareProcedure(p))
     env = module.userTypes.foldLeft(env)((acc, t) => acc.addUserDefinedType(t))
@@ -295,7 +291,7 @@ class TypeChecker {
   def checkProcedure(procedure: Procedure): List[(Statement, String)] = {
     env = env.push()
     env = procedure.args.foldLeft(env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType))
-    env = procedure.constants.foldLeft(env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExp(c.exp).get))
+    env = procedure.constants.foldLeft(env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp).get))
     env = procedure.variables.foldLeft(env)((acc, v) => acc.setLocalVariable(v.name, v.variableType))
     val errors = checkStmt(procedure.stmt)
     env = env.pop()
@@ -311,7 +307,7 @@ class TypeChecker {
     case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
     case SequenceStmt(stmts)     => stmts.flatMap(s => checkStmt(s))
     case ReturnStmt(exp) =>
-      if (expVisitor.checkExp(exp).isDefined) List()
+      if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
     case ReadLongRealStmt(v) =>
       if (env.lookup(v).isDefined) List()
@@ -332,7 +328,7 @@ class TypeChecker {
       if (env.lookup(v).isDefined) List()
       else List((stmt, s"Variable $v not declared."))
     case WriteStmt(exp) =>
-      if (expVisitor.checkExp(exp).isDefined) List()
+      if (expVisitor.checkExpression(exp).isDefined) List()
       else List((stmt, s"Expression $exp is ill typed."))
     case AssertTrueStmt(exp) => visitAssertStmt(stmt)
     case NewStmt(varName) =>
@@ -355,7 +351,7 @@ class TypeChecker {
     val result = for {
       varType <- env.lookup(v)
       varBaseType <- env.baseType(varType)
-      expType <- expVisitor.checkExp(exp)
+      expType <- expVisitor.checkExpression(exp)
     } yield (varBaseType, expType)
     result match {
       case Some((PointerType(_), NullType)) => List()
@@ -370,7 +366,7 @@ class TypeChecker {
   private def checkPointerAssigment(v: String, exp: Expression): T = {
     val res = for {
       pointerType <- expVisitor.pointerAccessCheck(v)
-      expType <- expVisitor.checkExp(exp)
+      expType <- expVisitor.checkExpression(exp)
     } yield (pointerType, expType)
     res match {
       case Some((t1, t2)) if t1 == t2 => List()
@@ -381,9 +377,9 @@ class TypeChecker {
 
   private def checkArrayAssigment(arr: Expression, element: Expression, exp: Expression): T = {
     val res = for {
-      arrType <- expVisitor.checkExp(arr)
-      elementType <- expVisitor.checkExp(element)
-      expType <- expVisitor.checkExp(exp)
+      arrType <- expVisitor.checkExpression(arr)
+      elementType <- expVisitor.checkExpression(element)
+      expType <- expVisitor.checkExpression(exp)
     } yield (arrType, elementType, expType)
     res match {
       case Some((ArrayType(length, t1), IntegerType, t2)) if t1 == t2 => List()
@@ -396,7 +392,7 @@ class TypeChecker {
   private def checkRecordAssigment(record: Expression, field: String, exp: Expression): T = {
     val res = for {
       fieldAccessType <- expVisitor.fieldAccessCheck(record, field)
-      expType <- expVisitor.checkExp(exp)
+      expType <- expVisitor.checkExpression(exp)
     } yield (fieldAccessType, expType)
     res match {
       case Some((t1, t2)) if t1 == t2 => List()
@@ -410,7 +406,7 @@ class TypeChecker {
   private def visitIfElseStmt(stmt: Statement) = stmt match {
     case IfElseStmt(condition, thenStmt, elseStmt) =>
       var errorList = checkStmt(thenStmt)
-      if (!expVisitor.checkExp(condition).contains(BooleanType)) {
+      if (!expVisitor.checkExpression(condition).contains(BooleanType)) {
         errorList = (
           stmt,
           s"Expression $condition does not have a boolean type"
@@ -423,7 +419,7 @@ class TypeChecker {
     case WhileStmt(condition, stmt) =>
       val errorList = checkStmt(stmt)
 
-      if (expVisitor.checkExp(condition).contains(BooleanType)) {
+      if (expVisitor.checkExpression(condition).contains(BooleanType)) {
         errorList
       } else {
         (stmt, s"Expression $condition do not have a boolean type") :: errorList
@@ -431,7 +427,7 @@ class TypeChecker {
   }
 
   def visitForEachStmt(forEachStmt: ForEachStmt): List[(Statement, String)] = {
-    val expType = expVisitor.checkExp(forEachStmt.exp)
+    val expType = expVisitor.checkExpression(forEachStmt.exp)
     val varType = env.lookup(forEachStmt.varName)
 
     val res = if (expType.isDefined && expType.get.isInstanceOf[ArrayType]) {
@@ -450,7 +446,7 @@ class TypeChecker {
   private def visitAssertStmt(stmt: Statement) = stmt match {
     case AssertTrueStmt(condition) =>
       val errorList = List[(br.unb.cic.oberon.ir.ast.Statement, String)]()
-      if (expVisitor.checkExp(condition).contains(BooleanType)) {
+      if (expVisitor.checkExpression(condition).contains(BooleanType)) {
         errorList
       } else {
         (stmt, s"Expression $condition does not have a boolean type") :: errorList
@@ -480,7 +476,7 @@ class TypeChecker {
           // check if the type of the formal arguments and the actual arguments
           // match.
           val formalArgumentTypes = procedure.args.map(a => a.argumentType)
-          val actualArgumentTypes = args.map(a => expVisitor.checkExp(a).get)
+          val actualArgumentTypes = args.map(a => expVisitor.checkExpression(a).get)
           // the two lists must have the same size.
           if (formalArgumentTypes.size != actualArgumentTypes.size) {
             return List(
