@@ -281,7 +281,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         return (Constant("Null", NullType), insts)
 
       case VarExpression(name) => 
-        return (Name(name, expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get), insts)
+        return (Name(name, expVisitor.checkExpression(expr, tc.env).runA(tc.env).value.value.getOrElse(UndefinedType)), insts)
 
       case AddExpression(left, right) =>
         val (t, l, r, insts2) = generateBinaryExpression(
@@ -405,11 +405,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get)
+        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
         return (t, insts2 :+ ArrayGet(a, i, t, ""))
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get)
+        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(record, field) =>

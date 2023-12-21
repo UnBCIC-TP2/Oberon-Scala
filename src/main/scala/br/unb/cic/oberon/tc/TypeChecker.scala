@@ -89,11 +89,11 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
           return State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
         }
 
-        val givenArgumentTypes = args.map(arg => checkExpression(arg, env).get) //Type: List[Types]
+        val givenArgumentTypes = args.map(arg => checkExpression(arg, env).runA(env).value.value.getOrElse(UndefinedType)) //Type: List[Types]
         val neededArgumentTypes = procedure.args.map(_.argumentType)  //Type: List[Types]
 
         if(givenArgumentTypes == neededArgumentTypes) {
-          State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(procedure.returnType.getOrElse(NullType))))}
+          State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(procedure.returnType.getOrElse(UndefinedType))))}
         } else {
           State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
         }
@@ -102,8 +102,8 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
 
     // Verifica se todos os elementos da array são do tipo esperado.
     case ArrayValue(values, arrayType) =>
-      if (values.isEmpty || values.forall(v => checkExpression(v, env).get == arrayType.baseType)) 
-          {State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(arrayType)))}
+      if (values.isEmpty || values.forall(v => checkExpression(v, env).runA(env).value.value.getOrElse(None) == arrayType.baseType)) {
+        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(arrayType)))}
       } else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
     
      // Verifica um elemento especificado pelo index da array
@@ -122,12 +122,12 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
 
   def arrayElementAccessCheck(array: Expression, index: Expression, env: Environment[Type]): T = for{
     expressao1 <- checkExpression(array, env)
-    expressao2 <-  checkExpression(index, env)
+    expressao2 <- checkExpression(index, env)
   }yield(expressao1.mapBoth{(lista, tipo) => expressao2.mapBoth{ (lista2, tipo2) =>
     val lista3 = lista ++ lista2
-    if(tipo.get == ArrayType && tipo2.get == IntegerType){
-      // O tipo retornado precisa ser definido
-      (lista3, Some(UndefinedType))
+    if(tipo.getOrElse(None).isInstanceOf[ArrayType] && tipo2.getOrElse(None) == IntegerType){
+      // O tipo retornado precisa ser definido melhor
+      (List(), Some(IntegerType))
     }else{
      (lista3 ++ List("Error. "), None)
     }
@@ -138,7 +138,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
   def fieldAccessCheck(exp: Expression, attributeName: String, env: Environment[Type]): T = for
   {
     expressao1 <- checkExpression(exp, env)
-  }yield(expressao1.mapBoth{(lista, tipo) => tipo.get match{
+  }yield(expressao1.mapBoth{(lista, tipo) => tipo.getOrElse(None) match{
     case ReferenceToUserDefinedType(userTypeName) => env.lookupUserDefinedType(userTypeName) match{
       case Some(UserDefinedType(name, RecordType(variables))) => {
           (lista, variables
@@ -159,7 +159,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
   })
 
   def pointerAccessCheck(name: String, env: Environment[Type]): T = for{ 
-    ponteiro <- checkType(env.lookup(name).get)
+    ponteiro <- checkType(env.lookup(name).getOrElse(UndefinedType))
   }yield(ponteiro.value match{
     case Some(PointerType(varType)) => Writer(List(), Some(varType))
     case _ => Writer(List("Error. "), None)
@@ -175,7 +175,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
   env1 = env1.pop()
   for{
     tipo <- expType
-  }yield(tipo.value match{
+  }yield(tipo.value.getOrElse(None) match{
     case None => Writer(List("Error. "), None)
     case _ => Writer(List(), Some(LambdaType(argTypes, tipo.value.get)))
   })
@@ -192,7 +192,7 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
     t2 <- checkExpression(right, env)
     /* Verifica se os tipos são iguais
         Em seguida, é verificado se o tipo do primeiro elemento está na lista de tipos esperados*/
-  } yield(if (t1.value.getOrElse(None) == t2.value.getOrElse(None) && expected.contains(t1.value.getOrElse(NullType))) {
+  } yield(if (t1.value.getOrElse(None) == t2.value.getOrElse(None) && expected.contains(t1.value.getOrElse(UndefinedType))) {
           t1.mapBoth{(lista, tipo) => t2.mapBoth{(lista2, tipo2) => 
             val lista3 = lista ++ lista2
             (lista3, Some(result))
@@ -222,7 +222,7 @@ class TypeChecker (envPassado: Environment[Type]){
 
   // O checkModule deverá ser parte do construtor da classe
   def checkModule(module: OberonModule): /*List[(Statement, String)]*/ T = {
-    expVisitor.updateEnvironment(module.constants.foldLeft(expVisitor.env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp, expVisitor.env).runA(expVisitor.env).value.value.get )))
+    expVisitor.updateEnvironment(module.constants.foldLeft(expVisitor.env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(UndefinedType) )))
     env = expVisitor.env
     expVisitor.updateEnvironment(module.variables.foldLeft(expVisitor.env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType)))
     env = expVisitor.env
@@ -240,15 +240,19 @@ class TypeChecker (envPassado: Environment[Type]){
         (errors, tipo)
       })
     }else{
-      State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(errors, Some(NullType)))}
+      State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(errors, Some(UndefinedType)))}
     }
   }
 
   def checkProcedure(procedure: Procedure): /*List[(Statement, String)]*/ T = {
     expVisitor.updateEnvironment(expVisitor.env.push())
+    env = expVisitor.env
     expVisitor.updateEnvironment(procedure.args.foldLeft(expVisitor.env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType)))
+    env = expVisitor.env
     expVisitor.updateEnvironment(procedure.constants.foldLeft(expVisitor.env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp, env).runA(env).value.value.get)))
+    env = expVisitor.env
     expVisitor.updateEnvironment(procedure.variables.foldLeft(expVisitor.env)((acc, v) => acc.setLocalVariable(v.name, v.variableType)))
+    env = expVisitor.env
 
     val errors = checkStmt(procedure.stmt)
 
@@ -330,17 +334,20 @@ class TypeChecker (envPassado: Environment[Type]){
   }
 
   private def checkVarAssigment(v: String, exp: Expression): T = {
-      var varType = env.lookup(v).getOrElse(NullType)
+      var varType = env.lookup(v).getOrElse(UndefinedType)
       var varBaseType = env.baseType(varType)
       var expType = expVisitor.checkExpression(exp, env).runA(env).value.value
     (varBaseType.getOrElse(None), expType.getOrElse(None)) match {
       case (PointerType(_), NullType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
       case (IntegerType, BooleanType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
       case (BooleanType, IntegerType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
+
+      case (_, None) => if(! env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared"), None))} else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $exp is ill typed"), None))}
+
       case (t1, t2) if t1 == t2 => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
       case (t1, t2) if t1 != t2 => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Assignment between different types: $v, $exp"), None))}
 
-      case (None, None) => if(! env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared"), None))} else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $exp is ill typed"), None))}
+      case _ => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("It is ill typed"), None))}
     }
   }
 
@@ -351,7 +358,7 @@ class TypeChecker (envPassado: Environment[Type]){
     } yield (Some((pointerType.value, expType.value)) match {
       case Some((t1, t2)) => if (t1 == t2){Writer(List(), Some(NullType))}
         else{Writer(List(s"Expression $exp doesn't match variable type."), None)}
-      case Some((None, None)) => Writer(List(s"Could not compute the types correctly."), None)
+      case _ => Writer(List(s"Could not compute the types correctly."), None)
     })
   }
 
@@ -366,6 +373,7 @@ class TypeChecker (envPassado: Environment[Type]){
         else {Writer(List(s"Expression $exp doesn't match the array type."), None)}
       case (_, Some(t), _) => if (t != IntegerType) {Writer(List( s"The index expression must be an integer."), None)} else{Writer(List(s"Could not compute the types correctly."), None)}
       case (None, None, None) => Writer(List(s"Could not compute the types correctly."), None)
+      case _ => Writer(List(s"Could not compute the types correctly."), None)
     })
   }
 
@@ -376,7 +384,7 @@ class TypeChecker (envPassado: Environment[Type]){
     } yield ( (fieldAccessType.value, expType.value) match {
       case (Some(t1), Some(t2)) => if (t1 == t2) {Writer(List(), Some(NullType))}
         else Writer(List(s"Expression $exp doesn't match variable type."), None)
-      case (None, None) => Writer(List(s"Could not compute the types correctly."), None)
+      case _ => Writer(List(s"Could not compute the types correctly."), None)
     })
   }
 
@@ -416,10 +424,10 @@ class TypeChecker (envPassado: Environment[Type]){
     val expType = expVisitor.checkExpression(forEachStmt.exp, env)
     val varType = env.lookup(forEachStmt.varName)
 
-    val res = if (expType.runA(env).value.value.isDefined && expType.runA(env).value.value.get.isInstanceOf[ArrayType]) {
+    val res = if (expType.runA(env).value.value.isDefined && expType.runA(env).value.value.getOrElse(None).isInstanceOf[ArrayType]) {
       val arrayBaseType =
-        expVisitor.checkType(expType.get.asInstanceOf[ArrayType].baseType)
-      if (arrayBaseType != varType)
+        expVisitor.checkType(expType.runA(env).value.value.get.asInstanceOf[ArrayType].baseType)
+      if (arrayBaseType.runA(env).value.value.getOrElse(None) != varType.getOrElse(None))
         List("invalid types in the foreach statement")
       else
         List()

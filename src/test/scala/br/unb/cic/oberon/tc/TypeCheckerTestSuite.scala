@@ -1175,7 +1175,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test function call, wrong args") {
     val visitor = new TypeChecker(new Environment[Type]())
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.declareProcedure(
+    visitor.env = visitor.env.declareProcedure(
       Procedure(
         name = "proc",
         args = List(
@@ -1197,7 +1197,6 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
       "x",
       FunctionCallExpression("proc", List(IntValue(5), IntValue(0)))
     )
-
     val typeCheckerErrors = visitor.checkStmt(stmt).runA(visitor.env).value.written
 
     assert(typeCheckerErrors.length == 1)
@@ -1206,7 +1205,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test function call, less args than needed") {
     val visitor = new TypeChecker(new Environment[Type]())
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.declareProcedure(
+    visitor.env = visitor.env.declareProcedure(
       Procedure(
         name = "proc",
         args = List(
@@ -1237,7 +1236,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
   test("Test function call, wrong args and return type") {
     val visitor = new TypeChecker(new Environment[Type]())
     visitor.env = visitor.env.setGlobalVariable("x", IntegerType)
-    visitor.env.declareProcedure(
+    visitor.env = visitor.env.declareProcedure(
       Procedure(
         name = "proc",
         args = List(
@@ -1529,7 +1528,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
     val visitor = new TypeChecker(new Environment[Type]())
 
-    assert(visitor.checkModule(module) == List())
+    assert(visitor.checkModule(module).runA(visitor.env).value.written == List())
   }
 
   test("Type checking expressions with user defined types") {
@@ -1621,8 +1620,7 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     val res = visitor.checkModule(module).runA(visitor.env).value.written
   
     assert(res.size == 1)
-    val msg = res(0)
-    assert(msg.contains("is ill typed"))
+    assert(res.contains("is ill typed"))
   }
 
   test("Test lambda expression assignment to a constant.") {
