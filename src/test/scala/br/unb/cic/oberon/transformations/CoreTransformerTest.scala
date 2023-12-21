@@ -4,6 +4,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.ir.ast._
 
 import java.nio.file.{Files, Paths}
@@ -1539,4 +1540,5 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
       "Case must be transformed to IfElseStmt using new variable"
     )
   }
+  
 }

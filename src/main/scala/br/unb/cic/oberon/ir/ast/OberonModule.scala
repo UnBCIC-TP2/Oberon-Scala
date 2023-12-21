@@ -34,17 +34,6 @@ case class OberonModule(name: String,
 // SequenceStatement(List[Stmt]) extends Stmt
 // alternativa: SequenceStatement(stmt, stmt) extends Stmt
 
-/* procedure declaration definition */
-case class Procedure(
-    name: String,
-    args: List[FormalArg],
-    returnType: Option[Type],
-    constants: List[Constant],
-    variables: List[VariableDeclaration],
-    stmt: Statement
-) {
-  def accept(v: OberonVisitor): v.T = v.visit(this)
-}
 
 /* test declaration definition*/
 case class Test(modifier: String,
@@ -212,6 +201,18 @@ case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
 case class LambdaExpression(args: List[FormalArg], exp: Expression)
     extends Expression
+
+/* procedure declaration definition */
+case class Procedure(
+    name: String,
+    args: List[FormalArg],
+    returnType: Option[Type],
+    constants: List[Constant],
+    variables: List[VariableDeclaration],
+    stmt: Statement
+) extends Expression {}
+
+
 
 /* Statements */
 trait Statement {

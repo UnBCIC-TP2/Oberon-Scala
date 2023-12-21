@@ -9,6 +9,11 @@ import br.unb.cic.oberon.ir.ast.Procedure
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable._
 
+import shapeless.HList.ListCompat._
+import shapeless.Generic
+import shapeless.everywhere
+import shapeless.Poly1
+
 object CoreTransformer {
 
   def reduceToCoreStatement(
@@ -292,17 +297,49 @@ object CoreTransformer {
         case s => List(s)
       }
 
+    def reduceLambdaToProcedure(module: OberonModule): OberonModule = {
+        
+        object transformLambdaToProcedure extends Poly1 {
+          implicit def caseLambda = at[Expression](exp: Expression => 
+            exp match{
+              case LambdaExpression(lis_args, expression) => 
+                Procedure(
+                  name = "lambda",
+                  args = lis_args,
+                  returnType = None,
+                  constants = List(),
+                  variables = List(),
+                  stmt = ReturnStmt(expression)
+                )
+              case _ => exp
+            }
+          )     
+        } 
+        
+      
+        val gen = Generic[OberonModule]
+
+        val replaced = everywhere(transformLambdaToProcedure)(gen.to(module))
+
+        
+        return gen.from(replaced)
+        
+    }
+
+
     def reduceOberonModule(
                             module: OberonModule,
                             caseIdGenerator: AtomicInteger = new AtomicInteger(0),
                             addedVariables: ArrayBuffer[VariableDeclaration] =
                             new ArrayBuffer[VariableDeclaration]
                           ): OberonModule = {
-      // É possível remover essa val?
+      // É possível remover essa val?)
+
       val stmtcore =
         reduceToCoreStatement(module.stmt.get, caseIdGenerator, addedVariables)
 
       val testList = transformTestListStatement(module.tests, caseIdGenerator, addedVariables)
+      // val newModule =
       OberonModule(
         name = module.name,
         submodules = module.submodules,
@@ -315,6 +352,8 @@ object CoreTransformer {
         tests = testList,
         stmt = Some(stmtcore)
       )
+
+      // return reduceLambdaToProcedure(newModule)
     }
   }
 
