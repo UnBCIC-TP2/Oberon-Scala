@@ -1,18 +1,16 @@
 package br.unb.cic.oberon
 
-import br.unb.cic.oberon.codegen.{
-  CodeGenerator,
-  JVMCodeGenerator,
-  PaigesBasedGenerator
-}
+import br.unb.cic.oberon.codegen.{CodeGenerator, JVMCodeGenerator, PaigesBasedGenerator}
+import br.unb.cic.oberon.codegen.TACodeGenerator
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+import br.unb.cic.oberon.printer.TACodePrinter
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
 
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.{Files, Path, Paths}
 import java.util.Base64
 
 object Main extends App with Oberon2ScalaParser {
@@ -56,7 +54,7 @@ object Main extends App with Oberon2ScalaParser {
       )
       val backend = choice(
         name = "backend",
-        choices = Seq("llvm", "c", "jvm"),
+        choices = Seq("llvm", "c", "jvm", "tac"),
         default = Some("c"),
         descr = "Which backend to compile to",
         argName = "backend"
@@ -101,6 +99,11 @@ object Main extends App with Oberon2ScalaParser {
       }
       case "llvm" => {
         Files.writeString(conf.compile.outputPath.get.get, "LLVM :)")
+      }
+      case "tac" => {
+        val tacCode = TACodeGenerator.generateCode(module)
+        val formattedTacCode = TACodePrinter.getTacDocumentStringFormatted(tacCode)
+        Files.writeString(conf.compile.outputPath.get.get, formattedTacCode)
       }
     }
   }

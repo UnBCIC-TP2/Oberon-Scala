@@ -1,6 +1,8 @@
 package br.unb.cic.oberon.printer
 
-import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, MoveOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SubOp, TAC, Temporary}
+import br.unb.cic.oberon.codegen.TACodeGenerator
+import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
+import br.unb.cic.oberon.ir.tac.{AddOp, Address, AndOp, Constant, CopyOp, DivOp, EqJump, GTEJump, GTJump, Jump, JumpFalse, JumpTrue, LTEJump, LTJump, MulOp, Name, NeqJump, NotOp, OrOp, RemOp, SLTOp, SLTUOp, SubOp, ArraySet, ArrayGet, NOp, TAC, Temporary}
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc.{ line, text }
 
@@ -13,10 +15,11 @@ import org.typelevel.paiges.Doc.{ line, text }
  */
 object TACodePrinter {
 
-  private val jumpLine : String = "\n"
-  private val tab : String = "  "
-  private val ifStatement : String = "if"
-  private val jumpStatement : String = "jump"
+  private val jumpLine: String = "\n"
+  private val tab: String = "  "
+  private val singleTab: String = " "
+  private val ifStatement: String = "if"
+  private val jumpStatement: String = "jump"
 
   /**
    *
@@ -35,7 +38,6 @@ object TACodePrinter {
    * @return
    */
   private def generateCode(tac: Doc, instruction: TAC): Doc = {
-
     instruction match {
       case AddOp(s1, s2, dest, label) => tac / text(handleArithmeticOps(dest, s1, s2, "+", label))
       case SubOp(s1, s2, dest, label) => tac / text(handleArithmeticOps(dest, s1, s2, "-", label))
@@ -44,21 +46,24 @@ object TACodePrinter {
       case AndOp(s1, s2, dest, label) => tac / text(handleArithmeticOps(dest, s1, s2, "&&", label))
       case OrOp(s1, s2, dest, label) => tac / text(handleArithmeticOps(dest, s1, s2, "||", label))
       case RemOp(s1, s2, dest, label) => tac / text(handleArithmeticOps(dest, s1, s2, "%", label))
-      case EqJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,"==",dest, label))
-      case NeqJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,"!=",dest, label))
-      case GTJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,">",dest, label))
-      case GTEJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,">=",dest, label))
-      case LTJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,"<",dest, label))
-      case LTEJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1,s2,"<=>",dest, label))
+      case EqJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, "==", dest, label))
+      case NeqJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, "!=", dest, label))
+      case GTJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, ">", dest, label))
+      case GTEJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, ">=", dest, label))
+      case LTJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, "<", dest, label))
+      case LTEJump(s1, s2, dest, label) => tac / text(handleConditionalOps(s1, s2, "<=>", dest, label))
       case JumpTrue(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == true $jumpStatement $dest")
       case JumpFalse(s1, dest, label) => tac / text(s"if ${handleAddress(s1)} == false $jumpStatement $dest")
       case Jump(dest, label) => tac / text(s"$jumpStatement $dest")
       case NotOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = NOT ${handleAddress(s1)}")
-      case MoveOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
+      case CopyOp(s1, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(s1)}")
       case SLTOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLT ${handleAddress(s1)} ${handleAddress(s2)}")
-      case _ => text("Not implemented in printer")
+      case SLTUOp(s1, s2, dest, label) => tac / text(s"${handleAddress(dest)} = SLTU ${handleAddress(s1)} ${handleAddress(s2)}")
+      case ArraySet(s1, offset, listDest, label) => tac / text(s"${handleAddress(listDest)}[${handleArrayOffset(offset, listDest)}] = ${handleAddress(s1)}")
+      case ArrayGet(list, offset, dest, label) => tac / text(s"${handleAddress(dest)} = ${handleAddress(list)}[${handleAddress(offset)}]")
+      case NOp(label) => tac / text(label)
+      case _ => tac / text("Not implemented in printer")
     }
-
   }
 
   /**
@@ -69,7 +74,7 @@ object TACodePrinter {
    * @param operation of instruction
    * @return
    */
-  private def handleArithmeticOps(destiny : Address, s1 : Address, s2: Address, operation : String, label : String): String = {
+  private def handleArithmeticOps(destiny: Address, s1: Address, s2: Address, operation: String, label: String): String = {
     label match {
       case "" => s"${handleAddress(destiny)} = ${handleAddress(s1)} $operation ${handleAddress(s2)}"
       case _ => s"$label:" + jumpLine + tab + s"${handleAddress(destiny)} = ${handleAddress(s1)} $operation ${handleAddress(s2)}"
@@ -87,24 +92,43 @@ object TACodePrinter {
    */
   private def handleConditionalOps(s1: Address, s2: Address, operation: String, destLabel: String, label: String): String = {
     label match {
-      case "" => ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
-      case _ => s"$label:" + jumpLine + tab + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
+      case "" => ifStatement + singleTab + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
+      case _ => s"$label:" + jumpLine + ifStatement + s"${handleAddress(s1)} $operation ${handleAddress(s2)} jump $destLabel"
     }
+  }
+
+  /**
+   * @param offset to be handled
+   * @param array being assigned
+   */
+  private def handleArrayOffset(offset: Address, array: Address): String = {
+    val offset1 = offset match {
+      case Constant(value, t) => value
+      case _ => throw new IllegalArgumentException(s"Unexpected Address type: $offset")
+    }
+
+    val arrayType = array match {
+      case Name(_, ArrayType(_, baseType)) => baseType
+    }
+
+    val index = offset1.toInt / (TACodeGenerator.typeByteSize.getOrElse(arrayType, 0))
+    s"$index"
   }
 
   /**
    * @param address address to be handled
    */
-  private def handleAddress(address : Address): String = {
+  private def handleAddress(address: Address): String = {
     address match {
       case Temporary(t, number, p) => s"t$number"
       case Constant(value, t) => s"$value"
       case Name(id, t) => s"$id"
+      case _ => throw new IllegalArgumentException(s"Unexpected Address type: $address")
     }
   }
 
   /**
-   * This method print all items in instructions list
+   * This method prints all items in instructions list
    * @param instructions : reference to instructions list
    */
   def getTacDocumentStringFormatted(instructions: List[TAC]): String = {
@@ -115,5 +139,4 @@ object TACodePrinter {
   private def getTacDocument(instructions: List[TAC]): Doc = {
     buildDocument(instructions)
   }
-
 }
