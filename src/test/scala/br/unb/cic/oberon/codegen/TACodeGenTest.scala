@@ -1217,7 +1217,6 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val expr = AddExpression(RealValue(1.0), RealValue(2.0))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
-    // 1.0 + 2.0
 
     Temporary.reset
     val t0 = new Temporary(RealType, 0, true)
@@ -1233,7 +1232,6 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val expr = SubExpression(RealValue(1.0), RealValue(2.0))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
-    // 1.0 + 2.0
 
     Temporary.reset
     val t0 = new Temporary(RealType, 0, true)
@@ -1249,7 +1247,6 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val expr = DivExpression(RealValue(1.0), RealValue(2.0))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
-    // 1.0 + 2.0
 
     Temporary.reset
     val t0 = new Temporary(RealType, 0, true)
@@ -1265,7 +1262,6 @@ class TACodeTest extends AnyFunSuite {
     TACodeGenerator.reset
     val expr = MultExpression(RealValue(1.0), RealValue(2.0))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
-    // 1.0 + 2.0
 
     Temporary.reset
     val t0 = new Temporary(RealType, 0, true)
@@ -1314,7 +1310,6 @@ class TACodeTest extends AnyFunSuite {
   }
 
   test("Test for generating TACode for procedure div(1.0, 2.0) (Double)") {
-
     TACodeGenerator.reset()
     Temporary.reset()
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
@@ -1340,7 +1335,6 @@ class TACodeTest extends AnyFunSuite {
   }
 
   test("Test for generating TACode for procedure div(lista[1], lista[2])") {
-
     TACodeGenerator.reset()
     Temporary.reset()
     val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
@@ -1385,16 +1379,6 @@ class TACodeTest extends AnyFunSuite {
     )
     // *pointer = 2.0 + 3.0
     assert(list == ops)
-  }
-
-  ignore("Test for generating TACode for Handle out-of-bounds array access") {
-    TACodeGenerator.reset()
-    val list_var = List(VariableDeclaration("lista", ArrayType(4, IntegerType)))
-    TACodeGenerator.load_vars(list_var)
-    val expr = ArraySubscript(VarExpression("lista"), IntValue(5)) // Index out of bounds
-    assertThrows[IndexOutOfBoundsException] {
-      TACodeGenerator.generateExpression(expr, List())
-    }
   }
 
   test("Test for generating TACode for Record field access of non-record types") {
