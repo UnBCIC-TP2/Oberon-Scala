@@ -7,7 +7,11 @@ import br.unb.cic.oberon.codegen.{
 }
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
+
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.tc.TypeChecker
+import br.unb.cic.oberon.environment.Environment
+
 import br.unb.cic.oberon.repl.REPL
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions
@@ -117,13 +121,18 @@ object Main extends App with Oberon2ScalaParser {
     val content = Files.readString(conf.tc.inputPath.get.get)
     val module = parseAbs(parse(oberonParser,content))
 
-    val visitor = new TypeChecker()
-    val errors = visitor.checkModule(module)
+
+    // Alterar a instanciação do TypeChecker para fazer o checkModule ser ´parte do construtor
+    // Dessa forma, os val visitor e errors passam a ser o mesmo.
+    val env = new Environment[Type]()
+    val visitor = new TypeChecker(env)
+    val errors = visitor.checkModule(module).runA(env).value.written
+    
     if (errors.isEmpty) {
       println("The code is correctly typed")
     } else {
       println("Type errors detected:")
-      errors.filter(v => (v._2 != "None")).foreach(v => println(v))
+      errors.filter(v => (v != "None")).foreach(v => println(v))
     }
   }
 }
