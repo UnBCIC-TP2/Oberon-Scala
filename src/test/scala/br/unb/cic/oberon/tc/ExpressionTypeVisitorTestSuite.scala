@@ -12,9 +12,9 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val bTrue = BoolValue(true)
     val bFalse = BoolValue(false)
 
-    assert(visitor.checkExp(val10) == Some(IntegerType))
-    assert(visitor.checkExp(bTrue) == Some(BooleanType))
-    assert(visitor.checkExp(bFalse) == Some(BooleanType))
+    assert(visitor.checkExpression(val10) == Some(IntegerType))
+    assert(visitor.checkExpression(bTrue) == Some(BooleanType))
+    assert(visitor.checkExpression(bFalse) == Some(BooleanType))
   }
 
   test("Test expression type on add expressions") {
@@ -25,9 +25,9 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val add02 = AddExpression(val10, add01)
     val add03 = AddExpression(add01, add02)
 
-    assert(visitor.checkExp(add01) == Some(IntegerType))
-    assert(visitor.checkExp(add02) == Some(IntegerType))
-    assert(visitor.checkExp(add03) == Some(IntegerType))
+    assert(visitor.checkExpression(add01) == Some(IntegerType))
+    assert(visitor.checkExpression(add02) == Some(IntegerType))
+    assert(visitor.checkExpression(add03) == Some(IntegerType))
   }
 
   test("Test expression type on sub expressions") {
@@ -38,9 +38,9 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val sub02 = SubExpression(val10, sub01)
     val sub03 = SubExpression(sub01, sub02)
 
-    assert(visitor.checkExp(sub01) == Some(IntegerType))
-    assert(visitor.checkExp(sub02) == Some(IntegerType))
-    assert(visitor.checkExp(sub03) == Some(IntegerType))
+    assert(visitor.checkExpression(sub01) == Some(IntegerType))
+    assert(visitor.checkExpression(sub02) == Some(IntegerType))
+    assert(visitor.checkExpression(sub03) == Some(IntegerType))
   }
 
   test("Test expression type on div expressions") {
@@ -51,9 +51,9 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val sub02 = DivExpression(val10, sub01)
     val sub03 = DivExpression(sub01, sub02)
 
-    assert(visitor.checkExp(sub01) == Some(IntegerType))
-    assert(visitor.checkExp(sub02) == Some(IntegerType))
-    assert(visitor.checkExp(sub03) == Some(IntegerType))
+    assert(visitor.checkExpression(sub01) == Some(IntegerType))
+    assert(visitor.checkExpression(sub02) == Some(IntegerType))
+    assert(visitor.checkExpression(sub03) == Some(IntegerType))
   }
 
   test("Test expression type on mult expressions") {
@@ -64,9 +64,9 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val mult02 = AddExpression(val10, mult01)
     val mult03 = AddExpression(mult01, mult02)
 
-    assert(visitor.checkExp(mult01) == Some(IntegerType))
-    assert(visitor.checkExp(mult02) == Some(IntegerType))
-    assert(visitor.checkExp(mult03) == Some(IntegerType))
+    assert(visitor.checkExpression(mult01) == Some(IntegerType))
+    assert(visitor.checkExpression(mult02) == Some(IntegerType))
+    assert(visitor.checkExpression(mult03) == Some(IntegerType))
   }
 
   test("Test expression type on eq expressions") {
@@ -75,7 +75,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val val20 = IntValue(20)
     val eq01 = EQExpression(val10, val20)
 
-    assert(visitor.checkExp(eq01) == Some(BooleanType))
+    assert(visitor.checkExpression(eq01) == Some(BooleanType))
   }
 
   test("Test expression add with boolean values") {
@@ -84,7 +84,7 @@ class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
     val valTrue = BoolValue(true)
     val invalidAdd = AddExpression(val10, valTrue)
 
-    assert(visitor.checkExp(invalidAdd) == None)
+    assert(visitor.checkExpression(invalidAdd) == None)
   }
 
 }
