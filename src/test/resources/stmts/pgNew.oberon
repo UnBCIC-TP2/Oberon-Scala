@@ -1,0 +1,19 @@
+MODULE pgNew;
+
+VAR
+ pg, a1, r, N, n, p : INTEGER;
+
+BEGIN
+ a1 := 2;
+ r := 3;
+ N := 5;
+ FOR n:= 0 TO N DO
+  p := POW(r, n - 1);
+  pg := a1 * p;
+  write(pg);
+  n := n + 1
+ END
+END
+
+END pgNew.
+

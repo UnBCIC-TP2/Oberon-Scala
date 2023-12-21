@@ -1,0 +1,13 @@
+MODULE avg;
+
+VAR
+ average, num1, num2 : INTEGER;
+
+BEGIN
+ num1 := 80;
+ num2 := 10;
+ average := num1 + num2 / 2;
+ write(average)
+END
+
+END avg.

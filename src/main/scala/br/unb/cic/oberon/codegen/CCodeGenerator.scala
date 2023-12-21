@@ -40,6 +40,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         ) + Doc.char('}')
       case None => text("int main() {}")
     }
+
     val CCode =
       mainHeader + userDefinedTypes / globalVars / mainDefines + mainProcedures / mainBody
     CCode.render(60)
@@ -237,6 +238,10 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
           textln(indent, "}")
       case ReturnStmt(exp) =>
         textln(indent, s"return ${genExp(exp)};")
+      case ForStmt(init, condition, stmt) =>
+        textln(indent, s"for ($init; ${genExp(condition)}; $stmt) {") +
+          generateStmt(stmt, indent + indentSize) +
+          textln(indent, "}")
 
       case AssignmentStmt(designator, exp) =>
         designator match {
@@ -256,7 +261,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
         }
 
       case ExitStmt() =>
-        textln(indent, "break; ")
+        textln(indent, "break;")
 
       case _ => empty
     }
@@ -275,7 +280,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
       case FunctionCallExpression(name, args) =>
         name match {
           case "ODD" =>
-            s"${genExp(args(0))} % 2 == 1"
+            s"${genExp(args.head)} % 2 == 1"
           case _ =>
             val expressions = args.map(arg => text(genExp(arg)))
             val functionArgs = intercalate(Doc.char(',') + space, expressions)
@@ -331,11 +336,11 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   def genInc(args: List[Expression], signal: String, indent: Int): Doc = {
     if (args.length == 1) {
       indentation(indent) + textln(
-        s"${genExp(args(0))} = ${genExp(args(0))} ${signal} 1;"
+        s"${genExp(args.head)} = ${genExp(args.head)} ${signal} 1;"
       )
     } else {
       indentation(indent) + textln(
-        s"${genExp(args(0))} = ${genExp(args(0))} ${signal} ${genExp(args(1))};"
+        s"${genExp(args.head)} = ${genExp(args.head)} ${signal} ${genExp(args(1))};"
       )
     }
   }

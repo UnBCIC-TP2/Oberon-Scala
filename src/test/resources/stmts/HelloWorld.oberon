@@ -1,0 +1,12 @@
+MODULE HelloWorld;
+
+VAR
+	greeting : INTEGER;
+
+
+BEGIN
+    greeting := 1 + 1
+    
+END
+    
+END HelloWorld.

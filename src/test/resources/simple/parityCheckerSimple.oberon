@@ -1,0 +1,16 @@
+MODULE parityCheck;
+
+VAR
+number, parity : INTEGER;
+BEGIN
+ number := 5;
+ parity := 0;
+ IF (parity = 0)
+ THEN
+    write(1)
+ ELSE
+    write(0)
+ END
+END
+
+END parityCheck.

@@ -1,0 +1,13 @@
+MODULE fuel;
+
+VAR
+ averageSpeed, time, liters : INTEGER;
+
+BEGIN
+ averageSpeed := 80;
+ time := 10;
+ liters := (averageSpeed * time) / 12;
+ write(liters)
+END
+
+END fuel.

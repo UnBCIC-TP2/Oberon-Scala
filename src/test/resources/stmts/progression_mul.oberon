@@ -1,0 +1,19 @@
+MODULE pa;
+
+VAR
+    an, d, n, z, pa : INTEGER;
+
+BEGIN
+    an := 2;
+    d := 3;
+    z := 5;
+    n := 1;
+    REPEAT
+        pa := an + (n - 1) * d;
+        write(pa);
+        INC(n)
+    UNTIL (n <= z)
+
+END
+
+END pa.

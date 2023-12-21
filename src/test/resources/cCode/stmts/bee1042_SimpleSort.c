@@ -27,12 +27,12 @@ int main() {
             }
             x = x + 1;
             if (x == 2) {
-                break; 
+                break;
             }
         }
         y = y + 1;
         if (y == 2) {
-            break; 
+            break;
         }
     }
     ans[0] = input[0];

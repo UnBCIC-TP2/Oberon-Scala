@@ -13,11 +13,11 @@ int main() {
         while (true) {
             y = y + 1;
             if (y >= 10) {
-                break; 
+                break;
             }
         }
         if (x >= 10) {
-            break; 
+            break;
         }
     }
     printf("%d\n", x);

@@ -1,0 +1,13 @@
+MODULE forstmt;
+
+VAR
+	i : INTEGER;
+
+BEGIN
+    FOR i := 1 TO 5 DO
+        write(i)
+    END
+
+END
+
+END forstmt.
