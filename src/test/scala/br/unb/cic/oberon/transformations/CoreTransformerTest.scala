@@ -1539,4 +1539,35 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
       "Case must be transformed to IfElseStmt using new variable"
     )
   }
+
+  test("Reduce Lambda Expression to Procedure 1"){
+    val lambda = LambdaExpression(List(ParameterByValue("x", IntegerType)), AddExpression(VarExpression("x"), IntValue(10)))
+    val proc = CoreTransformer.reduceExpressionToProcedure(lambda)
+
+    // assert(proc.name == "lambda")
+    // assert(proc.stmt == ReturnStmt(AddExpression(VarExpression("x"), IntValue(10))))
+    assert(proc == Procedure(
+            name = "lambda",
+            args = List(ParameterByValue("x", IntegerType)),
+            returnType = None,
+            constants = List(),
+            variables = List(),
+            stmt = ReturnStmt(AddExpression(VarExpression("x"), IntValue(10)))
+          ))
+  }
+
+  test("Reduce Lambda Expression to Procedure 2"){
+    val exp = AddExpression(VarExpression("x"), IntValue(10))
+    val proc = CoreTransformer.reduceExpressionToProcedure(exp)
+
+    assert(proc == exp)
+    
+  }
+  test("Reduce Lambda Expression to Procedure 3"){
+    val exp = VarExpression("z")
+    val proc = CoreTransformer.reduceExpressionToProcedure(exp)
+
+    assert(proc == exp)
+    
+  }
 }

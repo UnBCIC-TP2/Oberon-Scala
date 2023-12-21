@@ -34,18 +34,6 @@ case class OberonModule(name: String,
 // SequenceStatement(List[Stmt]) extends Stmt
 // alternativa: SequenceStatement(stmt, stmt) extends Stmt
 
-/* procedure declaration definition */
-case class Procedure(
-    name: String,
-    args: List[FormalArg],
-    returnType: Option[Type],
-    constants: List[Constant],
-    variables: List[VariableDeclaration],
-    stmt: Statement
-) {
-  def accept(v: OberonVisitor): v.T = v.visit(this)
-}
-
 /* test declaration definition*/
 case class Test(modifier: String,
                 name: String,
@@ -105,6 +93,18 @@ sealed abstract class Value extends Expression with Ordered[Value] {
         "Comparison is not defined for " + this.getClass + " and " + that.getClass
       )
   }
+}
+
+/* procedure declaration definition */
+case class Procedure(
+    name: String,
+    args: List[FormalArg],
+    returnType: Option[Type],
+    constants: List[Constant],
+    variables: List[VariableDeclaration],
+    stmt: Statement
+) extends Expression{
+  //def accept(v: OberonVisitor): v.T = v.visit(this)
 }
 
 sealed trait Number extends Expression {
