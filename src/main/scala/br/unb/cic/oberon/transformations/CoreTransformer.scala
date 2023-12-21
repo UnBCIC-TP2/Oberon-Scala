@@ -1,5 +1,7 @@
 package br.unb.cic.oberon.transformations
 
+import shapeless._
+import poly._
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -321,9 +323,27 @@ object CoreTransformer {
         stmt = Some(stmtcore)
       )
     }
+
+    def reduceExpressionToProcedure(exp: Expression): Expression = {
+      object polyExp extends Poly1 {
+        implicit def lambdaCase =  at[LambdaExpression]{ case LambdaExpression(lis_args, expression) => 
+          Procedure(
+            name = "lambda",
+            args = lis_args,
+            returnType = None,
+            constants = List(),
+            variables = List(),
+            stmt = ReturnStmt(expression)
+          )
+        }
+      }
+      
+      return everywhere(polyExp)(exp)
+    }
+
     // TODO Alterar a função para lidar com expressões dentro de enxpressões
     // TODO Ver artigo compartilhado pelo professor no teams
-    def reduceExpressionToProcedure(exp: Expression): Expression = exp match {
+    def reduceExpressionToProcedure2(exp: Expression): Expression = exp match {
         case LambdaExpression(lis_args, expression) => 
           Procedure(
             name = "lambda",
