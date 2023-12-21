@@ -6,6 +6,11 @@
 
 <b>Vídeo-tutorial de introdução a Oberon (inglês)</b>: https://www.youtube.com/watch?v=IyYRzpxJaaE
 
+## A tradução de código
+A geração de código em C na implementação atual, é feita a partir de um módulo Oberon. O módulo é traduzido para C, e então compilado e executado. O resultado da execução é comparado com o resultado esperado, e então o teste é considerado bem sucedido ou falhou. O resultado da execução dos testes é a comparação entre a tradução do módulo Oberon e a tradução do código em C equivalente a ele. Logo, é necessário ter ambos os códigos (Oberon e C) para a comparação. 
+
+Atente-se que ambos os códigos, Oberon e C, devem estar em pastas equivalentes, para que a comparação seja realizada com sucesso. Caso o módulo Oberon esteja na pasta stmts, o código C equivalente deve estar na pasta stmts no diretório referente a códigos em C.
+
 ## Código Exemplo Oberon utilizando Procedures
 
 ```
@@ -215,116 +220,109 @@ Lista de testes unitários feitos e documentados em forma de tutorial da linguag
 (Como subitens estão as funcionalidades testadas em cada teste.)
 
 <ul>
-	<li><b><a href="./bee1013.md">bee1013</a>: O Maior</b></li>
+	<li><b><a href="./parityCheckerProcedures.md">parityCheckerProcedures</a>: Par ou ímpar</b></li>
     <ul>
 	    <li>Procedure</li>
-	    <li>Nested Procedure</li>
-    </ul>
-	<li><b><a href="./bee1018.md">bee1018</a>: Cédulas</b></li>
-    <ul>
-	    <li>FOREACH</li>
-	    <li>Inicialização de arrays</li>
-	    <li>FLOOR</li>
-	    <li>INC</li>
-    </ul>
-	<li><b><a href="./bee1018user.md">bee1018user</a>: Cédulas (User Input)</b></li>
-    <ul>
-	    <li>Todas do bee1018</li>
-	    <li>READFILE</li>
-	    <li>STRINGTOINT</li>
-    </ul>
-	<li><b><a href="./bee1021.md">bee1021</a>: Notas e Moedas</b></li>
-    <ul>
-	    <li>FOREACH</li>
-	    <li>Inicialização de arrays</li>
-	    <li>FLOOR</li>
-	    <li>INC</li>
-    </ul>
-	<li><b><a href="./bee1029.md">bee1029</a>: Fibonacci, Quantas Chamadas?</b></li>
-    <ul>
-	    <li>Procedure</li>
-	    <li>FOR</li>
-	    <li>Comparador de igualdade</li>
-	    <li>Inicialização de arrays</li>
-    </ul>
-	<li><b><a href="./bee1038int.md">bee1038</a>: Snack (Inteiros)</b></li>
-    <ul>
-	    <li>Inicialização de arrays</li>
-	    <li>Aritmética com arrays de inteiros</li>
-    </ul>
-	<li><b><a href="./bee1038real.md">bee1038</a>: Snack (Reais)</b></li>
-    <ul>
-	    <li>Inicialização de arrays</li>
-	    <li>Aritmética com arrays de reais</li>
-    </ul>
-	<li><b><a href="./bee1042.md">bee1042</a>: Simple Sort</b></li>
-    <ul>
-	    <li>REPEAT</li>
-    </ul>
-	<li><b><a href="./bee1049.md">bee1049</a>: Animal</b></li>
-    <ul>
-	    <li>IF/ELSE</li>
-	    <li>Comparador de igualdade</li>
-	    <li>Procedure</li>
-    </ul>
-	<li><b><a href="./bee1060.md">bee1060</a>: Positive</b></li>
-    <ul>
-	    <li>FOREACH</li>
-    </ul>
-	<li><b><a href="./bee1061.md">bee1061</a>: Event Time</b></li>
-    <ul>
-	    <li>IF/ELSE</li>
-    </ul>
-	<li><b><a href="./bee1071.md">bee1071</a>: Sum</b></li>
-    <ul>
-	    <li>REPEAT</li>
-    </ul>
-	<li><b><a href="./bee1079.md">bee1079</a>: Average</b></li>
-    <ul>
-	    <li>REPEAT</li>
-    </ul>
-	<li><b><a href="./bee2057.md">bee2057</a>: Fuso Horário</b></li>
-    <ul>
-	    <li>FOREACH</li>
-	    <li>Inicialização de arrays</li>
 	    <li>MOD</li>
     </ul>
-	<li><b><a href="./bee2221.md">bee2221</a>: Pokemons Battle</b></li>
+	<li><b><a href="./parityCheckerSimple">parityCheckerSimple</a>: Par ou ímpar</b></li>
     <ul>
-	    <li>IF/ELSE</li>
-	    <li>ODD</li>
+	    <li>IF</li>
     </ul>
-	<li><b><a href="./bee2779.md">bee2779</a>: Álbum da Copa</b></li>
+	<li><b><a href="./Progression.md">Progression</a>: Progressão Aritmética</b></li>
     <ul>
-	    <li>FOREACH</li>
-	    <li>Inicialização de arrays</li>
-	    <li>IF/ELSE</li>
-    </ul>
-	<li><b><a href="./bee3205valt.md">bee3205valt</a>: Nasty Hacks (versão alterada)</b></li>
-    <ul>
-	    <li>FOREACH</li>
-	    <li>Inicialização de arrays</li>
-	    <li>FLOOR</li>
+	    <li>REPEAT</li>
 	    <li>INC</li>
     </ul>
-	<li><b><a href="./stringToInt.md">Nova função</a>: stringToInt</b></li>
+	<li><b><a href="./Countdown.md">Countdown</a>: Contagem decrescente</b></li>
     <ul>
-	    <li>STRINGTOINT</li>
+	    <li>REPEAT</li>
     </ul>
-	<li><b><a href="./stringToReal.md">Nova função</a>: stringToReal</b></li>
+	<li><b><a href="./beecrowd1017.md">beecrowd1017</a>: Consumo médio</b></li>
     <ul>
-	    <li>STRINGTOREAL</li>
+	    <li>Operadores matemáticos</li>
+    </ul>
+	<li><b><a href="./beecrowd1005.md">beecrowd1005</a>: Média aritmética simples</b></li>
+    <ul>
+	    <li>Operadores matemáticos</li>
+    </ul>
+	<li><b><a href="./beecrowd1008.md">beecrowd1008</a>: Salário</b></li>
+    <ul>
+		<li>Operadores matemáticos</li>
+    </ul>
+	<li><b><a href="./beecrowd1020.md">beecrowd1020</a>: Cálculo de anos</b></li>
+    <ul>
+	    <li>Operadores matemáticos</li>
+    </ul>
+	<li><b><a href="./beecrowd1014.md">beecrowd1014</a>: Consumo de combustível</b></li>
+    <ul>
+	    <li>Divisão</li>
+    </ul>
+	<li><b><a href="./beecrowd1010.md">beecrowd1010</a>: Cálculo de valor de produtos</b></li>
+    <ul>
+	    <li>Multiplas variáveis com multiplificação</li>
+    </ul>
+	<li><b><a href="./forstmt.md">forstmt</a>: For Statement</b></li>
+    <ul>
+	    <li>FOR</li>
+    </ul>
+	<li><b><a href="./Logic.md">Logic</a>: Lógica AND OR</b></li>
+    <ul>
+	    <li>Operadores Lógicos AND e OR</li>
+    </ul>
+	<li><b><a href="./LogicNot.md">LogicNot</a>: Lógica AND e UNEQUAL</b></li>
+    <ul>
+	    <li>Operadores Lógicos AND e UNEQUAL</li>
+    </ul>
+	<li><b><a href="./pgNormal.md">pgNormal</a>: Progressão Geométrica Expressão com +3 variáveis</b></li>
+    <ul>
+	    <li>POW</li>
+		<li>FOR</li>
+    </ul>
+	<li><b><a href="./pgNew.md">pgNew</a>: Progressão Geométrica</b></li>
+    <ul>
+	    <li>IF/ELSE</li>
+    </ul>
+	<li><b><a href="./boolNeg.md">boolNeg</a>: Negação Lógica</b></li>
+    <ul>
+	    <li>Operadores Lógicos</li>
+		<li>AND</li>
+		<li>NOT</li>
+		<li>IF</li>
+		<li>BOOLEAN</li>
+    </ul>
+	<li><b><a href="./Progression_mul.md">Progression_mul</a>: Progressão Aritmética com diversas variáveis</b></li>
+    <ul>
+	    <li>Operadores Lógicos</li>
+		<li>AND</li>
+		<li>NOT</li>
+		<li>IF</li>
+		<li>BOOLEAN</li>
     </ul>
 </ul> 
 
 ## Bugs e peculiaridades
 
 <ul>
-    <li><b><a href="./forstmt.md">Estrutura FOR</a>: forstmt</b></li>
+    <li><b><a href="./forstmt.md">Estrutura FOR</a>: Peculiaridade For</b></li>
     <ul>
-	    <li>FOR</li>
+	    <li>O FOR em Oberon se traduz em While em C. </li>
+    </ul>
+	<li><b><a href="./pgNormal.md">pgNormal</a> e <a href="./pgNew.md">pgNew</a>: POW e FOR</b></li>
+    <ul>
+	    <li>O while quando traduzido a partir de um FOR, ele não respeita a condição. A função POW não é encontrada no Oberon Module.</li>
+    </ul>
+	<li><b><a href="./Progression_mul.md">Progressão Aritmética</a>: Parenteses</b></li>
+    <ul>
+	    <li>O uso de parenteses para determinar precedência causa a falha no teste.</li>
     </ul>
 </ul>
 
-- 
+## Correções realizadas na versão 12/2023
+- Refatoração na tradução do CCodeGen.scala
+  - Correção de bugs (break e indentação).
+  - Otimização de código 
+    - Alteração na utilização das listas (lista[0] -> lista.head).
+- Refatoração de 18 testes afetados por bugs no CCodeGen.scala
+- Corrigida a formatação de código em C.
 
