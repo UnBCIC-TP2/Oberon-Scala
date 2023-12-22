@@ -38,12 +38,15 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
             case None => Some(IntegerType)
             case Some(IntegerType) => Some(IntegerType)
             case Some(RealType) => Some(RealType)
+            case _ => None
           }
           case Some(RealType) => acc match {
             case None => Some(RealType)
             case Some(IntegerType) => Some(RealType)
             case Some(RealType) => Some(RealType)
-          } 
+            case _ => None
+          }
+          case _ => None
         }
         unifyConstraints(newAcc, tail)
 
@@ -77,6 +80,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
               case None => Some(RealType)
               case _ => None
             }
+          case _ => None
         }
         unifyConstraints(newAcc, tail)
 
@@ -190,7 +194,7 @@ def unifyConstraints(acc: Option[Type], constraints: List[Constraint]): Option[T
     case ArrayValue(values, arrayType) =>
       if (
         values.isEmpty || values
-          .forall(v => checkExpression(v) == arrayType.baseType)
+          .forall(v => checkExpression(v).get == arrayType.baseType)
       ) {
         (List(), ExpT(ArrayValue(values, arrayType), Some(arrayType)))
       } else (List(), ExpT(ArrayValue(values, arrayType), None))
@@ -384,7 +388,9 @@ class TypeChecker {
     res match {
       case Some((ArrayType(length, t1), IntegerType, t2)) if t1 == t2 => List()
       case Some((ArrayType(length, t1), IntegerType, t2)) if t1 != t2 => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Expression $exp doesn't match the array type."))
-      case Some((_, t, _)) if t != IntegerType => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"The index expression must be an integer."))
+      case Some((_, t, _)) => 
+        if( t != IntegerType) List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"The index expression must be an integer."))
+        else List()
       case None => List((AssignmentStmt(ArrayAssignment(arr, element), exp), s"Could not compute the types correctly."))
     }
   }
