@@ -4,7 +4,13 @@ import br.unb.cic.oberon.AbstractTestSuite
 
 import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ir.ast._
-import br.unb.cic.oberon.ir.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
+import br.unb.cic.oberon.ir.ast.{
+  AndExpression,
+  EQExpression,
+  GTEExpression,
+  LTEExpression,
+  LTExpression,
+}
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
@@ -1653,6 +1659,25 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     assert(res.size == 1)
   }
 
+  test("Test valid lambda expression application") {
+    val visitor = new TypeChecker()
+    val module =
+      ScalaParser.parseResource("lambda/lambdaExpressionsIT01.oberon")
+    val res = visitor.checkModule(module)
+    assert(res.isEmpty)
+  }
+
+   test("Test assignment to lambda application statement") {
+    val visitor = new TypeChecker()
+    val stmt = AssignmentStmt("r", LambdaApplication(VarExpression("a"),List(IntValue(4))))
+    val stmt1 = AssignmentStmt("a", LambdaExpression(List(ParameterByValue("x",IntegerType)),AddExpression(VarExpression("x"),IntValue(5))))
+
+    visitor.env = visitor.env.setGlobalVariable("r",IntegerType)
+    visitor.env = visitor.env.setGlobalVariable("a", LambdaType(List(IntegerType),IntegerType))
+
+    assert(visitor.checkStmt(stmt).size == 0)
+    assert(visitor.checkStmt(stmt1).size == 0)
+   }  
   test("Test assert true statement (true)") {
     val visitor = new TypeChecker()
     val module = parseResource("stmts/AssertTrueStmt01.oberon")
@@ -1720,4 +1745,29 @@ class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
     assert(res.size == 0)
   }
 
+  test("Test testsuit Lambda Application - Arithmetic") {
+    val visitor = new TypeChecker()
+    val module = parseResource("lambda/lambdaTest01.oberon")
+
+    assert(module.name == "LambdaTest01")
+    assert(module.tests.size == 4)
+    assert(module.stmt.isDefined)
+
+    val res = visitor.checkModule(module)
+
+    assert(res.size == 0)
+  }
+
+  test("Test testsuit Lambda Application - Boolean") {
+    val visitor = new TypeChecker()
+    val module = parseResource("lambda/lambdaTest02.oberon")
+
+    assert(module.name == "LambdaTest02")
+    assert(module.tests.size == 4)
+    assert(module.stmt.isDefined)
+
+    val res = visitor.checkModule(module)
+
+    assert(res.size == 0)
+  }
 }

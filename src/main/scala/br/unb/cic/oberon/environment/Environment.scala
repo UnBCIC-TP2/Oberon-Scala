@@ -187,6 +187,8 @@ class Environment[T](private val top_loc:Int = 0,
 
   def allVariables(): collection.Set[String] = global.keySet
 
+  def allLocalVariables(): collection.Set[String] = stack.flatMap(_.keySet).toSet
+  
   def delVariable(name: String): Environment[T] = {
     if(stack.nonEmpty && stack.top.contains(name)) {
       var copystack = stack.clone()

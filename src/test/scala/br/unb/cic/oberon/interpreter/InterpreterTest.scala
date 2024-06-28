@@ -7,6 +7,7 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.parser.{Oberon2ScalaParser, ScalaParser}
 import br.unb.cic.oberon.transformations.CoreTransformer
 import org.scalatest.funsuite.AnyFunSuite
+import scala.collection.mutable.ListBuffer
 
 class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
@@ -193,7 +194,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val module = parseResource("procedures/interpreter_factorial04.oberon")
 
     
-   val coreModule = CoreTransformer.reduceOberonModule(module)
+    val coreModule = CoreTransformer.reduceOberonModule(module)
 
     assert(coreModule.name == "SimpleModule")
 
@@ -202,6 +203,54 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("x") == Some(IntValue(1)))
     assert(result.lookup("y") == Some(IntValue(24)))
 
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT01 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT01.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT01")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(IntValue(5)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT02 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT02.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT02")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(IntValue(2)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT03 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT03.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT03")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT04 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT04.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT04")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT05 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT05.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT05")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(false)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT06 program") {
+    val module = ScalaParser.parseResource("lambda/lambdaExpressionsIT06.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT06")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
   }
 
   test("Testing interpreter on interpreter_stmt08 program") {
@@ -556,6 +605,14 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(evalArraySubscript(result, "a", 2)._2 == IntValue(25))
   }
 
+  // test("lambdaExpressions01"){
+  //   val module = scalaPaser.parseResource("lambda/lambdaExpressions01.oberon")
+  //   val coreModule = CoreTransformer.reduceOberonModule(module)
+  //   assert(coreModule.name == "LambdaExpressions01")
+  //   val result = interpreter.runInterpreter(coreModule)
+    
+  // }
+
   test("Module A has no imports"){
     val module = parseResource("imports/A.oberon")
 
@@ -721,7 +778,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val module = parseResource("stmts/AssertNEqualStmt01.oberon")
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
-
+    
 
     interpreter.runInterpreter(coreModule) == ()
   }
@@ -734,7 +791,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val thrown = intercept[Exception] {
       interpreter.runInterpreter(coreModule)
     }
-    assert(thrown.getMessage() == "Exception thrown from assert")
+    assert(thrown.getMessage() == ("Exception thrown from assert"))
   }
 
   ignore("Testing Test interpreter1") {
@@ -742,7 +799,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
-    // assert(interpreter.runInterpreter(coreModule, "TEST") == ())
+    assert(interpreter.runInterpreter(coreModule, "TEST") == ())
   }
 
 
@@ -768,7 +825,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     val thrown = intercept[Exception] {
-      interpreter.runInterpreter(coreModule)
+      interpreter.runInterpreter(coreModule, "TEST")
     }
     assert(thrown.getMessage() == "Exception thrown from assert")
 
@@ -782,6 +839,243 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     interpreter.runInterpreter(coreModule)
   }
 
+  test("Testing interpreter on lambdaExpressionsIT01 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT01.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT01")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(IntValue(5)))
+  }
+
+   test("Testing interpreter on lambdaExpressionsIT02 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT02.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT02")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(IntValue(2)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT03 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT03.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT03")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT04 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT04.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT04")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT05 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT05.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT05")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(false)))
+  }
+
+  test("Testing interpreter on lambdaExpressionsIT06 program - New Parser") {
+    val module = parseResource("lambda/lambdaExpressionsIT06.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    assert(coreModule.name == "LambdaExpressionsIT06")
+    val result = interpreter.runInterpreter(coreModule)
+    assert(result.lookup("r") == Some(BoolValue(true)))
+  }
+
+  test("Testing Arithmetic Lambda - New Parser"){
+    val module = parseResource("lambda/lambdaExpressionsIT07.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("r").isDefined)
+    assert(result.lookup("r") == Some(IntValue(2)))
+  }
+
+  test("Testing Fibonacci 10 - Lambda Expression - New Parser"){
+    val module = parseResource("lambda/lambdaExpressionsIT08.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("fib").isDefined)
+    val fib_array =  result.lookup("fib").get
+    fib_array match {
+      case ArrayValue(values,arrayType) => {
+      assert(fib_array == ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), IntValue(55)),ArrayType(10,IntegerType)))
+      assert(values(0) == IntValue(1))
+      assert(values(1) == IntValue(1))
+      assert(values(2) == IntValue(2))
+      assert(values(3) == IntValue(3))
+      assert(values(4) == IntValue(5))
+      assert(values(5) == IntValue(8))
+      assert(values(6) == IntValue(13))
+      assert(values(7) == IntValue(21))
+      assert(values(8) == IntValue(34))
+      assert(values(9) == IntValue(55))
+    }
+  }
+  }
+
+  test("Testing Lambda Applications on Factorial"){
+    val module = parseResource("lambda/lambdaExpressionsIT10.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "TEST")
+    assert(result.lookup("val").isDefined)
+    assert(result.lookup("val") == Some(IntValue(720)))
+  }
+
+  test("Testing Invalid Lambda Application on Lambda Expressions"){
+    val module = parseResource("lambda/lambdaExpressionsIT09.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val thrown = intercept[Exception]{interpreter.runInterpreter(coreModule, "TEST")}
+    assert(!thrown.getMessage().isEmpty)
+    
+  }
+
+  test("Testing Arithmetic LambdaApplication Test"){
+    val module = parseResource("lambda/lambdaTest01.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTestM").description == StringValue("Testing LambdaApplication - Addition"))
+    assert(result.findTest("lambdaTestm").description == StringValue("Testing LambdaApplication - Subtraction"))
+    assert(result.findTest("lambdaTestx").description == StringValue("Testing LambdaApplication - Multiplication"))
+    assert(result.findTest("lambdaTestd").description == StringValue("Testing LambdaApplication - Division"))
+    assert(result.lookup("r") == Some(IntValue(2)))
+    assert(result.lookup("y") == Some(IntValue(5)))
+    assert(result.lookup("z") == Some(IntValue(16)))
+    assert(result.lookup("w") == Some(IntValue(8)))
+  }
+
+  test("Testing Boolean LambdaApplication Test"){
+    val module = parseResource("lambda/lambdaTest02.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTestT").description == StringValue("Testing LambdaApplication - Boolean Operation True"))
+    assert(result.findTest("lambdaTestF").description == StringValue("Testing LambdaApplication - Boolean Operation False"))
+    assert(result.findTest("lambdaTestAnd").description == StringValue("Testing LambdaApplication - AND Operation"))
+    assert(result.findTest("lambdaTestOr").description == StringValue("Testing LambdaApplication - OR Operation"))
+    assert(result.lookup("r") == Some(BoolValue(true)))
+    assert(result.lookup("y") == Some(BoolValue(false)))
+    assert(result.lookup("z") == Some(BoolValue(false)))
+    assert(result.lookup("w") == Some(BoolValue(true)))
+  }
+
+  test("Testing LambdaApplication on Array"){
+    val module = parseResource("lambda/lambdaTest03.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTestArray_A").description == StringValue("Testing LambdaApplication on Array - First Test"))
+    assert(result.findTest("lambdaTestArray_B").description == StringValue("Testing LambdaApplication on Array - Second Test"))
+    assert(result.findTest("lambdaTestArray_C").description == StringValue("Testing LambdaApplication on Array - Third Test"))
+    assert(result.findTest("lambdaTestArray_D").description == StringValue("Testing LambdaApplication on Array - Fourth Test"))
+    assert(result.lookup("vector") == Some(ArrayValue(ListBuffer(IntValue(36), IntValue(25), IntValue(6), IntValue(51)),ArrayType(4,IntegerType))))
+  }
+
+  test("Testing LambdaApplication - Foreach in Array"){
+    val module = parseResource("lambda/lambdaTest04.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTestForeach").description == StringValue("Testing LambdaApplication on Array-Foreach"))
+    assert(result.lookup("mediaTurma") == Some(ArrayValue(ListBuffer(IntValue(4), IntValue(8), IntValue(6)),ArrayType(3,IntegerType))))
+    assert(result.lookup("media_simples") == Some(IntValue(6)))
+  }
+
+  test("Testing LambdaApplication - Bee1038Real"){
+    val module = parseResource("lambda/lambdaTest05.oberon")
+    
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Bee1038Real").description == StringValue("Testing LambdaApplication on bee1038"))
+    assert(result.lookup("banknotesValues") == Some(ArrayValue(ListBuffer(RealValue(2.5), RealValue(3.5), RealValue(4.5)),ArrayType(3,RealType))))
+    assert(result.lookup("amount_jp") == Some(RealValue(15.0)))
+    assert(result.lookup("amount_rb") == Some(RealValue(10.5)))
+    assert(result.lookup("amount_wm") == Some(RealValue(40.5)))
+  }
+
+  test("Testing LambdaApplication - Bee1038RealDollar"){
+    val module = parseResource("lambda/lambdaTest05.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Bee1038RealDollar").description == StringValue("Testing LambdaApplication on bee1038 - Dollar Conversion"))
+    assert(result.lookup("dollarValues") == Some(ArrayValue(ListBuffer(RealValue(12.3), RealValue(17.22), RealValue(22.14)),ArrayType(3,RealType))))
+  }
+
+  test("Testing LambdaApplication - Wrong Assignment"){
+    val module = parseResource("lambda/lambdaTest06.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val thrown = intercept[Exception]{interpreter.runInterpreter(coreModule, "lambdaTest")}
+    assert(thrown.getMessage() == "Exception thrown from assert")
+  }
+
+   test("Testing LambdaApplication - Fibonacci Sequences"){
+    val module = parseResource("lambda/lambdaTest07.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Fibonacci20").description == StringValue("Testing LambdaApplication on Fibonacci Sequence - 20"))
+    
+    assert(result.lookup("fib20") == Some(ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), 
+    IntValue(55), IntValue(89), IntValue(144), IntValue(233), IntValue(377), IntValue(610), 
+    IntValue(987), IntValue(1597), IntValue(2584), IntValue(4181), IntValue(6765)),ArrayType(20,IntegerType))))
+    
+    assert(result.findTest("lambdaTest_Fibonacci40").description == StringValue("Testing LambdaApplication on Fibonacci Sequence - 40"))
+    
+    assert(result.lookup("fib40") == Some(ArrayValue(ListBuffer(IntValue(1), IntValue(1), IntValue(2), IntValue(3), IntValue(5), IntValue(8), IntValue(13), IntValue(21), IntValue(34), IntValue(55), IntValue(89), 
+    IntValue(144), IntValue(233), IntValue(377), IntValue(610), IntValue(987), IntValue(1597), IntValue(2584), IntValue(4181), IntValue(6765), IntValue(10946), IntValue(17711), IntValue(28657), IntValue(46368), IntValue(75025), 
+    IntValue(121393), IntValue(196418), IntValue(317811), IntValue(514229), IntValue(832040), IntValue(1346269), IntValue(2178309), 
+    IntValue(3524578), IntValue(5702887), IntValue(9227465), IntValue(14930352), IntValue(24157817), IntValue(39088169), IntValue(63245986), IntValue(102334155)),ArrayType(40,IntegerType))))
+  }
+
+  test("Testing LambdaApplication - Factorial"){
+    val module = parseResource("lambda/lambdaTest08.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Factorial8").description == StringValue("Testing LambdaApplication on Factorial - 8"))
+    
+    assert(result.lookup("val") == Some(IntValue(40320)))
+
+    assert(result.findTest("lambdaTest_Factorial11").description == StringValue("Testing LambdaApplication on Factorial - 11"))
+    
+    assert(result.lookup("val2") == Some(IntValue(39916800)))
+    
+  }
+
+  test("Testing LambdaApplication - Composite Operations"){
+    val module = parseResource("lambda/lambdaTest09.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_Composite").description == StringValue("Testing LambdaApplication on Composite Operations I"))
+    
+    assert(result.lookup("val") == Some(IntValue(16)))
+
+    assert(result.findTest("lambdaTest_CompositeII").description == StringValue("Testing LambdaApplication on Composite Operations II"))
+    
+    assert(result.lookup("val2") == Some(IntValue(8)))
+
+    assert(result.findTest("lambdaTest_CompositeIII").description == StringValue("Testing LambdaApplication on Composite Operations III"))
+    
+    assert(result.lookup("val3") == Some(IntValue(48)))
+    
+  }
+
+   test("Testing LambdaApplication - Composite Operation on Array"){
+    val module = parseResource("lambda/lambdaTest10.oberon")
+    val coreModule = CoreTransformer.reduceOberonModule(module)
+    val result = interpreter.runInterpreter(coreModule, "lambdaTest")
+    assert(result.findTest("lambdaTest_CompositeArray").description == StringValue("Testing LambdaApplication on problem solving in Arrays"))
+    
+    assert(result.lookup("sallary_after") == Some(ArrayValue(ListBuffer(IntValue(90), IntValue(80), IntValue(70), IntValue(60)),ArrayType(4,IntegerType))))
+  }
+  
   test(testName = "Testing boolean32"){
     val module = parseResource("boolean/boolean32.oberon")
 

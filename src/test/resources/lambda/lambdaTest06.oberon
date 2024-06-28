@@ -1,0 +1,26 @@
+MODULE LambdaTest06;
+
+TYPE
+  ld = LAMBDA -> (INTEGER, INTEGER): BOOLEAN
+
+VAR
+  z: BOOLEAN;
+  x: ld;
+
+TEST lambdaTest_Wrong ("Testing LambdaApplication - Wrong Assignment");
+        BEGIN
+            x := (a: INTEGER, b: INTEGER) => (a+b < 5);
+            
+            z := (x)(1,2); 
+
+            assert_eq(z, False);
+
+            write("Test Gone Wrong")
+
+    END lambdaTest_Wrong
+
+BEGIN
+  write("Test Gone Wrong")
+END
+
+END LambdaTest06.

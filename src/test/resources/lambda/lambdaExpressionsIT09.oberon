@@ -1,0 +1,15 @@
+MODULE LambdaExpressionsIT09;
+
+TYPE
+   ld = LAMBDA -> (INTEGER, INTEGER, BOOLEAN): BOOLEAN
+   
+VAR
+    x : ld;
+    r : INTEGER;
+
+BEGIN
+    x := (a: INTEGER, b: INTEGER, c: BOOLEAN) => ((a + b) >= 10) && c;
+    r := (x)(True,True,14)
+END
+
+END LambdaExpressionsIT05.

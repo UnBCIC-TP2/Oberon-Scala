@@ -52,12 +52,42 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     if (module.stmt.isDefined) {
       val env5 = setupStandardLibraries(env4)
       executeStatement(env5, module.stmt.get)
+
     }
     else {
       env4
     }
   }
 
+def runInterpreter(module: OberonModule, Test: String): Environment[Expression] = {
+    // set up the global declarations
+    val env1 = module.userTypes.foldLeft(new Environment[Expression]())((a, b) => declareUserDefinedType(a, b))
+    val env2 = module.constants.foldLeft(env1)((a, b) => declareConstant(a, b))
+    val env3 = module.variables.foldLeft(env2)((a, b) => declareVariable(a, b))
+    val env4 = module.procedures.foldLeft(env3)((a, b) => declareProcedure(a, b))
+    val env5 = module.tests.foldLeft(env4)((a,b) => declareTest(a,b))
+
+    // execute the statement if it is defined.
+    // remember, module.stmt is an Option[Statement].
+    var env6 = env5
+    if (module.stmt.isDefined) {
+      env6 = setupStandardLibraries(env5)
+      env6 = executeStatement(env6, module.stmt.get)
+    }
+
+    if (!(module.tests.isEmpty)) {
+      module.tests.foreach(test => env6 = executeStatement(env6,test.stmt))
+      env6
+    }
+
+    else {
+      env6
+    }
+  }
+
+  def declareTest(environment: Environment[Expression], test: Test): Environment[Expression] = {
+    environment.declareTest(test)
+  }
   def declareConstant(environment : Environment[Expression], constant: Constant): Environment[Expression] = {
     environment.setGlobalVariable(constant.name, constant.exp)
   }
@@ -68,6 +98,13 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case _ => environment.setGlobalVariable(variable.name, Undef())
     }
   }
+  
+  def declareParameter(environment : Environment[Expression], variable: VariableDeclaration): Environment[Expression] = {
+    environment.baseType(variable.variableType) match {
+      case Some(ArrayType(length, baseType)) => environment.setLocalVariable(variable.name, ArrayValue(ListBuffer.fill(length)(Undef()), ArrayType(length, baseType)))
+      case _ => environment.setLocalVariable(variable.name, Undef())
+    }
+  } 
 
   def declareUserDefinedType(environment : Environment[Expression], userType: UserDefinedType): Environment[Expression] = {
     environment.addUserDefinedType(userType)
@@ -166,10 +203,25 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
       case ProcedureCallStmt(name, args) =>
         callProcedure(name, args, envt)
 
+      case TestCallStmt(name) =>
+        callTest(envt,name) 
+        
+
+      case AssertEqualStmt(left:Expression, right: Expression) =>
+        var envteste = envt
+        if(evalCondition(envteste, left) != evalCondition(envteste,right)) throw new Exception("Not Equal Condition")
+        envteste
+
+      case AssertNotEqualStmt(left: Expression, right: Expression) =>
+        var envteste = envt
+        if(evalCondition(envteste, left) == evalCondition(envteste,right)) throw new Exception("Equal Condition")
+        envteste
+      
       case AssertTrueStmt(exp: Expression) =>
         var envteste = envt
         if (!evalCondition(envteste, exp)) throw new Exception("Exception thrown from assert")
         envteste
+      
     }
   }
 
@@ -190,7 +242,6 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     env1 = env1.pop()
     env1
   }
-
 
   def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression], environment : Environment[Expression]): Environment[Expression] = {
     val mappedArgs = procedure.args.zip(args).map(pair => pair match {
@@ -284,9 +335,29 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     case AndExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] && v2.value.asInstanceOf[Boolean]))
     case OrExpression(left, right) => binExpression(environment, left, right, (v1: Value, v2: Value) => BoolValue(v1.value.asInstanceOf[Boolean] || v2.value.asInstanceOf[Boolean]))
     case FunctionCallExpression(name, args) => evalFunctionCall(environment, name, args)
+    case LambdaExpression(args,exp) => (environment,LambdaExpression(args,exp))
+    case LambdaApplication(exp, listExp) => evalLambdaApplication(environment,exp, listExp)
     // TODO FieldAccessExpression
     // TODO PointerAccessExpression
   }
+  
+  def evalLambdaApplication(environment: Environment[Expression], Expression: Expression, listExpression: List[Expression]) : (Environment[Expression], Expression) = {
+    var (env,expression) = evalExpression(environment,Expression)
+
+    (expression) match{
+        case (LambdaExpression(args,exp)) => {
+          var envt = env.push()
+          args.zip(listExpression).foreach{case (ParameterByValue(variable, _),value) => envt = envt.setLocalVariable(variable,evalExpression(envt,value)._2)}
+          var (envt1,exp1) = evalExpression(envt,exp)
+          (envt1.pop,exp1)
+        }
+
+        case _ => {
+          env = env.pop
+          throw new RuntimeException(s"It is not a Lambda Expression")
+        }
+    }
+  } 
 
   def evalVarExpression(environment: Environment[Expression], name: String) = {
     val variable = environment.lookup(name)
@@ -312,6 +383,16 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
     (env1, returnValue.get)
   }
 
+  def callTest(environment: Environment[Expression], test: String): (Environment[Expression]) = {
+    val Test = environment.findTest(test)
+    var env1 = updateEnvironmentWithTest(Test,environment)
+    env1 = executeStatement(env1, Test.stmt)
+    //val returnValue = env1.lookup(Values.ReturnKeyWord)
+    env1 = env1.pop()
+    //(env1, returnValue.get)
+    env1
+  }
+
   /**
    * Eval an arithmetic expression on Numbers
    *
@@ -323,8 +404,9 @@ def runInterpreter(module: OberonModule): Environment[Expression] = {
    *         numbers.
    */
   def arithmeticExpression(environment: Environment[Expression], left: Expression, right: Expression, fn: (Number, Number) => Number): (Environment[Expression], Expression) = {
-    val (_, vl) = evalExpression(environment, left)
-    val (_, vr) = evalExpression(environment, right)
+    val (_, vl) = evalExpression(environment,left)
+    val (_, vr) = evalExpression(environment,right)
+    
     (environment, fn(vl.asInstanceOf[Number], vr.asInstanceOf[Number]))
   }
 
