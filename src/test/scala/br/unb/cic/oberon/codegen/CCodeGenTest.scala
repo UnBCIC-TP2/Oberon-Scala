@@ -257,4 +257,75 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/bee3205_NastyHacks_v_alt.oberon")
   }
 
+  test("C generator for Parity Check with Procedures"){
+    testGenerator("procedures/parityCheckerProcedures.oberon")
+  }
+
+  test("C generator for Parity Check"){
+    testGenerator("simple/parityCheckerSimple.oberon")
+  }
+
+  test("C generator for Progression"){
+    testGenerator("stmts/progression.oberon")
+  }
+
+  test("C generator for Countdown"){
+    testGenerator("stmts/countdown.oberon")
+  }
+
+  test("C generator for Fuel") {
+    testGenerator("stmts/beecrowd1017.oberon")
+  }
+
+  test("C generator for Avg") {
+    testGenerator("stmts/beecrowd1005.oberon")
+  }
+
+  test("C generator for Salary") {
+    testGenerator("stmts/beecrowd1008.oberon")
+  }
+
+  test("C generator for Years") {
+    testGenerator("stmts/beecrowd1020.oberon")
+  }
+
+  test("C generator for Fuel Consumption") {
+    testGenerator("stmts/beecrowd1014.oberon")
+  }
+
+  test("C generator for Salary bonus") {
+    testGenerator("stmts/beecrowd1010.oberon")
+  }
+
+  ignore("C generator for ForSTMT"){
+    testGenerator("stmts/forstmt.oberon")
+  }
+
+  test("C generator for Logic AND OR") {
+    testGenerator("stmts/Logic.oberon")
+  }
+
+  test("C generator for Logic AND NOT") {
+    testGenerator("stmts/LogicNot.oberon")
+  }
+
+  ignore("C generator for Geometric Progression") {
+    testGenerator("stmts/pgNormal.oberon")
+  }
+
+  ignore("C generator for Geometric Progression with multiple args") {
+    testGenerator("stmts/pgNew.oberon")
+  }
+
+  ignore("C generator for Boolean Negation") {
+    testGenerator("stmts/boolNeg.oberon")
+  }
+
+  ignore("C generator for Progression Multiple Variable"){
+    testGenerator("stmts/progression_mul.oberon")
+  }
+
+  ignore("C generator for Pow Test"){
+    testGenerator("stdlib/POWTest.oberon")
+  }
 }

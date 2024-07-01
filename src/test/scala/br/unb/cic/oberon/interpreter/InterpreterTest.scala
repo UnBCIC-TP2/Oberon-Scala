@@ -838,7 +838,7 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("answer") == Some(IntValue(217)))
   }
 
+  def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): (Environment[Expression], Expression) =
+    interpreter.evalExpression(environment, ArraySubscript(VarExpression(name), IntValue(index)))
 
-  def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): Expression =
-    interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index))).runA(environment).value
 }

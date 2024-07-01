@@ -17,7 +17,7 @@ int power(int b, int e) {
         r = r * b;
         e = e - 1;
         if (e <= 1) {
-            break; 
+            break;
         }
     }
     return r;

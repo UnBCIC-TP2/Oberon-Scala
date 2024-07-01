@@ -10,7 +10,7 @@ int main() {
     while (true) {
         x = x + 1;
         if (x == 10) {
-            break; 
+            break;
         }
     }
     printf("%d\n", x);

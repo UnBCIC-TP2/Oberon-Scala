@@ -1,0 +1,15 @@
+MODULE boolNeg;
+
+VAR
+    p, q, r : BOOLEAN;
+BEGIN
+ p := TRUE;
+ q := FALSE;
+ p := p && ~q;
+ IF (r = FALSE)
+ THEN
+    write(r)
+ END
+END
+
+END boolNeg.

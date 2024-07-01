@@ -1,0 +1,18 @@
+MODULE pgNormal;
+
+VAR
+ pg, a1, r, N, n : INTEGER;
+
+BEGIN
+ a1 := 2;
+ r := 3;
+ N := 5;
+ FOR n:= 0 TO N DO
+  pg := a1 * POW(r, n - 1);
+  write(pg);
+  n := n + 1
+ END
+END
+
+END pgNormal.
+

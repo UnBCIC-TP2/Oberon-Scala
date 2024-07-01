@@ -12,7 +12,7 @@ int main() {
         x = x + 1;
         y = y + 1;
         if (x >= 10 && y >= 20) {
-            break; 
+            break;
         }
     }
     printf("%d\n", x);
