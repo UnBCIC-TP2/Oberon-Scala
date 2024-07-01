@@ -16,7 +16,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "INCTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(RealValue(10.0)))
     assert(result.lookup("y") == Some(IntValue(-7)))
@@ -28,7 +28,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "DECTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(IntValue(8)))
     assert(result.lookup("y") == Some(RealValue(-9.0)))
@@ -39,7 +39,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "ABSTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
     assert(result.lookup("x") == Some(IntValue(-10)))
     assert(result.lookup("y") == Some(IntValue(10)))
     assert(result.lookup("z") == Some(IntValue(10)))
@@ -52,7 +52,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "ODDTest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(IntValue(10)))
     assert(result.lookup("y") == Some(IntValue(11)))
@@ -66,7 +66,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "FLOORTest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(IntValue(10)))
     assert(result.lookup("z") == Some(IntValue(50)))
@@ -78,7 +78,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "RNDTest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(IntValue(10)))
     assert(result.lookup("z") == Some(IntValue(-1)))
@@ -89,7 +89,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "FLTTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(RealValue(-8.0)))
     assert(result.lookup("z") == Some(RealValue(2.0)))
@@ -101,7 +101,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "POWTest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("z") == Some(RealValue(0.25298221281347033)))
     assert(result.lookup("w") == Some(RealValue(-729.0)))
@@ -112,7 +112,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "SQRTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("z") == Some(RealValue(14.0)))
     assert(result.lookup("y") == Some(RealValue(3.1622776601683795)))
@@ -123,7 +123,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "CEILTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("z") == Some(IntValue(10)))
     assert(result.lookup("w") == Some(IntValue(12)))
@@ -135,7 +135,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "READFILETest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
   }
@@ -146,7 +146,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "WRITEFILETest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
     assert(result.lookup("y") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")))
@@ -164,7 +164,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "APPENDFILETest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(StringValue("src/test/resources/stdlib/plainFile.txt")))
     assert(result.lookup("w") == Some(StringValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit.Testando append")))
@@ -183,7 +183,7 @@ class StandardLibraryTest extends AnyFunSuite {
     assert(module.name == "STRINGTOINTTest")
 
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(IntValue(-8)))
     assert(result.lookup("z") == Some(IntValue(2)))
@@ -194,7 +194,7 @@ class StandardLibraryTest extends AnyFunSuite {
 
     assert(module.name == "STRINGTOREALTest")
 
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("y") == Some(RealValue(-8.0)))
     assert(result.lookup("z") == Some(RealValue(2.5)))

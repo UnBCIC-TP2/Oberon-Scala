@@ -68,7 +68,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
     assert(result.lookup("x") == Some(IntValue(6)))
     assert(result.lookup("factorial") == Some(IntValue(120)))
   }
@@ -136,7 +136,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(result.lookup("x") == Some(IntValue(10)))
     assert(result.lookup("i") == Some(IntValue(10)))
@@ -229,7 +229,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "RepeatUntilModule");
     assert(result.lookup("x").contains(IntValue(11)));
@@ -308,7 +308,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(coreModule.name == "RepeatUntilModule")
     assert(result.lookup("sum") == Some(IntValue(330)));
@@ -335,7 +335,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "RepeatUntilModule");
     assert(result.lookup("x").contains(IntValue(11)))
@@ -414,7 +414,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "RepeatUntilModule");
     assert(result.lookup("x").contains(IntValue(3)));
@@ -480,7 +480,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "RepeatUntilModule");
 
@@ -562,7 +562,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "RepeatUntilModule");
 
@@ -666,7 +666,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -733,7 +733,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -812,7 +812,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -873,7 +873,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -894,7 +894,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -955,7 +955,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -1028,7 +1028,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
 
     assert(module.name == "SimpleModule")
 
@@ -1092,7 +1092,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
     assert(module.name == "SimpleModule")
 
     assert(result.lookup("xs") == Some(IntValue(0)));
@@ -1163,7 +1163,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
     assert(module.name == "SimpleModule")
 
     assert(result.lookup("xs") == Some(IntValue(10)));
@@ -1234,7 +1234,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
     assert(module.name == "SimpleRangeCaseModule")
 
     assert(result.lookup("xs") == Some(IntValue(5)));
@@ -1304,7 +1304,7 @@ class CoreTransformerTest extends AbstractTestSuite with Oberon2ScalaParser {
     val coreModule = CoreTransformer.reduceOberonModule(module)
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(coreModule)
+    val result = interpreter.run(coreModule)
     assert(module.name == "SimpleRangeCaseModule")
 
     assert(result.lookup("xs") == Some(IntValue(20)));

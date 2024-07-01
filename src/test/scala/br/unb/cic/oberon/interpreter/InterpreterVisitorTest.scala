@@ -14,7 +14,7 @@ class InterpreterVisitorTest extends AnyFunSuite {
     assert(module.name == "SimpleModule")
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("x") == Some(IntValue(625)))
     assert(result.lookup("y") == Some(IntValue(100)))
@@ -27,7 +27,7 @@ class InterpreterVisitorTest extends AnyFunSuite {
     assert(module.name == "Factorial")
 
     interpreter.setTestEnvironment()
-    val result = interpreter.runInterpreter(module)
+    val result = interpreter.run(module)
 
     assert(result.lookup("res").isDefined)
     assert(result.lookup("res") == Some(IntValue(120)))

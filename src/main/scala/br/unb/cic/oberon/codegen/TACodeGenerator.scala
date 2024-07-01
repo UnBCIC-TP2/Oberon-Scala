@@ -3,11 +3,13 @@ package br.unb.cic.oberon.codegen
 import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
 import br.unb.cic.oberon.ir.tac._
 import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.environment.Environment
 
 object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
-  private var tc = new TypeChecker()
-  private var expVisitor = new ExpressionTypeChecker(tc)
+  var env = new Environment[Type]()
+  private var tc = new TypeChecker(env)
+  private var expVisitor = new ExpressionTypeChecker(tc, env)
 
   private val typeByteSize: Map[Type, Int] =
     Map(IntegerType -> 4,
@@ -29,7 +31,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t, insts1) = generateExpression(exp, insts)
         designator match {
           case VarAssignment(varName) =>
-            val v = Name(varName, expVisitor.checkExpression(exp).get)
+            val v = Name(varName, expVisitor.checkExpression(exp, expVisitor.env).runA(expVisitor.env).value.value.get)
             insts1 :+ CopyOp(t, v, "")
           case ArrayAssignment(array, index) =>
             val (a, insts2) = generateExpression(array, insts1)
@@ -278,15 +280,15 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case NullValue =>
         return (Constant("Null", NullType), insts)
 
-      case VarExpression(name) =>
-        return (Name(name, expVisitor.checkExpression(expr).get), insts)
+      case VarExpression(name) => 
+        return (Name(name, expVisitor.checkExpression(expr, tc.env).runA(tc.env).value.value.getOrElse(UndefinedType)), insts)
 
       case AddExpression(left, right) =>
         val (t, l, r, insts2) = generateBinaryExpression(
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
         )
         return (t, insts2 :+ AddOp(l, r, t, ""))
 
@@ -295,7 +297,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
         )
         return (t, insts2 :+ SubOp(l, r, t, ""))
 
@@ -304,7 +306,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
         )
         return (t, insts2 :+ MulOp(l, r, t, ""))
 
@@ -313,7 +315,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
           left,
           right,
           insts,
-          expVisitor.checkExpression(expr).get
+          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
         )
 
         return (t, insts2 :+ DivOp(l, r, t, ""))
@@ -403,11 +405,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expVisitor.checkExpression(expr).get)
+        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
         return (t, insts2 :+ ArrayGet(a, i, t, ""))
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expVisitor.checkExpression(expr).get)
+        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(record, field) =>
@@ -515,8 +517,9 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   }
 
   def reset(): Unit = {
-    tc = new TypeChecker()
-    expVisitor = new ExpressionTypeChecker(tc)
+    var env = new Environment[Type]()
+    tc = new TypeChecker(env)
+    expVisitor = new ExpressionTypeChecker(tc, env)
     Temporary.reset
     LabelGenerator.reset
   }
