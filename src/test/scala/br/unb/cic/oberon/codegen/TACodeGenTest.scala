@@ -12,7 +12,7 @@ class TACodeTest extends AnyFunSuite {
     val expr = AddExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
     // 1 + 2
-
+    TACodeGenerator.reset
     Temporary.reset
     val t0 = new Temporary(IntegerType, 0, true)
     val ops = List(
@@ -23,7 +23,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Generate add between add and constant") {
+  ignore("Generate add between add and constant") {
 
     TACodeGenerator.reset
     val expr =

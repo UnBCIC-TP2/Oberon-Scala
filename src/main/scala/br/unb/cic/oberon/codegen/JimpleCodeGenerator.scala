@@ -19,6 +19,7 @@ import br.unb.cic.oberon.ir.ast.{
 }
 import br.unb.cic.oberon.ir.jimple._
 import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.ListBuffer
 
@@ -39,12 +40,13 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
   }
 
   def generateConstants(module: OberonModule): List[Field] = {
-    val visitor = new ExpressionTypeChecker(new TypeChecker())
+    val env = new Environment[Type]()
+    val visitor = new ExpressionTypeChecker(new TypeChecker(env), env)
 
     module.constants.map(constant =>
       Field(
         modifiers = List(PublicModifer, StaticModifier, FinalModifier),
-        fieldType = jimpleType(visitor.checkExpression(constant.exp), module),
+        fieldType = jimpleType(visitor.checkExpression(constant.exp, visitor.env).runA(visitor.env).value.value, module),
         name = constant.name
       )
     )
