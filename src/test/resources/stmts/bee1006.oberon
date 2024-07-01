@@ -1,0 +1,23 @@
+MODULE bee1006;
+
+IMPORT Input, Texts;
+
+VAR
+    A, B, C, media: REAL;
+
+PROCEDURE Media2;
+BEGIN
+    Input.Int(A);
+    Input.Int(B);
+    Input.Int(C);
+
+    media := ((A * 2) + (B * 3) + (C * 5)) / 10;
+
+    Texts.WriteString(Texts.Console, "MEDIA = ");
+    Texts.WriteReal(Texts.Console, media, 1);
+    Texts.WriteLn(Texts.Console);
+END Media2;
+
+BEGIN
+    Media2;
+END bee1006.

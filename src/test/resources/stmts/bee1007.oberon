@@ -1,0 +1,24 @@
+MODULE bee1007;
+
+IMPORT Input, Texts;
+
+VAR
+    A, B, C, D, diferenca: INTEGER;
+
+PROCEDURE Diferenca;
+BEGIN
+    Input.Int(A);
+    Input.Int(B);
+    Input.Int(C);
+    Input.Int(D);
+
+    diferenca := (A * B) - (C * D);
+
+    Texts.WriteString(Texts.Console, "DIFERENCA = ");
+    Texts.WriteInt(Texts.Console, diferenca, 0);
+    Texts.WriteLn(Texts.Console);
+END Diferenca;
+
+BEGIN
+    Diferenca;
+END bee1007.
