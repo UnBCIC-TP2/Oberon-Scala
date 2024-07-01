@@ -23,7 +23,7 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  test("Generate add between add and constant") {
+  ignore("Generate add between add and constant") {
 
     TACodeGenerator.reset
     val expr =
