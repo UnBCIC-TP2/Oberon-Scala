@@ -13,13 +13,13 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val bTrue = BoolValue(true)
     val bFalse = BoolValue(false)
 
-    val (_, exp1) = interpreter.evalExpression(env, val10)
+    val exp1 = interpreter.evalExpression(val10).runA(env).value
     assert(exp1 == val10)
 
-    val (_, exp2) = interpreter.evalExpression(env, bTrue)
+    val exp2 = interpreter.evalExpression(bTrue).runA(env).value
     assert(exp2 == bTrue)
 
-    val (_, exp3) = interpreter.evalExpression(env, bFalse)
+    val exp3 = interpreter.evalExpression(bFalse).runA(env).value
     assert(exp3 == bFalse)
   }
 
@@ -32,7 +32,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
     val exp = AddExpression(val10, MultExpression(val20, val30))
 
-    val (_, exp1) = interpreter.evalExpression(env, exp)
+    val exp1 = interpreter.evalExpression(exp).runA(env).value
     assert(exp1 == IntValue(610))
   }
 
@@ -45,7 +45,7 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
 
     val exp = SubExpression(val20, DivExpression(val30, val10))
 
-    val (_, exp1) = interpreter.evalExpression(env, exp)
+    val exp1 = interpreter.evalExpression(exp).runA(env).value
     assert(exp1 == IntValue(17))
   }
 
@@ -56,29 +56,29 @@ class EvalExpressionVisitorTest extends AnyFunSuite {
     val valFalse = BoolValue(false)
     val exp = AndExpression(valTrue, AndExpression(valTrue, OrExpression(valTrue, valFalse)))
 
-    val (_, exp1) = interpreter.evalExpression(env, exp)
+    val exp1 = interpreter.evalExpression(exp).runA(env).value
     assert(exp1 == valTrue)
   }
 
   test("Test eval on global variables") {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
-    env = interpreter.setGlobalVariable(env, "x", IntValue(30))
+    env = interpreter.setGlobalVariable("x", IntValue(30)).runS(env).value
 
     val exp = AddExpression(IntValue(10), VarExpression("x"))
 
-    val (_, exp1) = interpreter.evalExpression(env, exp)
+    val exp1 = interpreter.evalExpression(exp).runA(env).value
     assert(exp1 == IntValue(40))
   }
 
   test("Test eval on local (stack) and global variables") {
     val interpreter = new Interpreter()
     var env = new Environment[Expression]()
-    env = interpreter.setGlobalVariable(env, "x", IntValue(30))
-    env = interpreter.setLocalVariable(env, "y", IntValue(10))
+    env = interpreter.setGlobalVariable("x", IntValue(30)).runS(env).value
+    env = interpreter.setLocalVariable("y", IntValue(10)).runS(env).value
 
     val exp = AddExpression(VarExpression("x"), VarExpression("y"))
-    val (_, exp1) = interpreter.evalExpression(env, exp)
+    val exp1 = interpreter.evalExpression(exp).runA(env).value
     assert(exp1 == IntValue(40))
   }
 

@@ -58,7 +58,7 @@ object JVMCodeGenerator extends CodeGenerator[String] {
 
     constants.map {
       case (constant) => 
-        val (_, v) = interpreter.evalExpression(env, constant.exp)
+        val v = interpreter.evalExpression(constant.exp).runA(env).value
 
       v match {
         case IntValue(value) => {
