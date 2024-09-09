@@ -144,7 +144,7 @@ trait ExpressionParser extends CompositeParsers {
 
   def fieldAccessTerm: Parser[Expression => Expression] = "." ~ identifier ^^ { case _ ~ b => FieldAccessExpression(_, b) }
 
-  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")"
+  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")" | shiftOperatorParser
 
   def complexTerm: Parser[Expression] = (
     "~" ~> factor ^^ NotExpression
@@ -186,6 +186,13 @@ trait ExpressionParser extends CompositeParsers {
     )
 
   def expressionParser: Parser[Expression] = relTerm ~ rep(logExpParser) ^^ aggregator
+
+  def shiftOperatorParser: Parser[Expression] = {
+    factor ~ (("<<" | ">>") ~ factor) ^^ {
+      case leftExpr ~ ("<<" ~ rightExp) => LeftShift(leftExpr, rightExp)
+      case leftExpr ~ (">>" ~ rightExp) => RightShift(leftExpr, rightExp)
+    }
+  }
 }
 
 

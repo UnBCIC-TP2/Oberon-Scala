@@ -566,6 +566,8 @@ class ParserVisitor {
         case "&&"  => AndExpression
         case "||"  => OrExpression
         case "MOD" => ModExpression
+        case "<<"  => LeftShift
+        case ">>"  => RightShift
       }
 
     /*
