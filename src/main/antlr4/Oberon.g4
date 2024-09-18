@@ -82,6 +82,11 @@ expression
  | left = expression opr = ('MOD' | '*' | '/' | '&&') right = expression                  #MultExpression
  | left = expression opr = ('+' | '-' | '||') right = expression                          #AddExpression
  | '(' formals? ')' '=>' expression                                                       #LambdaExpression
+ | 'CONS' '(' head = expression ')'                                                       #ConsExpression
+ | 'LEN' '(' list = expression ')'                                                        #LenExpression
+ | listBase = expression '[' index = expression ']'                                       #ListSubscript
+ | 'CONCAT' '(' list1 = expression ',' list2 = expression ')'                             #ConcatExpression
+ | 'REMOVE' '(' item = expression ',' list = expression ')'                               #RemoveExpression
  ;
 
 qualifiedName
@@ -141,8 +146,10 @@ expValue
   | stringValue
   | boolValue
   | nullValue
+  | listValue
   ;
 
+listValue: '[' (elements += expression (',' elements += expression)*)? ']' ;
 intValue: INT ;
 realValue: REAL ;
 charValue: CHAR ;
@@ -159,6 +166,7 @@ oberonType
  | NIL               #NullType
  | name = Id         #ReferenceType        // Reference for user defined types
  | userType          #ComplexType
+ | '[' baseType = oberonType ']'  #ListType
  ;
 
 INT : '-'? Digit+;

@@ -838,6 +838,51 @@ class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
     assert(result.lookup("answer") == Some(IntValue(217)))
   }
 
+  test("Testing cons in List module") {
+    val module = parseResource("stmts/list.oberon")
+    assert(module.name == "list")
+
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.run(module)
+
+    assert(result.lookup("a") == Some(ListValue(List(IntValue(3)))))
+  }
+
+  test("Testing len in List module") {
+    val module = parseResource("stmts/list.oberon")
+    assert(module.name == "list")
+
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.run(module)
+
+    assert(result.lookup("c") == Some(IntValue(1)))
+  }
+
+  test("Testing concat in List module") {
+    val module = parseResource("stmts/list.oberon")
+    assert(module.name == "list")
+
+    assert(module.stmt.isDefined)
+
+    val result = interpreter.run(module)
+
+    assert(result.lookup("d") == Some(ListValue(List(IntValue(3), IntValue(4)))))
+  }
+
+  test("Testing remove in List module") {
+  val module = parseResource("stmts/list.oberon")
+
+  assert(module.name == "list")
+  assert(module.stmt.isDefined)
+
+  val result = interpreter.run(module)
+
+  assert(result.lookup("e") == Some(ListValue(List(IntValue(4))))) 
+  }
+
   def evalArraySubscript(environment : Environment[Expression], name: String, index: Integer): Expression =
     interpreter.evalExpression(ArraySubscript(VarExpression(name), IntValue(index))).runA(environment).value
+
 }

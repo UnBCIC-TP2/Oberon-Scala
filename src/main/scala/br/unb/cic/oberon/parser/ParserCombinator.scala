@@ -73,6 +73,7 @@ trait CompositeParsers extends BasicParsers {
       | "RECORD" ~> multDeclarationTermParser <~ "END" ^^ RecordType
       | ("POINTER" ~ "TO") ~> (userTypeParser | typeParser) ^^ PointerType
       | ("LAMBDA" ~ "->") ~> ("(" ~> lambdaTypes <~ ")") ~ (":" ~> (userTypeParser | typeParser)) ^^ { case args ~ ret => LambdaType(args, ret) }
+      | "LIST" ~> ("OF" ~> (userTypeParser | typeParser)) ^^ ListType  // Suporte para ListType
     )
 
   def lambdaTypes: Parser[List[Type]] = opt((userTypeParser | typeParser) ~ rep("," ~> (userTypeParser | typeParser))) ^^ {
@@ -122,7 +123,13 @@ trait CompositeParsers extends BasicParsers {
 }
 
 trait ExpressionParser extends CompositeParsers {
+  def consExpressionParser: Parser[Expression] = {"CONS" ~> "(" ~> expressionParser <~ ")" ^^ {case head => ConsExpression(head)}} // Create a list with the head as the only element}
 
+  def concatExpressionParser: Parser[Expression] = "CONCAT" ~> ("(" ~> expressionParser ~ ("," ~> expressionParser) <~ ")") ^^ {case left ~ right => ConcatExpression(left, right)}
+
+  def removeExpressionParser: Parser[Expression] = "REMOVE" ~> ("(" ~> expressionParser ~ ("," ~> expressionParser) <~ ")") ^^ {case item ~ list => RemoveExpression(item, list)}
+
+  def lenExpressionParser: Parser[Expression] = "LEN" ~> ("(" ~> expressionParser <~ ")") ^^ LenExpression
 
   def pointerParser: Parser[Expression] = identifier <~ "^" ^^ PointerAccessExpression
 
@@ -144,7 +151,7 @@ trait ExpressionParser extends CompositeParsers {
 
   def fieldAccessTerm: Parser[Expression => Expression] = "." ~ identifier ^^ { case _ ~ b => FieldAccessExpression(_, b) }
 
-  def factor: Parser[Expression] = expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")"
+  def factor: Parser[Expression] = removeExpressionParser | concatExpressionParser | consExpressionParser | lenExpressionParser | expValueParser | pointerParser | functionParser | variableParser | lambdaExpParser | "(" ~> expressionParser <~ ")"
 
   def complexTerm: Parser[Expression] = (
     "~" ~> factor ^^ NotExpression

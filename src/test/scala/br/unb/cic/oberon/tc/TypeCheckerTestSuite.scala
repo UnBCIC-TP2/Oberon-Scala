@@ -18,7 +18,49 @@ import scala.collection.mutable.ListBuffer
 
 class TypeCheckerTestSuite  extends AbstractTestSuite with Oberon2ScalaParser {
 
+  test("Test homogeneous list type checker") {
+  val visitor = new TypeChecker(new Environment[Type]())
+  
+  val assignHomogeneousList = AssignmentStmt("z", ListValue(List(IntValue(10), IntValue(20), IntValue(30))))
+  
+  visitor.env = visitor.env.setGlobalVariable("z", ListType(IntegerType))
 
+  val homogeneousResult = visitor.checkStmt(assignHomogeneousList).runA(visitor.env).value.written
+  assert(homogeneousResult.isEmpty)
+}
+
+test("Test heterogeneous list type checker") {
+  val visitor = new TypeChecker(new Environment[Type]())
+  
+  val assignHeterogeneousList = AssignmentStmt("z", ListValue(List(IntValue(10), StringValue("teste"))))
+  
+  visitor.env = visitor.env.setGlobalVariable("z", ListType(IntegerType))
+
+  val heterogeneousResult = visitor.checkStmt(assignHeterogeneousList).runA(visitor.env).value.written
+  assert(heterogeneousResult.nonEmpty) 
+}
+
+test("Test list with mixed types (Real and Boolean) type checker") {
+  val visitor = new TypeChecker(new Environment[Type]())
+  
+  val mixedList = AssignmentStmt("z", ListValue(List(RealValue(3.14), BoolValue(true))))
+  
+  visitor.env = visitor.env.setGlobalVariable("z", ListType(RealType))
+  
+  val mixedListResult = visitor.checkStmt(mixedList).runA(visitor.env).value.written
+  assert(mixedListResult.nonEmpty)
+}
+
+test("Test list with mixed types (Boolean and String) type checker") {
+  val visitor = new TypeChecker(new Environment[Type]())
+  
+  val mixedList = AssignmentStmt("z", ListValue(List(BoolValue(false), StringValue("Oberon"))))
+  
+  visitor.env = visitor.env.setGlobalVariable("z", ListType(BooleanType))
+  
+  val mixedListResult = visitor.checkStmt(mixedList).runA(visitor.env).value.written
+  assert(mixedListResult.nonEmpty)
+}
   test("Test read int statement type checker") {
     val visitor = new TypeChecker(new Environment[Type]())
     val read01 = ReadIntStmt("x")

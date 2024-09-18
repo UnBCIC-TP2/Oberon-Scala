@@ -44,7 +44,19 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
     case NullValue           => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
     case Undef()             => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), None))}
     case VarExpression(name) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), typeChecker.env.lookup(name)))}
+    case ListValue(elements) => val elementTypes = elements.map(e => checkExpression(e, env).runA(env).value.value.getOrElse(UndefinedType))
 
+  if (elementTypes.forall(_ == elementTypes.headOption.getOrElse(UndefinedType))) {
+    // Se todos os elementos têm o mesmo tipo, retorna o tipo da lista com esse tipo
+    State[Environment[Type], Writer[List[String], Option[Type]]] { env =>
+      (env, Writer(List(), Some(ListType(elementTypes.headOption.getOrElse(UndefinedType)))))
+    }
+  } else {
+    // Caso contrário, retorna um erro
+    State[Environment[Type], Writer[List[String], Option[Type]]] { env =>
+      (env, Writer(List("Error: Elements have different types in the list."), None))
+    }
+  }
   //   /* Verifica se a variável avaliada já foi definida anteriormente, 
   //   se não for definida retorna None. A mensagem de erro é retornada pelo checkStmt*/
   //   case VarExpression(name) => typeChecker.env.lookup(name)
@@ -80,6 +92,60 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
     case OrExpression(left, right) =>
         computeBinExpressionType(left, right, List(BooleanType), BooleanType)
+    case LenExpression(exp) => 
+        computeGeneralExpressionType(exp, env).flatMap { t =>
+        t.value match {
+        case Some(ListType(_)) =>
+          State[Environment[Type], Writer[List[String], Option[Type]]] { env => (env, Writer(List(), Some(IntegerType)))}
+          case _ =>
+          State[Environment[Type], Writer[List[String], Option[Type]]] { env =>(env, Writer(List("Error: len expects a list."), None))
+            }
+    }
+  }
+
+    case RemoveExpression(item, list) =>
+      for {
+        itemType <- checkExpression(item, env)
+        listType <- checkExpression(list, env)
+      } yield {
+        (itemType.value, listType.value) match {
+          case (Some(itType), Some(ListType(lType))) if itType == lType =>
+            Writer(List(), Some(ListType(lType)))  // O tipo do item é o mesmo da lista, operação válida
+          case (Some(itType), Some(ListType(_))) =>
+            Writer(List("Error: remove expects an item of the same type as the list elements."), None)
+          case (Some(_), _) =>
+            Writer(List("Error: remove expects a list as the second argument."), None)
+          case _ =>
+            Writer(List("Error: remove expression has invalid types."), None)
+    }
+  }
+
+    case ConsExpression(head) =>
+      for {
+        headType <- checkExpression(head, env)
+      } yield {
+        headType.value match {
+          case Some(ht) =>
+            Writer(List(), Some(ListType(ht)))  // O tipo do elemento é o tipo da lista com um único elemento
+          case None =>
+            Writer(List("Error: cons expects a valid head element."), None)
+        }
+      }
+
+    case ConcatExpression(left, right) =>
+      for {
+        leftType <- checkExpression(left, env)
+        rightType <- checkExpression(right, env)
+      } yield {
+        (leftType.value, rightType.value) match {
+          case (Some(ListType(lType)), Some(ListType(rType))) if lType == rType =>
+            Writer(List(), Some(ListType(lType)))  // Ambos são listas do mesmo tipo, concatenação válida
+          case (Some(ListType(_)), Some(ListType(_))) =>
+            Writer(List("Error: concat expects lists of the same type."), None)
+          case _ =>
+            Writer(List("Error: concat expects two lists."), None)
+        }
+      }
   // Verifica se os argumentos da função são do tipo esperado pela definição dela.
     //TODO: Definir mensagens de erro.
     case FunctionCallExpression(name, args) => {
@@ -98,7 +164,14 @@ class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[T
           State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
         }
   } 
-
+    case ListValue(elements) => 
+      val elementTypes = elements.map(e => checkExpression(e, env).runA(env).value.value.getOrElse(UndefinedType))
+      if (elementTypes.forall(_ == elementTypes.headOption.getOrElse(UndefinedType))) {
+        State[Environment[Type], Writer[List[String], Option[Type]]] { env => (env, Writer(List(), Some(ListType(elementTypes.headOption.getOrElse(UndefinedType)))))}
+        } else {
+          State[Environment[Type], Writer[List[String], Option[Type]]] { env => (env, Writer(List("Error: Elements have different types in list."), None))
+        }
+  }
 
     // Verifica se todos os elementos da array são do tipo esperado.
     case ArrayValue(values, arrayType) =>

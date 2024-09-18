@@ -174,6 +174,10 @@ case class RealValue(value: Double) extends Value with Number {
   }
 }
 
+case class ListValue(value: List[Expression]) extends Value {
+  type T = List[Expression]
+}
+
 case class CharValue(value: Char) extends Value { type T = Char }
 case class StringValue(value: String) extends Value { type T = String }
 case class BoolValue(value: Boolean) extends Value { type T = Boolean }
@@ -212,6 +216,11 @@ case class ModExpression(left: Expression, right: Expression) extends Expression
 case class NotExpression(exp: Expression) extends Expression
 case class LambdaExpression(args: List[FormalArg], exp: Expression)
     extends Expression
+case class LenExpression(exp: Expression) extends Expression 
+case class ConsExpression(head: Expression) extends Expression
+case class ListSubscript(listBase: Expression, index: Expression) extends Expression
+case class ConcatExpression(list1: Expression, list2: Expression) extends Expression
+case class RemoveExpression(item: Expression, list: Expression) extends Expression
 
 /* Statements */
 trait Statement {
@@ -324,6 +333,7 @@ case class RecordType(variables: List[VariableDeclaration]) extends Type
 case class ArrayType(length: Int, baseType: Type) extends Type
 case class PointerType(variableType: Type) extends Type
 case class LambdaType(argsTypes: List[Type], returnType: Type) extends Type
+case class ListType(baseType: Type) extends Type
 
 case class ReferenceToUserDefinedType(name: String) extends Type
 

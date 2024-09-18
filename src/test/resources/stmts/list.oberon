@@ -1,0 +1,16 @@
+MODULE list;
+VAR
+    a : list;
+    b : list;
+    c : INTEGER;
+    d : list;
+    e : list;
+BEGIN
+    a := CONS(3);
+    b := CONS(4);
+    c := LEN(a);
+    d := CONCAT(a , b);
+    e := REMOVE(3, d)
+END
+
+END list.

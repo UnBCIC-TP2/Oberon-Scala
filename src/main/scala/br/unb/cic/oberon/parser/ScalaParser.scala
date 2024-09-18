@@ -265,6 +265,12 @@ class ParserVisitor {
   class OberonTypeVisitor extends OberonBaseVisitor[Unit] {
     var baseType: Type = _
 
+    override def visitListType(ctx: OberonParser.ListTypeContext
+    ): Unit = {
+        val baseType = visitOberonType(ctx.baseType) // ctx.baseType agora existe
+        this.baseType = ListType(baseType) // Corrigido: atribuir à variável baseType da classe
+    }
+    
     override def visitIntegerType(
         ctx: OberonParser.IntegerTypeContext
     ): Unit = {
@@ -446,6 +452,16 @@ class ParserVisitor {
       exp = StringValue(str.slice(1, str.length() - 1))
     }
 
+    override def visitListValue(
+        ctx: OberonParser.ListValueContext
+    ): Unit = {
+      val elements = ctx.expression().asScala.toList.map { e =>
+      e.accept(this)
+      exp
+    }
+    exp = ListValue(elements)
+    }
+
     override def visitNullValue(ctx: OberonParser.NullValueContext): Unit =
       exp = NullValue
 
@@ -474,10 +490,69 @@ class ParserVisitor {
       exp = ArraySubscript(arrayBase, index)
     }
 
+    override def visitListSubscript(ctx: OberonParser.ListSubscriptContext
+    ): Unit = {
+      ctx.listBase.accept(this)
+      val listExp = exp
+
+      ctx.index.accept(this)
+      val indexExp = exp
+
+      exp = ListSubscript(listExp, indexExp)
+    }
+
+
     override def visitPointerAccess(
         ctx: OberonParser.PointerAccessContext
     ): Unit = {
       exp = PointerAccessExpression(ctx.name.getText)
+    }
+
+    override def visitConsExpression(
+        ctx: OberonParser.ConsExpressionContext
+    ): Unit = {
+      ctx.head.accept(this)
+      val headExp = exp
+
+      // Cria a lista com o head como único elemento
+      exp = ConsExpression(headExp) // Assumindo que ConsExpression agora recebe apenas um argumento
+    }
+    
+    override def visitConcatExpression(
+        ctx: OberonParser.ConcatExpressionContext
+    ): Unit = {
+      // Avalia ambas as expressões (listas a serem concatenadas)
+      ctx.list1.accept(this)
+      val leftExp = exp
+      
+      ctx.list2.accept(this)
+      val rightExp = exp
+      
+      // Define a expressão de concatenação
+      exp = ConcatExpression(leftExp, rightExp)
+    }
+
+    override def visitLenExpression(
+        ctx: OberonParser.LenExpressionContext
+    ): Unit = 
+    {
+      ctx.expression().accept(this)
+      exp = LenExpression(exp)
+    }
+
+    override def visitRemoveExpression(
+        ctx: OberonParser.RemoveExpressionContext
+    ): Unit = {
+      // Avalia a expressão que indica o valor a ser removido
+      ctx.item.accept(this)
+      val itemExp = exp
+
+      // Avalia a lista da qual o item será removido
+      ctx.list.accept(this)
+      val listExp = exp
+
+      // Define a expressão de remoção
+      exp = RemoveExpression(itemExp, listExp)
     }
 
     override def visitRelExpression(

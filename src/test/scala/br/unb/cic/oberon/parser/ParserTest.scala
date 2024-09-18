@@ -3258,4 +3258,15 @@ class ParserTestSuite extends AbstractTestSuite {
     assert(x == VariableDeclaration("x", ReferenceToUserDefinedType("ld")))
   }
 
+  test("Testing ListExpressions") {
+  val module = ScalaParser.parseResource("stmts/list.oberon")
+
+  assert(module.name == "list")
+  assert(module.variables.size == 5)
+  assert(module.variables.head == VariableDeclaration("a", ReferenceToUserDefinedType("list")))
+  assert(module.variables(1) == VariableDeclaration("b", ReferenceToUserDefinedType("list")))
+  assert(module.variables(2) == VariableDeclaration("c", IntegerType))
+  assert(module.variables(3) == VariableDeclaration("d", ReferenceToUserDefinedType("list")))
+  assert(module.variables(4) == VariableDeclaration("e", ReferenceToUserDefinedType("list")))
+}
 }
