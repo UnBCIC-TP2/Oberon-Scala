@@ -7,7 +7,7 @@ import org.typelevel.paiges.Doc._
 
 class NotOberonCoreException(s: String) extends Exception(s) {}
 
-abstract class CCodeGenerator extends CodeGenerator[String] {}
+abstract class CCodeGenerator extends CodeGenerator[OberonModule, String] {}
 
 case class PaigesBasedGenerator() extends CCodeGenerator {
   val indentSize: Int = 4

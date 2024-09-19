@@ -6,11 +6,13 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TACodeTest extends AnyFunSuite {
 
-  ignore("Generate add between constants") {
+  test("Generate add between constants") {
 
     TACodeGenerator.reset
     val expr = AddExpression(IntValue(1), IntValue(2))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    
     // 1 + 2
     TACodeGenerator.reset
     Temporary.reset
@@ -23,12 +25,14 @@ class TACodeTest extends AnyFunSuite {
     assert(list == ops)
   }
 
-  ignore("Generate add between add and constant") {
+  test("Generate add between add and constant") {
 
     TACodeGenerator.reset
     val expr =
       AddExpression(AddExpression(IntValue(1), IntValue(2)), IntValue(3))
     val (t, list) = TACodeGenerator.generateExpression(expr, List())
+
+    println(list)
 
     TACodeGenerator.reset
     val t0 = new Temporary(IntegerType, 0, true)

@@ -6,7 +6,7 @@ import br.unb.cic.oberon.ir.ast.OberonModule
   * target languages (e.g.: C, C++, LLVM, JIMPLE, JVM) and using different
   * technologies (String Interpolation, Pretty Printer Library, and so on).
   */
-trait CodeGenerator[T] {
+trait CodeGenerator[source, target] {
 
   /** Generates code for an Oberon module
     *
@@ -16,5 +16,5 @@ trait CodeGenerator[T] {
     * @return
     *   the resulting code for a given target language.
     */
-  def generateCode(module: OberonModule): T
+  def generateCode(module: source): target
 }

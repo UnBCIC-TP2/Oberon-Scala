@@ -1,11 +1,12 @@
 package br.unb.cic.oberon.codegen
 
+import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
 import br.unb.cic.oberon.ir.tac._
-import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
-import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.tc.ExpressionTypeChecker
+import br.unb.cic.oberon.tc.TypeChecker
 
-object TACodeGenerator extends CodeGenerator[List[TAC]] {
+object TACodeGenerator extends CodeGenerator[OberonModule, List[TAC]] {
 
   var env = new Environment[Type]()
   private var tc = new TypeChecker(env)

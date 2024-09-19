@@ -23,7 +23,7 @@ import br.unb.cic.oberon.environment.Environment
 
 import scala.collection.mutable.ListBuffer
 
-object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
+object JimpleCodeGenerator extends CodeGenerator[OberonModule, ClassDeclaration] {
   override def generateCode(module: OberonModule): ClassDeclaration = {
     val fields = generateFields(module)
     val methodSignatures = generateMethodSignatures(module)

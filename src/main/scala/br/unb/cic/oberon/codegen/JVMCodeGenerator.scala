@@ -9,7 +9,7 @@ import org.objectweb.asm.Opcodes._
 import java.io.PrintStream
 import java.util.Base64
 
-object JVMCodeGenerator extends CodeGenerator[String] {
+object JVMCodeGenerator extends CodeGenerator[OberonModule, String] {
 
   override def generateCode(module: OberonModule): String = {
     val cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
