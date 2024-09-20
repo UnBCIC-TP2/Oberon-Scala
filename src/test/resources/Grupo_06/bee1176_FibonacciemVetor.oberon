@@ -1,0 +1,36 @@
+  MODULE bee1176FibonacciemVetor;
+
+  VAR
+      n : ARRAY 4 OF INTEGER;
+      r : ARRAY 3 OF INTEGER;
+      i : INTEGER;
+      res,res2,res3: INTEGER;
+
+
+PROCEDURE fibonacci(x: INTEGER) : INTEGER;
+ BEGIN
+   IF (x <= 1)
+   THEN
+     RETURN x
+   ELSE
+     RETURN fibonacci(x - 1) + fibonacci(x - 2)
+   END
+ END fibonacci
+
+  BEGIN
+      n[0] := 3;
+      n[1] := 0;
+      n[2] := 4;
+      n[3] := 2;
+
+      i := 0;
+      WHILE (i < n[0]) DO
+          r[i] := fibonacci(n[i+1]);
+          i := i + 1
+          END;
+      res := r[0];
+      res2 := r[1];
+      res3 := r[2]
+
+  END
+  END bee1176FibonacciemVetor.

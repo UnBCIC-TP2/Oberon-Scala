@@ -1,0 +1,54 @@
+MODULE bee1279;
+    VAR
+        saida1, saida2, saida3, saida4: STRING;
+    PROCEDURE CheckYear(ano: INTEGER): STRING;
+    VAR
+      b, ord: INTEGER;
+      result: STRING;
+    BEGIN
+      b := 0;
+      ord := 1;
+      IF (((ano MOD 4) = 0)  && (((ano MOD 100) # 0)||((ano MOD 400)=0))) THEN
+          b := 1;
+          ord := 0
+        END;
+    IF ((ano MOD 15) = 0) THEN
+            IF b = 1 THEN
+              IF ((ano MOD 55) = 0) THEN
+                result := "Este e um ano bissexto, de festival huluculu e de festival bulukulu.";
+                RETURN result
+              ELSE
+                result := "Este e um ano bissexto e de festival huluculu.";
+                RETURN result
+              END
+            ELSE
+              IF ((ano MOD 55) = 0) THEN
+                result := "Este e um ano de festival huluculu e de festival bulukulu.";
+                RETURN result
+              ELSE
+                result := "Este e um ano de festival huluculu.";
+                RETURN result
+              END
+            END
+          END;
+
+          IF (((ano MOD 55) = 0) && (b = 1)) THEN
+            result := "Este e um ano bissexto e de festival bulukulu.";
+            RETURN result
+          END;
+
+          IF (b = 1) THEN
+            result := "Este e um ano bissexto.";
+            RETURN result
+          END;
+
+      result := "Este e um ano comum.";
+      RETURN result
+    END CheckYear
+    BEGIN
+        saida1 := CheckYear(2000);
+        saida2 := CheckYear(3600);
+        saida3 := CheckYear(4515);
+        saida4 := CheckYear(2001)
+    END
+END bee1279.

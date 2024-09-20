@@ -1,0 +1,46 @@
+MODULE codeforces_Upscaling;
+
+VAR
+    s1, s2 : ARRAY 8 OF CHAR ;
+    new_line : CHAR;
+    n, i, length, aux : INTEGER;
+
+BEGIN
+    
+    new_line := CHR(10);
+    n := 4;
+    length := 2*n;
+    aux := 0;
+    i := 0;
+    WHILE (aux < length) DO
+        IF (i MOD 2 = 0) THEN
+            s1[aux] := '#';
+            s1[aux+1] := '#';
+            s2[aux] := '.';
+            s2[aux+1] := '.';
+            aux := aux + 2
+        ELSE
+            s1[aux] := '.';
+            s1[aux+1] := '.';
+            s2[aux] := '#';
+            s2[aux+1] := '#';
+            aux := aux + 2
+        END;
+        INC(i)
+    END;
+
+    FOR i := 0 TO i < length DO
+        IF(i MOD 2 = 0) THEN
+            write(s1);
+            write(new_line);
+            write(s1)
+        ELSE
+            write(s2);
+            write(new_line);
+            write(s2)
+        END;
+        INC(i)
+    END
+END
+
+END codeforces_Upscaling.

@@ -43,11 +43,55 @@ class StandardLibrary[T]() {
       writeFile,
       appendFile,
       stringToInt,
-      stringToFloat
+      stringToFloat,
+      ord,
+      chr
     ),
     List(),
     None
   )
+
+  def ord = Procedure(
+   "ORD",                              
+   List(ParameterByValue("x", CharacterType)), 
+   Some(IntegerType),                    
+   List(),                               
+   List(),                               
+
+   SequenceStmt(
+     List(
+       MetaStmt((env) =>
+         ReturnStmt(
+            IntValue(                   
+             env.lookup("x").get.asInstanceOf[CharValue].value.toInt
+           )
+         )
+       )
+     )
+   )
+  )
+
+
+  def chr = Procedure(
+    "CHR",                              
+    List(ParameterByValue("x", IntegerType)), 
+    Some(CharacterType),                     
+    List(),                             
+    List(),                             
+
+    SequenceStmt(
+      List(
+        MetaStmt((env) =>
+          ReturnStmt(
+            CharValue(                  
+              env.lookup("x").get.asInstanceOf[IntValue].value.toChar
+            )
+          )
+        )
+      )
+    )
+  )
+
 
   def stringToInt = Procedure(
     "STRINGTOINT",

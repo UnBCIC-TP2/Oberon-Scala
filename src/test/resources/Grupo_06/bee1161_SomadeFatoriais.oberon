@@ -1,0 +1,39 @@
+MODULE bee1161SomadeFatoriais;
+
+VAR
+    m : ARRAY 3 OF INTEGER;
+    n : ARRAY 3 OF INTEGER;
+    r : ARRAY 3 OF INTEGER;
+    i : INTEGER;
+    res,res2,res3: INTEGER;
+
+
+PROCEDURE fatorial(x: INTEGER) : INTEGER;
+ BEGIN
+   IF (x > 1)
+   THEN
+     RETURN x * fatorial(x - 1)
+   ELSE
+     RETURN 1
+   END
+ END fatorial
+
+BEGIN
+    m[0] := 4;
+    n[0] := 4;
+    m[1] := 0;
+    n[1] := 0;
+    m[2] := 0;
+    n[2] := 2;
+
+    i := 0;
+    WHILE (i < 3) DO
+        r[i] := fatorial(m[i]) + fatorial(n[i]);
+        i := i + 1
+        END;
+    res := r[0];
+    res2 := r[1];
+    res3 := r[2]
+
+END
+END bee1161SomadeFatoriais.
