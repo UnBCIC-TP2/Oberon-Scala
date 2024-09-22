@@ -1,9 +1,13 @@
 package br.unb.cic.oberon.tc
 
-import br.unb.cic.oberon.ir.ast.{AddExpression, BoolValue, BooleanType, DivExpression, EQExpression, IntValue, IntegerType, SubExpression, Type}
+//import br.unb.cic.oberon.ir.ast.{AddExpression, BoolValue, BooleanType, DivExpression, EQExpression, IntValue, IntegerType, SubExpression, Type}
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.environment.Environment
+import br.unb.cic.oberon.ir.common._
+import br.unb.cic.oberon.ir.ast._
+
+
 
 class ExpressionTypeVisitorTestSuite extends AnyFunSuite {
 

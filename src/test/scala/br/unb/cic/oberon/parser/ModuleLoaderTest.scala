@@ -5,6 +5,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import java.nio.file.{Files, Paths}
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 
 class ModuleLoaderTestSuite extends AbstractTestSuite {
 
@@ -14,7 +15,7 @@ class ModuleLoaderTestSuite extends AbstractTestSuite {
       userTypes: List[UserDefinedType] = List(),
       constants: List[Constant] = List(),
       variables: List[VariableDeclaration] = List(),
-      procedures: List[Procedure] = List(),
+      procedures: List[Procedure[Statement]] = List(),
       tests: List[Test] = List(),
       stmt: Option[Statement] = None
   ): OberonModule = {

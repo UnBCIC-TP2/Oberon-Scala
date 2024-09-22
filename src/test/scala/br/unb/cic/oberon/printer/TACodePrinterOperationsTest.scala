@@ -1,10 +1,13 @@
 package br.unb.cic.oberon.printer
 
 
-import br.unb.cic.oberon.ir.ast.{BooleanType, IntegerType}
+//import br.unb.cic.oberon.ir.ast.{BooleanType, IntegerType}
 import br.unb.cic.oberon.ir.tac._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+import br.unb.cic.oberon.ir.tac.Constant
+import br.unb.cic.oberon.ir.ast._
 
 
 /**

@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
+import br.unb.cic.oberon.ir.common.{Constant => ASTConstant, _}
+import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.ir.tac._
 import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
 import br.unb.cic.oberon.environment.Environment

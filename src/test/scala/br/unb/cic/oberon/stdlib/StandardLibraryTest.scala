@@ -1,9 +1,12 @@
 package br.unb.cic.oberon.stdlib
 
-import br.unb.cic.oberon.ir.ast.{BoolValue, IntValue, RealValue, StringValue}
+//import br.unb.cic.oberon.ir.ast.{BoolValue, IntValue, RealValue, StringValue}
 import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+import br.unb.cic.oberon.ir.ast._
+
 
 class StandardLibraryTest extends AnyFunSuite {
 

@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.visitor
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 
 /** The abstract definition of an Oberon Visitor. Note: here we are using a
   * hybrid approach for implementing visitors. Although it resembles the OO
@@ -17,7 +18,7 @@ trait OberonVisitor {
   def visit(impt: Import): T
   def visit(constant: Constant): T
   def visit(variable: VariableDeclaration): T
-  def visit(procedure: Procedure): T
+  def visit(procedure: Procedure[Statement]): T
   def visit(arg: FormalArg): T
   def visit(exp: Expression): T
   def visit(stmt: Statement): T
@@ -32,7 +33,7 @@ abstract class OberonVisitorAdapter extends OberonVisitor {
   override def visit(impt: Import): T = ???
   override def visit(constant: Constant): T = ???
   override def visit(variable: VariableDeclaration): T = ???
-  override def visit(procedure: Procedure): T = ???
+  override def visit(procedure: Procedure[Statement]): T = ???
   override def visit(arg: FormalArg): T = ???
   override def visit(exp: Expression): T = ???
   override def visit(stmt: Statement): T = ???

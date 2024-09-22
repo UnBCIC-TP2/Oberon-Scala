@@ -2,6 +2,8 @@ package br.unb.cic.oberon.ir.tac
 
 import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+
 
 class TACTestSuite extends AnyFunSuite {
   test("Test temporary counter") {

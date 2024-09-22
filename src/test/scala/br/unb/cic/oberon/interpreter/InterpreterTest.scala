@@ -7,6 +7,7 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.parser.{Oberon2ScalaParser, ScalaParser}
 import br.unb.cic.oberon.transformations.CoreTransformer
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
 
 class InterpreterTest extends AnyFunSuite with Oberon2ScalaParser {
 

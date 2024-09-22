@@ -12,6 +12,8 @@ import br.unb.cic.oberon.cfg.{
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
+import br.unb.cic.oberon.ir.common._
+
 
 class ControlFlowGraphTest extends AbstractTestSuite {
 

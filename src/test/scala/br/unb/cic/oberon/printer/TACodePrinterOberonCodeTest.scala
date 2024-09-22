@@ -1,10 +1,14 @@
 package br.unb.cic.oberon.printer
 
 import br.unb.cic.oberon.codegen.TACodeGenerator
-import br.unb.cic.oberon.ir.ast.{AddExpression, BooleanType, GTExpression, IntValue, LTExpression}
+//import br.unb.cic.oberon.ir.ast.{AddExpression, BooleanType, GTExpression, IntValue, LTExpression}
+import br.unb.cic.oberon.ir.ast._
+
 import br.unb.cic.oberon.ir.tac.Temporary
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+
 
 class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
 

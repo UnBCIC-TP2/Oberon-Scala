@@ -3,6 +3,8 @@ package br.unb.cic.oberon.interpreter
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+
 
 class EvalExpressionVisitorTest extends AnyFunSuite {
 

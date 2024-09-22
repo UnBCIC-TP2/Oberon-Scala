@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.environment
 
-import br.unb.cic.oberon.ir.ast.{Expression, Location, Procedure, ReferenceToUserDefinedType, Statement, Type, Test, UserDefinedType}
+import br.unb.cic.oberon.ir.common.{Procedure,Expression, Location, ReferenceToUserDefinedType, Statement, Type, UserDefinedType}
+import br.unb.cic.oberon.ir.ast._
 import org.jline.builtins.Completers.CompletionEnvironment
 
 import scala.collection.mutable.{Map, Stack}
@@ -24,7 +25,7 @@ class Environment[T](private val top_loc:Int = 0,
                      private val locations: Map[Location, T] = Map.empty[Location, T],
                      private val global: Map[String, Location] = Map.empty[String, Location],
                      private val stack: Stack[Map[String, Location]] = Stack.empty[Map[String, Location]],
-                     private val procedures: Map[String, Procedure] = Map.empty[String, Procedure],
+                     private val procedures: Map[String, Procedure[Statement]] = Map.empty[String, Procedure[Statement]],
                      private val tests: Map[String, Test] = Map.empty[String, Test],
                      private val userDefinedTypes: Map[String, UserDefinedType] = Map.empty[String, UserDefinedType]) {
 
@@ -129,7 +130,7 @@ class Environment[T](private val top_loc:Int = 0,
   def lookupUserDefinedType(name: String): Option[UserDefinedType] =
     userDefinedTypes.get(name)
 
-  def declareProcedure(procedure: Procedure): Environment[T] = {
+  def declareProcedure(procedure: Procedure[Statement]): Environment[T] = {
     val copyprocedures = procedures.clone() + (procedure.name -> procedure)
 
     new Environment[T](top_loc = this.top_loc,
@@ -181,7 +182,7 @@ class Environment[T](private val top_loc:Int = 0,
   }
 
 
-  def findProcedure(name: String): Procedure = procedures(name)
+  def findProcedure(name: String): Procedure[Statement] = procedures(name)
 
   def findTest(name: String): Test = tests(name)
 

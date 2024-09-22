@@ -1,6 +1,8 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{
+import br.unb.cic.oberon.ir.ast._
+
+import br.unb.cic.oberon.ir.common.{
   IntValue => OberonIntValue,
   BoolValue => OberonBoolValue,
   RealValue => OberonRealValue,
@@ -124,7 +126,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
     )
 
   def jimpleMethod(
-      procedure: Procedure,
+      procedure: Procedure[Statement],
       module: OberonModule,
       fields: List[Field],
       methodSignatures: List[MethodSignature]
@@ -139,7 +141,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
 
   // FIXME: statements don't work with local variables
   def jimpleMethodBody(
-      procedure: Procedure,
+      procedure: Procedure[Statement],
       module: OberonModule,
       fields: List[Field],
       methodSignatures: List[MethodSignature]

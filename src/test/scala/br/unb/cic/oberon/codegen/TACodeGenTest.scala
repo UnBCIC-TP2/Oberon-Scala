@@ -1,8 +1,15 @@
 package br.unb.cic.oberon.codegen
 
-import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
+//import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
 import br.unb.cic.oberon.ir.tac._
 import org.scalatest.funsuite.AnyFunSuite
+import br.unb.cic.oberon.ir.common._
+import br.unb.cic.oberon.ir.tac.Constant
+import br.unb.cic.oberon.ir.ast._
+ 
+
+//import br.unb.cic.oberon.ir.common._
+
 
 class TACodeTest extends AnyFunSuite {
 

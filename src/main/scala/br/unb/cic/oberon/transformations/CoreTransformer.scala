@@ -1,13 +1,15 @@
 package br.unb.cic.oberon.transformations
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
 import scala.collection.mutable.ListBuffer
-import br.unb.cic.oberon.ir.ast.Procedure
+//import br.unb.cic.oberon.ir.ast.Procedure
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable._
+import _root_.br.unb.cic.oberon.ir.core.WhileExp
 
 object CoreTransformer {
 
@@ -254,10 +256,10 @@ object CoreTransformer {
       }
 
     private def reduceProcedureDeclaration(
-                                            procedure: Procedure,
+                                            procedure: Procedure[Statement],
                                             caseIdGenerator: AtomicInteger,
                                             addedVariables: ArrayBuffer[VariableDeclaration]
-                                          ): Procedure = {
+                                          ): Procedure[Statement] = {
       Procedure(
         name = procedure.name,
         args = procedure.args,

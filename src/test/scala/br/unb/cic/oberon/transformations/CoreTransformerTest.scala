@@ -5,6 +5,8 @@ import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import br.unb.cic.oberon.interpreter.Interpreter
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
+
 
 import java.nio.file.{Files, Paths}
 

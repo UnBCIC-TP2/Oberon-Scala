@@ -4,6 +4,7 @@ import br.unb.cic.oberon.AbstractTestSuite
 import br.unb.cic.oberon.ir.ast._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalactic.TolerantNumerics
+import br.unb.cic.oberon.ir.common._
 
 import java.nio.file.{Files, Paths}
 

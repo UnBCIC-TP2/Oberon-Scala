@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.stdlib
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.environment.{Environment, MetaStmt}
 
 import scala.io.Source

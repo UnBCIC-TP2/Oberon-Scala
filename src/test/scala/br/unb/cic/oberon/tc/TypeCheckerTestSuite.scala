@@ -4,14 +4,18 @@ import br.unb.cic.oberon.AbstractTestSuite
 
 import java.nio.file.{Files, Paths}
 import br.unb.cic.oberon.ir.ast._
-import br.unb.cic.oberon.ir.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
+//import br.unb.cic.oberon.ir.ast.{AndExpression, EQExpression, GTEExpression, LTEExpression, LTExpression}
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 import org.scalatest.funsuite.AnyFunSuite
 import br.unb.cic.oberon.transformations.{CoreChecker, CoreTransformer}
-import br.unb.cic.oberon.ir.ast.{OberonModule, VariableDeclaration}
+//import br.unb.cic.oberon.ir.ast.{OberonModule, VariableDeclaration}
 import br.unb.cic.oberon.environment.Environment
 import org.scalatest.flatspec.AnyFlatSpec
+import br.unb.cic.oberon.ir.common._
+import br.unb.cic.oberon.ir.ast._
+
+
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer

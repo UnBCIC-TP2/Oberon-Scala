@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.cfg
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import scalax.collection.mutable.Graph
 import scalax.collection.GraphEdge
 import scalax.collection.GraphPredef.EdgeAssoc
@@ -17,7 +18,7 @@ case class NewEndNode() extends NewGraphNode
 
 trait NewControlFlowGraphBuilder {
   def createControlFlowGraph(
-      procedure: Procedure
+      procedure: Procedure[Statement]
   ): Graph[GraphNode, GraphEdge.DiEdge] // Graph
   def createControlFlowGraph(
       stmt: Statement

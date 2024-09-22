@@ -2,6 +2,7 @@ package br.unb.cic.oberon.interpreter
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.environment.{Environment, MetaStmt}
 import br.unb.cic.oberon.stdlib.StandardLibrary
 import br.unb.cic.oberon.util.Values
@@ -75,7 +76,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     _ <- modify[Environment[Expression]](_.addUserDefinedType(userType))
   } yield ()
 
-  def declareProcedure(procedure: Procedure): IResult[Unit] = for {
+  def declareProcedure(procedure: Procedure[Statement]): IResult[Unit] = for {
     _ <- modify[Environment[Expression]](_.declareProcedure(procedure))
   } yield ()
 
@@ -200,7 +201,7 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
   } yield ()
 
 
-  def updateEnvironmentWithProcedureCall(procedure: Procedure, args: List[Expression]): IResult[Unit] = for {
+  def updateEnvironmentWithProcedureCall(procedure: Procedure[Statement], args: List[Expression]): IResult[Unit] = for {
       mappedArgs <- procedure.args.zip(args).traverse(pair => pair match {
       case (ParameterByReference(_, _), VarExpression(name2)) => for {env <- get[Environment[Expression]] ; loc: Expression = env.pointsTo(name2).get} yield (pair._1, loc)
       case (ParameterByReference(_, _), _) => throw new RuntimeException

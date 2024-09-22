@@ -2,7 +2,8 @@ package br.unb.cic.oberon.repl
 
 
 import br.unb.cic.oberon.environment.Environment
-import br.unb.cic.oberon.ir.ast.{ArrayAssignment, AssignmentStmt, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
+import br.unb.cic.oberon.ir.common.{ArrayAssignment, BoolValue, Expression, IntValue, PointerAssignment, REPLConstant, REPLExpression, REPLStatement, REPLUserTypeDeclaration, REPLVarDeclaration, RecordAssignment, Statement, StringValue, Undef, Value, VarAssignment}
+import br.unb.cic.oberon.ir.ast.{AssignmentStmt}
 import br.unb.cic.oberon.interpreter.Interpreter
 import br.unb.cic.oberon.parser.ScalaParser
 import br.unb.cic.oberon.transformations.CoreTransformer

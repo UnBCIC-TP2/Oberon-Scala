@@ -6,6 +6,7 @@ import scala.reflect.runtime.universe.typeOf
 import br.unb.cic.oberon.util.Resources
 import br.unb.cic.oberon.ir.ast._
 import scala.collection.mutable.Map
+import br.unb.cic.oberon.ir.common._
 
 trait ParsersUtil extends JavaTokenParsers {
   // Encapsulator aggregator function
@@ -263,7 +264,7 @@ trait OberonParserFull extends StatementParser {
 
   // Procedure
 
-  def procedureParser: Parser[Procedure] =
+  def procedureParser: Parser[Procedure[Statement]] =
     "PROCEDURE" ~ identifier ~ ("(" ~> formalArgs <~ ")") ~ procedureTypeParser ~ ";" ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ ("BEGIN" ~> multStatementParser <~ "END") ~ identifier ^^ { case _ ~ name ~ args ~ procedureType ~ _ ~ constants ~ variables ~ statements ~ endName => {
       if (name != endName) throw new Exception(s"Procedure name ($name) doesn't match the end identifier ($endName)")
       Procedure(
@@ -313,7 +314,7 @@ trait OberonParserFull extends StatementParser {
     }
     )
 
-  class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure], val tests: List[Test])
+  class DeclarationProps(val userTypes: List[UserDefinedType], val constants: List[Constant], val variables: List[VariableDeclaration], val procedures: List[Procedure[Statement]], val tests: List[Test])
 
   def declarationsParser: Parser[DeclarationProps] =
     listOpt(userTypeDeclarationParser) ~ listOpt(constantParser) ~ listOpt(varDeclarationParser) ~ listOpt(rep(procedureParser)) ~ listOpt(rep(testParser)) ^^ { case userTypes ~ constants ~ vars ~ procedures ~ tests => new DeclarationProps(userTypes, constants, vars, procedures, tests) }

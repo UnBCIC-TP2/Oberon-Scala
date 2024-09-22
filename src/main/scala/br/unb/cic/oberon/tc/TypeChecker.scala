@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.tc
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
@@ -244,7 +245,7 @@ class TypeChecker (envPassado: Environment[Type]){
     }
   }
 
-  def checkProcedure(procedure: Procedure): /*List[(Statement, String)]*/ T = {
+  def checkProcedure(procedure: Procedure[Statement]): /*List[(Statement, String)]*/ T = {
     expVisitor.updateEnvironment(expVisitor.env.push())
     env = expVisitor.env
     expVisitor.updateEnvironment(procedure.args.foldLeft(expVisitor.env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType)))

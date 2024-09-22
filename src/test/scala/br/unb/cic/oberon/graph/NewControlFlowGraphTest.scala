@@ -5,6 +5,8 @@ import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.cfg.NewControlFlowGraph
 import org.scalactic.source.Position
 import org.scalatest.BeforeAndAfter
+import br.unb.cic.oberon.ir.common._
+
 
 class NewControlFlowGraphTest extends AbstractTestSuite with BeforeAndAfter {
 

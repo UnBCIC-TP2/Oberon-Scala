@@ -9,6 +9,7 @@ import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.parser.Oberon2ScalaParser
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.tc.TypeChecker
 import br.unb.cic.oberon.environment.Environment
 

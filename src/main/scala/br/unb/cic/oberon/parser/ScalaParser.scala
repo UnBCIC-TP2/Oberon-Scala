@@ -5,6 +5,7 @@ import org.antlr.v4.runtime._
 import br.unb.cic.oberon.ir.ast._
 import scala.collection.mutable.Map
 import org.antlr.stringtemplate.language.FormalArgument
+import br.unb.cic.oberon.ir.common._
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -72,7 +73,7 @@ object ScalaParser {
 
 class ParserVisitor {
   var module: OberonModule = _
-  var variables: List[br.unb.cic.oberon.ir.ast.VariableDeclaration] = List()
+  var variables: List[br.unb.cic.oberon.ir.common.VariableDeclaration] = List()
   var imptAliases =
     scala.collection.mutable.Map
       .empty[String, String] // Map[Module Alias, Module Name]
@@ -185,7 +186,7 @@ class ParserVisitor {
 
   def visitProcedureDeclaration(
       ctx: OberonParser.ProcedureContext
-  ): Procedure = {
+  ): Procedure[Statement] = {
     val name = ctx.name.getText
     val args = ctx
       .formals()

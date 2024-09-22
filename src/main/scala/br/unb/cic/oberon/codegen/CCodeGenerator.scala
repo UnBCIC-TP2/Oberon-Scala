@@ -1,6 +1,7 @@
 package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import br.unb.cic.oberon.transformations.CoreChecker
 import org.typelevel.paiges.Doc
 import org.typelevel.paiges.Doc._
@@ -47,7 +48,7 @@ case class PaigesBasedGenerator() extends CCodeGenerator {
   }
 
   def generateProcedure(
-      procedure: Procedure,
+      procedure: Procedure[Statement],
       userTypes: List[UserDefinedType]
   ): Doc = {
     val returnType = procedure.returnType match {

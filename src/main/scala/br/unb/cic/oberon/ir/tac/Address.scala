@@ -1,6 +1,6 @@
 package br.unb.cic.oberon.ir.tac
 
-import br.unb.cic.oberon.ir.ast.{Type}
+import br.unb.cic.oberon.ir.common.{Type}
 
 class Address(t: Type){}
 

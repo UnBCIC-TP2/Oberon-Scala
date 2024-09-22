@@ -3,6 +3,7 @@ package br.unb.cic.oberon.codegen
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.interpreter._
 import br.unb.cic.oberon.ir.ast._
+import br.unb.cic.oberon.ir.common._
 import org.objectweb.asm._
 import org.objectweb.asm.Opcodes._
 
