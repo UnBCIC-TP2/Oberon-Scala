@@ -5,6 +5,8 @@ organization := "br.unb.cic"
 version := "0.1.1"
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+
 
 // githubOwner := "UnBCIC-TP2"
 // githubRepository := "Oberon-Scala"

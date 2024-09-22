@@ -6,6 +6,7 @@ import scala.reflect.runtime.universe.typeOf
 import br.unb.cic.oberon.util.Resources
 import br.unb.cic.oberon.ir.ast._
 import scala.collection.mutable.Map
+import br.unb.cic.oberon.parser.ModuleLoader
 
 trait ParsersUtil extends JavaTokenParsers {
   // Encapsulator aggregator function
@@ -331,6 +332,83 @@ trait OberonParserFull extends StatementParser {
         declarations.tests,
         statements
       )
+  }
+  // Implementação bitwise
+  // Variáveis para o lexer
+  /*
+    * Parser vai ser responsável por ler uma lista de tokens
+    * e construir a ast(árvore sintática abstrata) correspondente, com base nas expressões bitwise(and, or, xor, not, left shift e right shift).
+    *
+   */
+  // lista de tokens
+  var tokens: List[Token] = _
+  // indices pra rastrear a posição atual do token
+  var tokenIndex: Int = 0
+
+  // Retorna o token atual
+  def currentToken: Token = {
+    if (tokenIndex < tokens.length) tokens(tokenIndex)
+    else throw new Exception("End of token stream")
+  }
+
+  // avança para o próximo token da lista
+  def nextToken(): Unit = {
+    if (tokenIndex < tokens.length - 1) {
+      tokenIndex += 1
+    } else {
+      throw new Exception("No more tokens available")
+    }
+  }
+
+  // func para analisar um termo (números ou variáveis)
+  def parseTerm(): BitwiseExpression = {
+    currentToken match {
+      case NumberToken(value) =>
+        nextToken()
+        BitwiseIntValue(value)
+      case VariableToken(name) =>
+        nextToken()
+        BitwiseVarExpression(name)
+      case _ =>
+        throw new Exception(s"Unexpected token: $currentToken")
+    }
+  }
+
+  // Função para analisar expressões bitwise
+  def parseBitwiseExpr(): BitwiseExpression = {
+    val lhs = parseTerm() // Analisa o lado esquerdo
+
+    currentToken match {
+      case BitwiseAndToken =>
+        nextToken()
+        BitwiseAnd(lhs, parseBitwiseExpr())
+      case BitwiseOrToken =>
+        nextToken()
+        BitwiseOr(lhs, parseBitwiseExpr())
+      case BitwiseXorToken =>
+        nextToken()
+        BitwiseXor(lhs, parseBitwiseExpr())
+      case LeftShiftToken =>
+        nextToken()
+        LeftShift(lhs, parseBitwiseExpr())
+      case RightShiftToken =>
+        nextToken()
+        RightShift(lhs, parseBitwiseExpr())
+      case BitwiseNotToken =>
+        nextToken()
+        BitwiseNot(parseBitwiseExpr())
+      case _ => lhs // verifica que o tipo correto seja retornado
+    }
+  }
+
+  // Função principal para analisar expressões bitwise
+  def parseExpression(): BitwiseExpression = {
+    currentToken match {
+      case BitwiseAndToken | BitwiseOrToken | BitwiseXorToken | LeftShiftToken | RightShiftToken | BitwiseNotToken =>
+        parseBitwiseExpr()
+      case _ =>
+        parseTerm()
+    }
   }
 }
 

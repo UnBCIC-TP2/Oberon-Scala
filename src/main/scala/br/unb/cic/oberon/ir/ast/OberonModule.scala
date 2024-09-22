@@ -345,3 +345,40 @@ object ValueConversion {
     charValue.value.toInt
   )
 }
+  /*
+  * Implementação bitwise
+  * Implemntação de expressões bitwise para o interpretador
+  */
+/*
+  * Token vai representar os elementos básicos da expressão bitwise
+  * que o parser vai reconhecer
+ */
+sealed trait Token
+case class NumberToken(value: Int) extends Token
+case class VariableToken(name: String) extends Token
+/*
+  * BitwiseAndToken, BitwiseOrToken, BitwiseXorToken, LeftShiftToken, RightShiftToken, BitwiseNotToken:
+  * objetos que representam os operadores bitwise
+ */
+case object BitwiseAndToken extends Token
+case object BitwiseOrToken extends Token
+case object BitwiseXorToken extends Token
+case object LeftShiftToken extends Token
+case object RightShiftToken extends Token
+case object BitwiseNotToken extends Token
+
+
+sealed trait BitwiseExpression
+/*
+  * as expressões representa uma  estrutura sintática das operações bitwise.
+  * BitwiseExpression  define uma hierarqioa envolvendo manipulacao de operacoes
+ */
+case class BitwiseIntValue(value: Int) extends BitwiseExpression
+case class BitwiseVarExpression(name: String) extends BitwiseExpression
+case class BitwiseAnd(lhs: BitwiseExpression, rhs: BitwiseExpression) extends BitwiseExpression
+case class BitwiseOr(lhs: BitwiseExpression, rhs: BitwiseExpression) extends BitwiseExpression
+case class BitwiseXor(lhs: BitwiseExpression, rhs: BitwiseExpression) extends BitwiseExpression
+case class LeftShift(lhs: BitwiseExpression, rhs: BitwiseExpression) extends BitwiseExpression
+case class RightShift(lhs: BitwiseExpression, rhs: BitwiseExpression) extends BitwiseExpression
+case class BitwiseNot(expr: BitwiseExpression) extends BitwiseExpression
+

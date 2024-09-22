@@ -363,6 +363,35 @@ def runInterpreter(module: OberonModule): IResult[Unit] = for {
     v1 <- evalExpression(left)
     v2 <- evalExpression(right)
   } yield fn(v1.asInstanceOf[Value], v2.asInstanceOf[Value])
+
+  // Implementação bitwise
+  /*
+    * eVALUAET ponto de entrada para a avaliação de qualquer expressão bitwise.
+    * @param expr a expressão a ser avaliada e utiliza pattern matching para avaliar a expressão.
+   */
+  def evaluate(expr: BitwiseExpression): Int = expr match {
+    case BitwiseIntValue(value) => value
+    case BitwiseVarExpression(name) => throw new RuntimeException(s"Variable $name not implemented")
+    case BitwiseAnd(lhs, rhs) => evaluate(lhs) & evaluate(rhs)
+    case BitwiseOr(lhs, rhs) => evaluate(lhs) | evaluate(rhs)
+    case BitwiseXor(lhs, rhs) => evaluate(lhs) ^ evaluate(rhs)
+    case LeftShift(lhs, rhs) => evaluate(lhs) << evaluate(rhs)
+    case RightShift(lhs, rhs) => evaluate(lhs) >> evaluate(rhs)
+    case BitwiseNot(e) => ~evaluate(e)
+    // caso o tipo de expressão não seja reconhecida, chama a função auxiliar evaluateBitwise
+    case bitwiseExpr: BitwiseExpression => evaluateBitwise(bitwiseExpr)
+  }
+
+  // pode remover essa função já que evaluate cobre todos os casos e as duas no final das contas faz
+  // a mesma coisa
+  def evaluateBitwise(expr: BitwiseExpression): Int = expr match {
+    case BitwiseAnd(lhs, rhs) => evaluate(lhs) & evaluate(rhs)
+    case BitwiseOr(lhs, rhs)  => evaluate(lhs) | evaluate(rhs)
+    case BitwiseXor(lhs, rhs) => evaluate(lhs) ^ evaluate(rhs)
+    case LeftShift(lhs, rhs)  => evaluate(lhs) << evaluate(rhs)
+    case RightShift(lhs, rhs) => evaluate(lhs) >> evaluate(rhs)
+    case BitwiseNot(e)        => ~evaluate(e)
+  }
 }
 
 class NullPrintStream extends PrintStream(new NullByteArrayOutputStream) {}

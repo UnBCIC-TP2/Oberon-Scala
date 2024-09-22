@@ -2,6 +2,7 @@ package br.unb.cic.oberon.parser
 
 import br.unb.cic.oberon.ir.ast.{OberonModule, SequenceStmt, Statement}
 import br.unb.cic.oberon.util.Resources
+import scala.util.parsing.combinator._
 
 import scala.io.Source
 import scala.reflect.io.Path
@@ -132,3 +133,31 @@ object ResourceModuleLoader {
     new ModuleMerger(loader).merge()
   }
 }
+ /*
+object ModuleBitwise extends RegexParsers {
+  // tipo de Token
+  sealed trait Token
+
+  case object And extends Token
+
+  case object Or extends Token
+
+  case object Xor extends Token
+
+  case object LeftShift extends Token
+
+  case object RightShift extends Token
+
+  case object Not extends Token
+
+  val bitwiseOperators: Parser[Token] = (
+    "&" ^^^ And |
+      "|" ^^^ Or |
+      "^" ^^^ Xor |
+      "<<" ^^^ LeftShift |
+      ">>" ^^^ RightShift |
+      "~" ^^^ Not
+    )
+}*/
+
+
