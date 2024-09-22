@@ -297,7 +297,7 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/beecrowd1010.oberon")
   }
 
-  ignore("C generator for ForSTMT"){
+  test("C generator for ForSTMT"){
     testGenerator("stmts/forstmt.oberon")
   }
 
@@ -309,11 +309,34 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/LogicNot.oberon")
   }
 
-  ignore("C generator for Geometric Progression") {
+  for (i <- 1 to 2) {
+  test(s"C generator for lambda expressions $i") {
+    testGenerator(s"lambda/lambdaExpressions0$i.oberon")
+    }
+  }
+
+  ignore("C generator for lambda expressions 3") {
+    testGenerator("lambda/lambdaExpressions03.oberon")
+    }
+
+  for (i <- 4 to 6) {
+  test(s"C generator for lambda expressions $i") {
+    testGenerator(s"lambda/lambdaExpressions0$i.oberon")
+    }
+  }
+  test(s"C generator for lamba expressions TC") {
+      testGenerator(s"lambda/lambdaExpressionsTC05.oberon")
+    }
+
+  test("C generator for lambda expressions") {
+    testGenerator("lambda/lambdaExpressions01.oberon")
+  }
+
+  test("C generator for Geometric Progression") {
     testGenerator("stmts/pgNormal.oberon")
   }
 
-  ignore("C generator for Geometric Progression with multiple args") {
+  test("C generator for Geometric Progression with multiple args") {
     testGenerator("stmts/pgNew.oberon")
   }
 
@@ -321,11 +344,59 @@ class CCodeGenTest extends AnyFunSuite {
     testGenerator("stmts/boolNeg.oberon")
   }
 
-  ignore("C generator for Progression Multiple Variable"){
+  test("C generator for Progression Multiple Variable"){
     testGenerator("stmts/progression_mul.oberon")
   }
 
   ignore("C generator for Pow Test"){
     testGenerator("stdlib/POWTest.oberon")
+  }
+
+  test("C generator for pointers declaration") {
+    testGenerator("Pointers/pointerDecl1.oberon")
+  }
+
+  test("C generator for user defined types pointers"){
+    testGenerator("Pointers/pointerDecl2.oberon")
+  }
+
+  test("C generator for pointer assignment") {
+    testGenerator("Pointers/pointerNewStatement.oberon")
+  }
+
+  test("C generator for user type pointer assignment") {
+    testGenerator("Pointers/pointerUserDefinedType.oberon")
+  }
+
+  test("C generator for pointer operations") {
+    testGenerator("Pointers/pointerOps2.oberon")
+  }
+
+  test("C generator for logic operators precedence") {
+    testGenerator("stmts/LogicPrecedence.oberon")
+  }
+
+  test("C generator for abs function call"){
+    testGenerator("stdlib/ABSTest.oberon")
+  }
+
+  ignore("C generator for ceil function call"){
+    testGenerator("stdlib/CEILTest.oberon")
+  }
+
+  ignore("C generator for round function call"){
+    testGenerator("stdlib/RNDTest.oberon")
+  }
+
+  test("C generator for float casting"){
+    testGenerator("stdlib/FLTTest.oberon")
+  }
+
+  test("C generator for pow call"){
+    testGenerator("stdlib/POWTest.oberon")
+  }
+
+  test("C generator for sqrt call"){
+    testGenerator("stdlib/SQRTest.oberon")
   }
 }

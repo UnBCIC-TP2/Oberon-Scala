@@ -1,0 +1,15 @@
+MODULE LambdaExpressions01;
+
+
+CONST
+  x = (a: INTEGER) => a + 10;
+  y = (a: INTEGER, b: INTEGER) => a + b;
+  z = 10;
+  w = 5;
+
+BEGIN
+  x(z);
+  y(z,w)
+END
+
+END LambdaExpressions01.

@@ -1,5 +1,7 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 int a, b, c, answer;
@@ -12,7 +14,7 @@ int abs(int a) {
 }
 
 int maxValue(int a, int b) {
-    return a + b + abs(a - b) / 2;
+    return (a + b + abs(a - b)) / 2;
 }
 
 

@@ -1,0 +1,20 @@
+MODULE PointerUserTypeModule;
+
+TYPE
+    myType = RECORD
+        size : INTEGER;
+        active : BOOLEAN;
+    END
+
+VAR
+    p : POINTER TO myType;
+    x : myType;
+
+BEGIN
+    NEW(p);
+    x.size := 10;
+    x.active := True;
+    p^ := x
+END
+
+END PointerUserTypeModule.

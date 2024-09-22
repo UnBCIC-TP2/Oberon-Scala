@@ -1,5 +1,7 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef int simple[10];
 struct complicated_struct {

@@ -1,5 +1,7 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 struct DATE_struct {
     int day, month;

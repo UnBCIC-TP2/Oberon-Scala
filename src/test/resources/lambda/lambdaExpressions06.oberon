@@ -1,0 +1,13 @@
+MODULE LambdaExpressions03;
+
+CONST
+  divide = (a: REAL, b: REAL) => a / b;
+  addReal = (a: REAL, b: REAL) => a + b;
+  x = 10.5;
+  y = 2.5;
+
+BEGIN
+  divide(x, y);
+  addReal(x, y)
+END
+END LambdaExpressions03.

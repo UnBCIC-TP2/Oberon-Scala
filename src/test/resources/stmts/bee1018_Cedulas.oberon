@@ -6,7 +6,7 @@ TYPE
 
 VAR
 	banknotesValues, banknotesNeeded: intArray;
-	value: INTEGER;
+	value: REAL;
 	i, v: INTEGER;
 
 BEGIN

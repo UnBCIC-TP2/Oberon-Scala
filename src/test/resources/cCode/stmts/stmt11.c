@@ -1,5 +1,7 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 int y, z, x;
@@ -10,7 +12,7 @@ int main() {
     y = 0;
     while (y < x) {
         scanf("%d", &z);
-        z = z / y + 1;
+        z = z / (y + 1);
         printf("%d\n", z);
     }
 }

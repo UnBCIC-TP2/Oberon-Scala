@@ -1,0 +1,16 @@
+MODULE logic;
+
+VAR
+    numero : INTEGER;
+BEGIN
+ numero := 11;
+ IF (numero >= 10 && numero <= 20 && (numero = 5  || numero = 10))
+ THEN
+    write(1)
+ ELSIF (~ (numero = 5 || numero = 10))
+ THEN 
+    write(0)
+ END
+END
+
+END logic.

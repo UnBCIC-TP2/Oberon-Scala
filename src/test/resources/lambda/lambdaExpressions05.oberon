@@ -1,0 +1,14 @@
+MODULE LambdaExpressions05;
+
+CONST
+  multiply = (a: INTEGER, b: INTEGER) => a * b;
+  subtract = (a: INTEGER, b: INTEGER) => a - b;
+  x = 7;
+  y = 3;
+
+BEGIN
+  multiply(x, y);
+  subtract(x, y)
+END
+
+END LambdaExpressions05.
