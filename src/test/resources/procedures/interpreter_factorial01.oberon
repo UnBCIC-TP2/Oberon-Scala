@@ -9,7 +9,7 @@ BEGIN
       y := y * x;
       x := x - 1
     END;
-    write(y)
+    x := x - 0
 END
 
 END SimpleModule.

@@ -179,6 +179,8 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
       methodSignatures: List[MethodSignature],
       indexOffset: Int
   ): List[JimpleStatement] = oberonStmt match {
+
+
     case AssignmentStmt(designator, exp) =>
       jimpleAssignment(designator, exp, module, fields, methodSignatures)
 
@@ -212,6 +214,24 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
       jimpleWhileStatement(
         condition,
         stmt,
+        module,
+        fields,
+        methodSignatures,
+        indexOffset
+      )
+
+    case ForStmt(init, condition, stmt) =>
+      jimpleForStatement(
+        init,
+        condition,
+        stmt,
+        module,
+        fields,
+        methodSignatures,
+        indexOffset
+      ) case WriteStmt(exp) =>
+      jimplePrintStatement(
+        exp,
         module,
         fields,
         methodSignatures,
@@ -324,13 +344,14 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
   }
 
   def jimpleWhileStatement(
-      condition: Expression,
-      stmt: Statement,
-      module: OberonModule,
-      fields: List[Field],
-      methodSignatures: List[MethodSignature],
-      indexOffset: Int
+    condition: Expression,
+    stmt: Statement,
+    module: OberonModule,
+    fields: List[Field],
+    methodSignatures: List[MethodSignature],
+    indexOffset: Int
   ): List[JimpleStatement] = {
+
     var index = indexOffset
     val whileLabel = s"label${index}"
     val endWhileLabel = s"label${index + 1}"
@@ -343,10 +364,55 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
       jimpleExpression(condition, module, fields, methodSignatures),
       endWhileLabel
     )
+
     buffer ++= jimpleStatement(stmt, module, fields, methodSignatures, index)
     index += calculateIndexOffset(stmt)
     buffer += GotoStmt(whileLabel)
     buffer += LabelStmt(endWhileLabel)
+
+    buffer.result()
+  }
+
+  def jimpleForStatement(
+      init: Statement,
+      condition: Expression,
+      stmt: Statement,
+      module: OberonModule,
+      fields: List[Field],
+      methodSignatures: List[MethodSignature],
+      indexOffset: Int
+  ): List[JimpleStatement] = {
+    var index = indexOffset
+    val forLabel = s"label${index}"
+    val endForLabel = s"label${index + 1}"
+    val buffer = ListBuffer[JimpleStatement]()
+
+    index += 2
+    buffer ++= jimpleStatement(init, module, fields, methodSignatures, index)
+    buffer += LabelStmt(forLabel)
+    buffer += IfStmt(
+      jimpleExpression(condition, module, fields, methodSignatures),
+      endForLabel
+    )
+    buffer ++= jimpleStatement(stmt, module, fields, methodSignatures, index)
+    index += calculateIndexOffset(stmt)
+    buffer += GotoStmt(forLabel)
+    buffer += LabelStmt(endForLabel)
+
+    buffer.result()
+  }
+
+  def jimplePrintStatement(
+    exp: Expression,
+    module: OberonModule,
+    fields: List[Field],
+    methodSignatures: List[MethodSignature],
+    indexOffset: Int
+  ): List[JimpleStatement] = {
+    var index = indexOffset
+    val buffer = ListBuffer[JimpleStatement]()
+
+    index += 2
 
     buffer.result()
   }
@@ -485,7 +551,7 @@ object JimpleCodeGenerator extends CodeGenerator[ClassDeclaration] {
     case IfElseStmt(_, thenStmt, elseStmt) =>
       calculateIndexOffset(thenStmt) + calculateIndexOffset(elseStmt) + 2
     case WhileStmt(_, stmt) => calculateIndexOffset(stmt) + 2
-
+    case ForStmt(_, _, stmt) => calculateIndexOffset(stmt) + 2
     case _ => throw new Exception("Non-exhaustive match in case statement.")
   }
 }
