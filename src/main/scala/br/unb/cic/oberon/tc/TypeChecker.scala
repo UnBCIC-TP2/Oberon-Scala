@@ -1,489 +1,579 @@
 package br.unb.cic.oberon.tc
 
+import br.unb.cic.oberon.tc.StateOrErrorMonad._
+
 import br.unb.cic.oberon.ir.ast._
 import br.unb.cic.oberon.environment.Environment
 import br.unb.cic.oberon.visitor.OberonVisitorAdapter
 
 import cats.data.State
-import cats.data.Writer
+import cats.data.StateT
 
-class ExpressionTypeChecker(val typeChecker: TypeChecker, var env: Environment[Type]) {
-  type T = State[Environment[Type], Writer[List[String], Option[Type]]]
+object TypeChecker {
+  val comparableTypes = List(IntegerType, RealType)
+  val numericTypes = List(IntegerType, RealType)
 
-
-  /* Tem a função de pegar o tipo.
-  Caso não esteja definido retorna None, caso contrário retorna o tipo encontrado. */
-
-  // TODO: case_ verificar env.baseType(t)
-  def checkType(t: Type): T = t match {
-    case UndefinedType => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
-    case _             => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), env.baseType(t)))}
-  }
-
-  // Pergunta: A expressão [typeChecker.env.baseType(t)], pode ser substituída por checkType(t)?
-  // State[Environment, Writer[List[String], Type]]
-  def checkExpression(exp: Expression, env: Environment[Type]): T  =
-    computeGeneralExpressionType(exp, env).flatMap(t => State[Environment[Type], Writer[List[String], Option[Type]]] {env => {
-      if (t.value == None) {
-        (env, Writer(t.written, None))
-      }
-      else {
-        (env, Writer(List(), env.baseType(t.value.get)))  
-      }
-    }})
-
-  // Função Monadificável
-  def computeGeneralExpressionType(exp: Expression, env: Environment[Type]): T = exp match {
-  //   case Brackets(exp)       => checkExpression(exp)
-  //   // Retorna os tipos nativos
-    case IntValue(_)         => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(IntegerType)))}
-    case RealValue(_)        => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(RealType)))}
-    case CharValue(_)        => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(CharacterType)))}
-    case BoolValue(_)        => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(BooleanType)))}
-    case StringValue(_)      => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(StringType)))}
-    case NullValue           => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-    case Undef()             => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), None))}
-    case VarExpression(name) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), typeChecker.env.lookup(name)))}
-
-  //   /* Verifica se a variável avaliada já foi definida anteriormente, 
-  //   se não for definida retorna None. A mensagem de erro é retornada pelo checkStmt*/
-  //   case VarExpression(name) => typeChecker.env.lookup(name)
-    case EQExpression(left, right) => computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
-    )
-    case NEQExpression(left, right) => computeBinExpressionType(
-        left,
-        right,
-        List(IntegerType, RealType, BooleanType),
-        BooleanType
-    )
-    case GTExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case LTExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case GTEExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case LTEExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), BooleanType)
-    case AddExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case SubExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case MultExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case DivExpression(left, right) =>
-        computeBinExpressionType(left, right, List(IntegerType), IntegerType)
-    case AndExpression(left, right) =>
-        computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-    case OrExpression(left, right) =>
-        computeBinExpressionType(left, right, List(BooleanType), BooleanType)
-  // Verifica se os argumentos da função são do tipo esperado pela definição dela.
-    //TODO: Definir mensagens de erro.
-    case FunctionCallExpression(name, args) => {
-        val procedure = env.findProcedure(name)
-
-        if (args.length != procedure.args.length) {
-          return State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
-        }
-
-        val givenArgumentTypes = args.map(arg => checkExpression(arg, env).runA(env).value.value.getOrElse(UndefinedType)) //Type: List[Types]
-        val neededArgumentTypes = procedure.args.map(_.argumentType)  //Type: List[Types]
-
-        if(givenArgumentTypes == neededArgumentTypes) {
-          State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(procedure.returnType.getOrElse(UndefinedType))))}
-        } else {
-          State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
-        }
-  } 
-
-
-    // Verifica se todos os elementos da array são do tipo esperado.
-    case ArrayValue(values, arrayType) =>
-      if (values.isEmpty || values.forall(v => checkExpression(v, env).runA(env).value.value.getOrElse(None) == arrayType.baseType)) {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(arrayType)))}
-      } else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("Error. "), None))}
-    
-     // Verifica um elemento especificado pelo index da array
-     case ArraySubscript(array, index) => arrayElementAccessCheck(array, index, env)
-     // Verifica se o objeto/expressão tem o atributo indicado
-     case FieldAccessExpression(exp, attributeName) =>
-        fieldAccessCheck(exp, attributeName, env)
-     // Verifica se o nome passado possui um endereço/ponteiro definido.
-     // Ser definido significa que o nome foi utilizado para atribuir algo anteriormente.
-     // OBS: O endereço deve possuir algo com tipo válido. 
-     case PointerAccessExpression(name) => pointerAccessCheck(name, env)
-     
-     case LambdaExpression(args, exp) => checkLambdaExpression(args, exp, env)
-  }
-
-
-  def arrayElementAccessCheck(array: Expression, index: Expression, env: Environment[Type]): T = for{
-    expressao1 <- checkExpression(array, env)
-    expressao2 <- checkExpression(index, env)
-  }yield(expressao1.mapBoth{(lista, tipo) => expressao2.mapBoth{ (lista2, tipo2) =>
-    val lista3 = lista ++ lista2
-    if(tipo.getOrElse(None).isInstanceOf[ArrayType] && tipo2.getOrElse(None) == IntegerType){
-      // O tipo retornado precisa ser definido melhor
-      (List(), Some(IntegerType))
-    }else{
-     (lista3 ++ List("Error. "), None)
-    }
-  }.run
-  })
-
-
-  def fieldAccessCheck(exp: Expression, attributeName: String, env: Environment[Type]): T = for
-  {
-    expressao1 <- checkExpression(exp, env)
-  }yield(expressao1.mapBoth{(lista, tipo) => tipo.getOrElse(None) match{
-    case ReferenceToUserDefinedType(userTypeName) => env.lookupUserDefinedType(userTypeName) match{
-      case Some(UserDefinedType(name, RecordType(variables))) => {
-          (lista, variables
-          .find(v => v.name.equals(attributeName))   //TODO: consertar retorno desse caso?
-          .map(_.variableType))}
-      case _ => (lista ++ List("Error. "), None)
-    }
-    case RecordType(variables) => {
-        val attribute = variables.find(v => v.name.equals(attributeName))
-        if (attribute.isDefined) {
-          (lista, Some(attribute.get.variableType))
-        } else {
-          (lista ++ List("Error. "), None)
-        }
-      }
-    case _ => (lista ++ List("Error. "), None)
-    }
-  })
-
-  def pointerAccessCheck(name: String, env: Environment[Type]): T = for{ 
-    ponteiro <- checkType(env.lookup(name).getOrElse(UndefinedType))
-  }yield(ponteiro.value match{
-    case Some(PointerType(varType)) => Writer(List(), Some(varType))
-    case _ => Writer(List("Error. "), None)
-  })
-
-  // Verificar o impacto dos monads nesta parte
-  def checkLambdaExpression(args: List[FormalArg], exp: Expression, env: Environment[Type]): T = {
-  var env1 = env.push()
-  args.foreach(a => env1 = env1.setLocalVariable(a.name, a.argumentType))
-  val argTypes = args.map(a => a.argumentType)
-  val expType = checkExpression(exp, env1)
-  // O pop retorna a stack do Environment sem o elemento do topo
-  env1 = env1.pop()
-  for{
-    tipo <- expType
-  }yield(tipo.value.getOrElse(None) match{
-    case None => Writer(List("Error. "), None)
-    case _ => Writer(List(), Some(LambdaType(argTypes, tipo.value.get)))
-  })
-}
-
-  // Faz a verificação de tipos para comparações lógicas/binárias
-  def computeBinExpressionType(
-    left: Expression,
-    right: Expression,
-    expected: List[Type],
-    result: Type
-  ): T = for {
-    t1 <- checkExpression(left, env)
-    t2 <- checkExpression(right, env)
-    /* Verifica se os tipos são iguais
-        Em seguida, é verificado se o tipo do primeiro elemento está na lista de tipos esperados*/
-  } yield(if (t1.value.getOrElse(None) == t2.value.getOrElse(None) && expected.contains(t1.value.getOrElse(UndefinedType))) {
-          t1.mapBoth{(lista, tipo) => t2.mapBoth{(lista2, tipo2) => 
-            val lista3 = lista ++ lista2
-            (lista3, Some(result))
-          }.run }
+  def checkExpression(exp: Expression): StateOrError[Type] = {
+    exp match {
+      case IntValue(_)         => pure(IntegerType)
+      case RealValue(_)        => pure(RealType)
+      case CharValue(_)        => pure(CharacterType)
+      case BoolValue(_)        => pure(BooleanType)
+      case StringValue(_)      => pure(StringType)
+      case Location(_)         => pure(LocationType)
+      case NullValue           => pure(NullType)
+      case Undef()             => assertError("Undefined type.")
+      case VarExpression(name) => lookupVariable(name)
+      case EQExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case NEQExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case GTExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case LTExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case GTEExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case LTEExpression(l, r) =>
+        checkOperation(l, r, comparableTypes, BooleanType)
+      case AddExpression(l, r)  => checkOperationKeepType(l, r, numericTypes)
+      case SubExpression(l, r)  => checkOperationKeepType(l, r, numericTypes)
+      case MultExpression(l, r) => checkOperationKeepType(l, r, numericTypes)
+      case DivExpression(l, r)  => checkOperationKeepType(l, r, numericTypes)
+      case ModExpression(l, r)  => checkOperationKeepType(l, r, List(IntegerType))
+      case AndExpression(l, r) =>
+        checkOperation(l, r, List(BooleanType), BooleanType)
+      case OrExpression(l, r) =>
+        checkOperation(l, r, List(BooleanType), BooleanType)
+      case NotExpression(exp) =>
+        for {
+          t <- checkExpression(exp)
+          r <- enforceType(t, BooleanType)
+        } yield r
+      case Brackets(exp) => checkExpression(exp)
+      case FunctionCallExpression(name: String, args: List[Expression]) => {
+        for {
+          p <- lookupProcedure(name)
+          ts <- checkExpressions(args)
+          _ <-
+            if (p.args.map(fa => fa.argumentType) == ts) { pure(()) }
+            else {
+              assertError(s"Wrong type for argument of function ${name}.")
+            }
+          r <- p.returnType match {
+            case None    => pure(UndefinedType)
+            case Some(r) => pure(r)
           }
-          else {
-          t1.mapBoth{(lista, tipo) => t2.mapBoth{(lista2, tipo2) => 
-            val lista3 = lista ++ lista2
-            (lista3 ++ List("Incorrect types."), None)
-          }.run }
-          })
-
-  def updateEnvironment(nEnv: Environment[Type]){
-      env = nEnv
+        } yield r
+      }
+      case ArrayValue(values, arrayType) =>
+        for {
+          ts <- checkExpressions(values.toList)
+          _ <- enforceTypes(ts, arrayType.baseType)
+        } yield arrayType
+      case ArraySubscript(array: Expression, index: Expression) => {
+        for {
+          at <- checkExpression(array)
+          it <- checkExpression(index)
+          r <- at match {
+            case ArrayType(_, bt) =>
+              for {
+                _ <- wrapError(
+                  enforceType(it, IntegerType),
+                  "ArraySubscriptError: Element from array has wrong type!"
+                )
+              } yield bt
+            case _ =>
+              assertError(
+                s"ArraySubscriptError: Tried to subscript element of type ${at}. Expected ArrayType!"
+              )
+          }
+        } yield r
+      }
+      case FieldAccessExpression(exp: Expression, attributeName: String) =>
+        checkFieldAccess(exp, attributeName)
+      case PointerAccessExpression(name: String) => lookupPointer(name)
+      case LambdaExpression(args: List[FormalArg], exp: Expression) => {
+        for {
+          _ <- addLocalVariables(args.map(arg => (arg.name, arg.argumentType)))
+          t <- checkExpression(exp)
+        } yield t
+      }
+    }
   }
 
-}
+  def checkModule(module: OberonModule): StateOrError[Unit] = {
+    for {
+      _ <- module.constants.foldLeft[StateOrError[Unit]](pure(()))((acc, c) =>
+        for {
+          _ <- acc
+          t <- checkExpression(c.exp)
+          _ <- addGlobalVariable(c.name, t)
+        } yield ()
+      )
+      _ <- addGlobalVariables(
+        module.variables.map(v => (v.name, v.variableType))
+      )
+      _ <- addProcedures(module.procedures)
+      _ <- addUserDefinedTypes(module.userTypes)
+      _ <- module.procedures.foldLeft[StateOrError[Unit]](pure(()))((acc, p) =>
+        for {
+          _ <- acc
+          _ <- checkProcedure(p)
+        } yield ()
+      )
+      _ <- module.stmt match {
+        case Some(stmt) => checkStmt(stmt)
+        case None       => pure(()) // Should this be an error?
+      }
+    } yield ()
+  }
 
-class TypeChecker (envPassado: Environment[Type]){
-  var env = envPassado
-  type T = State[Environment[Type], Writer[List[String], Option[Type]]]
-
-  // O Environment está sendo passado como argumento da classe, logo ainda é global
-  // porém está explicito na classe. Além disso, todas as mudanças no environment passam
-  // a ser internas.
-  val expVisitor = new ExpressionTypeChecker(this, env)
-
-  // O checkModule deverá ser parte do construtor da classe
-  def checkModule(module: OberonModule): /*List[(Statement, String)]*/ T = {
-    expVisitor.updateEnvironment(module.constants.foldLeft(expVisitor.env)((acc, c) => acc.setGlobalVariable(c.name, expVisitor.checkExpression(c.exp, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(UndefinedType) )))
-    env = expVisitor.env
-    expVisitor.updateEnvironment(module.variables.foldLeft(expVisitor.env)((acc, v) => acc.setGlobalVariable(v.name, v.variableType)))
-    env = expVisitor.env
-    expVisitor.updateEnvironment(module.procedures.foldLeft(expVisitor.env)((acc, p) => acc.declareProcedure(p)))
-    env = expVisitor.env
-    expVisitor.updateEnvironment(module.userTypes.foldLeft(expVisitor.env)((acc, t) => acc.addUserDefinedType(t)))
-    env = expVisitor.env
-    var errors = module.procedures.flatMap(p => checkProcedure(p).runA(expVisitor.env).value.written)
-
-    if (module.stmt.isDefined) {
+  def checkStmt(stmt: Statement): StateOrError[Type] = stmt match {
+    case AssignmentStmt(VarAssignment(v: String), exp: Expression) => {
       for {
-        estado <- checkStmt(module.stmt.get)
-      }yield( estado.mapBoth{(lista, tipo) =>
-        errors = errors ++ lista
-        (errors, tipo)
-      })
-    }else{
-      State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(errors, Some(UndefinedType)))}
-    }
-  }
-
-  def checkProcedure(procedure: Procedure): /*List[(Statement, String)]*/ T = {
-    expVisitor.updateEnvironment(expVisitor.env.push())
-    env = expVisitor.env
-    expVisitor.updateEnvironment(procedure.args.foldLeft(expVisitor.env)((acc, a) => acc.setLocalVariable(a.name, a.argumentType)))
-    env = expVisitor.env
-    expVisitor.updateEnvironment(procedure.constants.foldLeft(expVisitor.env)((acc, c) => acc.setLocalVariable(c.name, expVisitor.checkExpression(c.exp, env).runA(env).value.value.get)))
-    env = expVisitor.env
-    expVisitor.updateEnvironment(procedure.variables.foldLeft(expVisitor.env)((acc, v) => acc.setLocalVariable(v.name, v.variableType)))
-    env = expVisitor.env
-
-    val errors = checkStmt(procedure.stmt)
-
-    // Colocar o Update nesta parte
-    expVisitor.updateEnvironment(env.pop())
-    errors
-  }
-
-  // Responsável por retornar as mensagens de erro
-  def checkStmt(stmt: Statement): /*List[(Statement, String)]*/ T = stmt match {
-    case AssignmentStmt(_, _)    => checkAssignment(stmt)
-    case IfElseStmt(_, _, _)     => visitIfElseStmt(stmt)
-    case WhileStmt(_, _)         => visitWhileStmt(stmt)
-    case ForEachStmt(v, e, s)    => visitForEachStmt(ForEachStmt(v, e, s))
-    case ExitStmt()              => visitExitStmt()
-    case ProcedureCallStmt(_, _) => procedureCallStmt(stmt)
-    case SequenceStmt(stmts)     => State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(stmts.flatMap(s => checkStmt(s).runA(env).value.written), Some(NullType)))}
-        
-    case ReturnStmt(exp) =>
-      if (expVisitor.checkExpression(exp, env).runA(env).value.value.isDefined){
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      } 
-      else{
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $exp is ill typed."), None))}
-      }
-    case ReadLongRealStmt(v) =>
-      if (env.lookup(v).isDefined){
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      } 
-      else {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-      }
-    case ReadRealStmt(v) =>
-      if (env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-    case ReadLongIntStmt(v) =>
-      if (env.lookup(v).isDefined) {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      } 
-      else {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-      }
-    case ReadIntStmt(v) =>
-      if (env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      else {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-      }
-    case ReadShortIntStmt(v) =>
-      if (env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      else{
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-      }
-    case ReadCharStmt(v) =>
-      if (env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      else {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared."), None))}
-      }
-    case WriteStmt(exp) =>
-      var state = expVisitor.checkExpression(exp, env)  
-      if (state.runA(env).value.value.isDefined && state.runA(env).value.written.isEmpty) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      else{
-        State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $exp is ill typed."), None))}
-      }
-    
-    case NewStmt(varName) =>
-      env.lookup(varName) match {
-        case Some(PointerType(_)) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-        case _ => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $varName is ill typed."), None))}
-      }
-    case _ => throw new RuntimeException("Statement not part of Oberon-Core")
-  }
-
-  private def checkAssignment(stmt: Statement): T = stmt match {
-    case AssignmentStmt(VarAssignment(v), exp) => checkVarAssigment(v, exp)
-    case AssignmentStmt(PointerAssignment(p), exp) => checkPointerAssigment(p, exp)
-    case AssignmentStmt(ArrayAssignment(arr, element), exp) => checkArrayAssigment(arr, element, exp)
-    case AssignmentStmt(RecordAssignment(record, field), exp) => checkRecordAssigment(record, field, exp)
-  }
-
-  private def checkVarAssigment(v: String, exp: Expression): T = {
-      var varType = env.lookup(v).getOrElse(UndefinedType)
-      var varBaseType = env.baseType(varType)
-      var expType = expVisitor.checkExpression(exp, env).runA(env).value.value
-    (varBaseType.getOrElse(None), expType.getOrElse(None)) match {
-      case (PointerType(_), NullType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      case (IntegerType, BooleanType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      case (BooleanType, IntegerType) => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-
-      case (_, None) => if(! env.lookup(v).isDefined) State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Variable $v not declared"), None))} else State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Expression $exp is ill typed"), None))}
-
-      case (t1, t2) if t1 == t2 => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-      case (t1, t2) if t1 != t2 => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Assignment between different types: $v, $exp"), None))}
-
-      case _ => State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List("It is ill typed"), None))}
-    }
-  }
-
-  private def checkPointerAssigment(v: String, exp: Expression): T = {
-    for {
-      pointerType <- expVisitor.pointerAccessCheck(v, env)
-      expType <- expVisitor.checkExpression(exp, env)
-    } yield (Some((pointerType.value, expType.value)) match {
-      case Some((t1, t2)) => if (t1 == t2){Writer(List(), Some(NullType))}
-        else{Writer(List(s"Expression $exp doesn't match variable type."), None)}
-      case _ => Writer(List(s"Could not compute the types correctly."), None)
-    })
-  }
-
-  private def checkArrayAssigment(arr: Expression, element: Expression, exp: Expression): T = {
-    for {
-      arrType <- expVisitor.checkExpression(arr, env)
-      elementType <- expVisitor.checkExpression(element, env)
-      expType <- expVisitor.checkExpression(exp, env)
-    } yield ( (arrType.value, elementType.value, expType.value) match {
-      case (Some(ArrayType(length, t1)), Some(IntegerType), Some(t2)) =>
-        if (t1 == t2) {Writer(List(), Some(NullType))}
-        else {Writer(List(s"Expression $exp doesn't match the array type."), None)}
-      case (_, Some(t), _) => if (t != IntegerType) {Writer(List( s"The index expression must be an integer."), None)} else{Writer(List(s"Could not compute the types correctly."), None)}
-      case (None, None, None) => Writer(List(s"Could not compute the types correctly."), None)
-      case _ => Writer(List(s"Could not compute the types correctly."), None)
-    })
-  }
-
-  private def checkRecordAssigment(record: Expression, field: String, exp: Expression): T = {
-    for {
-      fieldAccessType <- expVisitor.fieldAccessCheck(record, field, env)
-      expType <- expVisitor.checkExpression(exp, env)
-    } yield ( (fieldAccessType.value, expType.value) match {
-      case (Some(t1), Some(t2)) => if (t1 == t2) {Writer(List(), Some(NullType))}
-        else Writer(List(s"Expression $exp doesn't match variable type."), None)
-      case _ => Writer(List(s"Could not compute the types correctly."), None)
-    })
-  }
-
-  private def visitIfElseStmt(stmt: Statement): T = stmt match {
-    case IfElseStmt(condition, thenStmt, elseStmt) =>
-      var errorList = checkStmt(thenStmt).runA(env).value.written
-      if (!expVisitor.checkExpression(condition, env).runA(env).value.value.contains(BooleanType)) {
-        errorList = (s"Expression $condition does not have a boolean type") :: errorList
-      }
-      
-      val errors = errorList ++ elseStmt.map(s => checkStmt(s).runA(env).value.written).getOrElse(List())
-      if (errors.isEmpty){
-      State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(errors, Some(NullType)))
-      }}
-      else {State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(errors, None))
-      }}
-  }
-
-  private def visitWhileStmt(stmt: Statement): T = stmt match {
-    case WhileStmt(condition, stmt) =>
-      val errorList = checkStmt(stmt).runA(env).value.written
-
-      if (expVisitor.checkExpression(condition, env).runA(env).value.value.contains(BooleanType)) {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(errorList, Some(NullType)))
-      }
-      } else {
-        State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(s"Expression $condition do not have a boolean type" :: errorList, Some(NullType)))
+        tv <- lookupVariable(v)
+        te <- checkExpression(exp)
+        _ <- (tv, te) match {
+          case (PointerType(_), NullType) => pure(())
+          case (IntegerType, BooleanType) => pure(())
+          case (BooleanType, IntegerType) => pure(())
+          case _                          => wrapValue(enforceType(te, tv), ())
         }
-      }
-  }
-
-  def visitForEachStmt(forEachStmt: ForEachStmt): /* List[(Statement, String)] */ T = {
-    val expType = expVisitor.checkExpression(forEachStmt.exp, env)
-    val varType = env.lookup(forEachStmt.varName)
-
-    val res = if (expType.runA(env).value.value.isDefined && expType.runA(env).value.value.getOrElse(None).isInstanceOf[ArrayType]) {
-      val arrayBaseType =
-        expVisitor.checkType(expType.runA(env).value.value.get.asInstanceOf[ArrayType].baseType)
-      if (arrayBaseType.runA(env).value.value.getOrElse(None) != varType.getOrElse(None))
-        List("invalid types in the foreach statement")
-      else
-        List()
-    } else {
-      List("invalid types in the foreach statement")
+      } yield NullType
     }
-    val errors = res ++ checkStmt(forEachStmt.stmt).runA(env).value.written
-
-    if (errors.isEmpty){
-      State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(errors, Some(NullType)))
-      }}
-      else {State[Environment[Type], Writer[List[String], Option[Type]]] {
-        env => (env, Writer(errors, None))
-      }}
- 
-  }
-
-  private def visitExitStmt(): T = State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(), Some(NullType)))}
-
-  /*
-   * Type checker for a procedure call. This is the "toughest" implementation
-   * here. We have to check:
-   *
-   * (a) the procedure exists
-   * (b) the type of the actual arguments match the type of the formal arguments
-   * (c) the procedure body (stmt) is well typed.
-   *
-   * @param stmt (a procedure call)
-   *
-   * @return Our error representation (statement + string with the error message)
-   */
-  private def procedureCallStmt(stmt: Statement): T =
-    stmt match {
-      case ProcedureCallStmt(name, args) =>
-        val procedure = env.findProcedure(name)
-        if (procedure == null)
-          State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Procedure $name has not been declared."), None))}
-        else {
-          // check if the type of the formal arguments and the actual arguments
-          // match.
-          val formalArgumentTypes = procedure.args.map(a => a.argumentType)
-          val actualArgumentTypes = args.map(a => expVisitor.checkExpression(a, env).runA(env).value.value.get)
-          // the two lists must have the same size.
-          if (formalArgumentTypes.size != actualArgumentTypes.size) {
-            State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"Wrong number of arguments to the $name procedure"), None))
-          }}
-          val allTypesMatch = formalArgumentTypes
-            .zip(actualArgumentTypes)
-            .map(pair => pair._1 == pair._2)
-            .forall(v => v)
-          if (!allTypesMatch) {
-            State[Environment[Type], Writer[List[String], Option[Type]]] {env => (env, Writer(List(s"The arguments do not match the $name formal arguments"), None))}
+    case AssignmentStmt(
+          ArrayAssignment(array: Expression, index: Expression),
+          exp: Expression
+        ) => {
+      for {
+        at <- checkExpression(array)
+        it <- checkExpression(index)
+        et <- checkExpression(exp)
+        _ <- enforceType(it, IntegerType)
+        _ <- at match {
+          case ArrayType(_, bt) => enforceType(et, bt)
+          case _ =>
+            assertError(
+              s"Tried to update array value for type ${at}. Expected ArrayType!"
+            )
+        }
+      } yield NullType
+    }
+    case AssignmentStmt(
+          RecordAssignment(record: Expression, field: String),
+          exp: Expression
+        ) => {
+      for {
+        rt <- checkFieldAccess(record, field)
+        et <- checkExpression(exp)
+        _ <- enforceType(rt, et)
+      } yield NullType
+    }
+    case AssignmentStmt(
+          PointerAssignment(name: String),
+          exp: Expression
+        ) => {
+      for {
+        pt <- lookupPointer(name)
+        et <- checkExpression(exp)
+        _ <- enforceType(et, pt)
+      } yield NullType
+    }
+    case SequenceStmt(stmts: List[Statement]) => {
+      stmts.foldLeft[StateOrError[Type]](pure(NullType))((acc, stmt) =>
+        for {
+          _ <- acc
+          _ <- checkStmt(stmt)
+        } yield NullType
+      )
+    }
+    case NewStmt(n: String) => lookupPointer(n)
+    case ReturnStmt(exp: Expression) =>
+      wrapValue(checkExpression(exp), NullType)
+    case ReadLongRealStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, RealType), NullType)
+    case ReadRealStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, RealType), NullType)
+    case ReadLongIntStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, IntegerType), NullType)
+    case ReadIntStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, IntegerType), NullType)
+    case ReadShortIntStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, IntegerType), NullType)
+    case ReadCharStmt(v: String) =>
+      wrapValue(lookupTypedVariable(v, CharacterType), NullType)
+    case WriteStmt(exp: Expression) => wrapValue(checkExpression(exp), NullType)
+    case ProcedureCallStmt(name: String, args: List[Expression]) => {
+      for {
+        p <- lookupProcedure(name)
+        ts <- checkExpressions(args)
+        _ <-
+          if (p.args.map(fa => fa.argumentType) == ts) { pure(()) }
+          else {
+            assertError(s"Wrong type for argument of procedure ${name}.")
           }
-          // if everything above is ok, lets check the procedure body.
-          checkStmt(stmt)
-        }
+      } yield NullType
     }
+    case IfElseStmt(
+          condition: Expression,
+          thenStmt: Statement,
+          elseStmt: Option[Statement]
+        ) => {
+      for {
+        t <- checkExpression(condition)
+        _ <- enforceType(t, BooleanType)
+        _ <- wrapIgnoreEnvironment(checkStmt(thenStmt))
+        _ <- elseStmt match {
+          case Some(stmt) => wrapIgnoreEnvironment(checkStmt(stmt))
+          case None       => pure(NullType)
+        }
+      } yield NullType
+    }
+    case WhileStmt(condition: Expression, stmt: Statement) => {
+      for {
+        t <- checkExpression(condition)
+        _ <- enforceType(t, BooleanType)
+        _ <- wrapIgnoreEnvironment(checkStmt(stmt))
+      } yield NullType
+    }
+    case ForEachStmt(n: String, exp: Expression, stmt: Statement) => {
+      for {
+        et <- checkExpression(exp)
+        vt <- lookupVariable(n)
+        _ <- et match {
+          case ArrayType(_, bt) => enforceType(vt, bt)
+          case t =>
+            assertError(
+              s"ForEach statement required ArrayType, but received ${t}."
+            )
+        }
+        _ <- wrapIgnoreEnvironment(checkStmt(stmt))
+      } yield NullType
+    }
+    case ExitStmt() => pure(NullType)
+    case _          => assertError("Statement not part of Oberon-Core")
+  }
+
+  private def checkProcedure(p: Procedure): StateOrError[Unit] = {
+    for {
+      env <- getEnvironment()
+      _ <- updateEnvironment(env.push())
+      _ <- addLocalVariables(p.args.map(arg => (arg.name, arg.argumentType)))
+      _ <- p.constants.foldLeft[StateOrError[Unit]](pure(()))((acc, c) =>
+        for {
+          _ <- acc
+          t <- checkExpression(c.exp)
+          _ <- addLocalVariable(c.name, t)
+        } yield ()
+      )
+      _ <- addLocalVariables(p.variables.map(v => (v.name, v.variableType)))
+      _ <- checkStmt(p.stmt)
+      _ <- updateEnvironment(env.pop())
+    } yield ()
+  }
+
+  private def checkFieldAccess(
+      exp: Expression,
+      attributeName: String
+  ): StateOrError[Type] = {
+    // Not currently testable, no value has RecordType
+
+    for {
+      t <- checkExpression(exp)
+      r <- t match {
+        case RecordType(vars) =>
+          for {
+            v <- find[VariableDeclaration](
+              vars,
+              (v => v.name == attributeName)
+            )
+          } yield v.variableType
+        case ReferenceToUserDefinedType(name) =>
+          for {
+            u <- lookupUserDefinedType(name)
+            vs <- u match {
+              case UserDefinedType(_, RecordType(vars)) => pure(vars)
+              case _ => assertError("User defined type not with base record.")
+            }
+            v <- find[VariableDeclaration](
+              vs,
+              (v => v.name == attributeName)
+            )
+          } yield v.variableType
+        case _ =>
+          assertError(
+            s"Tried to access field from type ${t}. Expected RecordType."
+          )
+      }
+    } yield r
+  }
+
+  private def getEnvironment(): StateOrError[Environment[Type]] = {
+    StateT[ErrorOr, Environment[Type], Environment[Type]](
+      (env: Environment[Type]) => Right(env, env)
+    )
+  }
+
+  private def updateEnvironment(
+      env: Environment[Type]
+  ): StateOrError[Environment[Type]] = {
+    StateT[ErrorOr, Environment[Type], Environment[Type]](_ =>
+      Right((env, env))
+    )
+  }
+
+  private def wrapIgnoreEnvironment[A](
+      wrapped: StateOrError[A]
+  ): StateOrError[A] = {
+    for {
+      env <- getEnvironment()
+      r <- wrapped
+      _ <- updateEnvironment(env)
+    } yield r
+  }
+
+  // TODO: Usar esses para abstrair o restante
+  private def addManyToEnv[A](
+      f: (A, Environment[Type]) => Environment[Type]
+  )(xs: List[A]): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- xs.foldRight[StateOrError[Environment[Type]]](pure(env))(
+        (x, acc) => {
+          for {
+            _ <- acc
+            nEnv <- addToEnv(f)(x)
+          } yield nEnv
+        }
+      )
+    } yield nEnv
+  }
+
+  private def addToEnv[A](
+      f: (A, Environment[Type]) => Environment[Type]
+  )(x: A): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- updateEnvironment(f(x, env))
+    } yield nEnv
+  }
+
+  private def addUserDefinedTypes(
+      us: List[UserDefinedType]
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- us.foldLeft[StateOrError[Environment[Type]]](pure(env))(
+        (acc, u) => {
+          for {
+            _ <- acc
+            nEnv <- addUserDefinedType(u)
+          } yield nEnv
+        }
+      )
+    } yield nEnv
+  }
+
+  private def addUserDefinedType(
+      u: UserDefinedType
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- updateEnvironment(env.addUserDefinedType(u))
+    } yield nEnv
+  }
+
+  private def addProcedures(
+      ps: List[Procedure]
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- ps.foldLeft[StateOrError[Environment[Type]]](pure(env))(
+        (acc, p) => {
+          for {
+            _ <- acc
+            nEnv <- addProcedure(p)
+          } yield nEnv
+        }
+      )
+    } yield nEnv
+  }
+
+  private def addProcedure(p: Procedure): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- updateEnvironment(env.declareProcedure(p))
+    } yield nEnv
+  }
+
+  private def addGlobalVariables(
+      vars: List[(String, Type)]
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- vars.foldLeft[StateOrError[Environment[Type]]](pure(env))(
+        (acc, v) => {
+          for {
+            _ <- acc
+            nEnv <- addGlobalVariable(v._1, v._2)
+          } yield nEnv
+        }
+      )
+    } yield nEnv
+  }
+
+  private def addGlobalVariable(
+      name: String,
+      varType: Type
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- updateEnvironment(
+        env.setGlobalVariable(name, varType)
+      )
+    } yield nEnv
+  }
+
+  private def addLocalVariables(
+      vars: List[(String, Type)]
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- vars.foldLeft[StateOrError[Environment[Type]]](pure(env))(
+        (acc, v) => {
+          for {
+            _ <- acc
+            nEnv <- addLocalVariable(v._1, v._2)
+          } yield nEnv
+        }
+      )
+    } yield nEnv
+  }
+
+  private def addLocalVariable(
+      name: String,
+      varType: Type
+  ): StateOrError[Environment[Type]] = {
+    for {
+      env <- getEnvironment()
+      nEnv <- updateEnvironment(
+        env.setLocalVariable(name, varType)
+      )
+    } yield nEnv
+  }
+
+  private def wrapError[A](
+      wrapped: StateOrError[A],
+      error: String
+  ): StateOrError[A] = {
+    StateT[ErrorOr, Environment[Type], A]((env: Environment[Type]) => {
+      wrapped.runA(env) match {
+        case Left(_)  => Left(error)
+        case Right(r) => Right((env, r))
+      }
+    })
+  }
+
+  private def wrapValue[A, B](wrapped: StateOrError[B], v: A): StateOrError[A] = {
+    for {
+      _ <- wrapped
+    } yield v
+  }
+
+  private def find[A](xs: List[A], p: A => Boolean): StateOrError[A] = {
+    xs.find(p) match {
+      case Some(v) => pure(v)
+      case None    => assertError("ElementNotFoundError")
+    }
+  }
+
+  private def checkExpressions(
+      exps: List[Expression]
+  ): StateOrError[List[Type]] = {
+    exps.foldRight[StateOrError[List[Type]]](pure(List()))((exp, acc) =>
+      for {
+        t <- checkExpression(exp)
+        ts <- acc
+      } yield (t :: ts)
+    )
+  }
+
+  private def lookupUserDefinedType(
+      name: String
+  ): StateOrError[UserDefinedType] =
+    StateT[ErrorOr, Environment[Type], UserDefinedType](
+      (env: Environment[Type]) => {
+        env.lookupUserDefinedType(name) match {
+          case Some(u) => Right((env, u))
+          case None    => Left(s"Undefined user defined type ${name}.")
+        }
+      }
+    )
+
+  private def lookupProcedure(name: String): StateOrError[Procedure] =
+    StateT[ErrorOr, Environment[Type], Procedure]((env: Environment[Type]) => {
+      env.lookupProcedure(name) match {
+        case Some(p) => Right((env, p))
+        case None    => Left(s"Undefined procedure ${name}.")
+      }
+    })
+
+  private def lookupTypedVariable(name: String, et: Type): StateOrError[Type] =
+    for {
+      t <- lookupVariable(name)
+      r <- enforceType(t, et)
+    } yield r
+
+  private def lookupVariable(name: String): StateOrError[Type] =
+    StateT[ErrorOr, Environment[Type], Type]((env: Environment[Type]) => {
+      env.lookup(name) match {
+        case Some(t) => Right((env, t))
+        case None    => Left(s"Undefined variable ${name}.")
+      }
+    })
+
+  private def lookupPointer(name: String): StateOrError[Type] = {
+    StateT[ErrorOr, Environment[Type], Type]((env: Environment[Type]) => {
+      env.lookup(name) match {
+        case Some(PointerType(vt)) => Right((env, vt))
+        case _ => Left(s"Could not find pointer with name ${name}.")
+      }
+    })
+  }
+
+  private def enforceType(at: Type, et: Type): StateOrError[Type] =
+    enforceAnyType(at, List(et))
+
+  private def enforceTypes(ts: List[Type], et: Type): StateOrError[Type] =
+    ts.foldRight[StateOrError[Type]](pure(et))((t, acc) => enforceType(t, et))
+
+  private def enforceAnyType(t: Type, ts: List[Type]): StateOrError[Type] = {
+    if (ts.contains(t)) {
+      pure(t)
+    } else {
+      assertError(s"Unexpected type ${t}. Expected one of ${ts.mkString(", ")}")
+    }
+  }
+
+  private def checkOperation(
+      lExpr: Expression,
+      rExpr: Expression,
+      expTypes: List[Type],
+      resType: Type
+  ): StateOrError[Type] =
+    wrapValue(checkOperationKeepType(lExpr, rExpr, expTypes), resType)
+
+  private def checkOperationKeepType(
+      lExpr: Expression,
+      rExpr: Expression,
+      expTypes: List[Type]
+  ): StateOrError[Type] = {
+    for {
+      t1 <- checkExpression(lExpr)
+      t2 <- checkExpression(rExpr)
+      t <- enforceType(t1, t2)
+      _ <- enforceAnyType(t, expTypes)
+    } yield t
+  }
 }

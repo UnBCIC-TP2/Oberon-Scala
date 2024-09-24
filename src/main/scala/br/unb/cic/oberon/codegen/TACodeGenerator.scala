@@ -2,19 +2,15 @@ package br.unb.cic.oberon.codegen
 
 import br.unb.cic.oberon.ir.ast.{Constant => ASTConstant, _}
 import br.unb.cic.oberon.ir.tac._
-import br.unb.cic.oberon.tc.{ExpressionTypeChecker, TypeChecker}
+import br.unb.cic.oberon.tc.{TypeChecker}
 import br.unb.cic.oberon.environment.Environment
 
 object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
   var env = new Environment[Type]()
-  private var tc = new TypeChecker(env)
-  private var expVisitor = new ExpressionTypeChecker(tc, env)
 
   private val typeByteSize: Map[Type, Int] =
-    Map(IntegerType -> 4,
-      RealType -> 4
-    )
+    Map(IntegerType -> 4, RealType -> 4)
 
   override def generateCode(module: OberonModule): List[TAC] = {
     load_vars(module.variables, module.constants)
@@ -31,7 +27,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val (t, insts1) = generateExpression(exp, insts)
         designator match {
           case VarAssignment(varName) =>
-            val v = Name(varName, expVisitor.checkExpression(exp, expVisitor.env).runA(expVisitor.env).value.value.get)
+            val v = Name(varName, checkExpression(exp))
             insts1 :+ CopyOp(t, v, "")
           case ArrayAssignment(array, index) =>
             val (a, insts2) = generateExpression(array, insts1)
@@ -39,9 +35,10 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
             insts2 :+ ArraySet(t, offset, a, "")
           case PointerAssignment(pointerName) =>
             val p = Name(pointerName, LocationType)
-             insts1 :+ SetPointer(t, p, "")
-          case RecordAssignment(record,field) =>
-            val (name: Name, insts2: List[TAC]) = generateExpression(record, insts1)
+            insts1 :+ SetPointer(t, p, "")
+          case RecordAssignment(record, field) =>
+            val (name: Name, insts2: List[TAC]) =
+              generateExpression(record, insts1)
             val offset = getRecordOffset(name, field)
             insts2 :+ RecordSet(t, offset, name, "")
         }
@@ -51,8 +48,8 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         }
       case ProcedureCallStmt(name, argsExps) => {
         val argsTAC = argsExps.map(exp => generateExpression(exp, List()))
-        val TACops = argsTAC.flatMap {
-          case (_, tac: List[TAC]) => tac
+        val TACops = argsTAC.flatMap { case (_, tac: List[TAC]) =>
+          tac
         }
         val param = argsTAC.map(_._1).map {
           case t: Temporary => (List[TAC](), Param(t, ""))
@@ -69,7 +66,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
         val paramops2 = paramops.flatten
         val param2 = param.map(_._2)
 
-        insts ++ TACops ++ paramops2 ++ param2 :+ Call(name, argsExps.length, "")
+        insts ++ TACops ++ paramops2 ++ param2 :+ Call(
+          name,
+          argsExps.length,
+          ""
+        )
 
       }
       case IfElseStmt(condition, thenStmt, elseStmt) =>
@@ -246,7 +247,8 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ExitStmt() =>
         return insts :+ Exit("")
       case NewStmt(varName) =>
-        val (variable: Address, insts1) = generateExpression(VarExpression(varName), insts)
+        val (variable: Address, insts1) =
+          generateExpression(VarExpression(varName), insts)
         insts1 :+ New(variable, "")
       case MetaStmt(_) =>
         throw new Exception("MetaStmt não foi implementado")
@@ -257,6 +259,7 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       expr: Expression,
       insts: List[TAC]
   ): (Address, List[TAC]) = {
+
     expr match {
 
       case Brackets(exp) =>
@@ -280,59 +283,43 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case NullValue =>
         return (Constant("Null", NullType), insts)
 
-      case VarExpression(name) => 
-        return (Name(name, expVisitor.checkExpression(expr, tc.env).runA(tc.env).value.value.getOrElse(UndefinedType)), insts)
+      case VarExpression(name) =>
+        return (Name(name, checkExpression(expr)), insts)
 
       case AddExpression(left, right) =>
-        val (t, l, r, insts2) = generateBinaryExpression(
-          left,
-          right,
-          insts,
-          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
-        )
+        val (t, l, r, insts2) =
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ AddOp(l, r, t, ""))
 
       case SubExpression(left, right) =>
-        val (t, l, r, insts2) = generateBinaryExpression(
-          left,
-          right,
-          insts,
-          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
-        )
+        val (t, l, r, insts2) =
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ SubOp(l, r, t, ""))
 
       case MultExpression(left, right) =>
-        val (t, l, r, insts2) = generateBinaryExpression(
-          left,
-          right,
-          insts,
-          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
-        )
+        val (t, l, r, insts2) =
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ MulOp(l, r, t, ""))
 
       case DivExpression(left, right) =>
-        val (t, l, r, insts2) = generateBinaryExpression(
-          left,
-          right,
-          insts,
-          expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.get
-        )
+        val (t, l, r, insts2) =
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
 
         return (t, insts2 :+ DivOp(l, r, t, ""))
 
       case AndExpression(left, right) =>
         val (t, l, r, insts2) =
-          generateBinaryExpression(left, right, insts, BooleanType)
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ AndOp(l, r, t, ""))
 
       case OrExpression(left, right) =>
         val (t, l, r, insts2) =
-          generateBinaryExpression(left, right, insts, BooleanType)
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ OrOp(l, r, t, ""))
 
       case ModExpression(left, right) =>
         val (t, l, r, insts2) =
-          generateBinaryExpression(left, right, insts, IntegerType)
+          generateBinaryExpression(left, right, insts, checkExpression(expr))
         return (t, insts2 :+ RemOp(l, r, t, ""))
 
       case NotExpression(exp) =>
@@ -405,11 +392,11 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
       case ArraySubscript(array, index) =>
         val (a, insts1) = generateExpression(array, insts)
         val (i, insts2) = generateExpression(index, insts1)
-        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
+        val t = new Temporary(checkExpressionSafe(expr))
         return (t, insts2 :+ ArrayGet(a, i, t, ""))
       case PointerAccessExpression(name) =>
         val p = Name(name, LocationType)
-        val t = new Temporary(expVisitor.checkExpression(expr, expVisitor.env).runA(expVisitor.env).value.value.getOrElse(NullType))
+        val t = new Temporary(checkExpressionSafe(expr))
         return (t, insts :+ GetValue(p, t, ""))
 
       case FieldAccessExpression(record, field) =>
@@ -477,18 +464,19 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
 
     val offset = typeByteSize.getOrElse(arrayType, 0) * index1
 
-
     Constant(offset.toString, IntegerType)
 
   }
 
   private def getRecordOffset(record: Name, field: String): Constant = {
-    val variables: List[VariableDeclaration] = record.t.asInstanceOf[RecordType].variables
+    val variables: List[VariableDeclaration] =
+      record.t.asInstanceOf[RecordType].variables
     val targetIndex: Int = variables.indexWhere(_.name == field)
     val variables2: List[VariableDeclaration] = variables.take(targetIndex + 1)
 
     val offset: Int = variables2.map {
-      case VariableDeclaration(_, ArrayType(size, vartype)) => size * typeByteSize.getOrElse(vartype, 0)
+      case VariableDeclaration(_, ArrayType(size, vartype)) =>
+        size * typeByteSize.getOrElse(vartype, 0)
       case VariableDeclaration(_, vartype) => typeByteSize.getOrElse(vartype, 0)
     }.sum
 
@@ -496,30 +484,81 @@ object TACodeGenerator extends CodeGenerator[List[TAC]] {
   }
 
   private def getFieldType(record: Name, field: String): Type = {
-    val variables: List[VariableDeclaration] = record.t.asInstanceOf[RecordType].variables
+    val variables: List[VariableDeclaration] =
+      record.t.asInstanceOf[RecordType].variables
     variables.find(_.name == field).map(_.variableType) match {
       case Some(ty) => ty
-      case None => throw new IllegalArgumentException("All variables need a Type")
+      case None =>
+        throw new IllegalArgumentException("All variables need a Type")
     }
   }
 
+  private def checkExpression(exp: Expression) =
+    TypeChecker.checkExpression(exp).run(env) match {
+      case Right((s, t)) =>
+        env.baseType(t) match {
+          case Some(t) => t
+          case None =>
+            throw new Exception(
+              s"TypeCheckerError: Error while trying to convert to base type."
+            )
+        }
+      case Left(err) => throw new Exception(s"TypeCheckerError: ${err}")
+    }
+
+  private def checkExpressionSafe(exp: Expression) =
+    TypeChecker.checkExpression(exp).run(env) match {
+      case Right((s, t)) =>
+        env.baseType(t) match {
+          case Some(t) => t
+          case None =>
+            throw new Exception(
+              s"TypeCheckerError: Error while trying to convert to base type."
+            )
+        }
+      case Left(err) => NullType
+    }
 
   def load_vars(
       vars: List[VariableDeclaration],
       consts: List[ASTConstant] = List()
   ): Unit = {
-    tc.checkModule(OberonModule("test", Set(), List(), consts, vars, List(), List(), None))
+    TypeChecker
+      .checkModule(
+        OberonModule("test", Set(), List(), consts, vars, List(), List(), None)
+      )
+      .runS(env) match {
+      case Right(s)  => { this.env = s }
+      case Left(err) => throw new Exception(s"TypeCheckerError: ${err}")
+    }
   }
 
-
-  def load_userTypes_and_vars(userTypes: List[UserDefinedType], vars: List[VariableDeclaration], consts: List[ASTConstant] = List()): Unit = {
-    tc.checkModule(OberonModule("test", Set(), userTypes, consts, vars, List(), List(), None))
+  def load_userTypes_and_vars(
+      userTypes: List[UserDefinedType],
+      vars: List[VariableDeclaration],
+      consts: List[ASTConstant] = List()
+  ): Unit = {
+    TypeChecker
+      .checkModule(
+        OberonModule(
+          "test",
+          Set(),
+          userTypes,
+          consts,
+          vars,
+          List(),
+          List(),
+          None
+        )
+      )
+      .runS(env) match {
+      case Right(s)  => { this.env = s }
+      case Left(err) => throw new Exception(s"TypeCheckerError: ${err}")
+    }
   }
 
   def reset(): Unit = {
-    var env = new Environment[Type]()
-    tc = new TypeChecker(env)
-    expVisitor = new ExpressionTypeChecker(tc, env)
+    this.env = new Environment[Type]()
     Temporary.reset
     LabelGenerator.reset
   }

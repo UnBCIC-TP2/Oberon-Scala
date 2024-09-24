@@ -1,7 +1,13 @@
 package br.unb.cic.oberon.printer
 
 import br.unb.cic.oberon.codegen.TACodeGenerator
-import br.unb.cic.oberon.ir.ast.{AddExpression, BooleanType, GTExpression, IntValue, LTExpression}
+import br.unb.cic.oberon.ir.ast.{
+  AddExpression,
+  BooleanType,
+  GTExpression,
+  IntValue,
+  LTExpression
+}
 import br.unb.cic.oberon.ir.tac.Temporary
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
@@ -22,7 +28,8 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
     val (t, operationList) = TACodeGenerator.generateExpression(expr, List())
 
     val expectedOutput = bl + "t0 = 1 + 2"
-    val tacDocumentToPrint = TACodePrinter.getTacDocumentStringFormatted(operationList)
+    val tacDocumentToPrint =
+      TACodePrinter.getTacDocumentStringFormatted(operationList)
 
     assert(expectedOutput == tacDocumentToPrint)
 
@@ -53,7 +60,5 @@ class TACodePrinterOberonCodeTest extends AnyFunSuite with BeforeAndAfterEach {
     assert(tacDocumentToPrint == expectedOutput)
 
   }
-
-
 
 }

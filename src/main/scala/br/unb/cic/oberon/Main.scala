@@ -87,9 +87,9 @@ object Main extends App with Oberon2ScalaParser {
     case Some(conf.repl)        => REPL.runREPL()
   }
 
-  private def compile() {
+  private def compile() = {
     val content = Files.readString(conf.compile.inputPath.get.get)
-    val module = parseAbs(parse(oberonParser,content))
+    val module = parseAbs(parse(oberonParser, content))
 
     conf.compile.backend.get.get match {
       case "c" => {
@@ -111,7 +111,7 @@ object Main extends App with Oberon2ScalaParser {
 
   private def interpret() = {
     val content = Files.readString(conf.interpreter.inputPath.get.get)
-    val module = parseAbs(parse(oberonParser,content))
+    val module = parseAbs(parse(oberonParser, content))
 
     val interpreter = new Interpreter()
     val result = interpreter.runInterpreter(module)
@@ -119,20 +119,16 @@ object Main extends App with Oberon2ScalaParser {
 
   private def typeCheck() = {
     val content = Files.readString(conf.tc.inputPath.get.get)
-    val module = parseAbs(parse(oberonParser,content))
-
+    val module = parseAbs(parse(oberonParser, content))
 
     // Alterar a instanciação do TypeChecker para fazer o checkModule ser ´parte do construtor
     // Dessa forma, os val visitor e errors passam a ser o mesmo.
     val env = new Environment[Type]()
-    val visitor = new TypeChecker(env)
-    val errors = visitor.checkModule(module).runA(env).value.written
-    
-    if (errors.isEmpty) {
-      println("The code is correctly typed")
-    } else {
-      println("Type errors detected:")
-      errors.filter(v => (v != "None")).foreach(v => println(v))
+    val errors = TypeChecker.checkModule(module).runA(env)
+
+    errors match {
+      case Left(error) => println(error)
+      case Right(_)    => println("The code is correctly typed")
     }
   }
 }
